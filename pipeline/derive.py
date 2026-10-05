@@ -234,9 +234,15 @@ def monthly(ind, frames: dict[str, pd.Series]) -> tuple[pd.DataFrame, dict]:
         g = d.resample("MS")
         out[ind.variants[k].source_id] = g.last() if v.get("how") == "last" else g.mean()
     df = pd.DataFrame(out).sort_index()
-    # The current month is partial: keep it, and say so.
+    # The current month is partial: keep it once it has 10 business days of
+    # data (an average of a few days is mostly noise), and say so.
     last = max(f.index.max() for f in frames.values())
     partial = last + pd.offsets.Day(1) <= last + pd.offsets.MonthEnd(0)
+    if partial:
+        days = sum(1 for d in next(iter(frames.values())).index if d >= last.replace(day=1))
+        if days < 10:
+            df = df[df.index < last.replace(day=1)]
+            return df, {"partial_month": None}
     return df, {"partial_month": last.strftime("%Y-%m-%d") if partial else None}
 
 

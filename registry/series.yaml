@@ -81,7 +81,7 @@ inputs:
   - {id: "bcra:57",  source: bcra, frequency: D, measure: flow, label: "Base money factor: redemption of quasi-currencies"}
   - {id: "bcra:58",  source: bcra, frequency: D, measure: flow, label: "Base money factor: fiscal liquidity notes (LEFI)"}
   - {id: "bcra:59",  source: bcra, frequency: D, measure: flow, label: "Base money factor: other operations"}
-  - {id: "bcra:29",  source: bcra, frequency: M, measure: flow, label: "REM: median expected inflation, next 12 months"}
+  - {id: "bcra:29",  source: bcra, frequency: M, measure: flow, allow_gaps: true, label: "REM: median expected inflation, next 12 months"}
   - {id: 4.4_DGI_2004_T_19, source: datos_gob, frequency: Q, measure: index,
      label: "INDEC gross fixed capital formation, current prices"}
 

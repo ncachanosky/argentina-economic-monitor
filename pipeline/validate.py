@@ -26,7 +26,8 @@ class Check:
         return not self.errors
 
 
-def check_series(new: pd.Series, old: pd.Series, frequency: str = "M", measure: str = "index") -> Check:
+def check_series(new: pd.Series, old: pd.Series, frequency: str = "M", measure: str = "index",
+                 allow_gaps: bool = False) -> Check:
     c = Check()
     new = new.dropna().sort_index()
 
@@ -43,7 +44,9 @@ def check_series(new: pd.Series, old: pd.Series, frequency: str = "M", measure: 
         expected = pd.date_range(new.index.min(), new.index.max(), freq="MS" if frequency == "M" else "QS")
         missing = expected.difference(new.index)
         if len(missing):
-            c.errors.append(f"{len(missing)} missing period(s), first {missing[0]:%Y-%m}")
+            msg = f"{len(missing)} missing period(s), first {missing[0]:%Y-%m}"
+            # Some sources have known historical holes (e.g. the REM survey).
+            (c.warnings if allow_gaps else c.errors).append(msg)
     if frequency == "D":
         # Business days: weekends and holidays are normal gaps; long ones get a look.
         gaps = new.index.to_series().diff().dt.days

@@ -65,7 +65,8 @@ def run(dry_run: bool = False, strict: bool = False) -> int:
 
             if problem is None:
                 new = res.data.loc[res.data["series_id"] == sid].set_index("date")["value"]
-                chk = validate.check_series(new, old, freq_of[sid], measure_of[sid])
+                chk = validate.check_series(new, old, freq_of[sid], measure_of[sid],
+                                            allow_gaps=meta[sid].get("allow_gaps", False))
                 if res.meta.get(sid, {}).get("units"):
                     entry["source_units"] = res.meta[sid]["units"]
                 if not chk.ok:

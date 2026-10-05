@@ -125,7 +125,7 @@ class Registry:
         for inp in self.inputs:
             m = out.setdefault(inp["id"], {"source": inp["source"], "frequency": inp["frequency"],
                                            "measure": inp.get("measure", "index"),
-                                           "static": bool(inp.get("static"))})
+                                           "static": bool(inp.get("static")), "allow_gaps": bool(inp.get("allow_gaps"))})
             if m["measure"] == "flow":
                 m["measure"] = inp.get("measure", "index")
         return out

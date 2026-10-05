@@ -331,7 +331,7 @@
       const end = vals[vals.length - 1];
       out.push({
         p, first: pts[0][0], last: pts[pts.length - 1][0], n: pts.length,
-        partial: pts[0][0] > w.first, ongoing: !w.last,
+        partial: freq === "D" ? isoMs(pts[0][0]) - isoMs(w.first) > 7 * dayMs : pts[0][0] > w.first, ongoing: !w.last,
         start, end, change: start === null || start === undefined ? null : measure === "rate" ? end - start : start ? (end / start - 1) * 100 : null,
         avg: isAnnualized(kind, measure) && levels
           ? (() => {
@@ -848,7 +848,8 @@
 
       Plotly.react(chartEl, traces, baseLayout({
         pct: t,
-        yaxis: isLog() ? { type: "log", ticksuffix: "", exponentformat: "power" } : { type: "linear" },
+        // Plain numbers on log axes unless the values are tiny (long-run price indices).
+        yaxis: isLog() ? { type: "log", ticksuffix: "", exponentformat: Math.min(...y.filter((q) => q > 0)) < 0.01 ? "power" : "none", tickformat: Math.min(...y.filter((q) => q > 0)) < 0.01 ? undefined : ",~r" } : { type: "linear" },
         extra: {
           bargap: 0.2, shapes, annotations, barmode: "group",
           showlegend: (state.byPres && state.transform !== "mom") || (ind.overlay && !state.byPres),
@@ -972,14 +973,15 @@
       return i;
     }
     let metric = metricFor(bstate.kind, false), refIdx = refFor(metric), refDate = ind.dates[refIdx];
+    const fmtRef = (iso) => (ind.frequency === "D" ? fmtDay(iso) : fmtMonth(iso));
     const INC = { label: "Incidence (pp)", short: "Contribution to the total's change, percentage points", suffix: " pp", signed: true, change: true };
     const totalInc = () => keys.reduce((a, k) => a + (metric[k][refIdx] || 0), 0);
     const WORDS = { mom: ["Month-over-month change", "m/m"], yoy: ["Year-over-year change", "y/y"], ytd: ["Year-to-date change", "YTD"],
       acc: ["Accumulated change (year to date vs. same months a year earlier)", "accumulated"], level: ["Level", ""] };
     const ytdNote = () => (bstate.kind === "ytd" ? ` (since Dec ${Number(refDate.slice(0, 4)) - 1})` : "");
-    const barTitleFor = () => isRate ? `${ind.units}, ${fmtMonth(refDate)}`
-      : bstate.inc ? `Incidence (contribution to total ${WORDS[bstate.kind][1]} change${ytdNote()}), ${fmtMonth(refDate)}; total ${(totalInc() > 0 ? "+" : "") + totalInc().toFixed(2)} pp`
-      : `${WORDS[bstate.kind][0]}${ytdNote()}, ${fmtMonth(refDate)}`;
+    const barTitleFor = () => isRate ? `${ind.units}, ${fmtRef(refDate)}`
+      : bstate.inc ? `Incidence (contribution to total ${WORDS[bstate.kind][1]} change${ytdNote()}), ${fmtRef(refDate)}; total ${(totalInc() > 0 ? "+" : "") + totalInc().toFixed(2)} pp`
+      : `${WORDS[bstate.kind][0]}${ytdNote()}, ${fmtRef(refDate)}`;
     let barTitle = barTitleFor();
     const barTitleEl = h("span", {}, `${barTitle}. `);
     function setBars() {
