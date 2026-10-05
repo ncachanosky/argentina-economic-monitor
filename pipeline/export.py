@@ -78,6 +78,27 @@ def contributions(ind, raw: pd.DataFrame) -> dict:
     }
 
 
+def sector_weights(ind, reg) -> dict | None:
+    """Fixed-base sector weights (% of base-year GDP) for incidence calculations."""
+    spec = ind.weights
+    if not spec:
+        return None
+    src = next((i for i in reg.indicators if i.id == spec["from"]), None)
+    if src is None or not src.contributions:
+        return None
+    raw = store.latest_frame([v.source_id for v in src.variants.values()])
+    year = raw.loc[str(spec["year"])]
+    if len(year) == 0:
+        return None
+    tot = year[src.variants[src.contributions["total"]].source_id].sum()
+    share = {k: year[v.source_id].sum() / tot * 100 for k, v in src.variants.items() if k != src.contributions["total"]}
+    out = {k: share[sk] for k, sk in spec["map"].items() if sk in share}
+    if spec.get("residual"):
+        excl = set(spec.get("exclude_from_residual", []))
+        out[spec["residual"]] = 100 - sum(v for k, v in share.items() if k not in excl)
+    return {"year": str(spec["year"]), "values": {k: round(v, 4) for k, v in out.items()}}
+
+
 def export(out: Path) -> None:
     reg = registry.load()
     status = json.loads(STATUS_PATH.read_text(encoding="utf-8")) if STATUS_PATH.exists() else {}
@@ -142,6 +163,8 @@ def export(out: Path) -> None:
         }
         if ind.kind == "contributions":
             payload["contributions"] = contributions(ind, raw_wide)
+        if ind.weights:
+            payload["weights"] = sector_weights(ind, reg)
         (out / f"{ind.id}.json").write_text(json.dumps(payload, separators=(",", ":")), encoding="utf-8")
 
         # The downloadable "all data" CSV keeps the source units (e.g. millions of 2004 pesos).

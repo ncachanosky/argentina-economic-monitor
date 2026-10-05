@@ -96,7 +96,7 @@ indicators:
       fishing:       {label: Fishing,                        id: 11.3_VIPAA_2004_M_5}
       mining:        {label: Mining & quarrying,             id: 11.3_ISD_2004_M_26}
       manufacturing: {label: Manufacturing,                  id: 11.3_VMASD_2004_M_23}
-      utilities:     {label: Electricity, gas & water,       id: 11.3_ITC_2004_M_21}
+      utilities:     {label: "Electricity, gas & water",       id: 11.3_ITC_2004_M_21}
       construction:  {label: Construction,                   id: 11.3_VMATC_2004_M_12}
       trade:         {label: Wholesale & retail trade,       id: 11.3_AGCS_2004_M_41}
       hotels:        {label: Hotels & restaurants,           id: 11.3_P_2004_M_20}
@@ -109,6 +109,19 @@ indicators:
       other_services: {label: Other community services,      id: 11.3_TAC_2004_M_60}
       net_taxes:     {label: Net taxes on products,          id: 11.3_IF_2004_M_25}
     default: {variant: [manufacturing, construction, agro], transform: yoy, start: "2016-01"}
+    # Sector weights = shares of 2004 GDP at constant prices, from the quarterly
+    # value added by industry (gdp_supply). Net taxes take the remainder.
+    # With these, incidences reproduce INDEC's published figures.
+    weights:
+      from: gdp_supply
+      year: "2004"
+      residual: net_taxes          # weight = 100 - all sector shares
+      exclude_from_residual: [net_taxes]
+      map: {agro: agro, fishing: fishing, mining: mining, manufacturing: manufacturing,
+            utilities: utilities, construction: construction, trade: trade, hotels: hotels,
+            transport: transport, finance: finance, real_estate: real_estate,
+            public_admin: public_admin, education: education, health: health,
+            other_services: other_services}
 
   - id: ipi
     topic: real_sector
@@ -298,7 +311,7 @@ indicators:
       fishing:      {label: Fishing,                            id: 6.2_P_2004_T_5}
       mining:       {label: Mining & quarrying,                 id: 6.2_EMC_2004_T_26}
       manufacturing: {label: Manufacturing,                     id: 6.2_IM_2004_T_23}
-      utilities:    {label: Electricity, gas & water,           id: 6.2_SEGA_2004_T_32}
+      utilities:    {label: "Electricity, gas & water",           id: 6.2_SEGA_2004_T_32}
       construction: {label: Construction,                       id: 6.2_C_2004_T_12}
       trade:        {label: Wholesale & retail trade,           id: 6.2_CMMR_2004_T_41}
       hotels:       {label: Hotels & restaurants,               id: 6.2_HR_2004_T_20}
@@ -317,7 +330,7 @@ indicators:
         - {key: goods,    label: Goods,                         color: copper,   add: [agro, fishing, mining, manufacturing, utilities, construction]}
         - {key: trade,    label: Trade & transport,             color: sky,      add: [trade, hotels, transport]}
         - {key: business, label: Finance & business services,   color: sage,     add: [finance, real_estate]}
-        - {key: public,   label: Public admin, education & health, color: lavender, add: [public_admin, education, health]}
+        - {key: public,   label: "Public admin, education & health", color: lavender, add: [public_admin, education, health]}
         - {key: other,    label: Other services & net taxes,    color: neutral,  residual: true}
       lines: groups
       lines_title: Industry groups, year-over-year change

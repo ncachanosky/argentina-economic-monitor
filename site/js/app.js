@@ -576,8 +576,12 @@
     const keys = Object.keys(ind.variants);
     const T = tfs(ind);
     const isRate = ind.measure === "rate";
-    const barKind = isRate ? "level" : "yoy";      // what the ranked bars show
-    const barSpec = T[barKind];
+    // What the ranked bars show: level (rates), y/y, or incidence (y/y
+    // contribution to the total in pp, when fixed-base sector weights exist).
+    const W = ind.weights && ind.weights.values;
+    const INC = { label: "Incidence (pp)", short: "Contribution to total y/y change, percentage points", suffix: " pp", signed: true, change: true };
+    const barState = { kind: isRate ? "level" : "yoy" };
+    let barKind = barState.kind, barSpec = T[barKind];
     const defaults = [].concat(ind.default.variant).slice(0, MAX_PANEL_SERIES);
     const slots = new Map(defaults.map((k, i) => [k, i]));   // color follows the component, not its rank
     const state = { transform: ind.default.transform || barKind, range: rangeFromDefault(ind) };
@@ -594,11 +598,36 @@
     let table;
 
     // Bar metric for every component, at the most recent month they all share.
-    const metric = Object.fromEntries(keys.map((k) => [k, transform(ind.dates, ind.variants[k].values, barKind, ind.measure, ind.frequency)]));
+    const yoyMetric = Object.fromEntries(keys.map((k) => [k, transform(ind.dates, ind.variants[k].values, isRate ? "level" : "yoy", ind.measure, ind.frequency)]));
     let refIdx = ind.dates.length - 1;
-    while (refIdx > 0 && keys.some((k) => metric[k][refIdx] === null)) refIdx--;
+    while (refIdx > 0 && keys.some((k) => yoyMetric[k][refIdx] === null)) refIdx--;
     const refDate = ind.dates[refIdx];
-    const barTitle = isRate ? `${ind.units}, ${fmtMonth(refDate)}` : `Year-over-year change, ${fmtMonth(refDate)}`;
+    // Incidence_k,t = w_k (X_k,t - X_k,t-12) / sum_j w_j X_j,t-12 * 100
+    const incMetric = W ? (() => {
+      const lag = ind.frequency === "Q" ? 4 : 12;
+      const out = Object.fromEntries(keys.map((k) => [k, ind.dates.map(() => null)]));
+      for (let i = lag; i < ind.dates.length; i++) {
+        let den = 0, ok = true;
+        for (const k of keys) { const p = ind.variants[k].values[i - lag]; if (W[k] === undefined) continue; if (p === null) { ok = false; break; } den += W[k] * p; }
+        if (!ok || !den) continue;
+        for (const k of keys) {
+          const a = ind.variants[k].values[i], p = ind.variants[k].values[i - lag];
+          if (W[k] !== undefined && a !== null && p !== null) out[k][i] = (W[k] * (a - p)) / den * 100;
+        }
+      }
+      return out;
+    })() : null;
+    let metric = yoyMetric;
+    const totalInc = () => keys.reduce((a, k) => a + (incMetric[k][refIdx] || 0), 0);
+    const barTitleFor = () => isRate ? `${ind.units}, ${fmtMonth(refDate)}`
+      : barKind === "incidence" ? `Incidence (contribution to total y/y change), ${fmtMonth(refDate)}; total ${(totalInc() > 0 ? "+" : "") + totalInc().toFixed(2)} pp`
+      : `Year-over-year change, ${fmtMonth(refDate)}`;
+    let barTitle = barTitleFor();
+    const barTitleEl = h("span", {}, `${barTitle}. `);
+    const bSeg = W ? segmented([["yoy", "y/y %"], ["incidence", "Incidence (pp)"]], barKind, (k) => {
+      barKind = k; barSpec = k === "incidence" ? INC : T.yoy; metric = k === "incidence" ? incMetric : yoyMetric;
+      barTitle = barTitleFor(); barTitleEl.textContent = `${barTitle}. `; bSeg.update(k); drawBars();
+    }, "Bar metric") : null;
 
     function freeSlot() { const used = new Set(slots.values()); for (let i = 0; i < MAX_PANEL_SERIES; i++) if (!used.has(i)) return i; return -1; }
 
@@ -623,13 +652,13 @@
         y: order.map((k) => ind.variants[k].label),
         x: shown,
         marker: { color: colors },
-        customdata: order.map((k, i) => [k, actual[i]]),
-        text: actual.map((v) => fmtNum(v, barSpec)),
+        customdata: order.map((k, i) => [k, actual[i], W && W[k] !== undefined ? W[k] : null]),
+        text: actual.map((v) => (barKind === "incidence" ? (v > 0 ? "+" : "") + v.toFixed(2) + " pp" : fmtNum(v, barSpec))),
         textposition: clipped.map((c) => (c ? "inside" : "outside")),
         insidetextanchor: "end",
         textfont: { family: cssVar("--font-ui") || "Calibri, Arial, sans-serif", size: forExport ? 15 : 12, color: clipped.map((c, i) => (c && slots.has(order[i]) ? "#FFFFFF" : inkColor)) },
         cliponaxis: false,
-        hovertemplate: `%{y}: <b>%{customdata[1]:,.1f}${barSpec.suffix}</b><extra></extra>`,
+        hovertemplate: `%{y}: <b>%{customdata[1]:,${barKind === "incidence" ? ".2f" : ".1f"}}${barSpec.suffix}</b>${W ? `<br>Weight: %{customdata[2]:.1f}% of ${ind.weights.year} GDP` : ""}<extra></extra>`,
         _lightColors: colors,
       };
       // Room for outside labels; the broken bar ends at the axis edge.
@@ -703,7 +732,7 @@
     const onBarPNG = () => {
       const b = bars(true);
       exportPNG({ ...ind, title: `${ind.title}: ${barTitle.charAt(0).toLowerCase() + barTitle.slice(1)}` }, b.traces,
-        isRate ? `Latest month, by ${noun}` : `Percent change vs. same month a year earlier${seriesNote}`, barSpec, `${ind.id}_latest_${barKind}.png`,
+        isRate ? `Latest month, by ${noun}` : barKind === "incidence" ? `Percentage points; weights: shares of ${ind.weights.year} GDP${seriesNote}` : `Percent change vs. same month a year earlier${seriesNote}`, barSpec, `${ind.id}_latest_${barKind}.png`,
         { shapes: b.shapes, xrange: b.range, xsuffix: barSpec.suffix });
     };
     const onCSV = () => {
@@ -716,10 +745,15 @@
     };
 
     barNote = h("span", {});
+    const weightsTable = W ? h("details", { class: "table-view" }, h("summary", {}, `Sector weights (share of ${ind.weights.year} GDP at constant prices)`),
+      h("div", { class: "table-scroll" }, h("table", { class: "data" },
+        h("thead", {}, h("tr", {}, h("th", {}, "Sector"), h("th", {}, "Weight"))),
+        h("tbody", {}, keys.filter((k) => W[k] !== undefined).sort((a, b) => W[b] - W[a]).map((k) => h("tr", {}, h("td", {}, ind.variants[k].label), h("td", {}, W[k].toFixed(1) + "%"))))))) : null;
     card.append(
-      h("p", { class: "hint" }, `${barTitle}. `,
+      bSeg ? h("div", { class: "controls" }, bSeg) : null,
+      h("p", { class: "hint" }, barTitleEl,
         h("button", { class: "btn", type: "button", onclick: onBarPNG, style: "padding:1px 8px;font-size:12px" }, "PNG"), barNote),
-      barEl,
+      barEl, weightsTable,
       h("div", { class: "controls", style: "margin-top:14px" }, tSeg, h("span", { class: "spacer" }), rSeg),
       chipsEl, chipsNote, lineEl);
     table = tableView([], [], T[state.transform], ind.frequency);

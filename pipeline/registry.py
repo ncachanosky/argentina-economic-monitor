@@ -46,6 +46,7 @@ class Indicator:
     source_units: str | None = None   # units of the source data (noted on charts; kept in raw CSV)
     note: str | None = None
     contributions: dict | None = None
+    weights: dict | None = None
 
 
 HEX = __import__("re").compile(r"^#[0-9A-Fa-f]{6}$")
@@ -169,6 +170,7 @@ def load(path: Path = REGISTRY_PATH, releases_path: Path = RELEASES_PATH) -> Reg
                 source_units=item.get("source_units"),
                 note=" ".join(str(item["note"]).split()) if item.get("note") else None,
                 contributions=contrib,
+                weights=item.get("weights"),
             )
         )
 

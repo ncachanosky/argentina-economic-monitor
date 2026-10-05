@@ -192,3 +192,15 @@ def test_contributions_add_up_to_total():
     s = np.sum([g["values"] for g in out["groups"]], axis=0)
     assert np.allclose(tot, s, atol=1e-4)
     assert len(out["dates"]) == 8
+
+
+def test_registry_flow_maps_have_no_stray_keys():
+    """An unquoted comma in a YAML flow map ({label: A, b, id: x}) silently
+    truncates the label and adds a stray key; catch that."""
+    import yaml
+    raw = yaml.safe_load(registry.REGISTRY_PATH.read_text(encoding="utf-8"))
+    for ind in raw["indicators"]:
+        for k, v in ind["variants"].items():
+            assert set(v) <= {"label", "id"}, (ind["id"], k, v)
+        for g in (ind.get("contributions") or {}).get("groups", []):
+            assert set(g) <= {"key", "label", "color", "add", "subtract", "residual"}, (ind["id"], g)
