@@ -48,13 +48,9 @@ topics:
   - id: real_sector
     title: Real Sector
     description: >-
-      Monthly indicators of economic activity: the INDEC monthly activity
-      estimator (EMAE), manufacturing, and construction.
-  - id: gdp
-    title: GDP & Demand
-    description: >-
-      Quarterly national accounts at constant 2004 prices: GDP and the
-      expenditure components behind it.
+      Economic activity: the monthly activity estimator (EMAE) by sector,
+      manufacturing, construction and capacity utilization, plus quarterly
+      GDP by expenditure and by industry.
 
 indicators:
   - id: emae
@@ -216,7 +212,7 @@ indicators:
 
   # ---------------- GDP & Demand (quarterly) ----------------
   - id: gdp
-    topic: gdp
+    topic: real_sector
     wide: true
     kind: variants
     title: Gross Domestic Product (GDP)
@@ -241,7 +237,7 @@ indicators:
     headline: {variant: sa, transform: mom}
 
   - id: gdp_demand
-    topic: gdp
+    topic: real_sector
     kind: contributions
     measure: flow
     title: What Drives GDP Growth
@@ -284,7 +280,7 @@ indicators:
     default: {variant: gdp, transform: yoy, start: "2016-01"}
 
   - id: gdp_supply
-    topic: gdp
+    topic: real_sector
     kind: contributions
     measure: flow
     title: Which Industries Drive GDP Growth

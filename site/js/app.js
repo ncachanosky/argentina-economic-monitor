@@ -51,6 +51,7 @@
     for (const kid of kids.flat()) if (kid !== null && kid !== undefined) el.append(kid);
     return el;
   };
+  const appendAll = (el, ...kids) => el.append(...kids.flat().filter((k) => k !== null && k !== undefined && k !== false));
   const cssVar = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
   const isDark = () => {
     const t = document.documentElement.dataset.theme;
@@ -553,12 +554,12 @@
       downloadBlob(toCSV(header, rows), `${fileTag()}.csv`, "text/csv");
     };
 
-    card.append(
+    appendAll(card, 
       h("div", { class: "controls" }, vSeg, tSeg, h("span", { class: "spacer" }), rSeg),
       h("div", { class: "controls" }, baseWrap, presBtn),
       hint, chartEl, statsEl);
     table = tableView([], [], false, ind.frequency);
-    card.append(table, ind.note ? h("p", { class: "chips-note" }, ind.note) : null, footer(ind, onPNG, onCSV));
+    appendAll(card, table, ind.note ? h("p", { class: "chips-note" }, ind.note) : null, footer(ind, onPNG, onCSV));
     card.draw = draw;
     return card;
   }
@@ -749,7 +750,7 @@
       h("div", { class: "table-scroll" }, h("table", { class: "data" },
         h("thead", {}, h("tr", {}, h("th", {}, "Sector"), h("th", {}, "Weight"))),
         h("tbody", {}, keys.filter((k) => W[k] !== undefined).sort((a, b) => W[b] - W[a]).map((k) => h("tr", {}, h("td", {}, ind.variants[k].label), h("td", {}, W[k].toFixed(1) + "%"))))))) : null;
-    card.append(
+    appendAll(card, 
       bSeg ? h("div", { class: "controls" }, bSeg) : null,
       h("p", { class: "hint" }, barTitleEl,
         h("button", { class: "btn", type: "button", onclick: onBarPNG, style: "padding:1px 8px;font-size:12px" }, "PNG"), barNote),
@@ -757,7 +758,7 @@
       h("div", { class: "controls", style: "margin-top:14px" }, tSeg, h("span", { class: "spacer" }), rSeg),
       chipsEl, chipsNote, lineEl);
     table = tableView([], [], T[state.transform], ind.frequency);
-    card.append(table, ind.note ? h("p", { class: "chips-note" }, ind.note) : null, footer(ind, onPNG, onCSV));
+    appendAll(card, table, ind.note ? h("p", { class: "chips-note" }, ind.note) : null, footer(ind, onPNG, onCSV));
     card.draw = () => {
       drawAll();
       if (!barEl.dataset.bound) {
@@ -869,7 +870,7 @@
 
     // Latest-quarter summary line.
     const parts = C.groups.map((g) => `${g.label} ${fmtNum(g.values[latestI], pp)}`).join(" · ");
-    card.append(
+    appendAll(card, 
       h("p", { class: "hint" }, `${fP(C.dates[latestI])}: GDP ${fmtNum(C.total.values[latestI], pct)} y/y — ${parts}`),
       h("div", { class: "controls" }, h("span", { class: "spacer" }), rSeg),
       barEl,
@@ -877,7 +878,7 @@
         h("button", { class: "btn", type: "button", onclick: onLinePNG, style: "padding:1px 8px;font-size:12px" }, "PNG")),
       chipsEl, lineEl);
     table = tableView([], [], pp, ind.frequency);
-    card.append(table, ind.note ? h("p", { class: "chips-note" }, ind.note) : null, footer(ind, onPNG, onCSV));
+    appendAll(card, table, ind.note ? h("p", { class: "chips-note" }, ind.note) : null, footer(ind, onPNG, onCSV));
     card.draw = drawAll;
     return card;
   }
