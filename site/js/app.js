@@ -1071,7 +1071,7 @@
     const shown = new Set(C.default_lines || lineKeys.slice(0, 3));
 
     const card = cardFrame(ind, true);
-    const barEl = h("div", { class: "chart tall-ish", role: "img", "aria-label": "Contributions to GDP growth" });
+    const barEl = h("div", { class: "chart tall-ish", role: "img", "aria-label": `Contributions to ${C.total.label} growth` });
     const lineEl = h("div", { class: "chart", role: "img", "aria-label": "Components, year-over-year change" });
     const chipsEl = h("div", { class: "chips", role: "group", "aria-label": "Components to compare" });
     const rSeg = segmented(rangeKeys(ind).map((k) => [k, k]), state.range, (k) => { state.range = k; drawAll(); }, "Time range");
@@ -1139,7 +1139,7 @@
     }
 
     const latestI = C.dates.length - 1;
-    const onPNG = () => exportPNG(ind, barTraces(), `Contributions to year-over-year GDP growth, percentage points · latest: ${fP(C.dates[latestI])}`,
+    const onPNG = () => exportPNG(ind, barTraces(), `Contributions to year-over-year ${C.total.label} growth, percentage points · latest: ${fP(C.dates[latestI])}`,
       pp, `${ind.id}_contributions.png`, { barmode: "relative" });
     const onLinePNG = () => exportPNG({ ...ind, title: C.lines_title || "Components, year-over-year change" }, lineTraces(), `Percent change vs. same ${ind.frequency === "Q" ? "quarter" : "month"} a year earlier · constant 2004 prices`, pct, `${ind.id}_lines_yoy.png`);
     const onCSV = () => {
@@ -1152,7 +1152,7 @@
     // Latest-quarter summary line.
     const parts = C.groups.map((g) => `${g.label} ${fmtNum(g.values[latestI], pp)}`).join(" · ");
     appendAll(card, 
-      h("p", { class: "hint" }, `${fP(C.dates[latestI])}: GDP ${fmtNum(C.total.values[latestI], pct)} y/y — ${parts}`),
+      h("p", { class: "hint" }, `${fP(C.dates[latestI])}: ${C.total.label} ${fmtNum(C.total.values[latestI], pct)} y/y — ${parts}`),
       h("div", { class: "controls" }, h("span", { class: "spacer" }), rSeg),
       barEl,
       h("p", { class: "hint", style: "margin-top:14px" }, `${C.lines_title || "Components, year-over-year change"}. `,
