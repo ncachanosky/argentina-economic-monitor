@@ -1,0 +1,117 @@
+# Argentina Economic Monitor — series registry
+#
+# Single source of truth for everything the site shows. To add a series,
+# add an entry here; the pipeline, exports, and front end all read from it.
+#
+# Concepts
+#   topic      a site section (Real Sector, Monetary, Trade, ...)
+#   indicator  one chart card. It has one or more `variants` (original,
+#              seasonally adjusted, trend-cycle, or sector components),
+#              each mapped to a source series id.
+#   kind       `variants`: mutually exclusive views of the same series
+#              (toggle between them); `panel`: several components shown
+#              together (e.g. EMAE by sector).
+#
+# Source ids for `datos_gob` were taken from the API's own search and
+# metadata endpoints (apis.datos.gob.ar/series/api). Run
+# `python -m pipeline.verify` to re-check every id against the live API.
+
+site:
+  title: Argentina Economic Monitor
+  publisher: Economic Order
+  publisher_url: ""   # TODO: Economic Order Substack URL (used for header link and subscribe button)
+  repo_url: https://github.com/ncachanosky/argentina-economic-monitor
+
+topics:
+  - id: real_sector
+    title: Real Sector
+    description: >-
+      Monthly indicators of economic activity: the INDEC monthly activity
+      estimator (EMAE), manufacturing, and construction.
+
+indicators:
+  - id: emae
+    topic: real_sector
+    kind: variants
+    title: Monthly Economic Activity Estimator (EMAE)
+    short_title: EMAE
+    description: >-
+      INDEC's monthly proxy for GDP. The seasonally adjusted series is the
+      standard read on month-to-month momentum.
+    source: datos_gob
+    source_label: INDEC, via datos.gob.ar
+    frequency: M
+    units: Index, 2004 = 100
+    variants:
+      sa:       {label: Seasonally adjusted, id: 143.3_NO_PR_2004_A_31}
+      original: {label: Original,            id: 143.3_NO_PR_2004_A_21}
+      trend:    {label: Trend-cycle,         id: 143.3_NO_PR_2004_A_28}
+    default: {variant: sa, transform: level, start: "2016-01"}
+    headline: {variant: sa, transform: mom}
+
+  - id: emae_sectors
+    topic: real_sector
+    kind: panel
+    title: EMAE by Sector
+    short_title: EMAE sectors
+    description: >-
+      Year-over-year change by sector, original (not seasonally adjusted)
+      series. Select sectors to compare their paths.
+    source: datos_gob
+    source_label: INDEC, via datos.gob.ar
+    frequency: M
+    units: Index, 2004 = 100
+    variants:
+      agro:          {label: Agriculture & livestock,        id: 11.3_ISOM_2004_M_39}
+      fishing:       {label: Fishing,                        id: 11.3_VIPAA_2004_M_5}
+      mining:        {label: Mining & quarrying,             id: 11.3_ISD_2004_M_26}
+      manufacturing: {label: Manufacturing,                  id: 11.3_VMASD_2004_M_23}
+      utilities:     {label: Electricity, gas & water,       id: 11.3_ITC_2004_M_21}
+      construction:  {label: Construction,                   id: 11.3_VMATC_2004_M_12}
+      trade:         {label: Wholesale & retail trade,       id: 11.3_AGCS_2004_M_41}
+      hotels:        {label: Hotels & restaurants,           id: 11.3_P_2004_M_20}
+      transport:     {label: Transport & communications,     id: 11.3_EMC_2004_M_25}
+      finance:       {label: Financial intermediation,       id: 11.3_IM_2004_M_25}
+      real_estate:   {label: Real estate & business services, id: 11.3_SEGA_2004_M_48}
+      public_admin:  {label: Public administration,          id: 11.3_C_2004_M_60}
+      education:     {label: Education,                      id: 11.3_CMMR_2004_M_10}
+      health:        {label: Health & social services,       id: 11.3_HR_2004_M_24}
+      other_services: {label: Other community services,      id: 11.3_TAC_2004_M_60}
+      net_taxes:     {label: Net taxes on products,          id: 11.3_IF_2004_M_25}
+    default: {variant: [manufacturing, construction, agro], transform: yoy, start: "2016-01"}
+
+  - id: ipi
+    topic: real_sector
+    kind: variants
+    title: Manufacturing Production Index (IPI)
+    short_title: IPI manufacturing
+    description: >-
+      INDEC's index of manufacturing output. Published since 2016.
+    source: datos_gob
+    source_label: INDEC, via datos.gob.ar
+    frequency: M
+    units: Index
+    variants:
+      sa:       {label: Seasonally adjusted, id: 453.1_SERIE_DESEADA_0_0_24_58}
+      original: {label: Original,            id: 453.1_SERIE_ORIGNAL_0_0_14_46}
+    default: {variant: sa, transform: level, start: "2016-01"}
+    headline: {variant: sa, transform: mom}
+
+  - id: isac
+    topic: real_sector
+    kind: variants
+    title: Construction Activity Index (ISAC)
+    short_title: ISAC construction
+    description: >-
+      INDEC's synthetic indicator of construction activity, built from
+      input demand (cement, steel, asphalt, and others).
+    source: datos_gob
+    source_label: INDEC, via datos.gob.ar
+    frequency: M
+    units: Index, 2004 = 100
+    variants:
+      sa:       {label: Seasonally adjusted, id: 33.2_ISAC_SIN_EDAD_0_M_23_56}
+      original: {label: Original,            id: 33.2_ISAC_NIVELRAL_0_M_18_63}
+      trend:    {label: Trend-cycle,         id: 33.2_ISAC_CICLOCIA_0_M_20_62}
+    default: {variant: sa, transform: level, start: "2016-01"}
+    headline: {variant: sa, transform: mom}

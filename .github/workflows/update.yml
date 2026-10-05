@@ -1,0 +1,79 @@
+name: Update data and deploy
+
+# Daily: fetch every registry series, validate, record new vintages,
+# commit any changes, then build and publish the site to GitHub Pages.
+on:
+  schedule:
+    # 10:30 UTC = 07:30 Buenos Aires. INDEC releases at 16:00 local, so a
+    # second run picks up same-day releases.
+    - cron: "30 10 * * *"
+    - cron: "30 20 * * *"
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ["site/**", "pipeline/**", "registry/**", ".github/workflows/update.yml"]
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: update-and-deploy
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install
+        run: pip install -r requirements.txt
+
+      - name: Test
+        run: python -m pytest -q
+
+      - name: Fetch, validate, store
+        # Skip fetching on code-only pushes; just rebuild the site.
+        if: github.event_name != 'push'
+        run: python -m pipeline.update
+
+      - name: Commit new data
+        if: github.event_name != 'push'
+        run: |
+          git config user.name "aem-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/
+          if git diff --cached --quiet; then
+            echo "No data changes."
+          else
+            git commit -m "data: update $(date -u +%Y-%m-%d)"
+            git push
+          fi
+
+      - name: Build site
+        run: |
+          mkdir -p _site
+          cp -r site/. _site/
+          python -m pipeline.export --out _site/data
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: update
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

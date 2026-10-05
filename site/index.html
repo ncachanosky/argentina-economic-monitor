@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Argentina Economic Monitor</title>
+  <meta name="description" content="Interactive, daily-updated charts of Argentina's economy: economic activity (EMAE), manufacturing, construction and more. From Economic Order.">
+  <meta property="og:title" content="Argentina Economic Monitor">
+  <meta property="og:description" content="Interactive, daily-updated charts of Argentina's economy. From Economic Order.">
+  <meta property="og:type" content="website">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect x='2' y='2' width='12' height='12' rx='3' fill='%23B87333'/%3E%3C/svg%3E">
+  <script>
+    // Apply the saved theme before first paint to avoid a flash.
+    try { var t = localStorage.getItem("aem-theme"); if (t) document.documentElement.dataset.theme = t; } catch (e) {}
+  </script>
+  <link rel="stylesheet" href="css/theme.css">
+  <script src="https://cdn.jsdelivr.net/npm/plotly.js-basic-dist-min@3.7.0/plotly-basic.min.js" defer></script>
+  <script src="js/app.js" defer></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap">
+      <a class="brand" href="./" aria-label="Argentina Economic Monitor, home">
+        <span class="brand-name">Argentina Economic Monitor</span>
+        <span class="brand-by">by Economic Order</span>
+      </a>
+      <nav class="nav" id="nav" aria-label="Topics"></nav>
+      <div class="header-tools">
+        <a class="btn btn-primary" id="subscribe" href="#" hidden>Subscribe</a>
+        <button class="btn icon-btn" id="theme-toggle" type="button" aria-label="Toggle dark mode" title="Toggle dark mode">
+          <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1Zm0 1.5v11a5.5 5.5 0 0 1 0-11Z"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="intro">
+      <h1>Argentina's economy, updated daily</h1>
+      <p>Official statistics, checked every morning against the source and charted as soon as a new release lands. Every chart is interactive and exportable as an image or data file.</p>
+      <div class="meta-line" id="build-meta"></div>
+    </section>
+    <div class="tiles" id="tiles" aria-label="Latest readings"></div>
+    <div id="topics"><div class="loading">Loading data…</div></div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap cols">
+      <div>
+        <h4>About</h4>
+        <p>The Argentina Economic Monitor is a project of <a id="eo-link" href="#">Economic Order</a>, by Nicolás Cachanosky. Data are pulled automatically from official sources each day, validated, and stored with their full revision history.</p>
+        <p>Source data: INDEC and other official agencies via <a href="https://datos.gob.ar/">datos.gob.ar</a> (CC BY 4.0). Charts and transformations are ours; errors are ours too. Corrections are welcome on <a id="repo-link" href="#">GitHub</a>.</p>
+      </div>
+      <div>
+        <h4>Data</h4>
+        <p>Each chart offers the series as CSV. Full revision histories (every published vintage) are in <code>data/vintages/</code>.</p>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>
