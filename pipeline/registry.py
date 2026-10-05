@@ -13,7 +13,7 @@ RELEASES_PATH = ROOT / "registry" / "releases.yaml"
 KINDS = {"variants", "panel", "contributions"}
 DERIVE_METHODS = {"splice", "reweight"}
 RANGE_KEYS = {"2Y", "5Y", "10Y", "25Y", "50Y", "Max"}
-TRANSFORMS = {"level", "yoy", "mom", "ytd"}
+TRANSFORMS = {"level", "yoy", "mom", "ytd", "acc"}
 FREQUENCIES = {"M", "Q"}
 
 

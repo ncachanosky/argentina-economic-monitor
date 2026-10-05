@@ -113,7 +113,7 @@ indicators:
     title: EMAE by Sector
     short_title: EMAE sectors
     description: >-
-      Year-over-year change by sector, original (not seasonally adjusted)
+      Change by sector, original (not seasonally adjusted)
       series. Select sectors to compare their paths.
     release: emae
     source: datos_gob
@@ -137,6 +137,9 @@ indicators:
       health:        {label: Health & social services,       id: 11.3_HR_2004_M_24}
       other_services: {label: Other community services,      id: 11.3_TAC_2004_M_60}
       net_taxes:     {label: Net taxes on products,          id: 11.3_IF_2004_M_25}
+    # Bars: y/y and INDEC's accumulated change (year to date vs. the same months
+    # a year earlier). No m/m: sector series are not seasonally adjusted.
+    bar_transforms: [yoy, acc]
     default: {variant: [manufacturing, construction, agro], transform: yoy, start: "2016-01"}
     # Sector weights = shares of 2004 GDP at constant prices, from the quarterly
     # value added by industry (gdp_supply). Net taxes take the remainder.
@@ -398,10 +401,11 @@ indicators:
     title: Consumer Prices since 1943, Corrected for the INDEC Intervention
     short_title: CPI, long run
     description: >-
-      From January 2007 until the statistical emergency of late 2015, INDEC's
-      CPI understated inflation. The corrected series replaces January 2007 to
-      April 2016 with a composite of private estimates; the official series
-      is the CPI as INDEC published it.
+      From January 2007 to October 2015, the last figure published before the
+      change of government, INDEC's CPI understated inflation. The new INDEC
+      then suspended the CPI until it was rebuilt (no data for November 2015 to
+      April 2016). The corrected series uses a composite of private estimates
+      for both periods; the official series is the CPI as INDEC published it.
     release: ipc
     source: derived
     source_label: "INDEC; composite of private estimates for Jan 2007 - Apr 2016"
@@ -417,9 +421,11 @@ indicators:
       changes. Both series are equal through Dec 2006, so in levels the
       distance between them is the inflation the official figures left out.
       Corrected: the same, with the private composite from Jan 2007 to Apr 2016.
+    # Two different periods, drawn differently and explained in a key above
+    # the chart: manipulated figures (shaded) and no figures at all (outlined).
     bands:
-      - {start: "2007-01-01", end: "2015-10-01", label: INDEC intervention}
-      - {start: "2015-11-01", end: "2016-04-01"}
+      - {start: "2007-01-01", end: "2015-10-01", key: "INDEC intervention: official figures understated (Jan 2007 - Oct 2015)"}
+      - {start: "2015-11-01", end: "2016-04-01", style: outline, key: "Statistical emergency: no official CPI published (Nov 2015 - Apr 2016)"}
     summary_windows:
       - {label: "Jan 2007 - Oct 2015", base: "2006-12-01", end: "2015-10-01"}
     default: {variant: corrected, transform: yoy, range: 25Y, base: "2006-12-01"}

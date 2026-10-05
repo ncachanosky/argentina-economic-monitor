@@ -24,6 +24,7 @@
     yoy:   { label: "y/y %", short: "Year-over-year change, %", suffix: "%", signed: true, change: true },
     mom:   { label: "m/m %", short: "Month-over-month change, %", suffix: "%", signed: true, change: true },
     ytd:   { label: "YTD %", short: "Year to date: change since December of the previous year, %", suffix: "%", signed: true, change: true },
+    acc:   { label: "Accum. y/y %", short: "Accumulated: year to date vs. the same months a year earlier, %", suffix: "%", signed: true, change: true },
   };
   const RATE_TRANSFORMS = {
     level: { label: "Level", short: null, suffix: "%", signed: false, change: false },
@@ -93,10 +94,24 @@
   function lagOf(kind, iso, freq) {
     if (kind === "yoy") return 12;
     if (kind === "ytd") return Number(iso.slice(5, 7));
+    if (kind === "acc") return 12;
     return freq === "Q" ? 3 : 1;
+  }
+  // Running sum of the months of each calendar year so far (null if a month is
+  // missing). INDEC's "accumulated" change is the y/y change of this sum.
+  function yearToDateSum(dates, values) {
+    let year = null, acc = 0, ok = true;
+    return values.map((v, i) => {
+      const y = dates[i].slice(0, 4);
+      if (y !== year) { year = y; acc = 0; ok = dates[i].slice(5, 7) === "01"; }
+      if (v === null) ok = false;
+      acc += v || 0;
+      return ok ? acc : null;
+    });
   }
   function transform(dates, values, kind, measure, freq) {
     if (kind === "level") return values.slice();
+    if (kind === "acc") return transform(dates, yearToDateSum(dates, values), "yoy", measure, freq);
     const diff = measure === "rate";
     const mi = dates.map(monthIndex);
     const pos = new Map(mi.map((m, i) => [m, i]));
@@ -252,7 +267,10 @@
   }
 
   // Per-term statistics on a full (not range-clipped) series.
-  function termStats(dates, y, isLevel, measure, freq) {
+  // The average of a compounding rate (m/m, q/q) is geometric:
+  // (prod(1 + r/100))^(1/n) - 1, the constant rate giving the same cumulative change.
+  const isGeometric = (kind, measure) => kind === "mom" && measure !== "rate";
+  function termStats(dates, y, isLevel, measure, freq, kind) {
     const idx = new Map(dates.map((d, i) => [d, i]));
     const out = [];
     for (const p of PRESIDENCIES) {
@@ -272,7 +290,9 @@
         p, first: pts[0][0], last: pts[pts.length - 1][0], n: pts.length,
         partial: pts[0][0] > w.first, ongoing: !w.last,
         start, end, change: start === null || start === undefined ? null : measure === "rate" ? end - start : start ? (end / start - 1) * 100 : null,
-        avg: vals.reduce((a, b) => a + b, 0) / vals.length,
+        avg: isGeometric(kind, measure)
+          ? (Math.exp(vals.reduce((a, b) => a + Math.log(1 + b / 100), 0) / vals.length) - 1) * 100
+          : vals.reduce((a, b) => a + b, 0) / vals.length,
         min: vals[iMin], minAt: pts[iMin][0], max: vals[iMax], maxAt: pts[iMax][0],
       });
     }
@@ -378,8 +398,8 @@
     return h("details", { class: "table-view" }, h("summary", {}, "Show yearly change"),
       h("div", { class: "table-scroll" }, h("table", { class: "data" },
         h("thead", {}, h("tr", {}, h("th", {}, "Year"),
-          h("th", { title: `Year to date vs. the same months of the previous year, ${acc.label.toLowerCase()} series` }, "Accumulated y/y"),
-          h("th", { title: `Latest month of the year vs. the previous December, ${wy.label.toLowerCase()} series` }, "Within year (Dec/Dec)"))),
+          h("th", { title: `Year to date vs. the same months of the previous year, ${acc.label.toLowerCase()} series` }, `Accumulated y/y (${acc.label.toLowerCase()})`),
+          h("th", { title: `Latest month of the year vs. the previous December, ${wy.label.toLowerCase()} series` }, `Within year, Dec/Dec (${wy.label.toLowerCase()})`))),
         h("tbody", {}, rows))),
       h("p", { class: "chips-note" }, `Accumulated y/y: average of the months published so far in the year over the same months a year earlier (${acc.label.toLowerCase()} series), as INDEC reports it. Within year: the year's last month vs. the previous December (${wy.label.toLowerCase()}).`));
   }
@@ -495,13 +515,20 @@
         const end = addMonths(b.end || x1, 1);
         if (end <= x0 || b.start > x1) continue;
         const s0 = b.start < x0 ? x0 : b.start;
-        shapes.push({ type: "rect", xref: "x", yref: "paper", x0: s0, x1: end, y0: 0, y1: 1, layer: "below",
-          fillcolor: cssVar("--band"), _lightFill: "rgba(54, 69, 79, 0.07)", line: { width: 0 } });
+        shapes.push(b.style === "outline"
+          ? { type: "rect", xref: "x", yref: "paper", x0: s0, x1: end, y0: 0, y1: 1, layer: "below",
+              fillcolor: "rgba(0,0,0,0)", line: { width: 1.2, dash: "dot", color: cssVar("--ink-3"), _light: "#85909A" } }
+          : { type: "rect", xref: "x", yref: "paper", x0: s0, x1: end, y0: 0, y1: 1, layer: "below",
+              fillcolor: cssVar("--band"), _lightFill: "rgba(54, 69, 79, 0.07)", line: { width: 0 } });
         if (b.label) annotations.push({ xref: "x", yref: "paper", x: s0, y: 1, xanchor: "left", yanchor: "top", showarrow: false,
           text: b.label, font: { size: 11, color: cssVar("--ink-3") } });
       }
       return { shapes, annotations };
     }
+
+    // Key for shaded periods: shaded = one kind of period, dotted outline = another.
+    const bandKey = ind.bands && ind.bands.some((b) => b.key) ? h("p", { class: "band-key" }, ind.bands.filter((b) => b.key).map((b) =>
+      h("span", {}, h("span", { class: "band-sw" + (b.style === "outline" ? " outline" : "") }), b.key))) : null;
 
     // Cumulative change of each variant over fixed windows, on the levels.
     const summaryEl = h("p", { class: "summary-line", hidden: true });
@@ -564,7 +591,7 @@
           hovertemplate: `%{x|${DF}}: <b>%{y:,.1f}${sfx}</b><extra>%{customdata}</extra>`,
         });
       } else {
-        const stats = new Map(termStats(ind.dates, main.y, state.transform === "level", ind.measure, ind.frequency).map((s) => [s.p.id, s]));
+        const stats = new Map(termStats(ind.dates, main.y, state.transform === "level", ind.measure, ind.frequency, state.transform).map((s) => [s.p.id, s]));
         const visible = new Set(x);
         // Faint dashed original series behind a seasonally adjusted / trend view, as context.
         const bg = state.variant !== "original" && ind.variants.original ? series("original") : null;
@@ -620,12 +647,13 @@
     function drawStats(main, t) {
       if (!state.byPres) { statsEl.hidden = true; return; }
       const isLevel = state.transform === "level";
-      const rows = termStats(ind.dates, main.y, isLevel, ind.measure, ind.frequency);
+      const rows = termStats(ind.dates, main.y, isLevel, ind.measure, ind.frequency, state.transform);
+      const geo = isGeometric(state.transform, ind.measure);
       const f = (v) => fmtNum(v, t);
       const fc = (v) => fmtNum(v, isRate ? RATE_TRANSFORMS.yoy : INDEX_TRANSFORMS.yoy);
       const head = isLevel
         ? ["Presidency", "Period", "Start", "Latest / end", "Change", "Average", "Min", "Max"]
-        : ["Presidency", "Period", "Average", "Min", "Max", "Latest / end"];
+        : ["Presidency", "Period", geo ? "Average (geometric)" : "Average", "Min", "Max", "Latest / end"];
       const tbody = h("tbody", {}, rows.slice().reverse().map((r) => {
         const sw = h("span", { class: "sw" }); sw.style.background = termColor(r.p);
         const period = `${fP(r.first)} – ${r.ongoing ? "present" : fP(r.last)}${r.partial ? "*" : ""}`;
@@ -637,6 +665,7 @@
       }));
       const note = [
         `Statistics use each full term regardless of the time range shown. ${isLevel ? `Start is the base ${ind.frequency === "Q" ? "quarter" : "month"} (the last one before the term); change is latest/end vs. start.` : ""}`,
+        geo ? ` The average ${T.mom.label.split(" ")[0]} rate is geometric: the constant rate that compounds to the term's cumulative change.` : "",
         rows.some((r) => r.partial) ? " *Series begins after the term started." : "",
       ].join("");
       statsEl.replaceChildren(
@@ -709,7 +738,7 @@
       h("div", { class: "controls" }, vSeg, tSeg, h("span", { class: "spacer" }), ind.view_start ? null : rSeg),
       // A short fixed window (view_start) has no use for rebasing or presidencies.
       ind.view_start ? null : h("div", { class: "controls" }, baseWrap, presBtn),
-      summaryEl, hint, chartEl, statsEl);
+      summaryEl, hint, bandKey, chartEl, statsEl);
     drawSummary();
     table = tableView([], [], false, ind.frequency);
     appendAll(card, table, annualTable(ind), weightsTable(ind), ind.note ? h("p", { class: "chips-note" }, ind.note) : null, footer(ind, onPNG, onCSV));
@@ -760,15 +789,17 @@
     const pos = new Map(ind.dates.map((d, i) => [monthIndex(d), i]));
     const baseIdx = (kind, i) => pos.get(monthIndex(ind.dates[i]) - lagOf(kind, ind.dates[i], ind.frequency));
     function incidence(kind) {
+      // Accumulated change: the same formula on year-to-date sums, a year back.
+      const lv = Object.fromEntries(keys.map((k) => [k, kind === "acc" ? yearToDateSum(ind.dates, ind.variants[k].values) : ind.variants[k].values]));
       const out = Object.fromEntries(keys.map((k) => [k, ind.dates.map(() => null)]));
       for (let i = 0; i < ind.dates.length; i++) {
         const j = baseIdx(kind, i);
         if (j === undefined) continue;
         let den = 0, ok = true;
-        for (const k of keys) { if (W[k] === undefined) continue; const p = ind.variants[k].values[j]; if (p === null) { ok = false; break; } den += W[k] * p; }
+        for (const k of keys) { if (W[k] === undefined) continue; const p = lv[k][j]; if (p === null) { ok = false; break; } den += W[k] * p; }
         if (!ok || !den) continue;
         for (const k of keys) {
-          const a = ind.variants[k].values[i], p = ind.variants[k].values[j];
+          const a = lv[k][i], p = lv[k][j];
           if (W[k] !== undefined && a !== null && p !== null) out[k][i] = (W[k] * (a - p)) / den * 100;
         }
       }
@@ -790,7 +821,8 @@
     let metric = metricFor(bstate.kind, false), refIdx = refFor(metric), refDate = ind.dates[refIdx];
     const INC = { label: "Incidence (pp)", short: "Contribution to the total's change, percentage points", suffix: " pp", signed: true, change: true };
     const totalInc = () => keys.reduce((a, k) => a + (metric[k][refIdx] || 0), 0);
-    const WORDS = { mom: ["Month-over-month change", "m/m"], yoy: ["Year-over-year change", "y/y"], ytd: ["Year-to-date change", "YTD"], level: ["Level", ""] };
+    const WORDS = { mom: ["Month-over-month change", "m/m"], yoy: ["Year-over-year change", "y/y"], ytd: ["Year-to-date change", "YTD"],
+      acc: ["Accumulated change (year to date vs. same months a year earlier)", "accumulated"], level: ["Level", ""] };
     const ytdNote = () => (bstate.kind === "ytd" ? ` (since Dec ${Number(refDate.slice(0, 4)) - 1})` : "");
     const barTitleFor = () => isRate ? `${ind.units}, ${fmtMonth(refDate)}`
       : bstate.inc ? `Incidence (contribution to total ${WORDS[bstate.kind][1]} change${ytdNote()}), ${fmtMonth(refDate)}; total ${(totalInc() > 0 ? "+" : "") + totalInc().toFixed(2)} pp`
@@ -914,7 +946,8 @@
       const b = bars(true);
       exportPNG({ ...ind, title: `${ind.title}: ${barTitle.charAt(0).toLowerCase() + barTitle.slice(1)}` }, b.traces,
         isRate ? `Latest month, by ${noun}` : bstate.inc ? `Percentage points; weights: ${ind.weights.label}${seriesNote}`
-          : bstate.kind === "mom" ? `Percent change vs. previous month${seriesNote}` : bstate.kind === "ytd" ? `Percent change vs. December of the previous year${seriesNote}` : `Percent change vs. same month a year earlier${seriesNote}`,
+          : bstate.kind === "mom" ? `Percent change vs. previous month${seriesNote}`
+          : bstate.kind === "acc" ? `Year to date vs. the same months a year earlier, %${seriesNote}` : bstate.kind === "ytd" ? `Percent change vs. December of the previous year${seriesNote}` : `Percent change vs. same month a year earlier${seriesNote}`,
         barSpec, `${ind.id}_latest_${bstate.kind}${bstate.inc ? "_incidence" : ""}.png`,
         { shapes: b.shapes, xrange: b.range, xsuffix: barSpec.suffix });
     };
