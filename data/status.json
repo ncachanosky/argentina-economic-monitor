@@ -2,7 +2,7 @@
   "11.3_AGCS_2004_M_41": {
     "error": "validation failed: 178 missing period(s), first 2004-02; latest date went backwards (2026-07 -> 2026-04); 181 previously published observations disappeared",
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T16:21:38+00:00",
+    "last_checked": "2026-10-05T16:24:28+00:00",
     "last_obs": "2026-07-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice 2004=100",
@@ -12,7 +12,7 @@
   "11.3_CMMR_2004_M_10": {
     "error": "validation failed: 178 missing period(s), first 2004-02; latest date went backwards (2026-07 -> 2026-04); 181 previously published observations disappeared",
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T16:21:38+00:00",
+    "last_checked": "2026-10-05T16:24:28+00:00",
     "last_obs": "2026-07-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice 2004=100",
@@ -22,7 +22,7 @@
   "11.3_C_2004_M_60": {
     "error": "validation failed: 178 missing period(s), first 2004-02; latest date went backwards (2026-07 -> 2026-04); 181 previously published observations disappeared",
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T16:21:38+00:00",
+    "last_checked": "2026-10-05T16:24:28+00:00",
     "last_obs": "2026-07-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice 2004=100",
@@ -32,7 +32,7 @@
   "11.3_EMC_2004_M_25": {
     "error": "validation failed: 178 missing period(s), first 2004-02; latest date went backwards (2026-07 -> 2026-04); 181 previously published observations disappeared",
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T16:21:38+00:00",
+    "last_checked": "2026-10-05T16:24:28+00:00",
     "last_obs": "2026-07-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice 2004=100",
@@ -42,7 +42,7 @@
   "11.3_HR_2004_M_24": {
     "error": "validation failed: 178 missing period(s), first 2004-02; latest date went backwards (2026-07 -> 2026-04); 181 previously published observations disappeared",
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T16:21:38+00:00",
+    "last_checked": "2026-10-05T16:24:28+00:00",
     "last_obs": "2026-07-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice 2004=100",
@@ -52,7 +52,7 @@
   "11.3_IF_2004_M_25": {
     "error": "validation failed: 178 missing period(s), first 2004-02; latest date went backwards (2026-07 -> 2026-04); 181 previously published observations disappeared",
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T16:21:38+00:00",
+    "last_checked": "2026-10-05T16:24:28+00:00",
     "last_obs": "2026-07-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice 2004=100",
@@ -62,7 +62,7 @@
   "11.3_IM_2004_M_25": {
     "error": "validation failed: 178 missing period(s), first 2004-02; latest date went backwards (2026-07 -> 2026-04); 181 previously published observations disappeared",
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T16:21:38+00:00",
+    "last_checked": "2026-10-05T16:24:28+00:00",
     "last_obs": "2026-07-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice 2004=100",
@@ -72,7 +72,7 @@
   "11.3_ISD_2004_M_26": {
     "error": "validation failed: 178 missing period(s), first 2004-02; latest date went backwards (2026-07 -> 2026-04); 181 previously published observations disappeared",
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T16:21:38+00:00",
+    "last_checked": "2026-10-05T16:24:28+00:00",
     "last_obs": "2026-07-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice 2004=100",
@@ -82,7 +82,7 @@
   "11.3_ISOM_2004_M_39": {
     "error": "validation failed: 178 missing period(s), first 2004-02; latest date went backwards (2026-07 -> 2026-04); 181 previously published observations disappeared",
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T16:21:38+00:00",
+    "last_checked": "2026-10-05T16:24:28+00:00",
     "last_obs": "2026-07-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice 2004=100",
@@ -92,7 +92,7 @@
   "11.3_ITC_2004_M_21": {
     "error": "validation failed: 178 missing period(s), first 2004-02; latest date went backwards (2026-07 -> 2026-04); 181 previously published observations disappeared",
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T16:21:38+00:00",
+    "last_checked": "2026-10-05T16:24:28+00:00",
     "last_obs": "2026-07-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice 2004=100",
@@ -102,7 +102,7 @@
   "11.3_P_2004_M_20": {
     "error": "validation failed: 178 missing period(s), first 2004-02; latest date went backwards (2026-07 -> 2026-04); 181 previously published observations disappeared",
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T16:21:38+00:00",
+    "last_checked": "2026-10-05T16:24:28+00:00",
     "last_obs": "2026-07-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice 2004=100",
@@ -112,7 +112,7 @@
   "11.3_SEGA_2004_M_48": {
     "error": "validation failed: 178 missing period(s), first 2004-02; latest date went backwards (2026-07 -> 2026-04); 181 previously published observations disappeared",
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T16:21:38+00:00",
+    "last_checked": "2026-10-05T16:24:28+00:00",
     "last_obs": "2026-07-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice 2004=100",
@@ -122,7 +122,7 @@
   "11.3_TAC_2004_M_60": {
     "error": "validation failed: 178 missing period(s), first 2004-02; latest date went backwards (2026-07 -> 2026-04); 181 previously published observations disappeared",
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T16:21:38+00:00",
+    "last_checked": "2026-10-05T16:24:28+00:00",
     "last_obs": "2026-07-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice 2004=100",
@@ -132,7 +132,7 @@
   "11.3_VIPAA_2004_M_5": {
     "error": "validation failed: 178 missing period(s), first 2004-02; latest date went backwards (2026-07 -> 2026-04); 181 previously published observations disappeared",
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T16:21:38+00:00",
+    "last_checked": "2026-10-05T16:24:28+00:00",
     "last_obs": "2026-07-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice 2004=100",
@@ -142,7 +142,7 @@
   "11.3_VMASD_2004_M_23": {
     "error": "validation failed: 178 missing period(s), first 2004-02; latest date went backwards (2026-07 -> 2026-04); 181 previously published observations disappeared",
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T16:21:38+00:00",
+    "last_checked": "2026-10-05T16:24:28+00:00",
     "last_obs": "2026-07-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice 2004=100",
@@ -152,7 +152,7 @@
   "11.3_VMATC_2004_M_12": {
     "error": "validation failed: 178 missing period(s), first 2004-02; latest date went backwards (2026-07 -> 2026-04); 181 previously published observations disappeared",
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T16:21:38+00:00",
+    "last_checked": "2026-10-05T16:24:28+00:00",
     "last_obs": "2026-07-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice 2004=100",
@@ -162,7 +162,7 @@
   "143.3_NO_PR_2004_A_21": {
     "error": "validation failed: 178 missing period(s), first 2004-02; latest date went backwards (2026-07 -> 2026-04); 181 previously published observations disappeared",
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T16:21:38+00:00",
+    "last_checked": "2026-10-05T16:24:28+00:00",
     "last_obs": "2026-07-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice 2004=100",
@@ -172,7 +172,7 @@
   "143.3_NO_PR_2004_A_28": {
     "error": "validation failed: 178 missing period(s), first 2004-02; latest date went backwards (2026-07 -> 2026-04); 181 previously published observations disappeared",
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T16:21:38+00:00",
+    "last_checked": "2026-10-05T16:24:28+00:00",
     "last_obs": "2026-07-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice 2004=100",
@@ -182,7 +182,7 @@
   "143.3_NO_PR_2004_A_31": {
     "error": "validation failed: 178 missing period(s), first 2004-02; latest date went backwards (2026-07 -> 2026-04); 181 previously published observations disappeared",
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T16:21:38+00:00",
+    "last_checked": "2026-10-05T16:24:28+00:00",
     "last_obs": "2026-07-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice 2004=100",
@@ -191,7 +191,7 @@
   },
   "3.2_OGP_D_2004_T_17": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T16:21:38+00:00",
+    "last_checked": "2026-10-05T16:24:28+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos a precios de 2004",
@@ -201,7 +201,7 @@
   "31.3_UCP_2004_M_20": {
     "error": "validation failed: 82 missing period(s), first 2016-02; latest date went backwards (2026-07 -> 2026-04); 85 previously published observations disappeared",
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T16:21:38+00:00",
+    "last_checked": "2026-10-05T16:24:28+00:00",
     "last_obs": "2026-07-01",
     "source": "datos_gob",
     "source_units": "Porcentaje",
@@ -211,7 +211,7 @@
   "31.3_UEI_2004_M_22": {
     "error": "validation failed: 82 missing period(s), first 2016-02; latest date went backwards (2026-07 -> 2026-04); 85 previously published observations disappeared",
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T16:21:38+00:00",
+    "last_checked": "2026-10-05T16:24:28+00:00",
     "last_obs": "2026-07-01",
     "source": "datos_gob",
     "source_units": "Porcentaje",
@@ -221,7 +221,7 @@
   "31.3_UIMB_2004_M_33": {
     "error": "validation failed: 82 missing period(s), first 2016-02; latest date went backwards (2026-07 -> 2026-04); 85 previously published observations disappeared",
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T16:21:38+00:00",
+    "last_checked": "2026-10-05T16:24:28+00:00",
     "last_obs": "2026-07-01",
     "source": "datos_gob",
     "source_units": "Porcentaje",
@@ -231,7 +231,7 @@
   "31.3_UMNIA_2004_M_42": {
     "error": "validation failed: 82 missing period(s), first 2016-02; latest date went backwards (2026-07 -> 2026-04); 85 previously published observations disappeared",
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T16:21:38+00:00",
+    "last_checked": "2026-10-05T16:24:28+00:00",
     "last_obs": "2026-07-01",
     "source": "datos_gob",
     "source_units": "Porcentaje",
@@ -241,7 +241,7 @@
   "31.3_UMNM_2004_M_27": {
     "error": "validation failed: 82 missing period(s), first 2016-02; latest date went backwards (2026-07 -> 2026-04); 85 previously published observations disappeared",
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T16:21:38+00:00",
+    "last_checked": "2026-10-05T16:24:28+00:00",
     "last_obs": "2026-07-01",
     "source": "datos_gob",
     "source_units": "Porcentaje",
@@ -251,7 +251,7 @@
   "31.3_UNG_2004_M_18": {
     "error": "validation failed: 82 missing period(s), first 2016-02; latest date went backwards (2026-07 -> 2026-04); 85 previously published observations disappeared",
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T16:21:38+00:00",
+    "last_checked": "2026-10-05T16:24:28+00:00",
     "last_obs": "2026-07-01",
     "source": "datos_gob",
     "source_units": "Porcentaje",
@@ -261,7 +261,7 @@
   "31.3_UPAB_2004_M_35": {
     "error": "validation failed: 82 missing period(s), first 2016-02; latest date went backwards (2026-07 -> 2026-04); 85 previously published observations disappeared",
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T16:21:38+00:00",
+    "last_checked": "2026-10-05T16:24:28+00:00",
     "last_obs": "2026-07-01",
     "source": "datos_gob",
     "source_units": "Porcentaje",
@@ -271,7 +271,7 @@
   "31.3_UPC_2004_M_17": {
     "error": "validation failed: 82 missing period(s), first 2016-02; latest date went backwards (2026-07 -> 2026-04); 85 previously published observations disappeared",
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T16:21:38+00:00",
+    "last_checked": "2026-10-05T16:24:28+00:00",
     "last_obs": "2026-07-01",
     "source": "datos_gob",
     "source_units": "Porcentaje",
@@ -281,7 +281,7 @@
   "31.3_UPT_2004_M_21": {
     "error": "validation failed: 82 missing period(s), first 2016-02; latest date went backwards (2026-07 -> 2026-04); 85 previously published observations disappeared",
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T16:21:38+00:00",
+    "last_checked": "2026-10-05T16:24:28+00:00",
     "last_obs": "2026-07-01",
     "source": "datos_gob",
     "source_units": "Porcentaje",
@@ -291,7 +291,7 @@
   "31.3_UPT_2004_M_23": {
     "error": "validation failed: 82 missing period(s), first 2016-02; latest date went backwards (2026-07 -> 2026-04); 85 previously published observations disappeared",
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T16:21:38+00:00",
+    "last_checked": "2026-10-05T16:24:28+00:00",
     "last_obs": "2026-07-01",
     "source": "datos_gob",
     "source_units": "Porcentaje",
@@ -301,7 +301,7 @@
   "31.3_URP_2004_M_24": {
     "error": "validation failed: 82 missing period(s), first 2016-02; latest date went backwards (2026-07 -> 2026-04); 85 previously published observations disappeared",
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T16:21:38+00:00",
+    "last_checked": "2026-10-05T16:24:28+00:00",
     "last_obs": "2026-07-01",
     "source": "datos_gob",
     "source_units": "Porcentaje",
@@ -311,7 +311,7 @@
   "31.3_USPQ_2004_M_34": {
     "error": "validation failed: 82 missing period(s), first 2016-02; latest date went backwards (2026-07 -> 2026-04); 85 previously published observations disappeared",
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T16:21:38+00:00",
+    "last_checked": "2026-10-05T16:24:28+00:00",
     "last_obs": "2026-07-01",
     "source": "datos_gob",
     "source_units": "Porcentaje",
@@ -321,7 +321,7 @@
   "31.3_UV_2004_M_25": {
     "error": "validation failed: 82 missing period(s), first 2016-02; latest date went backwards (2026-07 -> 2026-04); 85 previously published observations disappeared",
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T16:21:38+00:00",
+    "last_checked": "2026-10-05T16:24:28+00:00",
     "last_obs": "2026-07-01",
     "source": "datos_gob",
     "source_units": "Porcentaje",
@@ -331,7 +331,7 @@
   "33.2_ISAC_CICLOCIA_0_M_20_62": {
     "error": "validation failed: 114 missing period(s), first 2012-02; latest date went backwards (2026-07 -> 2026-04); 117 previously published observations disappeared",
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T16:21:38+00:00",
+    "last_checked": "2026-10-05T16:24:28+00:00",
     "last_obs": "2026-07-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice 2004=100",
@@ -341,7 +341,7 @@
   "33.2_ISAC_NIVELRAL_0_M_18_63": {
     "error": "validation failed: 114 missing period(s), first 2012-02; latest date went backwards (2026-07 -> 2026-04); 117 previously published observations disappeared",
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T16:21:38+00:00",
+    "last_checked": "2026-10-05T16:24:28+00:00",
     "last_obs": "2026-07-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice 2004=100",
@@ -351,7 +351,7 @@
   "33.2_ISAC_SIN_EDAD_0_M_23_56": {
     "error": "validation failed: 114 missing period(s), first 2012-02; latest date went backwards (2026-07 -> 2026-04); 117 previously published observations disappeared",
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T16:21:38+00:00",
+    "last_checked": "2026-10-05T16:24:28+00:00",
     "last_obs": "2026-07-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice 2004=100",
@@ -360,7 +360,7 @@
   },
   "4.2_DE_2004_T_24": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T16:21:38+00:00",
+    "last_checked": "2026-10-05T16:24:28+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos a precios de 2004",
@@ -369,7 +369,7 @@
   },
   "4.2_DGCP_2004_T_30": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T16:21:38+00:00",
+    "last_checked": "2026-10-05T16:24:28+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos a precios de 2004",
@@ -378,7 +378,7 @@
   },
   "4.2_DGE_2004_T_26": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T16:21:38+00:00",
+    "last_checked": "2026-10-05T16:24:28+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos a precios de 2004",
@@ -387,7 +387,7 @@
   },
   "4.2_DGIT_2004_T_25": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T16:21:38+00:00",
+    "last_checked": "2026-10-05T16:24:28+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos a precios de 2004",
@@ -396,7 +396,7 @@
   },
   "4.2_MGCP_2004_T_25": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T16:21:38+00:00",
+    "last_checked": "2026-10-05T16:24:28+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos a precios de 2004",
@@ -405,7 +405,7 @@
   },
   "4.2_OGI_2004_T_25": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T16:21:38+00:00",
+    "last_checked": "2026-10-05T16:24:28+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos a precios de 2004",
@@ -414,7 +414,7 @@
   },
   "4.2_OGP_2004_T_17": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T16:21:38+00:00",
+    "last_checked": "2026-10-05T16:24:28+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos a precios de 2004",
@@ -423,7 +423,7 @@
   },
   "4.2_VE_2004_T_21": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T16:21:38+00:00",
+    "last_checked": "2026-10-05T16:24:28+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos a precios de 2004",
@@ -433,7 +433,7 @@
   "453.1_SERIE_DESEADA_0_0_24_58": {
     "error": "validation failed: 82 missing period(s), first 2016-02; latest date went backwards (2026-07 -> 2026-04); 85 previously published observations disappeared",
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T16:21:38+00:00",
+    "last_checked": "2026-10-05T16:24:28+00:00",
     "last_obs": "2026-07-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice 2004 = 100",
@@ -443,7 +443,7 @@
   "453.1_SERIE_ORIGNAL_0_0_14_46": {
     "error": "validation failed: 82 missing period(s), first 2016-02; latest date went backwards (2026-07 -> 2026-04); 85 previously published observations disappeared",
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T16:21:38+00:00",
+    "last_checked": "2026-10-05T16:24:28+00:00",
     "last_obs": "2026-07-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice 2004 = 100",
@@ -452,7 +452,7 @@
   },
   "6.2_AGCS_2004_T_39": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T16:21:38+00:00",
+    "last_checked": "2026-10-05T16:24:28+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos a precios de 2004",
@@ -461,7 +461,7 @@
   },
   "6.2_AIEA_2004_T_48": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T16:21:38+00:00",
+    "last_checked": "2026-10-05T16:24:28+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos a precios de 2004",
@@ -470,7 +470,7 @@
   },
   "6.2_APDPSSAO_2004_T_60": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T16:21:38+00:00",
+    "last_checked": "2026-10-05T16:24:28+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos a precios de 2004",
@@ -479,7 +479,7 @@
   },
   "6.2_CMMR_2004_T_41": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T16:21:38+00:00",
+    "last_checked": "2026-10-05T16:24:28+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos a precios de 2004",
@@ -488,7 +488,7 @@
   },
   "6.2_C_2004_T_12": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T16:21:38+00:00",
+    "last_checked": "2026-10-05T16:24:28+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos a precios de 2004",
@@ -497,7 +497,7 @@
   },
   "6.2_EMC_2004_T_26": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T16:21:38+00:00",
+    "last_checked": "2026-10-05T16:24:28+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos a precios de 2004",
@@ -506,7 +506,7 @@
   },
   "6.2_E_2004_T_10": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T16:21:38+00:00",
+    "last_checked": "2026-10-05T16:24:28+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos a precios de 2004",
@@ -515,7 +515,7 @@
   },
   "6.2_HPSD_2004_T_32": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T16:21:38+00:00",
+    "last_checked": "2026-10-05T16:24:28+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos a precios de 2004",
@@ -524,7 +524,7 @@
   },
   "6.2_HR_2004_T_20": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T16:21:38+00:00",
+    "last_checked": "2026-10-05T16:24:28+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos a precios de 2004",
@@ -533,7 +533,7 @@
   },
   "6.2_IF_2004_T_25": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T16:21:38+00:00",
+    "last_checked": "2026-10-05T16:24:28+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos a precios de 2004",
@@ -542,7 +542,7 @@
   },
   "6.2_IM_2004_T_23": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T16:21:38+00:00",
+    "last_checked": "2026-10-05T16:24:28+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos a precios de 2004",
@@ -551,7 +551,7 @@
   },
   "6.2_IPNS_2004_T_35": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T16:21:38+00:00",
+    "last_checked": "2026-10-05T16:24:28+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos a precios de 2004",
@@ -560,7 +560,7 @@
   },
   "6.2_OASCSP_2004_T_60": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T16:21:38+00:00",
+    "last_checked": "2026-10-05T16:24:28+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos a precios de 2004",
@@ -569,7 +569,7 @@
   },
   "6.2_PIBPM_2004_T_38": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T16:21:38+00:00",
+    "last_checked": "2026-10-05T16:24:28+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos a precios de 2004",
@@ -578,7 +578,7 @@
   },
   "6.2_P_2004_T_5": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T16:21:38+00:00",
+    "last_checked": "2026-10-05T16:24:28+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos a precios de 2004",
@@ -587,7 +587,7 @@
   },
   "6.2_SEGA_2004_T_32": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T16:21:38+00:00",
+    "last_checked": "2026-10-05T16:24:28+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos a precios de 2004",
@@ -596,7 +596,7 @@
   },
   "6.2_SSS_2004_T_24": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T16:21:38+00:00",
+    "last_checked": "2026-10-05T16:24:28+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos a precios de 2004",
@@ -605,7 +605,7 @@
   },
   "6.2_TAC_2004_T_40": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T16:21:38+00:00",
+    "last_checked": "2026-10-05T16:24:28+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos a precios de 2004",
