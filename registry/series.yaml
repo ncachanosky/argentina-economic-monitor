@@ -96,7 +96,7 @@ inputs:
   - {id: "bcrabal:104", source: bcra_balance, frequency: M, measure: flow, allow_gaps: true, label: "BCRA balance: Deposits, total"}
   - {id: "bcrabal:105", source: bcra_balance, frequency: M, measure: flow, allow_gaps: true, label: "BCRA balance: Official deposits"}
   - {id: "bcrabal:111", source: bcra_balance, frequency: M, measure: flow, allow_gaps: true, label: "BCRA balance: Banks' foreign-currency deposits at BCRA"}
-  - {id: "bcrabal:112", source: bcra_balance, frequency: M, measure: flow, allow_gaps: true, label: "BCRA balance: Deposits in institutions in liquidation (BCRA)"}
+  - {id: "bcrabal:112", source: bcra_balance, frequency: M, measure: flow, allow_gaps: true, static: true, label: "BCRA balance: Deposits in institutions in liquidation (BCRA)"}
   - {id: "bcrabal:113", source: bcra_balance, frequency: M, measure: flow, allow_gaps: true, label: "BCRA balance: Notes issued by the BCRA"}
   - {id: "bcrabal:114", source: bcra_balance, frequency: M, measure: flow, allow_gaps: true, label: "BCRA balance: Miscellaneous accounts (incl. net worth)"}
   - {id: "bcrabal:115", source: bcra_balance, frequency: M, measure: flow, allow_gaps: true, label: "BCRA balance: Base money"}
