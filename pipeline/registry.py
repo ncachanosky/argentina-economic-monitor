@@ -13,7 +13,7 @@ RELEASES_PATH = ROOT / "registry" / "releases.yaml"
 KINDS = {"variants", "panel", "contributions"}
 DERIVE_METHODS = {"splice", "reweight"}
 RANGE_KEYS = {"2Y", "5Y", "10Y", "25Y", "50Y", "Max"}
-TRANSFORMS = {"level", "yoy", "mom"}
+TRANSFORMS = {"level", "yoy", "mom", "ytd"}
 FREQUENCIES = {"M", "Q"}
 
 
@@ -56,6 +56,9 @@ class Indicator:
     bands: list | None = None          # shaded periods [{start, end, label}]
     summary_windows: list | None = None  # cumulative change over [{label, base, end}]
     ranges: list | None = None         # time-range buttons, e.g. ["10Y", "25Y", "Max"]
+    annual_table: dict | None = None   # variants card: yearly table {accumulated: variant, within_year: variant}
+    bar_transforms: list | None = None # panels: bar metrics to choose from (first is the default)
+    view_start: str | None = None      # charts never start before this month (fixed window, no range buttons)
 
     def input_ids(self) -> list[str]:
         """Source series this indicator reads (its variants, or a derivation's inputs)."""
@@ -145,6 +148,9 @@ def load(path: Path = REGISTRY_PATH, releases_path: Path = RELEASES_PATH) -> Reg
                 d["date"], d["period"] = str(d["date"]), str(d["period"])
     topics = raw.get("topics", [])
     topic_ids = {t["id"] for t in topics}
+    slugs = [t.get("slug") for t in topics]
+    if any(not sl or not __import__("re").fullmatch(r"[a-z0-9-]+", sl) for sl in slugs) or len(set(slugs)) != len(slugs):
+        raise RegistryError("every topic needs a unique lowercase slug (its page path)")
     seen: set[str] = set()
     indicators: list[Indicator] = []
 
@@ -204,6 +210,11 @@ def load(path: Path = REGISTRY_PATH, releases_path: Path = RELEASES_PATH) -> Reg
                         raise RegistryError(f"{where}: group {g.get('key')} uses unknown variant {k}")
             if sum(1 for g in contrib.get("groups", []) if g.get("residual")) > 1:
                 raise RegistryError(f"{where}: at most one residual group")
+        if item.get("bar_transforms") and not set(item["bar_transforms"]) <= TRANSFORMS:
+            raise RegistryError(f"{where}: unknown bar_transforms {item['bar_transforms']}")
+        at = item.get("annual_table")
+        if at and not all(at.get(k) in (item.get("variants") or {}) for k in ("accumulated", "within_year")):
+            raise RegistryError(f"{where}: annual_table needs accumulated and within_year variants")
         if item.get("transforms") and not set(item["transforms"]) <= TRANSFORMS:
             raise RegistryError(f"{where}: unknown transforms {item['transforms']}")
         if item.get("release") and item["release"] not in releases:
@@ -244,6 +255,9 @@ def load(path: Path = REGISTRY_PATH, releases_path: Path = RELEASES_PATH) -> Reg
                 summary_windows=[{k: (str(v) if v is not None else None) for k, v in w.items()}
                                  for w in item.get("summary_windows") or []] or None,
                 ranges=item.get("ranges"),
+                annual_table=item.get("annual_table"),
+                bar_transforms=item.get("bar_transforms"),
+                view_start=str(item["view_start"]) + ("-01" if len(str(item["view_start"])) == 7 else "") if item.get("view_start") else None,
             )
         )
 

@@ -65,7 +65,10 @@ def _fetch_chunk(ids: list[str], session: requests.Session) -> tuple[pd.DataFram
                     "dataset": (entry.get("dataset") or {}).get("title"),
                 }
         start += len(data)
-        if not data or start >= payload.get("count", 0):
+        # Page until a short page. Don't trust "count": with several ids it is
+        # the length of the FIRST series only, so a long series later in the
+        # request (e.g. a 1943 CPI) would be cut off at that many rows.
+        if len(data) < PAGE_SIZE:
             break
 
     wide = pd.DataFrame(rows, columns=["date", *ids])

@@ -26,7 +26,7 @@ def test_registry_loads_and_ids_unique():
 def test_registry_rejects_bad_default(tmp_path):
     p = tmp_path / "r.yaml"
     p.write_text("""
-topics: [{id: t, title: T}]
+topics: [{id: t, slug: t, title: T}]
 indicators:
   - {id: x, topic: t, kind: variants, title: X, source: s, frequency: M,
      variants: {a: {label: A, id: "1"}}, default: {variant: b}}
@@ -287,3 +287,19 @@ def test_reweight_with_unchanged_weights_reproduces_official(tmp_path, monkeypat
     df, info = derive.reweight(ind, reg, {ind.derive["headline"]: store.as_of(ind.derive["headline"])})
     pd.testing.assert_series_equal(df.iloc[:, 0], df.iloc[:, 1], check_names=False, rtol=1e-6)
     assert info["replication_max_error_pct"] < 1e-4
+
+
+def test_datos_gob_pages_past_misleading_count(monkeypatch):
+    """The API's "count" is the first series' length, not the row count."""
+    monkeypatch.setattr(datos_gob, "PAGE_SIZE", 2)
+    dates = [f"2020-{m:02d}-01" for m in range(1, 6)]
+
+    def fake_get(self, url, params=None, timeout=None):
+        data = [[d, None if i < 3 else 1.0, float(i)] for i, d in enumerate(dates)]
+        start, limit = params["start"], params["limit"]
+        meta = [{}] + [{"field": {"id": i}} for i in params["ids"].split(",")]
+        return FakeResp({"data": data[start:start + limit], "count": 2, "meta": meta})
+
+    monkeypatch.setattr(datos_gob.requests.Session, "get", fake_get)
+    res = datos_gob.fetch(["A", "B"])
+    assert res.data[res.data.series_id == "B"]["value"].tolist() == [0.0, 1.0, 2.0, 3.0, 4.0]

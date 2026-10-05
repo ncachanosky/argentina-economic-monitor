@@ -191,6 +191,9 @@ def export(out: Path) -> None:
             "log_level": ind.log_level,
             "bands": ind.bands,
             "summary_windows": ind.summary_windows,
+            "annual_table": ind.annual_table,
+            "bar_transforms": ind.bar_transforms,
+            "view_start": ind.view_start,
             "ranges": ind.ranges,
             "derived": derived_info,
             "status": worst,
@@ -234,6 +237,7 @@ def export(out: Path) -> None:
         manifest_inds.append({
             "id": ind.id, "topic": ind.topic, "kind": ind.kind, "title": ind.title,
             "short_title": ind.short_title, "status": worst, "last_obs": payload["last_obs"],
+            "headline": bool(ind.headline),
         })
 
     manifest = {

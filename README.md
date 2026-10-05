@@ -109,8 +109,8 @@ New sources (BCRA, etc.) need an adapter in `pipeline/sources/` exposing
 pip install -r requirements.txt
 python -m pytest -q
 python -m pipeline.update            # needs internet access to apis.datos.gob.ar
-python -m pipeline.export            # writes site/data/
-python -m http.server -d site 8000   # open http://localhost:8000
+python -m pipeline.build            # pages + data into _site/
+python -m http.server -d _site 8000  # open http://localhost:8000
 ```
 
 ## Branding

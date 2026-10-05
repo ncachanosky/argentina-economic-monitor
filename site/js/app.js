@@ -7,7 +7,11 @@
 (function () {
   "use strict";
 
-  const DATA = "data/";
+  // Each page is rendered from one template (pipeline/build.py): the body
+  // carries the page id ("home" or a topic id) and the path back to the root.
+  const ROOT = (document.body && document.body.dataset.root) || "";
+  const PAGE = (document.body && document.body.dataset.page) || "home";
+  const DATA = ROOT + "data/";
   const MAX_PANEL_SERIES = 4;              // fixed palette has four distinguishable slots
   const SERIES_VARS = ["--series-1", "--series-2", "--series-3", "--series-4"];
   const EXPORT = { width: 1200, height: 800 }; // EO figure standard
@@ -19,6 +23,7 @@
     level: { label: "Level", short: null, suffix: "", signed: false, change: false },
     yoy:   { label: "y/y %", short: "Year-over-year change, %", suffix: "%", signed: true, change: true },
     mom:   { label: "m/m %", short: "Month-over-month change, %", suffix: "%", signed: true, change: true },
+    ytd:   { label: "YTD %", short: "Year to date: change since December of the previous year, %", suffix: "%", signed: true, change: true },
   };
   const RATE_TRANSFORMS = {
     level: { label: "Level", short: null, suffix: "%", signed: false, change: false },
@@ -28,7 +33,7 @@
   const TRANSFORMS = INDEX_TRANSFORMS;
   function tfs(ind) {
     const all = ind.measure === "rate" ? RATE_TRANSFORMS : INDEX_TRANSFORMS;
-    const keys = ind.transforms && ind.transforms.length ? ind.transforms : Object.keys(all);
+    const keys = ind.transforms && ind.transforms.length ? ind.transforms : ["level", "yoy", "mom"];
     const out = Object.fromEntries(keys.map((k) => [k, { ...all[k] }]));
     if (ind.frequency === "Q" && out.mom) {
       out.mom.label = out.mom.label.replace("m/m", "q/q");
@@ -82,16 +87,21 @@
   }
 
   // ---------- transformations ----------
+  // Months back to the comparison point: a year is 12 months for both monthly
+  // and quarterly dates; one period is 1 month, or 3 for quarters; year to date
+  // compares with December of the previous year (so December is Dec/Dec).
+  function lagOf(kind, iso, freq) {
+    if (kind === "yoy") return 12;
+    if (kind === "ytd") return Number(iso.slice(5, 7));
+    return freq === "Q" ? 3 : 1;
+  }
   function transform(dates, values, kind, measure, freq) {
     if (kind === "level") return values.slice();
     const diff = measure === "rate";
-    // Lags in months: a year back is 12 months for both monthly and quarterly
-    // dates; one period back is 1 month, or 3 for quarters.
-    const lag = kind === "yoy" ? 12 : freq === "Q" ? 3 : 1;
     const mi = dates.map(monthIndex);
     const pos = new Map(mi.map((m, i) => [m, i]));
     return values.map((v, i) => {
-      const j = pos.get(mi[i] - lag);
+      const j = pos.get(mi[i] - lagOf(kind, dates[i], freq));
       const prev = j === undefined ? null : values[j];
       if (v === null || prev === null) return null;
       if (diff) return v - prev;
@@ -104,6 +114,11 @@
     return null;
   }
 
+  // First month to show: the card's fixed start, or the range back from the latest.
+  function viewStart(ind, rangeKey) {
+    if (ind.view_start) return ind.view_start;
+    return startDate(ind.last_obs, RANGES[rangeKey]);
+  }
   function startDate(lastIso, years) {
     if (!years) return null;
     const [y, m] = lastIso.split("-").map(Number);
@@ -331,6 +346,44 @@
     return details;
   }
 
+  // Yearly summary for monthly activity indices: the year-to-date change vs.
+  // the same months a year earlier (average of Jan..m over average of the same
+  // months of the previous year, original series, as INDEC reports it), and the
+  // change within the year (December, or the latest month, vs. the previous
+  // December, seasonally adjusted).
+  function annualTable(ind) {
+    const at = ind.annual_table;
+    if (!at || ind.frequency !== "M") return null;
+    const acc = ind.variants[at.accumulated], wy = ind.variants[at.within_year];
+    const val = (v, y, m) => { const i = ind.dates.indexOf(`${y}-${String(m).padStart(2, "0")}-01`); return i < 0 ? null : v.values[i]; };
+    const years = [...new Set(ind.dates.map((d) => +d.slice(0, 4)))].sort((a, b) => b - a);
+    const rows = [];
+    for (const y of years) {
+      // Last month of year y with data in the accumulated series.
+      let m = 12; while (m > 0 && val(acc, y, m) === null) m--;
+      if (!m) continue;
+      let a = 0, b = 0, ok = true;
+      for (let k = 1; k <= m; k++) { const cur = val(acc, y, k), prev = val(acc, y - 1, k); if (cur === null || prev === null) { ok = false; break; } a += cur; b += prev; }
+      const accum = ok && b ? (a / b - 1) * 100 : null;
+      let mw = 12; while (mw > 0 && val(wy, y, mw) === null) mw--;
+      const d0 = val(wy, y - 1, 12), d1 = mw ? val(wy, y, mw) : null;
+      const within = d0 && d1 !== null ? (d1 / d0 - 1) * 100 : null;
+      if (accum === null && within === null) continue;
+      const mName = (mm) => new Date(Date.UTC(2000, mm - 1, 1)).toLocaleDateString("en-US", { month: "short", timeZone: "UTC" });
+      rows.push(h("tr", {}, h("td", {}, String(y)),
+        h("td", {}, accum === null ? "–" : fmtNum(accum, INDEX_TRANSFORMS.yoy), m < 12 ? h("span", { class: "at" }, ` Jan–${mName(m)}`) : null),
+        h("td", {}, within === null ? "–" : fmtNum(within, INDEX_TRANSFORMS.yoy), mw && mw < 12 ? h("span", { class: "at" }, ` to ${mName(mw)}`) : null)));
+    }
+    if (!rows.length) return null;
+    return h("details", { class: "table-view" }, h("summary", {}, "Show yearly change"),
+      h("div", { class: "table-scroll" }, h("table", { class: "data" },
+        h("thead", {}, h("tr", {}, h("th", {}, "Year"),
+          h("th", { title: `Year to date vs. the same months of the previous year, ${acc.label.toLowerCase()} series` }, "Accumulated y/y"),
+          h("th", { title: `Latest month of the year vs. the previous December, ${wy.label.toLowerCase()} series` }, "Within year (Dec/Dec)"))),
+        h("tbody", {}, rows))),
+      h("p", { class: "chips-note" }, `Accumulated y/y: average of the months published so far in the year over the same months a year earlier (${acc.label.toLowerCase()} series), as INDEC reports it. Within year: the year's last month vs. the previous December (${wy.label.toLowerCase()}).`));
+  }
+
   // Old vs. new basket weights for a reweighted index.
   function weightsTable(ind) {
     const w = ind.derived && ind.derived.weights;
@@ -411,9 +464,8 @@
       // A derived series bridged over a gap has no meaningful change across it.
       const gaps = ind.derived && ind.derived.gaps && ind.derived.gaps[variantKey];
       if (gaps && state.transform !== "level") {
-        const lag = state.transform === "yoy" ? 12 : 1;
         const spans = gaps.map(([a, b]) => [monthIndex(a), monthIndex(b)]);
-        y = y.map((q, i) => { const m = monthIndex(ind.dates[i]); return spans.some(([a, b]) => a <= m && b > m - lag) ? null : q; });
+        y = y.map((q, i) => { const m = monthIndex(ind.dates[i]), lag = lagOf(state.transform, ind.dates[i], ind.frequency); return spans.some(([a, b]) => a <= m && b > m - lag) ? null : q; });
       }
       const bm = isRate ? null : baseMonth();
       let units = ind.units, rebased = false;
@@ -426,7 +478,7 @@
     }
 
     function visibleIdx(y) {
-      const start = startDate(ind.last_obs, RANGES[state.range]);
+      const start = viewStart(ind, state.range);
       return ind.dates.map((d, i) => i).filter((i) => (!start || ind.dates[i] >= start) && y[i] !== null);
     }
     const isLog = () => ind.log_level && state.transform === "level";
@@ -445,7 +497,7 @@
         const s0 = b.start < x0 ? x0 : b.start;
         shapes.push({ type: "rect", xref: "x", yref: "paper", x0: s0, x1: end, y0: 0, y1: 1, layer: "below",
           fillcolor: cssVar("--band"), _lightFill: "rgba(54, 69, 79, 0.07)", line: { width: 0 } });
-        annotations.push({ xref: "x", yref: "paper", x: s0, y: 1, xanchor: "left", yanchor: "top", showarrow: false,
+        if (b.label) annotations.push({ xref: "x", yref: "paper", x: s0, y: 1, xanchor: "left", yanchor: "top", showarrow: false,
           text: b.label, font: { size: 11, color: cssVar("--ink-3") } });
       }
       return { shapes, annotations };
@@ -489,7 +541,7 @@
 
       if (!state.byPres) {
         const keys = ind.overlay ? [state.variant, ...variantKeys.filter((k) => k !== state.variant)] : [state.variant];
-        const start = startDate(ind.last_obs, RANGES[state.range]);
+        const start = viewStart(ind, state.range);
         keys.forEach((k, slot) => {
           const s = k === state.variant ? main : series(k);
           // Overlays keep empty months in range so a gap in one series shows as a gap.
@@ -654,12 +706,13 @@
     };
 
     appendAll(card, 
-      h("div", { class: "controls" }, vSeg, tSeg, h("span", { class: "spacer" }), rSeg),
-      h("div", { class: "controls" }, baseWrap, presBtn),
+      h("div", { class: "controls" }, vSeg, tSeg, h("span", { class: "spacer" }), ind.view_start ? null : rSeg),
+      // A short fixed window (view_start) has no use for rebasing or presidencies.
+      ind.view_start ? null : h("div", { class: "controls" }, baseWrap, presBtn),
       summaryEl, hint, chartEl, statsEl);
     drawSummary();
     table = tableView([], [], false, ind.frequency);
-    appendAll(card, table, weightsTable(ind), ind.note ? h("p", { class: "chips-note" }, ind.note) : null, footer(ind, onPNG, onCSV));
+    appendAll(card, table, annualTable(ind), weightsTable(ind), ind.note ? h("p", { class: "chips-note" }, ind.note) : null, footer(ind, onPNG, onCSV));
     card.draw = draw;
     return card;
   }
@@ -677,12 +730,15 @@
     const keys = Object.keys(ind.variants);
     const T = tfs(ind);
     const isRate = ind.measure === "rate";
-    // What the ranked bars show: level (rates), y/y, or incidence (y/y
-    // contribution to the total in pp, when fixed-base sector weights exist).
+    // What the ranked bars show: level (rates) or a change (m/m, y/y, YTD,
+    // chosen with `bar_transforms`), optionally as incidence: the contribution
+    // to the total's change in pp, when fixed-base weights exist.
     const W = ind.weights && ind.weights.values;
-    const INC = { label: "Incidence (pp)", short: "Contribution to total y/y change, percentage points", suffix: " pp", signed: true, change: true };
-    const baseKind = ind.bar_transform || (isRate ? "level" : "yoy");   // bars: level, y/y or m/m
-    let barKind = baseKind, barSpec = T[barKind];
+    const baseKind = ind.bar_transform || (isRate ? "level" : "yoy");
+    const barKinds = (ind.bar_transforms && ind.bar_transforms.length ? ind.bar_transforms : [baseKind]).filter((k) => T[k] || INDEX_TRANSFORMS[k]);
+    const specFor = (k) => T[k] || INDEX_TRANSFORMS[k];
+    const bstate = { kind: barKinds.includes(baseKind) ? baseKind : barKinds[0], inc: false };
+    let barSpec = specFor(bstate.kind);
     const defaults = [].concat(ind.default.variant).slice(0, MAX_PANEL_SERIES);
     const slots = new Map(defaults.map((k, i) => [k, i]));   // color follows the component, not its rank
     const state = { transform: ind.default.transform || baseKind, range: rangeFromDefault(ind) };
@@ -698,40 +754,61 @@
     const rSeg = segmented(rangeKeys(ind).map((k) => [k, k]), state.range, (k) => { state.range = k; drawLines(); }, "Time range");
     let table;
 
-    // Bar metric for every component, at the most recent month they all share.
-    const yoyMetric = Object.fromEntries(keys.map((k) => [k, transform(ind.dates, ind.variants[k].values, baseKind, ind.measure, ind.frequency)]));
-    let refIdx = ind.dates.length - 1;
-    while (refIdx > 0 && keys.some((k) => yoyMetric[k][refIdx] === null)) refIdx--;
-    const refDate = ind.dates[refIdx];
-    // Incidence_k,t = w_k (X_k,t - X_k,t-L) / sum_j w_j X_j,t-L * 100, with L
-    // the lag of the bar metric (12 months for y/y, 1 for m/m).
-    const incMetric = W ? (() => {
-      const lag = baseKind === "mom" ? (ind.frequency === "Q" ? 1 : 1) : (ind.frequency === "Q" ? 4 : 12);
+    // Incidence_k,t = w_k (X_k,t - X_k,b) / sum_j w_j X_j,b * 100, with b the
+    // comparison month of the bar metric (previous month, a year earlier, or
+    // the previous December). Contributions add up to the total's change.
+    const pos = new Map(ind.dates.map((d, i) => [monthIndex(d), i]));
+    const baseIdx = (kind, i) => pos.get(monthIndex(ind.dates[i]) - lagOf(kind, ind.dates[i], ind.frequency));
+    function incidence(kind) {
       const out = Object.fromEntries(keys.map((k) => [k, ind.dates.map(() => null)]));
-      for (let i = lag; i < ind.dates.length; i++) {
+      for (let i = 0; i < ind.dates.length; i++) {
+        const j = baseIdx(kind, i);
+        if (j === undefined) continue;
         let den = 0, ok = true;
-        for (const k of keys) { const p = ind.variants[k].values[i - lag]; if (W[k] === undefined) continue; if (p === null) { ok = false; break; } den += W[k] * p; }
+        for (const k of keys) { if (W[k] === undefined) continue; const p = ind.variants[k].values[j]; if (p === null) { ok = false; break; } den += W[k] * p; }
         if (!ok || !den) continue;
         for (const k of keys) {
-          const a = ind.variants[k].values[i], p = ind.variants[k].values[i - lag];
+          const a = ind.variants[k].values[i], p = ind.variants[k].values[j];
           if (W[k] !== undefined && a !== null && p !== null) out[k][i] = (W[k] * (a - p)) / den * 100;
         }
       }
       return out;
-    })() : null;
-    let metric = yoyMetric;
-    const totalInc = () => keys.reduce((a, k) => a + (incMetric[k][refIdx] || 0), 0);
-    const changeWord = baseKind === "mom" ? "month-over-month" : "year-over-year";
-    const changeShort = baseKind === "mom" ? "m/m" : "y/y";
+    }
+    const cache = new Map();
+    function metricFor(kind, inc) {
+      const key = `${kind}:${inc}`;
+      if (!cache.has(key)) cache.set(key, inc ? incidence(kind)
+        : Object.fromEntries(keys.map((k) => [k, transform(ind.dates, ind.variants[k].values, kind, ind.measure, ind.frequency)])));
+      return cache.get(key);
+    }
+    // Bars use the most recent month every component shares.
+    function refFor(m) {
+      let i = ind.dates.length - 1;
+      while (i > 0 && keys.some((k) => m[k][i] === null)) i--;
+      return i;
+    }
+    let metric = metricFor(bstate.kind, false), refIdx = refFor(metric), refDate = ind.dates[refIdx];
+    const INC = { label: "Incidence (pp)", short: "Contribution to the total's change, percentage points", suffix: " pp", signed: true, change: true };
+    const totalInc = () => keys.reduce((a, k) => a + (metric[k][refIdx] || 0), 0);
+    const WORDS = { mom: ["Month-over-month change", "m/m"], yoy: ["Year-over-year change", "y/y"], ytd: ["Year-to-date change", "YTD"], level: ["Level", ""] };
+    const ytdNote = () => (bstate.kind === "ytd" ? ` (since Dec ${Number(refDate.slice(0, 4)) - 1})` : "");
     const barTitleFor = () => isRate ? `${ind.units}, ${fmtMonth(refDate)}`
-      : barKind === "incidence" ? `Incidence (contribution to total ${changeShort} change), ${fmtMonth(refDate)}; total ${(totalInc() > 0 ? "+" : "") + totalInc().toFixed(2)} pp`
-      : `${changeWord.charAt(0).toUpperCase() + changeWord.slice(1)} change, ${fmtMonth(refDate)}`;
+      : bstate.inc ? `Incidence (contribution to total ${WORDS[bstate.kind][1]} change${ytdNote()}), ${fmtMonth(refDate)}; total ${(totalInc() > 0 ? "+" : "") + totalInc().toFixed(2)} pp`
+      : `${WORDS[bstate.kind][0]}${ytdNote()}, ${fmtMonth(refDate)}`;
     let barTitle = barTitleFor();
     const barTitleEl = h("span", {}, `${barTitle}. `);
-    const bSeg = W ? segmented([[baseKind, T[baseKind].label], ["incidence", "Incidence (pp)"]], barKind, (k) => {
-      barKind = k; barSpec = k === "incidence" ? INC : T[baseKind]; metric = k === "incidence" ? incMetric : yoyMetric;
-      barTitle = barTitleFor(); barTitleEl.textContent = `${barTitle}. `; bSeg.update(k); drawBars();
-    }, "Bar metric") : null;
+    function setBars() {
+      metric = metricFor(bstate.kind, bstate.inc);
+      refIdx = refFor(metric); refDate = ind.dates[refIdx];
+      barSpec = bstate.inc ? INC : specFor(bstate.kind);
+      barTitle = barTitleFor(); barTitleEl.textContent = `${barTitle}. `;
+      bSeg && bSeg.update(bstate.kind);
+      incBtn && incBtn.setAttribute("aria-pressed", String(bstate.inc));
+      drawBars();
+    }
+    const bSeg = barKinds.length > 1 ? segmented(barKinds.map((k) => [k, specFor(k).label]), bstate.kind, (k) => { bstate.kind = k; setBars(); }, "Bar metric") : null;
+    const incBtn = W && !isRate ? h("button", { class: "btn toggle", type: "button", "aria-pressed": "false", title: "Show each component's contribution to the total's change",
+      onclick: () => { bstate.inc = !bstate.inc; setBars(); } }, "Incidence (pp)") : null;
 
     function freeSlot() { const used = new Set(slots.values()); for (let i = 0; i < MAX_PANEL_SERIES; i++) if (!used.has(i)) return i; return -1; }
 
@@ -757,12 +834,12 @@
         x: shown,
         marker: { color: colors },
         customdata: order.map((k, i) => [k, actual[i], W && W[k] !== undefined ? W[k] : null]),
-        text: actual.map((v) => (barKind === "incidence" ? (v > 0 ? "+" : "") + v.toFixed(2) + " pp" : fmtNum(v, barSpec))),
+        text: actual.map((v) => (bstate.inc ? (v > 0 ? "+" : "") + v.toFixed(2) + " pp" : fmtNum(v, barSpec))),
         textposition: clipped.map((c) => (c ? "inside" : "outside")),
         insidetextanchor: "end",
         textfont: { family: cssVar("--font-ui") || "Calibri, Arial, sans-serif", size: forExport ? 15 : 12, color: clipped.map((c, i) => (c && slots.has(order[i]) ? "#FFFFFF" : inkColor)) },
         cliponaxis: false,
-        hovertemplate: `%{y}: <b>%{customdata[1]:,${barKind === "incidence" ? ".2f" : ".1f"}}${barSpec.suffix}</b>${W ? `<br>Weight: %{customdata[2]:.1f}% (${ind.weights.label || "weight"})` : ""}<extra></extra>`,
+        hovertemplate: `%{y}: <b>%{customdata[1]:,${bstate.inc ? ".2f" : ".1f"}}${barSpec.suffix}</b>${W ? `<br>Weight: %{customdata[2]:.1f}% (${ind.weights.label || "weight"})` : ""}<extra></extra>`,
         _lightColors: colors,
       };
       // Room for outside labels; the broken bar ends at the axis edge.
@@ -836,7 +913,9 @@
     const onBarPNG = () => {
       const b = bars(true);
       exportPNG({ ...ind, title: `${ind.title}: ${barTitle.charAt(0).toLowerCase() + barTitle.slice(1)}` }, b.traces,
-        isRate ? `Latest month, by ${noun}` : barKind === "incidence" ? `Percentage points; weights: ${ind.weights.label}${seriesNote}` : baseKind === "mom" ? `Percent change vs. previous month${seriesNote}` : `Percent change vs. same month a year earlier${seriesNote}`, barSpec, `${ind.id}_latest_${barKind}.png`,
+        isRate ? `Latest month, by ${noun}` : bstate.inc ? `Percentage points; weights: ${ind.weights.label}${seriesNote}`
+          : bstate.kind === "mom" ? `Percent change vs. previous month${seriesNote}` : bstate.kind === "ytd" ? `Percent change vs. December of the previous year${seriesNote}` : `Percent change vs. same month a year earlier${seriesNote}`,
+        barSpec, `${ind.id}_latest_${bstate.kind}${bstate.inc ? "_incidence" : ""}.png`,
         { shapes: b.shapes, xrange: b.range, xsuffix: barSpec.suffix });
     };
     const onCSV = () => {
@@ -854,7 +933,7 @@
         h("thead", {}, h("tr", {}, h("th", {}, noun.charAt(0).toUpperCase() + noun.slice(1, -1).replace(/ie$/, "y")), h("th", {}, "Weight"))),
         h("tbody", {}, keys.filter((k) => W[k] !== undefined).sort((a, b) => W[b] - W[a]).map((k) => h("tr", {}, h("td", {}, ind.variants[k].label), h("td", {}, W[k].toFixed(1) + "%"))))))) : null;
     appendAll(card, 
-      bSeg ? h("div", { class: "controls" }, bSeg) : null,
+      bSeg || incBtn ? h("div", { class: "controls" }, bSeg, incBtn) : null,
       h("p", { class: "hint" }, barTitleEl,
         h("button", { class: "btn", type: "button", onclick: onBarPNG, style: "padding:1px 8px;font-size:12px" }, "PNG"), barNote),
       barEl, weightsTable,
@@ -987,7 +1066,7 @@
   }
 
   // ---------- headline tiles ----------
-  function tile(ind) {
+  function tile(ind, href) {
     const hl = ind.headline;
     const T = tfs(ind);
     const v = ind.variants[hl.variant];
@@ -1002,7 +1081,7 @@
     const yoy = yoySrc ? lastValid(ind.dates, transform(ind.dates, yoySrc.values, "yoy", ind.measure, ind.frequency)) : null;
     const cls = t.change ? (last.value > 0 ? " pos" : last.value < 0 ? " neg" : "") : "";
     const what = isRate ? (t.change ? t.label : ind.units) : `${hl.transform === "mom" ? (ind.frequency === "Q" ? "q/q" : "m/m") : t.label}, ${v.label.toLowerCase()}`;
-    return h("a", { class: "tile", href: `#ind-${ind.id}` },
+    return h("a", { class: "tile", href: href || `#ind-${ind.id}` },
       h("div", { class: "tile-label" }, ind.short_title),
       h("div", { class: "tile-value" + cls }, fmtNum(last.value, t)),
       h("div", { class: "tile-sub" }, `${fmtPeriod(last.date, ind.frequency)} · ${what}`),
@@ -1032,43 +1111,80 @@
     const built = new Date(manifest.built_at);
     $("#build-meta").textContent = `Last data check: ${built.toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" })}`;
 
-    const inds = await Promise.all(manifest.indicators.map((m) => getJSON(`${DATA}${m.id}.json`).catch((e) => { console.error(e); return null; })));
-    const byTopic = new Map();
-    for (const ind of inds.filter(Boolean)) {
-      if (!byTopic.has(ind.topic)) byTopic.set(ind.topic, []);
-      byTopic.get(ind.topic).push(ind);
+    const topicOf = new Map(manifest.indicators.map((m) => [m.id, m.topic]));
+    const slugOf = new Map(manifest.topics.map((t) => [t.id, t.slug]));
+    const pageHref = (topicId, anchor) => `${ROOT}${slugOf.get(topicId)}/${anchor ? "#" + anchor : ""}`;
+
+    // Links shared before the site had one page per topic (…/#ind-emae,
+    // …/#topic-real_sector) land on the home page: send them on.
+    if (PAGE === "home") {
+      const m = location.hash.match(/^#(ind|topic)-(.+)$/);
+      const topicId = m && (m[1] === "ind" ? topicOf.get(m[2]) : m[2]);
+      if (topicId && slugOf.has(topicId)) { location.replace(pageHref(topicId, m[1] === "ind" ? `ind-${m[2]}` : "")); return; }
     }
 
     const nav = $("#nav");
-    const sections = [];
-    for (const topic of manifest.topics) {
-      const list = byTopic.get(topic.id);
-      if (!list || !list.length) continue;
-      nav.append(h("a", { href: `#topic-${topic.id}` }, topic.title));
-      const cards = h("div", { class: "cards" });
-      // Registry order; panels and cards flagged `wide` span the full row.
-      list.forEach((ind) => cards.append(
-        ind.kind === "panel" ? panelCard(ind)
-          : ind.kind === "contributions" ? contributionsCard(ind)
-          : variantsCard(ind, !!ind.wide)));
-      sections.push(h("section", { class: "topic", id: `topic-${topic.id}` },
-        h("h2", {}, topic.title), h("p", {}, topic.description || ""), cards));
+    for (const t of manifest.topics) {
+      if (!manifest.indicators.some((m) => m.topic === t.id)) continue;
+      nav.append(h("a", { href: pageHref(t.id), "aria-current": t.id === PAGE ? "true" : null }, t.title));
     }
-    topicsEl.replaceChildren(...sections);
 
-    $("#tiles").replaceChildren(...inds.filter((i) => i && i.headline).map(tile).filter(Boolean));
-
-    const drawAll = () => document.querySelectorAll(".card").forEach((c) => c.draw && c.draw());
-    if (window.Plotly) drawAll();
-    else topicsEl.prepend(h("div", { class: "error-box" }, "The charting library could not be loaded."));
-
+    // Charts are redrawn on a theme change (set once the page has charts).
+    let redraw = () => {};
     $("#theme-toggle").addEventListener("click", () => {
       const next = isDark() ? "light" : "dark";
       document.documentElement.dataset.theme = next;
       try { localStorage.setItem("aem-theme", next); } catch (e) {}
-      drawAll();
+      redraw();
     });
-    window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => { if (!document.documentElement.dataset.theme) drawAll(); });
+    window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => { if (!document.documentElement.dataset.theme) redraw(); });
+
+    const topicsEl2 = $("#topics");
+    if (PAGE === "home") {
+      // Home: latest headline readings and one card per topic; no charts to draw.
+      const heads = await Promise.all(manifest.indicators.filter((m) => m.headline)
+        .map((m) => getJSON(`${DATA}${m.id}.json`).catch((e) => { console.error(e); return null; })));
+      $("#tiles").replaceChildren(...heads.filter(Boolean).map((ind) => tile(ind, pageHref(ind.topic, `ind-${ind.id}`))).filter(Boolean));
+      topicsEl2.replaceChildren(h("div", { class: "topic-grid" }, manifest.topics.map((t) => {
+        const list = manifest.indicators.filter((m) => m.topic === t.id);
+        if (!list.length) return null;
+        return h("a", { class: "topic-card", href: pageHref(t.id) },
+          h("h2", {}, t.title), h("p", {}, t.description || ""),
+          h("p", { class: "topic-list" }, list.map((m) => m.short_title).join(" · ")));
+      })));
+      return;
+    }
+
+    const topic = manifest.topics.find((t) => t.id === PAGE);
+    const list = manifest.indicators.filter((m) => m.topic === PAGE);
+    if (!topic || !list.length) { topicsEl2.replaceChildren(h("div", { class: "error-box" }, "Nothing to show on this page yet.")); return; }
+    const inds = (await Promise.all(list.map((m) => getJSON(`${DATA}${m.id}.json`).catch((e) => { console.error(e); return null; })))).filter(Boolean);
+
+    // Registry order; panels and cards flagged `wide` span the full row.
+    const cards = h("div", { class: "cards" }, inds.map((ind) =>
+      ind.kind === "panel" ? panelCard(ind)
+        : ind.kind === "contributions" ? contributionsCard(ind)
+        : variantsCard(ind, !!ind.wide)));
+    topicsEl2.replaceChildren(h("section", { class: "topic", id: `topic-${topic.id}` }, cards));
+    $("#tiles").replaceChildren(...inds.filter((i) => i.headline).map((i) => tile(i)).filter(Boolean));
+    const sn = $("#section-nav");
+    sn.replaceChildren(...inds.map((i) => h("a", { href: `#ind-${i.id}` }, i.short_title)));
+    sn.hidden = false;
+
+    if (!window.Plotly) { topicsEl2.prepend(h("div", { class: "error-box" }, "The charting library could not be loaded.")); return; }
+    // Draw each chart when it comes near the viewport, so long pages open fast.
+    const drawn = new Set();
+    const drawCard = (c) => { if (c.draw) { c.draw(); drawn.add(c); } };
+    const all = [...document.querySelectorAll(".card")];
+    if ("IntersectionObserver" in window) {
+      const io = new IntersectionObserver((entries) => entries.forEach((e) => {
+        if (e.isIntersecting && !drawn.has(e.target)) { drawCard(e.target); io.unobserve(e.target); }
+      }), { rootMargin: "600px 0px" });
+      all.forEach((c) => io.observe(c));
+    } else all.forEach(drawCard);
+    // The cards were built after load, so jump to a linked card now.
+    if (location.hash) { const el = document.getElementById(location.hash.slice(1)); if (el) { drawCard(el); el.scrollIntoView(); } }
+    redraw = () => drawn.forEach((c) => c.draw());
   }
 
   document.addEventListener("DOMContentLoaded", main);
