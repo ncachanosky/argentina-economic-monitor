@@ -27,14 +27,22 @@ site:
 # Convention: the handover month belongs to the outgoing president. A term
 # starts in the first full month after inauguration, and the month before
 # that is the base month (Milei, inaugurated 10 Dec 2023: base Dec 2023 = 100,
-# first month Jan 2024). `color` is one of the chart series colors.
+# first month Jan 2024). `party` picks the line color from `party_colors`.
+#
+# Party colors (light mode / dark mode). Checked for color-blind separation;
+# the gold is darkened from PRO yellow so it stays visible on white.
+party_colors:
+  peronism: {label: "Peronism (FpV / FdT)", light: "#4A9FDB", dark: "#6CB4E8"}
+  pro:      {label: "PRO / Cambiemos",      light: "#D99B00", dark: "#F2BE3C"}
+  lla:      {label: "La Libertad Avanza",   light: "#6A3FB5", dark: "#9A78D6"}
+
 presidencies:
-  - {id: nkirchner, name: Néstor Kirchner,  short: N. Kirchner, start: "2003-05-25", end: "2007-12-10", color: sky}
-  - {id: cfk1,      name: Cristina Fernández de Kirchner (1st term), short: CFK I,  start: "2007-12-10", end: "2011-12-10", color: sky}
-  - {id: cfk2,      name: Cristina Fernández de Kirchner (2nd term), short: CFK II, start: "2011-12-10", end: "2015-12-10", color: sky}
-  - {id: macri,     name: Mauricio Macri,   short: Macri,       start: "2015-12-10", end: "2019-12-10", color: copper}
-  - {id: afernandez, name: Alberto Fernández, short: A. Fernández, start: "2019-12-10", end: "2023-12-10", color: sky}
-  - {id: milei,     name: Javier Milei,     short: Milei,       start: "2023-12-10", end: null,         color: lavender}
+  - {id: nkirchner, name: Néstor Kirchner,  short: N. Kirchner, start: "2003-05-25", end: "2007-12-10", party: peronism}
+  - {id: cfk1,      name: Cristina Fernández de Kirchner (1st term), short: CFK I,  start: "2007-12-10", end: "2011-12-10", party: peronism}
+  - {id: cfk2,      name: Cristina Fernández de Kirchner (2nd term), short: CFK II, start: "2011-12-10", end: "2015-12-10", party: peronism}
+  - {id: macri,     name: Mauricio Macri,   short: Macri,       start: "2015-12-10", end: "2019-12-10", party: pro}
+  - {id: afernandez, name: Alberto Fernández, short: A. Fernández, start: "2019-12-10", end: "2023-12-10", party: peronism}
+  - {id: milei,     name: Javier Milei,     short: Milei,       start: "2023-12-10", end: null,         party: lla}
 
 topics:
   - id: real_sector
@@ -52,6 +60,7 @@ indicators:
     description: >-
       INDEC's monthly proxy for GDP. The seasonally adjusted series is the
       standard read on month-to-month momentum.
+    release: emae
     source: datos_gob
     source_label: INDEC, via datos.gob.ar
     frequency: M
@@ -71,6 +80,7 @@ indicators:
     description: >-
       Year-over-year change by sector, original (not seasonally adjusted)
       series. Select sectors to compare their paths.
+    release: emae
     source: datos_gob
     source_label: INDEC, via datos.gob.ar
     frequency: M
@@ -101,6 +111,7 @@ indicators:
     short_title: IPI manufacturing
     description: >-
       INDEC's index of manufacturing output. Published since 2016.
+    release: ipi_manufacturero
     source: datos_gob
     source_label: INDEC, via datos.gob.ar
     frequency: M
@@ -119,6 +130,7 @@ indicators:
     description: >-
       INDEC's synthetic indicator of construction activity, built from
       input demand (cement, steel, asphalt, and others).
+    release: construccion
     source: datos_gob
     source_label: INDEC, via datos.gob.ar
     frequency: M

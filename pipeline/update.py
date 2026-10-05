@@ -102,6 +102,17 @@ def run(dry_run: bool = False, strict: bool = False) -> int:
             entry["status"] = "error" if problem else ("stale" if stale else "ok")
             status[sid] = entry
 
+    # Flag indicators whose release calendar has run out, so it gets updated.
+    for ind in reg.indicators:
+        if not ind.release:
+            continue
+        ids = [v.source_id for v in ind.variants.values()]
+        lasts = [status.get(i, {}).get("last_obs") for i in ids if status.get(i, {}).get("last_obs")]
+        if lasts and reg.next_release(ind, max(lasts)) is None:
+            msg = f"no upcoming '{ind.release}' release in registry/releases.yaml; add the next INDEC calendar"
+            lines.append(f"- ⚠️ `{ind.id}`: {msg}")
+            print(f"::warning title={ind.id}::{msg}")
+
     header = (
         f"## Data update {vintage}\n\n"
         f"{len(status)} series checked · {n_changed} changed · {n_err} with errors\n\n"

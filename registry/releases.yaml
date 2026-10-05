@@ -1,0 +1,43 @@
+# Official release calendar, used to show "Next release" on each chart.
+#
+# Source: INDEC, "Calendario de difusión. Segundo semestre de 2026"
+#   https://www.indec.gob.ar/ftp/cuadros/publicaciones/calendario_2sem2026.pdf
+# INDEC publishes each semester's calendar ahead of time. When the listed
+# dates run out, the daily update flags it in the run summary; add the next
+# semester's dates here.
+#
+# Each entry: date of publication and the reference month it covers.
+# Indicators point here with `release: <key>` in series.yaml.
+
+emae:
+  name: Estimador mensual de actividad económica (EMAE)
+  calendar_url: https://www.indec.gob.ar/ftp/cuadros/publicaciones/calendario_2sem2026.pdf
+  dates:
+    - {date: "2026-07-22", period: "2026-05"}
+    - {date: "2026-08-20", period: "2026-06"}
+    - {date: "2026-09-24", period: "2026-07"}
+    - {date: "2026-10-21", period: "2026-08"}
+    - {date: "2026-11-24", period: "2026-09"}
+    - {date: "2026-12-21", period: "2026-10"}
+
+ipi_manufacturero:
+  name: Índice de producción industrial manufacturero (IPI manufacturero)
+  calendar_url: https://www.indec.gob.ar/ftp/cuadros/publicaciones/calendario_2sem2026.pdf
+  dates:
+    - {date: "2026-07-08", period: "2026-05"}
+    - {date: "2026-08-07", period: "2026-06"}
+    - {date: "2026-09-08", period: "2026-07"}
+    - {date: "2026-10-07", period: "2026-08"}
+    - {date: "2026-11-06", period: "2026-09"}
+    - {date: "2026-12-09", period: "2026-10"}
+
+construccion:
+  name: Indicadores de coyuntura de la actividad de la construcción (ISAC)
+  calendar_url: https://www.indec.gob.ar/ftp/cuadros/publicaciones/calendario_2sem2026.pdf
+  dates:
+    - {date: "2026-07-08", period: "2026-05"}
+    - {date: "2026-08-07", period: "2026-06"}
+    - {date: "2026-09-08", period: "2026-07"}
+    - {date: "2026-10-07", period: "2026-08"}
+    - {date: "2026-11-06", period: "2026-09"}
+    - {date: "2026-12-09", period: "2026-10"}

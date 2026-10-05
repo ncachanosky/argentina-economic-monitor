@@ -152,3 +152,13 @@ def test_registry_presidencies_ordered_and_non_overlapping():
     assert ids[-1] == "milei" and reg.presidencies[-1]["end"] is None
     for a, b in zip(reg.presidencies, reg.presidencies[1:]):
         assert a["end"] == b["start"]
+
+
+def test_next_release_picks_first_unpublished_period():
+    reg = registry.load()
+    emae = next(i for i in reg.indicators if i.id == "emae")
+    nr = reg.next_release(emae, "2026-07-01")
+    assert nr["period"] == "2026-08" and nr["date"] == "2026-10-21"
+    # A release date that has passed but whose data hasn't landed is still "next".
+    assert reg.next_release(emae, "2026-06-01")["period"] == "2026-07"
+    assert reg.next_release(emae, "2026-10-01") is None  # calendar exhausted

@@ -8,6 +8,7 @@ import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
 REGISTRY_PATH = ROOT / "registry" / "series.yaml"
+RELEASES_PATH = ROOT / "registry" / "releases.yaml"
 
 KINDS = {"variants", "panel"}
 TRANSFORMS = {"level", "yoy", "mom"}
@@ -36,9 +37,10 @@ class Indicator:
     variants: dict[str, Variant]
     default: dict
     headline: dict | None = None
+    release: str | None = None
 
 
-PERIOD_COLORS = {"copper", "sky", "sage", "lavender"}
+HEX = __import__("re").compile(r"^#[0-9A-Fa-f]{6}$")
 
 
 @dataclass
@@ -47,6 +49,19 @@ class Registry:
     topics: list[dict]
     indicators: list[Indicator] = field(default_factory=list)
     presidencies: list[dict] = field(default_factory=list)
+    party_colors: dict = field(default_factory=dict)
+    releases: dict = field(default_factory=dict)
+
+    def next_release(self, ind: "Indicator", last_obs: str) -> dict | None:
+        """First scheduled release covering a month after `last_obs` (YYYY-MM-DD)."""
+        cal = self.releases.get(ind.release or "")
+        if not cal:
+            return None
+        for d in sorted(cal["dates"], key=lambda x: x["date"]):
+            if d["period"] > last_obs[:7]:
+                return {"date": d["date"], "period": d["period"], "name": cal.get("name"),
+                        "calendar_url": cal.get("calendar_url")}
+        return None
 
     def series_by_source(self) -> dict[str, set[str]]:
         """Unique source series ids, grouped by source adapter."""
@@ -60,8 +75,14 @@ class RegistryError(ValueError):
     pass
 
 
-def load(path: Path = REGISTRY_PATH) -> Registry:
+def load(path: Path = REGISTRY_PATH, releases_path: Path = RELEASES_PATH) -> Registry:
     raw = yaml.safe_load(path.read_text(encoding="utf-8"))
+    releases = {}
+    if releases_path.exists():
+        releases = yaml.safe_load(releases_path.read_text(encoding="utf-8")) or {}
+        for key, cal in releases.items():
+            for d in cal.get("dates", []):
+                d["date"], d["period"] = str(d["date"]), str(d["period"])
     topics = raw.get("topics", [])
     topic_ids = {t["id"] for t in topics}
     seen: set[str] = set()
@@ -97,6 +118,8 @@ def load(path: Path = REGISTRY_PATH) -> Registry:
             raise RegistryError(f"{where}: unknown default transform")
 
         headline = item.get("headline")
+        if item.get("release") and item["release"] not in releases:
+            raise RegistryError(f"{where}: release {item['release']!r} not in releases.yaml")
         if headline and headline.get("variant") not in variants:
             raise RegistryError(f"{where}: headline variant not defined")
 
@@ -115,18 +138,24 @@ def load(path: Path = REGISTRY_PATH) -> Registry:
                 variants=variants,
                 default=default,
                 headline=headline,
+                release=item.get("release"),
             )
         )
+
+    party_colors = raw.get("party_colors", {}) or {}
+    for key, c in party_colors.items():
+        if not (HEX.match(str(c.get("light", ""))) and HEX.match(str(c.get("dark", "")))):
+            raise RegistryError(f"party color '{key}': needs light and dark hex colors")
 
     presidencies = []
     prev_end = None
     for p in raw.get("presidencies", []) or []:
         where = f"presidency '{p.get('id')}'"
-        for k in ("id", "name", "start", "color"):
+        for k in ("id", "name", "start", "party"):
             if not p.get(k):
                 raise RegistryError(f"{where}: missing {k}")
-        if p["color"] not in PERIOD_COLORS:
-            raise RegistryError(f"{where}: color must be one of {sorted(PERIOD_COLORS)}")
+        if p["party"] not in party_colors:
+            raise RegistryError(f"{where}: party {p['party']!r} not in party_colors")
         start, end = str(p["start"]), (str(p["end"]) if p.get("end") else None)
         if end and end <= start:
             raise RegistryError(f"{where}: end before start")
@@ -136,4 +165,5 @@ def load(path: Path = REGISTRY_PATH) -> Registry:
         presidencies.append({**p, "start": start, "end": end, "short": p.get("short", p["name"])})
 
     return Registry(site=raw.get("site", {}), topics=topics, indicators=indicators,
-                    presidencies=presidencies)
+                    presidencies=presidencies, party_colors=party_colors,
+                    releases=releases)

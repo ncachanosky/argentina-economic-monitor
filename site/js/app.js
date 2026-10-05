@@ -166,8 +166,10 @@
   // handover month belongs to the outgoing president; a term's first month is
   // the first full month after inauguration and its base month the one before.
   let PRESIDENCIES = [];
-  const PERIOD_VARS = { copper: "--series-1", sky: "--series-2", sage: "--series-3", lavender: "--series-4" };
-  const PERIOD_LIGHT = { copper: "#B87333", sky: "#5B9BD5", sage: "#87A96B", lavender: "#8E7AB5" };
+  let PARTY_COLORS = {};
+  // Party color for the current theme, and the light-theme color used in PNG exports.
+  const termColor = (p) => { const c = PARTY_COLORS[p.party]; return c ? (isDark() ? c.dark : c.light) : cssVar("--ink-3"); };
+  const termLight = (p) => { const c = PARTY_COLORS[p.party]; return c ? c.light : "#85909A"; };
 
   const addMonths = (iso, k) => { const m = monthIndex(iso) + k; return `${Math.floor(m / 12)}-${String((m % 12) + 1).padStart(2, "0")}-01`; };
   const monthOf = (isoDay) => isoDay.slice(0, 7) + "-01";
@@ -237,11 +239,26 @@
     return card;
   }
 
+  // "Next release" from the official calendar, judged in Buenos Aires time.
+  function nextReleaseNote(ind) {
+    const nr = ind.next_release;
+    if (!nr) return null;
+    const today = new Date().toLocaleDateString("en-CA", { timeZone: "America/Argentina/Buenos_Aires" });
+    const day = new Date(nr.date + "T12:00:00Z").toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", year: "numeric", timeZone: "UTC" });
+    const period = fmtShortMonth(nr.period + "-01");
+    const text = nr.date > today ? `Next release: ${day} (${period} data)`
+      : nr.date === today ? `Next release: today (${period} data)`
+      : `${period} data was due ${day}; updating`;
+    return h("span", { class: "next-release" }, nr.calendar_url
+      ? h("a", { href: nr.calendar_url, target: "_blank", rel: "noopener", title: `INDEC release calendar: ${nr.name || ""}` }, text) : text);
+  }
+
   function footer(ind, onPNG, onCSV) {
     const src = Object.values(ind.variants)[0].source_url;
+    const nr = nextReleaseNote(ind);
     return h("div", { class: "card-foot" },
       h("span", {}, "Source: ", src ? h("a", { href: src, target: "_blank", rel: "noopener" }, ind.source_label) : ind.source_label,
-        ` · Latest: ${fmtShortMonth(ind.last_obs)}`),
+        ` · Latest: ${fmtShortMonth(ind.last_obs)}`, nr ? " · " : null, nr),
       h("div", { class: "actions" },
         h("button", { class: "btn", type: "button", onclick: onPNG, title: "Download this chart as a 1200×800 PNG" }, "PNG"),
         h("button", { class: "btn", type: "button", onclick: onCSV, title: "Download the data in this view as CSV" }, "CSV"),
@@ -354,8 +371,8 @@
         const terms = x.map(termOf);
         traces.push({
           type: "bar", x, y, name: main.v.label,
-          marker: { color: terms.map((p) => (p ? cssVar(PERIOD_VARS[p.color]) : cssVar("--ink-3"))) },
-          _lightColors: terms.map((p) => (p ? PERIOD_LIGHT[p.color] : "#85909A")),
+          marker: { color: terms.map((p) => (p ? termColor(p) : cssVar("--ink-3"))) },
+          _lightColors: terms.map((p) => (p ? termLight(p) : "#85909A")),
           customdata: terms.map((p) => (p ? p.short : "")),
           hovertemplate: `%{x|%b %Y}: <b>%{y:,.1f}%</b><extra>%{customdata}</extra>`,
         });
@@ -369,10 +386,10 @@
             const w = termWindow(p);
             const ii = idx.filter((i) => ind.dates[i] >= w.first && (!w.last || ind.dates[i] <= w.last) && yy[i] !== null);
             if (!ii.length) continue;
-            const color = cssVar(PERIOD_VARS[p.color]);
+            const color = termColor(p);
             const st = stats.get(p.id);
             const stat = st ? (t.pct ? `avg ${fmtNum(st.avg, true)}` : `max ${fmtNum(st.max, false)}`) : "";
-            const common = { type: "scatter", mode: "lines", _light: PERIOD_LIGHT[p.color], legendgroup: p.id };
+            const common = { type: "scatter", mode: "lines", _light: termLight(p), legendgroup: p.id };
             if (faint) {
               traces.push({ ...common, x: ii.map((i) => ind.dates[i]), y: ii.map((i) => yy[i]), line: { color, width: 1.2, dash: "dash" }, opacity: 0.35, showlegend: false, hoverinfo: "skip", name: `${p.short} (original)` });
               continue;
@@ -421,7 +438,7 @@
         ? ["Presidency", "Period", "Start", "Latest / end", "Change", "Average", "Min", "Max"]
         : ["Presidency", "Period", "Average", "Min", "Max", "Latest / end"];
       const tbody = h("tbody", {}, rows.slice().reverse().map((r) => {
-        const sw = h("span", { class: "sw" }); sw.style.background = cssVar(PERIOD_VARS[r.p.color]);
+        const sw = h("span", { class: "sw" }); sw.style.background = termColor(r.p);
         const period = `${fmtShortMonth(r.first)} – ${r.ongoing ? "present" : fmtShortMonth(r.last)}${r.partial ? "*" : ""}`;
         const mm = (v, at) => h("span", {}, f(v), h("span", { class: "at" }, ` ${fmtShortMonth(at)}`));
         const cells = isLevel
@@ -644,6 +661,7 @@
     }
 
     PRESIDENCIES = manifest.presidencies || [];
+    PARTY_COLORS = manifest.party_colors || {};
     const site = manifest.site || {};
     if (site.publisher_url) {
       const sub = $("#subscribe"); sub.href = site.publisher_url; sub.hidden = false;

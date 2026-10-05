@@ -36,6 +36,16 @@ to a custom month. Convention: the handover month belongs to the outgoing
 president, so for Milei (inaugurated 10 Dec 2023) Dec 2023 = 100 and his
 first month is Jan 2024.
 
+Line colors follow party (`party_colors` in the registry): Peronism (FpV /
+FdT) light blue, PRO gold, La Libertad Avanza purple.
+
+## Release calendar
+
+`registry/releases.yaml` holds INDEC's published release dates; each card
+shows the next one. INDEC issues its calendar by semester, so when the
+listed dates run out the daily run warns in its summary. Add the next
+semester's dates from INDEC's *Calendario de difusión*.
+
 ## Revision history (real-time data)
 
 Because the store only records changes, the value of any observation *as it

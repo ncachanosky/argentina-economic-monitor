@@ -66,6 +66,7 @@ def export(out: Path) -> None:
             "last_obs": wide.dropna(how="all").index.max().strftime("%Y-%m-%d"),
             "last_changed": max(changed) if changed else None,
             "last_checked": max(checked) if checked else None,
+            "next_release": reg.next_release(ind, wide.dropna(how="all").index.max().strftime("%Y-%m-%d")),
             "dates": [d.strftime("%Y-%m-%d") for d in wide.index],
             "variants": {
                 k: {
@@ -103,6 +104,7 @@ def export(out: Path) -> None:
         "site": reg.site,
         "topics": reg.topics,
         "presidencies": reg.presidencies,
+        "party_colors": reg.party_colors,
         "indicators": manifest_inds,
         "built_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
     }
