@@ -1,0 +1,218 @@
+{
+  "11.3_AGCS_2004_M_41": {
+    "last_changed": "2026-10-05",
+    "last_checked": "2026-10-05T14:43:22+00:00",
+    "last_obs": "2026-07-01",
+    "source": "datos_gob",
+    "source_units": "\u00cdndice 2004=100",
+    "status": "ok",
+    "warnings": []
+  },
+  "11.3_CMMR_2004_M_10": {
+    "last_changed": "2026-10-05",
+    "last_checked": "2026-10-05T14:43:22+00:00",
+    "last_obs": "2026-07-01",
+    "source": "datos_gob",
+    "source_units": "\u00cdndice 2004=100",
+    "status": "ok",
+    "warnings": []
+  },
+  "11.3_C_2004_M_60": {
+    "last_changed": "2026-10-05",
+    "last_checked": "2026-10-05T14:43:22+00:00",
+    "last_obs": "2026-07-01",
+    "source": "datos_gob",
+    "source_units": "\u00cdndice 2004=100",
+    "status": "ok",
+    "warnings": []
+  },
+  "11.3_EMC_2004_M_25": {
+    "last_changed": "2026-10-05",
+    "last_checked": "2026-10-05T14:43:22+00:00",
+    "last_obs": "2026-07-01",
+    "source": "datos_gob",
+    "source_units": "\u00cdndice 2004=100",
+    "status": "ok",
+    "warnings": []
+  },
+  "11.3_HR_2004_M_24": {
+    "last_changed": "2026-10-05",
+    "last_checked": "2026-10-05T14:43:22+00:00",
+    "last_obs": "2026-07-01",
+    "source": "datos_gob",
+    "source_units": "\u00cdndice 2004=100",
+    "status": "ok",
+    "warnings": []
+  },
+  "11.3_IF_2004_M_25": {
+    "last_changed": "2026-10-05",
+    "last_checked": "2026-10-05T14:43:22+00:00",
+    "last_obs": "2026-07-01",
+    "source": "datos_gob",
+    "source_units": "\u00cdndice 2004=100",
+    "status": "ok",
+    "warnings": []
+  },
+  "11.3_IM_2004_M_25": {
+    "last_changed": "2026-10-05",
+    "last_checked": "2026-10-05T14:43:22+00:00",
+    "last_obs": "2026-07-01",
+    "source": "datos_gob",
+    "source_units": "\u00cdndice 2004=100",
+    "status": "ok",
+    "warnings": []
+  },
+  "11.3_ISD_2004_M_26": {
+    "last_changed": "2026-10-05",
+    "last_checked": "2026-10-05T14:43:22+00:00",
+    "last_obs": "2026-07-01",
+    "source": "datos_gob",
+    "source_units": "\u00cdndice 2004=100",
+    "status": "ok",
+    "warnings": []
+  },
+  "11.3_ISOM_2004_M_39": {
+    "last_changed": "2026-10-05",
+    "last_checked": "2026-10-05T14:43:22+00:00",
+    "last_obs": "2026-07-01",
+    "source": "datos_gob",
+    "source_units": "\u00cdndice 2004=100",
+    "status": "ok",
+    "warnings": []
+  },
+  "11.3_ITC_2004_M_21": {
+    "last_changed": "2026-10-05",
+    "last_checked": "2026-10-05T14:43:22+00:00",
+    "last_obs": "2026-07-01",
+    "source": "datos_gob",
+    "source_units": "\u00cdndice 2004=100",
+    "status": "ok",
+    "warnings": []
+  },
+  "11.3_P_2004_M_20": {
+    "last_changed": "2026-10-05",
+    "last_checked": "2026-10-05T14:43:22+00:00",
+    "last_obs": "2026-07-01",
+    "source": "datos_gob",
+    "source_units": "\u00cdndice 2004=100",
+    "status": "ok",
+    "warnings": []
+  },
+  "11.3_SEGA_2004_M_48": {
+    "last_changed": "2026-10-05",
+    "last_checked": "2026-10-05T14:43:22+00:00",
+    "last_obs": "2026-07-01",
+    "source": "datos_gob",
+    "source_units": "\u00cdndice 2004=100",
+    "status": "ok",
+    "warnings": []
+  },
+  "11.3_TAC_2004_M_60": {
+    "last_changed": "2026-10-05",
+    "last_checked": "2026-10-05T14:43:22+00:00",
+    "last_obs": "2026-07-01",
+    "source": "datos_gob",
+    "source_units": "\u00cdndice 2004=100",
+    "status": "ok",
+    "warnings": []
+  },
+  "11.3_VIPAA_2004_M_5": {
+    "last_changed": "2026-10-05",
+    "last_checked": "2026-10-05T14:43:22+00:00",
+    "last_obs": "2026-07-01",
+    "source": "datos_gob",
+    "source_units": "\u00cdndice 2004=100",
+    "status": "ok",
+    "warnings": []
+  },
+  "11.3_VMASD_2004_M_23": {
+    "last_changed": "2026-10-05",
+    "last_checked": "2026-10-05T14:43:22+00:00",
+    "last_obs": "2026-07-01",
+    "source": "datos_gob",
+    "source_units": "\u00cdndice 2004=100",
+    "status": "ok",
+    "warnings": []
+  },
+  "11.3_VMATC_2004_M_12": {
+    "last_changed": "2026-10-05",
+    "last_checked": "2026-10-05T14:43:22+00:00",
+    "last_obs": "2026-07-01",
+    "source": "datos_gob",
+    "source_units": "\u00cdndice 2004=100",
+    "status": "ok",
+    "warnings": []
+  },
+  "143.3_NO_PR_2004_A_21": {
+    "last_changed": "2026-10-05",
+    "last_checked": "2026-10-05T14:43:22+00:00",
+    "last_obs": "2026-07-01",
+    "source": "datos_gob",
+    "source_units": "\u00cdndice 2004=100",
+    "status": "ok",
+    "warnings": []
+  },
+  "143.3_NO_PR_2004_A_28": {
+    "last_changed": "2026-10-05",
+    "last_checked": "2026-10-05T14:43:22+00:00",
+    "last_obs": "2026-07-01",
+    "source": "datos_gob",
+    "source_units": "\u00cdndice 2004=100",
+    "status": "ok",
+    "warnings": []
+  },
+  "143.3_NO_PR_2004_A_31": {
+    "last_changed": "2026-10-05",
+    "last_checked": "2026-10-05T14:43:22+00:00",
+    "last_obs": "2026-07-01",
+    "source": "datos_gob",
+    "source_units": "\u00cdndice 2004=100",
+    "status": "ok",
+    "warnings": []
+  },
+  "33.2_ISAC_CICLOCIA_0_M_20_62": {
+    "last_changed": "2026-10-05",
+    "last_checked": "2026-10-05T14:43:22+00:00",
+    "last_obs": "2026-07-01",
+    "source": "datos_gob",
+    "source_units": "\u00cdndice 2004=100",
+    "status": "ok",
+    "warnings": []
+  },
+  "33.2_ISAC_NIVELRAL_0_M_18_63": {
+    "last_changed": "2026-10-05",
+    "last_checked": "2026-10-05T14:43:22+00:00",
+    "last_obs": "2026-07-01",
+    "source": "datos_gob",
+    "source_units": "\u00cdndice 2004=100",
+    "status": "ok",
+    "warnings": []
+  },
+  "33.2_ISAC_SIN_EDAD_0_M_23_56": {
+    "last_changed": "2026-10-05",
+    "last_checked": "2026-10-05T14:43:22+00:00",
+    "last_obs": "2026-07-01",
+    "source": "datos_gob",
+    "source_units": "\u00cdndice 2004=100",
+    "status": "ok",
+    "warnings": []
+  },
+  "453.1_SERIE_DESEADA_0_0_24_58": {
+    "last_changed": "2026-10-05",
+    "last_checked": "2026-10-05T14:43:22+00:00",
+    "last_obs": "2026-07-01",
+    "source": "datos_gob",
+    "source_units": "\u00cdndice 2004 = 100",
+    "status": "ok",
+    "warnings": []
+  },
+  "453.1_SERIE_ORIGNAL_0_0_14_46": {
+    "last_changed": "2026-10-05",
+    "last_checked": "2026-10-05T14:43:22+00:00",
+    "last_obs": "2026-07-01",
+    "source": "datos_gob",
+    "source_units": "\u00cdndice 2004 = 100",
+    "status": "ok",
+    "warnings": []
+  }
+}
