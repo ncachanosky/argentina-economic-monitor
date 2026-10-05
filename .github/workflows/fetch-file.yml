@@ -1,0 +1,25 @@
+# Manual helper: download a source file on GitHub's network and keep it as a
+# run artifact, to inspect files the development sandbox cannot reach.
+name: Fetch a source file
+on:
+  workflow_dispatch:
+    inputs:
+      url:
+        description: File URL
+        required: true
+permissions:
+  contents: read
+jobs:
+  fetch:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Download
+        run: |
+          mkdir out
+          curl -sSL --retry 3 -A "argentina-economic-monitor" -o "out/$(basename "${{ inputs.url }}")" "${{ inputs.url }}"
+          ls -la out
+      - uses: actions/upload-artifact@v4
+        with:
+          name: fetched
+          path: out/
+          retention-days: 3
