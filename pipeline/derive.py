@@ -17,6 +17,12 @@ ratio     num / den * scale per variant ({num, den, scale, rolling}); with
           `rolling: k` both are summed over the last k periods first (e.g.
           investment as a share of GDP over the last four quarters).
 
+tracker   Quarterly averages of a monthly activity index (EMAE), next to
+          quarterly GDP, including the quarter in progress: q/q of the months
+          published so far against the previous quarter's average (s.a.) and
+          y/y of the same months (original series). INDEC reconciles EMAE with
+          quarterly GDP, so once GDP is out the two match.
+
 reweight  What a fixed-base CPI would show with a different basket, from the
           month the new basket would have started (`link`). With division
           indices I_i and price relatives r_i,t = I_i,t / I_i,link:
@@ -176,6 +182,37 @@ def ratio(ind, frames: dict[str, pd.Series]) -> tuple[pd.DataFrame, dict]:
     return pd.DataFrame(out).sort_index(), {}
 
 
+def tracker(ind, frames: dict[str, pd.Series]) -> tuple[pd.DataFrame, dict]:
+    spec = ind.derive
+    sa, orig, gdp = frames[spec["monthly_sa"]], frames[spec["monthly_original"]], frames[spec["quarterly"]]
+    q_sa = sa.resample("QS").mean()
+    months_in = sa.resample("QS").count()
+    q_sa = q_sa[months_in > 0]
+    last_q = q_sa.index.max()
+    n = int(months_in[last_q])
+    have = sa[sa.index >= last_q]
+    info = {"quarter": last_q.strftime("%Y-%m-%d"), "months": [d.strftime("%Y-%m-%d") for d in have.index],
+            "complete": n == 3, "gdp_published": bool(last_q in gdp.index)}
+    prev_q = last_q - pd.offsets.QuarterBegin(1, startingMonth=1)
+    if prev_q in q_sa.index:
+        info["qoq"] = round(float((q_sa[last_q] / q_sa[prev_q] - 1) * 100), 4)
+        # If the remaining months of the quarter stayed at the latest month's level.
+        flat = (have.sum() + have.iloc[-1] * (3 - n)) / 3
+        info["qoq_if_flat"] = round(float((flat / q_sa[prev_q] - 1) * 100), 4)
+    cur = orig[orig.index >= last_q]
+    ly = orig.reindex(cur.index - pd.DateOffset(years=1))
+    if len(cur) and ly.notna().all():
+        info["yoy_original"] = round(float((cur.sum() / ly.sum() - 1) * 100), 4)
+    # How closely complete-quarter EMAE averages match published GDP (q/q, s.a.).
+    full = sa.resample("QS").mean()[months_in == 3]
+    d = (full.pct_change() * 100 - gdp.pct_change() * 100).dropna()
+    if len(d):
+        info["fit_max_pp"] = round(float(d.abs().max()), 3)
+        info["fit_since"] = d.index.min().strftime("%Y-%m-%d")
+    df = pd.DataFrame({ind.variants["emae"].source_id: q_sa, ind.variants["gdp"].source_id: gdp})
+    return df.sort_index(), {"tracker": info}
+
+
 def compute(ind, reg) -> tuple[pd.DataFrame, dict]:
     ids = ind.input_ids()
     frames = {sid: store.as_of(sid) for sid in ids}
@@ -186,4 +223,6 @@ def compute(ind, reg) -> tuple[pd.DataFrame, dict]:
         return splice(ind, frames)
     if ind.derive["method"] == "ratio":
         return ratio(ind, frames)
+    if ind.derive["method"] == "tracker":
+        return tracker(ind, frames)
     return reweight(ind, reg, frames)

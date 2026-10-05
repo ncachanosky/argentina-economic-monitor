@@ -11,7 +11,7 @@ REGISTRY_PATH = ROOT / "registry" / "series.yaml"
 RELEASES_PATH = ROOT / "registry" / "releases.yaml"
 
 KINDS = {"variants", "panel", "contributions"}
-DERIVE_METHODS = {"splice", "reweight", "ratio"}
+DERIVE_METHODS = {"splice", "reweight", "ratio", "tracker"}
 RANGE_KEYS = {"2Y", "5Y", "10Y", "25Y", "50Y", "Max"}
 TRANSFORMS = {"level", "yoy", "mom", "ytd", "acc"}
 FREQUENCIES = {"M", "Q"}
@@ -71,6 +71,8 @@ class Indicator:
                 ids += [seg["id"] for seg in v["segments"]]
         elif self.derive.get("method") == "reweight":
             ids.append(self.derive["headline"])
+        elif self.derive.get("method") == "tracker":
+            ids += [self.derive["monthly_sa"], self.derive["monthly_original"], self.derive["quarterly"]]
         elif self.derive.get("method") == "ratio":
             for v in self.derive["variants"].values():
                 ids += [v["num"], v["den"]]
@@ -124,7 +126,7 @@ class Registry:
             return None
         for d in sorted(cal["dates"], key=lambda x: x["date"]):
             if d["period"] > last_obs[:7]:
-                return {"date": d["date"], "period": d["period"], "name": cal.get("name"),
+                return {"date": d["date"], "period": d["period"], "name": cal.get("name"), "frequency": cal.get("frequency", "M"),
                         "calendar_url": cal.get("calendar_url")}
         return None
 

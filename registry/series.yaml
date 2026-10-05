@@ -302,6 +302,39 @@ indicators:
     # series), Q4/Q4 and the carryover into the next year (seasonally adjusted).
     annual_table: {accumulated: original, within_year: sa, carryover: true}
 
+  - id: gdp_tracker
+    topic: gdp
+    wide: true
+    kind: variants
+    overlay: true
+    title: Tracking the Current Quarter
+    short_title: Quarter tracker
+    description: >-
+      Monthly activity (EMAE) averaged by quarter, next to quarterly GDP. The
+      months already published show where the current quarter is heading
+      before INDEC releases GDP.
+    release: emae
+    source: derived
+    source_label: INDEC, via datos.gob.ar
+    frequency: Q
+    units: Index, 2004 = 100
+    index_base: "2004"
+    transforms: [mom, yoy, level]
+    note: >-
+      Seasonally adjusted series. The latest quarter's EMAE bar uses only the
+      months published so far. INDEC reconciles EMAE with quarterly GDP, so
+      once GDP is published the two agree; before that, EMAE is the earliest
+      official reading of the quarter, and it is revised with each release.
+    default: {variant: emae, transform: mom, start: "2024-07"}
+    derive:
+      method: tracker
+      monthly_sa: 143.3_NO_PR_2004_A_31
+      monthly_original: 143.3_NO_PR_2004_A_21
+      quarterly: 3.2_OGP_D_2004_T_17
+      variants:
+        emae: {label: "EMAE, quarterly average"}
+        gdp:  {label: GDP}
+
   - id: gdp_long
     topic: gdp
     wide: true

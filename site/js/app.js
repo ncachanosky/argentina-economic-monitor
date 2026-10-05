@@ -341,7 +341,7 @@
     if (!nr) return null;
     const today = new Date().toLocaleDateString("en-CA", { timeZone: "America/Argentina/Buenos_Aires" });
     const day = new Date(nr.date + "T12:00:00Z").toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", year: "numeric", timeZone: "UTC" });
-    const period = fmtPeriod(nr.period + "-01", ind.frequency);
+    const period = fmtPeriod(nr.period + "-01", nr.frequency || ind.frequency);
     const text = nr.date > today ? `Next release: ${day} (${period} data)`
       : nr.date === today ? `Next release: today (${period} data)`
       : `${period} data was due ${day}; updating`;
@@ -579,6 +579,21 @@
     const bandKey = ind.bands && ind.bands.some((b) => b.key) ? h("p", { class: "band-key" }, ind.bands.filter((b) => b.key).map((b) =>
       h("span", {}, h("span", { class: "band-sw" + (b.style === "outline" ? " outline" : "") }), b.key))) : null;
 
+    // Quarter tracker: where the quarter in progress stands.
+    function trackerLine() {
+      const tk = ind.derived && ind.derived.tracker;
+      if (!tk) return null;
+      const mName = (iso) => fmtShortMonth(iso).split(" ")[0];
+      const span = tk.months.length > 1 ? `${mName(tk.months[0])}–${mName(tk.months[tk.months.length - 1])}` : mName(tk.months[0]);
+      const sp = INDEX_TRANSFORMS.yoy;
+      const parts = [h("b", {}, `${fmtPeriod(tk.quarter, "Q")}${tk.complete ? "" : ` so far (${span})`}: `)];
+      if (tk.qoq !== undefined) parts.push(`EMAE ${fmtNum(tk.qoq, sp)} q/q, seasonally adjusted`);
+      if (!tk.complete && tk.qoq_if_flat !== undefined && tk.months.length > 1) parts.push(` (${fmtNum(tk.qoq_if_flat, sp)} if the rest of the quarter stays at ${mName(tk.months[tk.months.length - 1])}'s level)`);
+      if (tk.yoy_original !== undefined) parts.push(` · ${fmtNum(tk.yoy_original, sp)} y/y, original series`);
+      parts.push(tk.gdp_published ? " · GDP for the quarter is published." : " · GDP not yet published.");
+      return h("p", { class: "summary-line" }, ...parts);
+    }
+
     // Cumulative change of each variant over fixed windows, on the levels.
     const summaryEl = h("p", { class: "summary-line", hidden: true });
     function drawSummary() {
@@ -689,6 +704,11 @@
       if (main.rebased && state.transform === "level") {
         shapes.push({ type: "line", xref: "paper", yref: "y", x0: 0, x1: 1, y0: 100, y1: 100, line: { color: cssVar("--ink-2"), width: 1, _light: "#5A6872" } });
       }
+      // Quarter tracker: the quarter in progress is drawn lighter.
+      const tk = ind.derived && ind.derived.tracker;
+      if (tk && !tk.complete) traces.forEach((tr) => {
+        if (tr.type === "bar" && tr.name === ind.variants.emae.label) tr.marker = { ...tr.marker, opacity: tr.x.map((d) => (d === tk.quarter ? 0.45 : 1)) };
+      });
       const bs = bandShapes(x);
       if (state.episodes && x.length) {
         EP.forEach((e, n) => {
@@ -804,7 +824,7 @@
       h("div", { class: "controls" }, vSeg, tSeg, h("span", { class: "spacer" }), ind.view_start ? null : rSeg),
       // A short fixed window (view_start) has no use for rebasing or presidencies.
       ind.view_start ? null : h("div", { class: "controls" }, baseWrap, presBtn, epBtn),
-      summaryEl, hint, bandKey, epKey, chartEl, statsEl);
+      trackerLine(), summaryEl, hint, bandKey, epKey, chartEl, statsEl);
     drawSummary();
     table = tableView([], [], false, ind.frequency);
     appendAll(card, table, annualTable(ind), weightsTable(ind), ind.note ? h("p", { class: "chips-note" }, ind.note) : null, footer(ind, onPNG, onCSV));
