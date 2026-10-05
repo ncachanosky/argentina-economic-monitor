@@ -1,7 +1,7 @@
 {
   "11.3_AGCS_2004_M_41": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T17:05:31+00:00",
+    "last_checked": "2026-10-05T17:09:13+00:00",
     "last_obs": "2026-07-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice 2004=100",
@@ -10,7 +10,7 @@
   },
   "11.3_CMMR_2004_M_10": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T17:05:31+00:00",
+    "last_checked": "2026-10-05T17:09:13+00:00",
     "last_obs": "2026-07-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice 2004=100",
@@ -19,7 +19,7 @@
   },
   "11.3_C_2004_M_60": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T17:05:31+00:00",
+    "last_checked": "2026-10-05T17:09:13+00:00",
     "last_obs": "2026-07-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice 2004=100",
@@ -28,7 +28,7 @@
   },
   "11.3_EMC_2004_M_25": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T17:05:31+00:00",
+    "last_checked": "2026-10-05T17:09:13+00:00",
     "last_obs": "2026-07-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice 2004=100",
@@ -37,7 +37,7 @@
   },
   "11.3_HR_2004_M_24": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T17:05:31+00:00",
+    "last_checked": "2026-10-05T17:09:13+00:00",
     "last_obs": "2026-07-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice 2004=100",
@@ -46,7 +46,7 @@
   },
   "11.3_IF_2004_M_25": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T17:05:31+00:00",
+    "last_checked": "2026-10-05T17:09:13+00:00",
     "last_obs": "2026-07-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice 2004=100",
@@ -55,7 +55,7 @@
   },
   "11.3_IM_2004_M_25": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T17:05:31+00:00",
+    "last_checked": "2026-10-05T17:09:13+00:00",
     "last_obs": "2026-07-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice 2004=100",
@@ -64,7 +64,7 @@
   },
   "11.3_ISD_2004_M_26": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T17:05:31+00:00",
+    "last_checked": "2026-10-05T17:09:13+00:00",
     "last_obs": "2026-07-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice 2004=100",
@@ -73,7 +73,7 @@
   },
   "11.3_ISOM_2004_M_39": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T17:05:31+00:00",
+    "last_checked": "2026-10-05T17:09:13+00:00",
     "last_obs": "2026-07-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice 2004=100",
@@ -82,7 +82,7 @@
   },
   "11.3_ITC_2004_M_21": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T17:05:31+00:00",
+    "last_checked": "2026-10-05T17:09:13+00:00",
     "last_obs": "2026-07-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice 2004=100",
@@ -91,7 +91,7 @@
   },
   "11.3_P_2004_M_20": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T17:05:31+00:00",
+    "last_checked": "2026-10-05T17:09:13+00:00",
     "last_obs": "2026-07-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice 2004=100",
@@ -100,7 +100,7 @@
   },
   "11.3_SEGA_2004_M_48": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T17:05:31+00:00",
+    "last_checked": "2026-10-05T17:09:13+00:00",
     "last_obs": "2026-07-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice 2004=100",
@@ -109,7 +109,7 @@
   },
   "11.3_TAC_2004_M_60": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T17:05:31+00:00",
+    "last_checked": "2026-10-05T17:09:13+00:00",
     "last_obs": "2026-07-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice 2004=100",
@@ -118,7 +118,7 @@
   },
   "11.3_VIPAA_2004_M_5": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T17:05:31+00:00",
+    "last_checked": "2026-10-05T17:09:13+00:00",
     "last_obs": "2026-07-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice 2004=100",
@@ -127,7 +127,7 @@
   },
   "11.3_VMASD_2004_M_23": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T17:05:31+00:00",
+    "last_checked": "2026-10-05T17:09:13+00:00",
     "last_obs": "2026-07-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice 2004=100",
@@ -136,7 +136,7 @@
   },
   "11.3_VMATC_2004_M_12": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T17:05:31+00:00",
+    "last_checked": "2026-10-05T17:09:13+00:00",
     "last_obs": "2026-07-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice 2004=100",
@@ -145,7 +145,7 @@
   },
   "143.3_NO_PR_2004_A_21": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T17:05:31+00:00",
+    "last_checked": "2026-10-05T17:09:13+00:00",
     "last_obs": "2026-07-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice 2004=100",
@@ -154,7 +154,7 @@
   },
   "143.3_NO_PR_2004_A_28": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T17:05:31+00:00",
+    "last_checked": "2026-10-05T17:09:13+00:00",
     "last_obs": "2026-07-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice 2004=100",
@@ -163,7 +163,7 @@
   },
   "143.3_NO_PR_2004_A_31": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T17:05:31+00:00",
+    "last_checked": "2026-10-05T17:09:13+00:00",
     "last_obs": "2026-07-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice 2004=100",
@@ -172,7 +172,7 @@
   },
   "146.3_IALIMENNAL_DICI_M_45": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T17:05:31+00:00",
+    "last_checked": "2026-10-05T17:09:13+00:00",
     "last_obs": "2026-08-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice",
@@ -181,7 +181,7 @@
   },
   "146.3_IBEBIDANAL_DICI_M_39": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T17:05:31+00:00",
+    "last_checked": "2026-10-05T17:09:13+00:00",
     "last_obs": "2026-08-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice",
@@ -190,22 +190,16 @@
   },
   "146.3_IBIENESNAL_DICI_M_36": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T17:05:31+00:00",
+    "last_checked": "2026-10-05T17:09:13+00:00",
     "last_obs": "2026-08-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice",
     "status": "ok",
     "warnings": []
   },
-  "146.3_IBIENIESNAL_DICI_M_36": {
-    "error": "fetch failed: {\"errors\": [{\"error\": \"Serie inexistente: 146.3_IBIENIESNAL_DICI_M_36\"}], \"failed_series\": [\"146.3_IBIENIESNAL_DICI_M_36\"]}",
-    "last_checked": "2026-10-05T17:02:46+00:00",
-    "source": "datos_gob",
-    "status": "error"
-  },
   "146.3_ICOMUNINAL_DICI_M_27": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T17:05:31+00:00",
+    "last_checked": "2026-10-05T17:09:13+00:00",
     "last_obs": "2026-08-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice",
@@ -214,7 +208,7 @@
   },
   "146.3_IEDUCACNAL_DICI_M_22": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T17:05:31+00:00",
+    "last_checked": "2026-10-05T17:09:13+00:00",
     "last_obs": "2026-08-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice",
@@ -223,7 +217,7 @@
   },
   "146.3_IEQUIPANAL_DICI_M_46": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T17:05:31+00:00",
+    "last_checked": "2026-10-05T17:09:13+00:00",
     "last_obs": "2026-08-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice",
@@ -232,7 +226,7 @@
   },
   "146.3_IPRENDANAL_DICI_M_35": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T17:05:31+00:00",
+    "last_checked": "2026-10-05T17:09:13+00:00",
     "last_obs": "2026-08-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice",
@@ -241,7 +235,7 @@
   },
   "146.3_IRECREANAL_DICI_M_31": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T17:05:31+00:00",
+    "last_checked": "2026-10-05T17:09:13+00:00",
     "last_obs": "2026-08-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice",
@@ -250,7 +244,7 @@
   },
   "146.3_IRESTAUNAL_DICI_M_33": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T17:05:31+00:00",
+    "last_checked": "2026-10-05T17:09:13+00:00",
     "last_obs": "2026-08-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice",
@@ -259,7 +253,7 @@
   },
   "146.3_ISALUDNAL_DICI_M_18": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T17:05:31+00:00",
+    "last_checked": "2026-10-05T17:09:13+00:00",
     "last_obs": "2026-08-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice",
@@ -268,7 +262,7 @@
   },
   "146.3_ITRANSPNAL_DICI_M_23": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T17:05:31+00:00",
+    "last_checked": "2026-10-05T17:09:13+00:00",
     "last_obs": "2026-08-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice",
@@ -277,7 +271,7 @@
   },
   "146.3_IVIVIENNAL_DICI_M_52": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T17:05:31+00:00",
+    "last_checked": "2026-10-05T17:09:13+00:00",
     "last_obs": "2026-08-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice",
@@ -286,7 +280,7 @@
   },
   "148.3_IESTACINAL_DICI_M_25": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T17:05:31+00:00",
+    "last_checked": "2026-10-05T17:09:13+00:00",
     "last_obs": "2026-08-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice",
@@ -295,7 +289,7 @@
   },
   "148.3_INIVELANA_DICI_M_26": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T17:05:31+00:00",
+    "last_checked": "2026-10-05T17:09:13+00:00",
     "last_obs": "2026-08-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice",
@@ -304,7 +298,7 @@
   },
   "148.3_INIVELGBA_DICI_M_21": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T17:05:31+00:00",
+    "last_checked": "2026-10-05T17:09:13+00:00",
     "last_obs": "2026-08-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice",
@@ -313,7 +307,7 @@
   },
   "148.3_INIVELNAL_DICI_M_26": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T17:05:31+00:00",
+    "last_checked": "2026-10-05T17:09:13+00:00",
     "last_obs": "2026-08-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice",
@@ -322,7 +316,7 @@
   },
   "148.3_INIVELNEA_DICI_M_21": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T17:05:31+00:00",
+    "last_checked": "2026-10-05T17:09:13+00:00",
     "last_obs": "2026-08-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice",
@@ -331,7 +325,7 @@
   },
   "148.3_INIVELNIA_DICI_M_27": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T17:05:31+00:00",
+    "last_checked": "2026-10-05T17:09:13+00:00",
     "last_obs": "2026-08-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice",
@@ -340,7 +334,7 @@
   },
   "148.3_INIVELNOA_DICI_M_21": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T17:05:31+00:00",
+    "last_checked": "2026-10-05T17:09:13+00:00",
     "last_obs": "2026-08-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice",
@@ -349,7 +343,7 @@
   },
   "148.3_INIVELUYO_DICI_M_22": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T17:05:31+00:00",
+    "last_checked": "2026-10-05T17:09:13+00:00",
     "last_obs": "2026-08-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice",
@@ -358,7 +352,7 @@
   },
   "148.3_INUCLEONAL_DICI_M_19": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T17:05:31+00:00",
+    "last_checked": "2026-10-05T17:09:13+00:00",
     "last_obs": "2026-08-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice",
@@ -367,7 +361,7 @@
   },
   "148.3_IREGULANAL_DICI_M_22": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T17:05:31+00:00",
+    "last_checked": "2026-10-05T17:09:13+00:00",
     "last_obs": "2026-08-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice",
@@ -376,7 +370,7 @@
   },
   "3.2_OGP_D_2004_T_17": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T17:05:31+00:00",
+    "last_checked": "2026-10-05T17:09:13+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos a precios de 2004",
@@ -385,7 +379,7 @@
   },
   "31.3_UCP_2004_M_20": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T17:05:31+00:00",
+    "last_checked": "2026-10-05T17:09:13+00:00",
     "last_obs": "2026-07-01",
     "source": "datos_gob",
     "source_units": "Porcentaje",
@@ -394,7 +388,7 @@
   },
   "31.3_UEI_2004_M_22": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T17:05:31+00:00",
+    "last_checked": "2026-10-05T17:09:13+00:00",
     "last_obs": "2026-07-01",
     "source": "datos_gob",
     "source_units": "Porcentaje",
@@ -403,7 +397,7 @@
   },
   "31.3_UIMB_2004_M_33": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T17:05:31+00:00",
+    "last_checked": "2026-10-05T17:09:13+00:00",
     "last_obs": "2026-07-01",
     "source": "datos_gob",
     "source_units": "Porcentaje",
@@ -412,7 +406,7 @@
   },
   "31.3_UMNIA_2004_M_42": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T17:05:31+00:00",
+    "last_checked": "2026-10-05T17:09:13+00:00",
     "last_obs": "2026-07-01",
     "source": "datos_gob",
     "source_units": "Porcentaje",
@@ -421,7 +415,7 @@
   },
   "31.3_UMNM_2004_M_27": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T17:05:31+00:00",
+    "last_checked": "2026-10-05T17:09:13+00:00",
     "last_obs": "2026-07-01",
     "source": "datos_gob",
     "source_units": "Porcentaje",
@@ -430,7 +424,7 @@
   },
   "31.3_UNG_2004_M_18": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T17:05:31+00:00",
+    "last_checked": "2026-10-05T17:09:13+00:00",
     "last_obs": "2026-07-01",
     "source": "datos_gob",
     "source_units": "Porcentaje",
@@ -439,7 +433,7 @@
   },
   "31.3_UPAB_2004_M_35": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T17:05:31+00:00",
+    "last_checked": "2026-10-05T17:09:13+00:00",
     "last_obs": "2026-07-01",
     "source": "datos_gob",
     "source_units": "Porcentaje",
@@ -448,7 +442,7 @@
   },
   "31.3_UPC_2004_M_17": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T17:05:31+00:00",
+    "last_checked": "2026-10-05T17:09:13+00:00",
     "last_obs": "2026-07-01",
     "source": "datos_gob",
     "source_units": "Porcentaje",
@@ -457,7 +451,7 @@
   },
   "31.3_UPT_2004_M_21": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T17:05:31+00:00",
+    "last_checked": "2026-10-05T17:09:13+00:00",
     "last_obs": "2026-07-01",
     "source": "datos_gob",
     "source_units": "Porcentaje",
@@ -466,7 +460,7 @@
   },
   "31.3_UPT_2004_M_23": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T17:05:31+00:00",
+    "last_checked": "2026-10-05T17:09:13+00:00",
     "last_obs": "2026-07-01",
     "source": "datos_gob",
     "source_units": "Porcentaje",
@@ -475,7 +469,7 @@
   },
   "31.3_URP_2004_M_24": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T17:05:31+00:00",
+    "last_checked": "2026-10-05T17:09:13+00:00",
     "last_obs": "2026-07-01",
     "source": "datos_gob",
     "source_units": "Porcentaje",
@@ -484,7 +478,7 @@
   },
   "31.3_USPQ_2004_M_34": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T17:05:31+00:00",
+    "last_checked": "2026-10-05T17:09:13+00:00",
     "last_obs": "2026-07-01",
     "source": "datos_gob",
     "source_units": "Porcentaje",
@@ -493,7 +487,7 @@
   },
   "31.3_UV_2004_M_25": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T17:05:31+00:00",
+    "last_checked": "2026-10-05T17:09:13+00:00",
     "last_obs": "2026-07-01",
     "source": "datos_gob",
     "source_units": "Porcentaje",
@@ -502,7 +496,7 @@
   },
   "33.2_ISAC_CICLOCIA_0_M_20_62": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T17:05:31+00:00",
+    "last_checked": "2026-10-05T17:09:13+00:00",
     "last_obs": "2026-07-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice 2004=100",
@@ -511,7 +505,7 @@
   },
   "33.2_ISAC_NIVELRAL_0_M_18_63": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T17:05:31+00:00",
+    "last_checked": "2026-10-05T17:09:13+00:00",
     "last_obs": "2026-07-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice 2004=100",
@@ -520,7 +514,7 @@
   },
   "33.2_ISAC_SIN_EDAD_0_M_23_56": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T17:05:31+00:00",
+    "last_checked": "2026-10-05T17:09:13+00:00",
     "last_obs": "2026-07-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice 2004=100",
@@ -529,7 +523,7 @@
   },
   "4.2_DE_2004_T_24": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T17:05:31+00:00",
+    "last_checked": "2026-10-05T17:09:13+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos a precios de 2004",
@@ -538,7 +532,7 @@
   },
   "4.2_DGCP_2004_T_30": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T17:05:31+00:00",
+    "last_checked": "2026-10-05T17:09:13+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos a precios de 2004",
@@ -547,7 +541,7 @@
   },
   "4.2_DGE_2004_T_26": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T17:05:31+00:00",
+    "last_checked": "2026-10-05T17:09:13+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos a precios de 2004",
@@ -556,7 +550,7 @@
   },
   "4.2_DGIT_2004_T_25": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T17:05:31+00:00",
+    "last_checked": "2026-10-05T17:09:13+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos a precios de 2004",
@@ -565,7 +559,7 @@
   },
   "4.2_MGCP_2004_T_25": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T17:05:31+00:00",
+    "last_checked": "2026-10-05T17:09:13+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos a precios de 2004",
@@ -574,7 +568,7 @@
   },
   "4.2_OGI_2004_T_25": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T17:05:31+00:00",
+    "last_checked": "2026-10-05T17:09:13+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos a precios de 2004",
@@ -583,7 +577,7 @@
   },
   "4.2_OGP_2004_T_17": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T17:05:31+00:00",
+    "last_checked": "2026-10-05T17:09:13+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos a precios de 2004",
@@ -592,7 +586,7 @@
   },
   "4.2_VE_2004_T_21": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T17:05:31+00:00",
+    "last_checked": "2026-10-05T17:09:13+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos a precios de 2004",
@@ -601,7 +595,7 @@
   },
   "448.1_NIVEL_GENERAL_0_0_13_46": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T17:05:31+00:00",
+    "last_checked": "2026-10-05T17:09:13+00:00",
     "last_obs": "2026-08-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice Dic-2015=100",
@@ -610,7 +604,7 @@
   },
   "453.1_SERIE_DESEADA_0_0_24_58": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T17:05:31+00:00",
+    "last_checked": "2026-10-05T17:09:13+00:00",
     "last_obs": "2026-07-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice 2004 = 100",
@@ -619,7 +613,7 @@
   },
   "453.1_SERIE_ORIGNAL_0_0_14_46": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T17:05:31+00:00",
+    "last_checked": "2026-10-05T17:09:13+00:00",
     "last_obs": "2026-07-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice 2004 = 100",
@@ -628,7 +622,7 @@
   },
   "6.2_AGCS_2004_T_39": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T17:05:31+00:00",
+    "last_checked": "2026-10-05T17:09:13+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos a precios de 2004",
@@ -637,7 +631,7 @@
   },
   "6.2_AIEA_2004_T_48": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T17:05:31+00:00",
+    "last_checked": "2026-10-05T17:09:13+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos a precios de 2004",
@@ -646,7 +640,7 @@
   },
   "6.2_APDPSSAO_2004_T_60": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T17:05:31+00:00",
+    "last_checked": "2026-10-05T17:09:13+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos a precios de 2004",
@@ -655,7 +649,7 @@
   },
   "6.2_CMMR_2004_T_41": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T17:05:31+00:00",
+    "last_checked": "2026-10-05T17:09:13+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos a precios de 2004",
@@ -664,7 +658,7 @@
   },
   "6.2_C_2004_T_12": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T17:05:31+00:00",
+    "last_checked": "2026-10-05T17:09:13+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos a precios de 2004",
@@ -673,7 +667,7 @@
   },
   "6.2_EMC_2004_T_26": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T17:05:31+00:00",
+    "last_checked": "2026-10-05T17:09:13+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos a precios de 2004",
@@ -682,7 +676,7 @@
   },
   "6.2_E_2004_T_10": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T17:05:31+00:00",
+    "last_checked": "2026-10-05T17:09:13+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos a precios de 2004",
@@ -691,7 +685,7 @@
   },
   "6.2_HPSD_2004_T_32": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T17:05:31+00:00",
+    "last_checked": "2026-10-05T17:09:13+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos a precios de 2004",
@@ -700,7 +694,7 @@
   },
   "6.2_HR_2004_T_20": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T17:05:31+00:00",
+    "last_checked": "2026-10-05T17:09:13+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos a precios de 2004",
@@ -709,7 +703,7 @@
   },
   "6.2_IF_2004_T_25": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T17:05:31+00:00",
+    "last_checked": "2026-10-05T17:09:13+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos a precios de 2004",
@@ -718,7 +712,7 @@
   },
   "6.2_IM_2004_T_23": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T17:05:31+00:00",
+    "last_checked": "2026-10-05T17:09:13+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos a precios de 2004",
@@ -727,7 +721,7 @@
   },
   "6.2_IPNS_2004_T_35": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T17:05:31+00:00",
+    "last_checked": "2026-10-05T17:09:13+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos a precios de 2004",
@@ -736,7 +730,7 @@
   },
   "6.2_OASCSP_2004_T_60": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T17:05:31+00:00",
+    "last_checked": "2026-10-05T17:09:13+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos a precios de 2004",
@@ -745,7 +739,7 @@
   },
   "6.2_PIBPM_2004_T_38": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T17:05:31+00:00",
+    "last_checked": "2026-10-05T17:09:13+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos a precios de 2004",
@@ -754,7 +748,7 @@
   },
   "6.2_P_2004_T_5": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T17:05:31+00:00",
+    "last_checked": "2026-10-05T17:09:13+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos a precios de 2004",
@@ -763,7 +757,7 @@
   },
   "6.2_SEGA_2004_T_32": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T17:05:31+00:00",
+    "last_checked": "2026-10-05T17:09:13+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos a precios de 2004",
@@ -772,7 +766,7 @@
   },
   "6.2_SSS_2004_T_24": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T17:05:31+00:00",
+    "last_checked": "2026-10-05T17:09:13+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos a precios de 2004",
@@ -781,7 +775,7 @@
   },
   "6.2_TAC_2004_T_40": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-05T17:05:31+00:00",
+    "last_checked": "2026-10-05T17:09:13+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos a precios de 2004",
