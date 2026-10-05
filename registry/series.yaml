@@ -54,6 +54,7 @@ topics:
 indicators:
   - id: emae
     topic: real_sector
+    wide: true
     kind: variants
     title: Monthly Economic Activity Estimator (EMAE)
     short_title: EMAE
@@ -141,3 +142,56 @@ indicators:
       trend:    {label: Trend-cycle,         id: 33.2_ISAC_CICLOCIA_0_M_20_62}
     default: {variant: sa, transform: level, start: "2016-01"}
     headline: {variant: sa, transform: mom}
+
+  - id: ucii
+    topic: real_sector
+    wide: true
+    kind: variants
+    measure: rate
+    transforms: [level, yoy]
+    title: Industrial Capacity Utilization (UCII)
+    short_title: Capacity utilization
+    description: >-
+      Share of installed manufacturing capacity in use, from INDEC's monthly
+      survey. Not seasonally adjusted, so compare against the same month of
+      earlier years. Changes are in percentage points.
+    release: ucii
+    source: datos_gob
+    source_label: INDEC, via datos.gob.ar
+    frequency: M
+    units: "% of installed capacity"
+    variants:
+      total: {label: Total manufacturing, id: 31.3_UNG_2004_M_18}
+    default: {variant: total, transform: level, start: "2016-01"}
+    headline: {variant: total, transform: level}
+
+  - id: ucii_blocks
+    topic: real_sector
+    kind: panel
+    measure: rate
+    transforms: [level, yoy]
+    component_noun: industries
+    title: Capacity Utilization by Industry
+    short_title: UCII by industry
+    description: >-
+      Capacity utilization in each of INDEC's twelve industry blocks, latest
+      month. Select industries to compare their paths.
+    release: ucii
+    source: datos_gob
+    source_label: INDEC, via datos.gob.ar
+    frequency: M
+    units: "% of installed capacity"
+    variants:
+      food:        {label: Food & beverages,               id: 31.3_UPAB_2004_M_35}
+      tobacco:     {label: Tobacco,                        id: 31.3_UPT_2004_M_21}
+      textiles:    {label: Textiles,                       id: 31.3_UPT_2004_M_23}
+      paper:       {label: Paper & cardboard,              id: 31.3_UPC_2004_M_17}
+      printing:    {label: Publishing & printing,          id: 31.3_UEI_2004_M_22}
+      refining:    {label: Oil refining,                   id: 31.3_URP_2004_M_24}
+      chemicals:   {label: Chemicals,                      id: 31.3_USPQ_2004_M_34}
+      plastics:    {label: Rubber & plastics,              id: 31.3_UCP_2004_M_20}
+      minerals:    {label: Non-metallic minerals,          id: 31.3_UMNM_2004_M_27}
+      metals:      {label: Basic metals,                   id: 31.3_UIMB_2004_M_33}
+      autos:       {label: Motor vehicles,                 id: 31.3_UV_2004_M_25}
+      metalwork:   {label: Metalworking (excl. autos),     id: 31.3_UMNIA_2004_M_42}
+    default: {variant: [food, autos, metals], transform: level, start: "2016-01"}

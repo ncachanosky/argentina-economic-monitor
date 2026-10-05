@@ -41,3 +41,11 @@ construccion:
     - {date: "2026-10-07", period: "2026-08"}
     - {date: "2026-11-06", period: "2026-09"}
     - {date: "2026-12-09", period: "2026-10"}
+
+ucii:
+  name: Utilización de la capacidad instalada en la industria (UCII)
+  calendar_url: https://www.indec.gob.ar/ftp/cuadros/publicaciones/calendario_2sem2026.pdf
+  dates:
+    - {date: "2026-10-15", period: "2026-08"}
+    - {date: "2026-11-13", period: "2026-09"}
+    - {date: "2026-12-16", period: "2026-10"}

@@ -26,7 +26,7 @@ class Check:
         return not self.errors
 
 
-def check_series(new: pd.Series, old: pd.Series, frequency: str = "M") -> Check:
+def check_series(new: pd.Series, old: pd.Series, frequency: str = "M", measure: str = "index") -> Check:
     c = Check()
     new = new.dropna().sort_index()
 
@@ -42,8 +42,10 @@ def check_series(new: pd.Series, old: pd.Series, frequency: str = "M") -> Check:
         missing = expected.difference(new.index)
         if len(missing):
             c.errors.append(f"{len(missing)} missing month(s), first {missing[0]:%Y-%m}")
-    if (new <= 0).any():
+    if measure == "index" and (new <= 0).any():
         c.errors.append("non-positive index values")
+    if measure == "rate" and ((new < 0) | (new > 100)).any():
+        c.errors.append("rate outside 0-100")
 
     if not old.empty:
         if new.index.max() < old.index.max():
@@ -55,17 +57,21 @@ def check_series(new: pd.Series, old: pd.Series, frequency: str = "M") -> Check:
             c.errors.append(f"{len(lost)} previously published observations disappeared")
 
         common = old.index.intersection(new.index)
-        rel = ((new[common] - old[common]).abs() / old[common].abs()).dropna()
+        if measure == "rate":  # revisions to a percentage, in points (5 pp = "large")
+            rel = ((new[common] - old[common]).abs() / 100).dropna()
+        else:
+            rel = ((new[common] - old[common]).abs() / old[common].abs()).dropna()
         big = rel[rel > LARGE_REVISION]
         if len(big):
+            unit = (lambda v: f"{v * 100:.1f} pp") if measure == "rate" else (lambda v: f"{v:.1%}")
             c.warnings.append(
-                f"{len(big)} observation(s) revised by more than {LARGE_REVISION:.0%}; "
-                f"largest {big.max():.1%} at {big.idxmax():%Y-%m}"
+                f"{len(big)} observation(s) revised by more than {unit(LARGE_REVISION)}; "
+                f"largest {unit(big.max())} at {big.idxmax():%Y-%m}"
             )
 
         fresh = new.index.difference(old.index)
         if len(fresh) and len(new) > 24:
-            pct = new.pct_change()
+            pct = new.diff() / 100 if measure == "rate" else new.pct_change()
             mad = (pct - pct.median()).abs().median()
             threshold = max(JUMP_FLOOR, JUMP_MADS * mad)
             jumps = pct[fresh][pct[fresh].abs() > threshold]

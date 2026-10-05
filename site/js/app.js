@@ -12,11 +12,25 @@
   const SERIES_VARS = ["--series-1", "--series-2", "--series-3", "--series-4"];
   const EXPORT = { width: 1200, height: 800 }; // EO figure standard
 
-  const TRANSFORMS = {
-    level: { label: "Level", short: "Level", unit: null, pct: false },
-    yoy:   { label: "y/y %", short: "Year-over-year change, %", unit: "%", pct: true },
-    mom:   { label: "m/m %", short: "Month-over-month change, %", unit: "%", pct: true },
+  // Transformations by measure. Indices change in percent; rates (e.g. capacity
+  // utilization, already in %) change in percentage points.
+  //   suffix: appended to values; signed: show +/-; change: is a change, not a level
+  const INDEX_TRANSFORMS = {
+    level: { label: "Level", short: null, suffix: "", signed: false, change: false },
+    yoy:   { label: "y/y %", short: "Year-over-year change, %", suffix: "%", signed: true, change: true },
+    mom:   { label: "m/m %", short: "Month-over-month change, %", suffix: "%", signed: true, change: true },
   };
+  const RATE_TRANSFORMS = {
+    level: { label: "Level", short: null, suffix: "%", signed: false, change: false },
+    yoy:   { label: "y/y (pp)", short: "Year-over-year change, percentage points", suffix: " pp", signed: true, change: true },
+    mom:   { label: "m/m (pp)", short: "Month-over-month change, percentage points", suffix: " pp", signed: true, change: true },
+  };
+  const TRANSFORMS = INDEX_TRANSFORMS;
+  function tfs(ind) {
+    const all = ind.measure === "rate" ? RATE_TRANSFORMS : INDEX_TRANSFORMS;
+    const keys = ind.transforms && ind.transforms.length ? ind.transforms : Object.keys(all);
+    return Object.fromEntries(keys.map((k) => [k, all[k]]));
+  }
   const RANGES = { "2Y": 2, "5Y": 5, "10Y": 10, "Max": null };
 
   // ---------- small helpers ----------
@@ -39,8 +53,13 @@
   };
   const fmtMonth = (iso) => new Date(iso + "T00:00:00Z").toLocaleDateString("en-US", { month: "long", year: "numeric", timeZone: "UTC" });
   const fmtShortMonth = (iso) => new Date(iso + "T00:00:00Z").toLocaleDateString("en-US", { month: "short", year: "numeric", timeZone: "UTC" });
-  const fmtNum = (v, pct) => v === null || v === undefined || Number.isNaN(v) ? "–" :
-    (pct ? (v > 0 ? "+" : "") + v.toFixed(1) + "%" : v.toLocaleString("en-US", { maximumFractionDigits: 1, minimumFractionDigits: 1 }));
+  const specOf = (p) => (p && typeof p === "object" ? p : p ? INDEX_TRANSFORMS.yoy : INDEX_TRANSFORMS.level);
+  const fmtNum = (v, p) => {
+    if (v === null || v === undefined || Number.isNaN(v)) return "–";
+    const s = specOf(p);
+    return s.signed ? (v > 0 ? "+" : "") + v.toFixed(1) + s.suffix
+      : v.toLocaleString("en-US", { maximumFractionDigits: 1, minimumFractionDigits: 1 }) + s.suffix;
+  };
   const monthIndex = (iso) => { const [y, m] = iso.split("-").map(Number); return y * 12 + (m - 1); };
 
   async function getJSON(path) {
@@ -50,15 +69,18 @@
   }
 
   // ---------- transformations ----------
-  function transform(dates, values, kind) {
+  function transform(dates, values, kind, measure) {
     if (kind === "level") return values.slice();
+    const diff = measure === "rate";
     const lag = kind === "yoy" ? 12 : 1;
     const mi = dates.map(monthIndex);
     const pos = new Map(mi.map((m, i) => [m, i]));
     return values.map((v, i) => {
       const j = pos.get(mi[i] - lag);
       const prev = j === undefined ? null : values[j];
-      return v === null || prev === null || prev === 0 ? null : (v / prev - 1) * 100;
+      if (v === null || prev === null) return null;
+      if (diff) return v - prev;
+      return prev === 0 ? null : (v / prev - 1) * 100;
     });
   }
 
@@ -93,7 +115,7 @@
       hoverlabel: { bgcolor: cssVar("--surface"), bordercolor: rule, font: { family: font, color: ink } },
       showlegend: false,
       xaxis: { type: "date", gridcolor: grid, linecolor: rule, tickcolor: rule, zeroline: false, showspikes: false, ...opts.xaxis },
-      yaxis: { gridcolor: grid, linecolor: rule, zerolinecolor: ink2, zerolinewidth: 1, automargin: true, ticksuffix: opts.pct ? "%" : "", ...opts.yaxis },
+      yaxis: { gridcolor: grid, linecolor: rule, zerolinecolor: ink2, zerolinewidth: 1, automargin: true, ticksuffix: specOf(opts.pct).suffix, ...opts.yaxis },
       ...opts.extra,
     };
   }
@@ -145,7 +167,7 @@
       showlegend: data.filter((t) => t.showlegend !== false).length > 1,
       legend: { orientation: "h", x: 0, y: 1.02, xanchor: "left", yanchor: "bottom", font: { size: 16, color: light.ink } },
       xaxis: { type: data[0] && data[0].orientation === "h" ? "linear" : "date", gridcolor: light.grid, linecolor: light.rule, ticks: "outside", tickcolor: light.rule },
-      yaxis: { gridcolor: light.grid, linecolor: light.rule, zerolinecolor: light.ink2, ticksuffix: pct ? "%" : "", automargin: true },
+      yaxis: { gridcolor: light.grid, linecolor: light.rule, zerolinecolor: light.ink2, ticksuffix: specOf(pct).suffix, automargin: true },
       shapes: (extras.shapes || []).map((sh) => ({ ...sh, line: { ...(sh.line || {}), color: (sh.line && sh.line._light) || light.ink3 } })),
       annotations: [
         ...(extras.annotations || []).map((a) => ({ ...a, font: { ...(a.font || {}), size: 15, color: light.ink2 } })),
@@ -154,7 +176,8 @@
       ],
       bargap: 0.25,
     };
-    if (data[0] && data[0].orientation === "h") { layout.xaxis.ticksuffix = pct ? "%" : ""; layout.yaxis.ticksuffix = ""; layout.margin.l = 260; }
+    if (extras.uniformtext) layout.uniformtext = extras.uniformtext;
+    if (data[0] && data[0].orientation === "h") { layout.xaxis.ticksuffix = (extras.xsuffix !== undefined ? extras.xsuffix : specOf(pct).suffix); if (extras.xrange) layout.xaxis.range = extras.xrange; layout.yaxis.ticksuffix = ""; layout.margin.l = 260; }
     const url = await Plotly.toImage({ data, layout }, { format: "png", width: EXPORT.width, height: EXPORT.height });
     const a = h("a", { href: url, download: filename });
     document.body.append(a); a.click(); a.remove();
@@ -189,7 +212,7 @@
   }
 
   // Per-term statistics on a full (not range-clipped) series.
-  function termStats(dates, y, isLevel) {
+  function termStats(dates, y, isLevel, measure) {
     const idx = new Map(dates.map((d, i) => [d, i]));
     const out = [];
     for (const p of PRESIDENCIES) {
@@ -208,7 +231,7 @@
       out.push({
         p, first: pts[0][0], last: pts[pts.length - 1][0], n: pts.length,
         partial: pts[0][0] > w.first, ongoing: !w.last,
-        start, end, change: start ? (end / start - 1) * 100 : null,
+        start, end, change: start === null || start === undefined ? null : measure === "rate" ? end - start : start ? (end / start - 1) * 100 : null,
         avg: vals.reduce((a, b) => a + b, 0) / vals.length,
         min: vals[iMin], minAt: pts[iMin][0], max: vals[iMax], maxAt: pts[iMax][0],
       });
@@ -286,6 +309,8 @@
   // ---------- card: one series with variants ----------
   function variantsCard(ind, wide) {
     const variantKeys = Object.keys(ind.variants);
+    const T = tfs(ind);
+    const isRate = ind.measure === "rate";
     const state = {
       variant: ind.default.variant,
       transform: ind.default.transform || "level",
@@ -300,7 +325,7 @@
     const statsEl = h("div", { class: "term-stats", hidden: true });
 
     const vSeg = variantKeys.length > 1 ? segmented(variantKeys.map((k) => [k, ind.variants[k].label]), state.variant, (k) => { state.variant = k; if (k === "original" && state.transform === "mom") state.transform = "yoy"; draw(); }, "Series") : null;
-    const tSeg = segmented(Object.entries(TRANSFORMS).map(([k, t]) => [k, t.label]), state.transform, (k) => { state.transform = k; draw(); }, "Transformation");
+    const tSeg = segmented(Object.entries(T).map(([k, t]) => [k, t.label]), state.transform, (k) => { state.transform = k; draw(); }, "Transformation");
     const rSeg = segmented(Object.keys(RANGES).map((k) => [k, k]), state.range, (k) => { state.range = k; draw(); }, "Time range");
 
     // Index base: as published, start of a presidential term, or a custom month.
@@ -321,7 +346,7 @@
       draw();
     });
     customIn.addEventListener("change", () => { if (customIn.value) { state.customBase = customIn.value + "-01"; draw(); } });
-    const baseWrap = h("label", { class: "base-pick" }, h("span", {}, "Base = 100:"), baseSel, customIn);
+    const baseWrap = isRate ? null : h("label", { class: "base-pick" }, h("span", {}, "Base = 100:"), baseSel, customIn);
 
     const presBtn = PRESIDENCIES.length ? h("button", { class: "btn toggle", type: "button", "aria-pressed": "false", onclick: () => { state.byPres = !state.byPres; draw(); } }, "By presidency") : null;
     let table;
@@ -336,8 +361,8 @@
     // Full transformed (and rebased) series for a variant, plus its label/units.
     function series(variantKey) {
       const v = ind.variants[variantKey];
-      let y = transform(ind.dates, v.values, state.transform);
-      const bm = baseMonth();
+      let y = transform(ind.dates, v.values, state.transform, ind.measure);
+      const bm = isRate ? null : baseMonth();
       let units = ind.units, rebased = false;
       if (bm) {
         const bi = ind.dates.indexOf(bm);
@@ -354,11 +379,11 @@
 
     // Build traces; each carries _light (export color) so the PNG matches.
     function build() {
-      const t = TRANSFORMS[state.transform];
+      const t = T[state.transform];
       const main = series(state.variant);
       const idx = visibleIdx(main.y);
       const x = idx.map((i) => ind.dates[i]), y = idx.map((i) => main.y[i]);
-      const sfx = t.pct ? "%" : "";
+      const sfx = t.suffix;
       const traces = [], shapes = [], annotations = [];
 
       if (!state.byPres) {
@@ -374,10 +399,10 @@
           marker: { color: terms.map((p) => (p ? termColor(p) : cssVar("--ink-3"))) },
           _lightColors: terms.map((p) => (p ? termLight(p) : "#85909A")),
           customdata: terms.map((p) => (p ? p.short : "")),
-          hovertemplate: `%{x|%b %Y}: <b>%{y:,.1f}%</b><extra>%{customdata}</extra>`,
+          hovertemplate: `%{x|%b %Y}: <b>%{y:,.1f}${sfx}</b><extra>%{customdata}</extra>`,
         });
       } else {
-        const stats = new Map(termStats(ind.dates, main.y, state.transform === "level").map((s) => [s.p.id, s]));
+        const stats = new Map(termStats(ind.dates, main.y, state.transform === "level", ind.measure).map((s) => [s.p.id, s]));
         const visible = new Set(x);
         // Faint dashed original series behind a seasonally adjusted / trend view, as context.
         const bg = state.variant !== "original" && ind.variants.original ? series("original") : null;
@@ -388,7 +413,7 @@
             if (!ii.length) continue;
             const color = termColor(p);
             const st = stats.get(p.id);
-            const stat = st ? (t.pct ? `avg ${fmtNum(st.avg, true)}` : `max ${fmtNum(st.max, false)}`) : "";
+            const stat = st ? (t.change ? `avg ${fmtNum(st.avg, t)}` : `max ${fmtNum(st.max, t)}`) : "";
             const common = { type: "scatter", mode: "lines", _light: termLight(p), legendgroup: p.id };
             if (faint) {
               traces.push({ ...common, x: ii.map((i) => ind.dates[i]), y: ii.map((i) => yy[i]), line: { color, width: 1.2, dash: "dash" }, opacity: 0.35, showlegend: false, hoverinfo: "skip", name: `${p.short} (original)` });
@@ -420,7 +445,7 @@
         if (state.transform === "level" && y.length) {
           const lastV = y[y.length - 1];
           shapes.push({ type: "line", xref: "paper", yref: "y", x0: 0, x1: 1, y0: lastV, y1: lastV, line: { color: cssVar("--ink-3"), width: 1, dash: "dash", _light: "#85909A" } });
-          annotations.push({ xref: "paper", yref: "y", x: 0.005, y: lastV, xanchor: "left", yanchor: "bottom", showarrow: false, text: `Latest: ${fmtNum(lastV, false)}`, font: { size: 12, color: cssVar("--ink-2") } });
+          annotations.push({ xref: "paper", yref: "y", x: 0.005, y: lastV, xanchor: "left", yanchor: "bottom", showarrow: false, text: `Latest: ${fmtNum(lastV, t)}`, font: { size: 12, color: cssVar("--ink-2") } });
         }
       }
       if (main.rebased && state.transform === "level") {
@@ -432,8 +457,9 @@
     function drawStats(main, t) {
       if (!state.byPres) { statsEl.hidden = true; return; }
       const isLevel = state.transform === "level";
-      const rows = termStats(ind.dates, main.y, isLevel);
-      const f = (v) => fmtNum(v, t.pct);
+      const rows = termStats(ind.dates, main.y, isLevel, ind.measure);
+      const f = (v) => fmtNum(v, t);
+      const fc = (v) => fmtNum(v, isRate ? RATE_TRANSFORMS.yoy : INDEX_TRANSFORMS.yoy);
       const head = isLevel
         ? ["Presidency", "Period", "Start", "Latest / end", "Change", "Average", "Min", "Max"]
         : ["Presidency", "Period", "Average", "Min", "Max", "Latest / end"];
@@ -442,7 +468,7 @@
         const period = `${fmtShortMonth(r.first)} – ${r.ongoing ? "present" : fmtShortMonth(r.last)}${r.partial ? "*" : ""}`;
         const mm = (v, at) => h("span", {}, f(v), h("span", { class: "at" }, ` ${fmtShortMonth(at)}`));
         const cells = isLevel
-          ? [r.start === null ? "–" : f(r.start), f(r.end), r.change === null ? "–" : fmtNum(r.change, true), f(r.avg), mm(r.min, r.minAt), mm(r.max, r.maxAt)]
+          ? [r.start === null ? "–" : f(r.start), f(r.end), r.change === null ? "–" : fc(r.change), f(r.avg), mm(r.min, r.minAt), mm(r.max, r.maxAt)]
           : [f(r.avg), mm(r.min, r.minAt), mm(r.max, r.maxAt), f(r.end)];
         return h("tr", {}, h("td", { class: "pres" }, sw, r.p.short), h("td", {}, period), ...cells.map((c) => h("td", {}, c)));
       }));
@@ -466,13 +492,14 @@
 
       const { traces, shapes, annotations, main, t, x, y } = build();
       const msgs = [];
-      if (state.variant === "original") msgs.push("m/m changes are only meaningful on seasonally adjusted data.");
+      if (isRate && state.transform !== "level") msgs.push("Changes in a rate are shown in percentage points.");
+      if (state.variant === "original" && T.mom) msgs.push("m/m changes are only meaningful on seasonally adjusted data.");
       if (state.transform !== "level" && state.base !== "published") msgs.push("Rebasing applies to levels only; percent changes are unaffected.");
       if (state.transform === "level" && state.base !== "published" && !main.rebased) msgs.push("No data for that base month; showing the series as published.");
       hint.textContent = msgs.join(" ");
 
       Plotly.react(chartEl, traces, baseLayout({
-        pct: t.pct,
+        pct: t,
         extra: {
           bargap: 0.2, shapes, annotations,
           showlegend: state.byPres && state.transform !== "mom",
@@ -481,18 +508,18 @@
         },
       }), PLOT_CONFIG);
       drawStats(main, t);
-      table && table.refresh(x, [{ label: `${main.v.label}${t.pct ? " (" + t.label + ")" : main.rebased ? ` (${main.units})` : ""}`, values: y }], t.pct);
+      table && table.refresh(x, [{ label: `${main.v.label}${t.change ? " (" + t.label + ")" : main.rebased ? ` (${main.units})` : ""}`, values: y }], t);
     }
 
-    const subtitle = (main, t) => `${main.v.label} · ${t.pct ? t.short : main.units}`;
+    const subtitle = (main, t) => `${main.v.label} · ${t.change ? t.short : main.units}`;
     const fileTag = () => `${ind.id}_${state.variant}_${state.transform}${baseMonth() ? "_base" + baseMonth().slice(0, 7) : ""}${state.byPres ? "_presidencies" : ""}`;
     const onPNG = () => {
       const { traces, shapes, annotations, main, t } = build();
-      exportPNG(ind, traces, subtitle(main, t), t.pct, `${fileTag()}.png`, { shapes, annotations });
+      exportPNG(ind, traces, subtitle(main, t), t, `${fileTag()}.png`, { shapes, annotations });
     };
     const onCSV = () => {
       const { main, t, x, y } = build();
-      const header = ["date", `${ind.short_title} — ${main.v.label} — ${t.pct ? t.short : main.units}`];
+      const header = ["date", `${ind.short_title} — ${main.v.label} — ${t.change ? t.short : main.units}`];
       if (state.byPres) header.push("presidency");
       const rows = x.map((d, i) => {
         const r = [d, y[i] === null ? "" : +y[i].toFixed(4)];
@@ -512,27 +539,42 @@
     return card;
   }
 
-  // ---------- card: panel of components (EMAE by sector) ----------
+  // ---------- card: panel of components (EMAE by sector, UCII by block) ----------
+  // Breaks the bar axis when one value dwarfs the rest (e.g. fishing +424%),
+  // so the others stay readable. Returns the axis cap, or null if no break.
+  function axisBreak(vals) {
+    const abs = vals.filter((v) => v !== null).map(Math.abs).sort((a, b) => b - a);
+    if (abs.length < 3 || abs[1] === 0 || abs[0] < 2.5 * abs[1]) return null;
+    return abs[1] * 1.35;
+  }
+
   function panelCard(ind) {
     const keys = Object.keys(ind.variants);
+    const T = tfs(ind);
+    const isRate = ind.measure === "rate";
+    const barKind = isRate ? "level" : "yoy";      // what the ranked bars show
+    const barSpec = T[barKind];
     const defaults = [].concat(ind.default.variant).slice(0, MAX_PANEL_SERIES);
-    const slots = new Map(defaults.map((k, i) => [k, i]));   // color follows the sector, not its rank
-    const state = { transform: ind.default.transform || "yoy", range: rangeFromDefault(ind) };
+    const slots = new Map(defaults.map((k, i) => [k, i]));   // color follows the component, not its rank
+    const state = { transform: ind.default.transform || barKind, range: rangeFromDefault(ind) };
+    const noun = ind.component_noun || "series";
 
     const card = cardFrame(ind, true);
-    const barEl = h("div", { class: "chart tall", role: "img", "aria-label": "Latest year-over-year change by sector" });
-    const lineEl = h("div", { class: "chart", role: "img", "aria-label": "Selected sectors over time" });
-    const chipsEl = h("div", { class: "chips", role: "group", "aria-label": "Sectors to compare" });
+    const barEl = h("div", { class: "chart tall", role: "img", "aria-label": `Latest ${barSpec.short || "level"} by ${noun}` });
+    const lineEl = h("div", { class: "chart", role: "img", "aria-label": `Selected ${noun} over time` });
+    const chipsEl = h("div", { class: "chips", role: "group", "aria-label": `${noun} to compare` });
     const chipsNote = h("span", { class: "chips-note" });
-    const tSeg = segmented([["yoy", TRANSFORMS.yoy.label], ["level", TRANSFORMS.level.label]], state.transform, (k) => { state.transform = k; drawLines(); }, "Transformation");
+    const lineKinds = Object.keys(T).filter((k) => k !== "mom");
+    const tSeg = segmented(lineKinds.map((k) => [k, T[k].label]), state.transform, (k) => { state.transform = k; drawLines(); }, "Transformation");
     const rSeg = segmented(Object.keys(RANGES).map((k) => [k, k]), state.range, (k) => { state.range = k; drawLines(); }, "Time range");
     let table;
 
-    // Latest y/y for every sector, at the most recent month all sectors share.
-    const yoys = Object.fromEntries(keys.map((k) => [k, transform(ind.dates, ind.variants[k].values, "yoy")]));
+    // Bar metric for every component, at the most recent month they all share.
+    const metric = Object.fromEntries(keys.map((k) => [k, transform(ind.dates, ind.variants[k].values, barKind, ind.measure)]));
     let refIdx = ind.dates.length - 1;
-    while (refIdx > 0 && keys.some((k) => yoys[k][refIdx] === null)) refIdx--;
+    while (refIdx > 0 && keys.some((k) => metric[k][refIdx] === null)) refIdx--;
     const refDate = ind.dates[refIdx];
+    const barTitle = isRate ? `${ind.units}, ${fmtMonth(refDate)}` : `Year-over-year change, ${fmtMonth(refDate)}`;
 
     function freeSlot() { const used = new Set(slots.values()); for (let i = 0; i < MAX_PANEL_SERIES; i++) if (!used.has(i)) return i; return -1; }
 
@@ -542,30 +584,58 @@
       drawAll();
     }
 
-    function barTraces(forExport) {
-      const order = keys.slice().sort((a, b) => yoys[a][refIdx] - yoys[b][refIdx]);
-      const muted = forExport ? "__muted__" : (isDark() ? "#4A5761" : "#C9CED3");
-      return [{
+    function bars(forExport) {
+      const order = keys.slice().sort((a, b) => metric[a][refIdx] - metric[b][refIdx]);
+      const actual = order.map((k) => metric[k][refIdx]);
+      const cap = axisBreak(actual);
+      const shown = actual.map((v) => (cap && Math.abs(v) > cap ? Math.sign(v) * cap : v));
+      const clipped = actual.map((v) => !!cap && Math.abs(v) > cap);
+      const muted = forExport ? "#C9CED3" : (isDark() ? "#4A5761" : "#C9CED3");
+      const lightSeries = ["#B87333", "#5B9BD5", "#87A96B", "#8E7AB5"];
+      const colors = order.map((k) => (slots.has(k) ? (forExport ? lightSeries[slots.get(k)] : cssVar(SERIES_VARS[slots.get(k)])) : muted));
+      const inkColor = forExport ? "#36454F" : cssVar("--ink");
+      const trace = {
         type: "bar", orientation: "h",
         y: order.map((k) => ind.variants[k].label),
-        x: order.map((k) => yoys[k][refIdx]),
-        marker: { color: order.map((k) => slots.has(k) ? (forExport ? ["#B87333", "#5B9BD5", "#87A96B", "#8E7AB5"][slots.get(k)] : cssVar(SERIES_VARS[slots.get(k)])) : muted) },
-        customdata: order,
-        hovertemplate: "%{y}: <b>%{x:+.1f}%</b><extra></extra>",
-      }];
+        x: shown,
+        marker: { color: colors },
+        customdata: order.map((k, i) => [k, actual[i]]),
+        text: actual.map((v) => fmtNum(v, barSpec)),
+        textposition: clipped.map((c) => (c ? "inside" : "outside")),
+        insidetextanchor: "end",
+        textfont: { family: cssVar("--font-ui") || "Calibri, Arial, sans-serif", size: forExport ? 15 : 12, color: clipped.map((c, i) => (c && slots.has(order[i]) ? "#FFFFFF" : inkColor)) },
+        cliponaxis: false,
+        hovertemplate: `%{y}: <b>%{customdata[1]:${barSpec.signed ? "+" : ""}.1f}${barSpec.suffix}</b><extra></extra>`,
+        _lightColors: colors,
+      };
+      // Room for outside labels; the broken bar ends at the axis edge.
+      const lo = Math.min(0, ...shown), hi = Math.max(0, ...shown);
+      const pad = (hi - lo) * 0.12;
+      const range = [lo < 0 ? lo - pad : 0, hi > 0 ? (clipped.some((c, i) => c && shown[i] > 0) ? hi : hi + pad) : 0 + pad * 0.2];
+      if (isRate) { range[0] = 0; range[1] = Math.min(100, hi + pad); }
+      // Two slanted strokes in the background color mark where the axis is broken.
+      const shapes = [];
+      clipped.forEach((c, i) => {
+        if (!c) return;
+        const xm = shown[i] * 0.8, d = Math.abs(shown[i]) * 0.012, bg = forExport ? "#FFFFFF" : cssVar("--surface");
+        for (const off of [-1.6 * d, 1.6 * d]) {
+          shapes.push({ type: "line", xref: "x", yref: "y", x0: xm + off - d, x1: xm + off + d, y0: i - 0.42, y1: i + 0.42, line: { color: bg, width: 3, _light: "#FFFFFF" } });
+        }
+      });
+      return { traces: [trace], shapes, range, cap };
     }
 
     function lineTraces() {
-      const t = TRANSFORMS[state.transform];
+      const t = T[state.transform];
       const start = startDate(ind.last_obs, RANGES[state.range]);
       return [...slots.entries()].sort((a, b) => a[1] - b[1]).map(([k, slot]) => {
-        const y = state.transform === "yoy" ? yoys[k] : ind.variants[k].values;
+        const y = state.transform === "level" ? ind.variants[k].values : transform(ind.dates, ind.variants[k].values, state.transform, ind.measure);
         const idx = ind.dates.map((d, i) => i).filter((i) => (!start || ind.dates[i] >= start) && y[i] !== null);
         return {
           type: "scatter", mode: "lines", name: ind.variants[k].label,
           x: idx.map((i) => ind.dates[i]), y: idx.map((i) => y[i]),
           line: { color: cssVar(SERIES_VARS[slot]), width: 2 }, _slot: slot,
-          hovertemplate: `%{y:,.1f}${t.pct ? "%" : ""}<extra>${ind.variants[k].label}</extra>`,
+          hovertemplate: `%{y:,.1f}${t.suffix}<extra>${ind.variants[k].label}</extra>`,
         };
       });
     }
@@ -577,53 +647,63 @@
         if (on) sw.style.background = cssVar(SERIES_VARS[slots.get(k)]);
         return h("button", { class: "chip", type: "button", "aria-pressed": String(on), disabled: !on && slots.size >= MAX_PANEL_SERIES ? true : null, onclick: () => toggle(k) }, sw, ind.variants[k].label);
       }));
-      chipsNote.textContent = `Compare up to ${MAX_PANEL_SERIES} sectors. Click a bar or a name to add or remove it.`;
+      chipsNote.textContent = `Compare up to ${MAX_PANEL_SERIES} ${noun}. Click a bar or a name to add or remove it.`;
     }
 
+    let barNote;
     function drawBars() {
-      Plotly.react(barEl, barTraces(false), baseLayout({
-        pct: false,
-        xaxis: { type: "linear", ticksuffix: "%", zeroline: true, zerolinecolor: cssVar("--ink-2") },
+      const b = bars(false);
+      Plotly.react(barEl, b.traces, baseLayout({
+        xaxis: { type: "linear", ticksuffix: barSpec.suffix, zeroline: true, zerolinecolor: cssVar("--ink-2"), range: b.range },
         yaxis: { ticksuffix: "", automargin: true, gridcolor: "rgba(0,0,0,0)" },
-        extra: { hovermode: "closest", margin: { l: 10, r: 16, t: 10, b: 36 }, bargap: 0.3 },
+        extra: { hovermode: "closest", margin: { l: 10, r: 16, t: 10, b: 36 }, bargap: 0.3, shapes: b.shapes, uniformtext: { minsize: 10, mode: "show" } },
       }), PLOT_CONFIG);
+      barNote.textContent = b.cap ? ` Axis broken at ${fmtNum(b.cap, barSpec)}; the marked bar extends beyond it; its label shows the full value.` : "";
     }
 
     function drawLines() {
       tSeg.update(state.transform); rSeg.update(state.range);
-      const t = TRANSFORMS[state.transform];
+      const t = T[state.transform];
       const tr = lineTraces();
-      Plotly.react(lineEl, tr, baseLayout({ pct: t.pct, extra: { showlegend: true, legend: { orientation: "h", x: 0, y: 1.02, yanchor: "bottom", font: { color: cssVar("--ink") } }, margin: { l: 52, r: 16, t: 30, b: 36 } } }), PLOT_CONFIG);
-      table && table.refresh(tr[0] ? tr[0].x : [], tr.map((s) => ({ label: s.name, values: s.y })), t.pct);
+      Plotly.react(lineEl, tr, baseLayout({ pct: t, extra: { showlegend: true, legend: { orientation: "h", x: 0, y: 1.02, yanchor: "bottom", font: { color: cssVar("--ink") } }, margin: { l: 52, r: 16, t: 30, b: 36 } } }), PLOT_CONFIG);
+      table && table.refresh(tr[0] ? tr[0].x : [], tr.map((s) => ({ label: s.name, values: s.y })), t);
     }
 
     function drawAll() { drawChips(); drawBars(); drawLines(); }
 
+    const seriesNote = isRate ? "" : " · original series";
     const onPNG = () => {
-      const t = TRANSFORMS[state.transform];
-      exportPNG(ind, lineTraces(), `${t.pct ? t.short : ind.units} · original series`, t.pct, `${ind.id}_${state.transform}.png`);
+      const t = T[state.transform];
+      exportPNG(ind, lineTraces(), `${t.change ? t.short : ind.units}${seriesNote}`, t, `${ind.id}_${state.transform}.png`);
     };
-    const onBarPNG = () => exportPNG({ ...ind, title: `${ind.title}: year-over-year change, ${fmtMonth(refDate)}` }, barTraces(true), "Percent change vs. same month a year earlier · original series", true, `${ind.id}_latest_yoy.png`);
+    const onBarPNG = () => {
+      const b = bars(true);
+      exportPNG({ ...ind, title: `${ind.title}: ${barTitle.charAt(0).toLowerCase() + barTitle.slice(1)}` }, b.traces,
+        isRate ? `Latest month, by ${noun}` : `Percent change vs. same month a year earlier${seriesNote}`, barSpec, `${ind.id}_latest_${barKind}.png`,
+        { shapes: b.shapes, xrange: b.range, xsuffix: barSpec.suffix });
+    };
     const onCSV = () => {
+      const t = T[state.transform];
       const tr = lineTraces();
       const all = [...new Set(tr.flatMap((s) => s.x))].sort();
       const maps = tr.map((s) => new Map(s.x.map((d, i) => [d, s.y[i]])));
-      downloadBlob(toCSV(["date", ...tr.map((s) => `${s.name}${state.transform === "yoy" ? " (y/y %)" : ""}`)], all.map((d) => [d, ...maps.map((m) => (m.has(d) ? +m.get(d).toFixed(4) : ""))])),
+      downloadBlob(toCSV(["date", ...tr.map((s) => `${s.name}${t.change ? ` (${t.label})` : ""}`)], all.map((d) => [d, ...maps.map((m) => (m.has(d) ? +m.get(d).toFixed(4) : ""))])),
         `${ind.id}_${state.transform}.csv`, "text/csv");
     };
 
+    barNote = h("span", {});
     card.append(
-      h("p", { class: "hint" }, `Year-over-year change, ${fmtMonth(refDate)}. `,
-        h("button", { class: "btn", type: "button", onclick: onBarPNG, style: "padding:1px 8px;font-size:12px" }, "PNG")),
+      h("p", { class: "hint" }, `${barTitle}. `,
+        h("button", { class: "btn", type: "button", onclick: onBarPNG, style: "padding:1px 8px;font-size:12px" }, "PNG"), barNote),
       barEl,
       h("div", { class: "controls", style: "margin-top:14px" }, tSeg, h("span", { class: "spacer" }), rSeg),
       chipsEl, chipsNote, lineEl);
-    table = tableView([], [], true);
+    table = tableView([], [], T[state.transform]);
     card.append(table, footer(ind, onPNG, onCSV));
     card.draw = () => {
       drawAll();
       if (!barEl.dataset.bound) {
-        barEl.on("plotly_click", (ev) => { const k = ev.points && ev.points[0] && ev.points[0].customdata; if (k) toggle(k); });
+        barEl.on("plotly_click", (ev) => { const cd = ev.points && ev.points[0] && ev.points[0].customdata; if (cd) toggle(cd[0]); });
         barEl.dataset.bound = "1";
       }
     };
@@ -633,19 +713,24 @@
   // ---------- headline tiles ----------
   function tile(ind) {
     const hl = ind.headline;
+    const T = tfs(ind);
     const v = ind.variants[hl.variant];
-    const series = transform(ind.dates, v.values, hl.transform);
+    const series = transform(ind.dates, v.values, hl.transform, ind.measure);
     const last = lastValid(ind.dates, series);
     if (!last) return null;
-    const t = TRANSFORMS[hl.transform];
-    const orig = ind.variants.original;
-    const yoy = orig ? lastValid(ind.dates, transform(ind.dates, orig.values, "yoy")) : null;
-    const cls = t.pct ? (last.value > 0 ? " pos" : last.value < 0 ? " neg" : "") : "";
+    const t = T[hl.transform] || INDEX_TRANSFORMS[hl.transform];
+    const isRate = ind.measure === "rate";
+    // Second line: y/y of the original series (indices) or of the same series in pp (rates).
+    const yoySrc = isRate ? v : ind.variants.original;
+    const yoySpec = isRate ? RATE_TRANSFORMS.yoy : INDEX_TRANSFORMS.yoy;
+    const yoy = yoySrc ? lastValid(ind.dates, transform(ind.dates, yoySrc.values, "yoy", ind.measure)) : null;
+    const cls = t.change ? (last.value > 0 ? " pos" : last.value < 0 ? " neg" : "") : "";
+    const what = isRate ? (t.change ? t.label : ind.units) : `${hl.transform === "mom" ? "m/m" : t.label}, ${v.label.toLowerCase()}`;
     return h("a", { class: "tile", href: `#ind-${ind.id}` },
       h("div", { class: "tile-label" }, ind.short_title),
-      h("div", { class: "tile-value" + cls }, fmtNum(last.value, t.pct)),
-      h("div", { class: "tile-sub" }, `${fmtShortMonth(last.date)} · ${hl.transform === "mom" ? "m/m" : t.label}, ${v.label.toLowerCase()}`),
-      yoy ? h("div", { class: "tile-sub" }, `${fmtNum(yoy.value, true)} y/y (original series, ${fmtShortMonth(yoy.date)})`) : null);
+      h("div", { class: "tile-value" + cls }, fmtNum(last.value, t)),
+      h("div", { class: "tile-sub" }, `${fmtShortMonth(last.date)} · ${what}`),
+      yoy ? h("div", { class: "tile-sub" }, isRate ? `${fmtNum(yoy.value, yoySpec)} vs. a year earlier` : `${fmtNum(yoy.value, yoySpec)} y/y (original series, ${fmtShortMonth(yoy.date)})`) : null);
   }
 
   // ---------- page ----------
@@ -685,11 +770,8 @@
       if (!list || !list.length) continue;
       nav.append(h("a", { href: `#topic-${topic.id}` }, topic.title));
       const cards = h("div", { class: "cards" });
-      // Panels span the full width; place single-series cards first so they pair up.
-      const ordered = [...list.filter((i) => i.kind !== "panel"), ...list.filter((i) => i.kind === "panel")];
-      // With an odd number of single-series cards, the first one spans the full row.
-      const singles = list.filter((i) => i.kind !== "panel").length;
-      ordered.forEach((ind, n) => cards.append(ind.kind === "panel" ? panelCard(ind) : variantsCard(ind, singles % 2 === 1 && n === 0)));
+      // Registry order; panels and cards flagged `wide` span the full row.
+      list.forEach((ind) => cards.append(ind.kind === "panel" ? panelCard(ind) : variantsCard(ind, !!ind.wide)));
       sections.push(h("section", { class: "topic", id: `topic-${topic.id}` },
         h("h2", {}, topic.title), h("p", {}, topic.description || ""), cards));
     }

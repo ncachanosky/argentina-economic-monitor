@@ -36,6 +36,7 @@ def run(dry_run: bool = False, strict: bool = False) -> int:
     vintage = now.strftime("%Y-%m-%d")
     today = pd.Timestamp(now.date())
     freq_of = {v.source_id: ind.frequency for ind in reg.indicators for v in ind.variants.values()}
+    measure_of = {v.source_id: ind.measure for ind in reg.indicators for v in ind.variants.values()}
 
     status = _load_status()
     lines: list[str] = []
@@ -63,7 +64,7 @@ def run(dry_run: bool = False, strict: bool = False) -> int:
 
             if problem is None:
                 new = res.data.loc[res.data["series_id"] == sid].set_index("date")["value"]
-                chk = validate.check_series(new, old, freq_of[sid])
+                chk = validate.check_series(new, old, freq_of[sid], measure_of[sid])
                 if res.meta.get(sid, {}).get("units"):
                     entry["source_units"] = res.meta[sid]["units"]
                 if not chk.ok:

@@ -38,6 +38,10 @@ class Indicator:
     default: dict
     headline: dict | None = None
     release: str | None = None
+    measure: str = "index"          # "index" (changes in %) or "rate" (changes in pp)
+    transforms: list[str] | None = None
+    component_noun: str | None = None
+    wide: bool = False
 
 
 HEX = __import__("re").compile(r"^#[0-9A-Fa-f]{6}$")
@@ -118,6 +122,10 @@ def load(path: Path = REGISTRY_PATH, releases_path: Path = RELEASES_PATH) -> Reg
             raise RegistryError(f"{where}: unknown default transform")
 
         headline = item.get("headline")
+        if item.get("measure", "index") not in {"index", "rate"}:
+            raise RegistryError(f"{where}: measure must be 'index' or 'rate'")
+        if item.get("transforms") and not set(item["transforms"]) <= TRANSFORMS:
+            raise RegistryError(f"{where}: unknown transforms {item['transforms']}")
         if item.get("release") and item["release"] not in releases:
             raise RegistryError(f"{where}: release {item['release']!r} not in releases.yaml")
         if headline and headline.get("variant") not in variants:
@@ -139,6 +147,10 @@ def load(path: Path = REGISTRY_PATH, releases_path: Path = RELEASES_PATH) -> Reg
                 default=default,
                 headline=headline,
                 release=item.get("release"),
+                measure=item.get("measure", "index"),
+                transforms=item.get("transforms"),
+                component_noun=item.get("component_noun"),
+                wide=bool(item.get("wide", False)),
             )
         )
 
