@@ -270,7 +270,10 @@
   // The average of a compounding rate (m/m, q/q) is geometric:
   // (prod(1 + r/100))^(1/n) - 1, the constant rate giving the same cumulative change.
   const isGeometric = (kind, measure) => kind === "mom" && measure !== "rate";
-  function termStats(dates, y, isLevel, measure, freq, kind) {
+  // For y/y views of an index, the term's "average" is its annualized change:
+  // (level_end / level_base)^(12 / months) - 1, which needs the levels.
+  const isAnnualized = (kind, measure) => kind === "yoy" && measure !== "rate";
+  function termStats(dates, y, isLevel, measure, freq, kind, levels) {
     const idx = new Map(dates.map((d, i) => [d, i]));
     const out = [];
     for (const p of PRESIDENCIES) {
@@ -290,7 +293,17 @@
         p, first: pts[0][0], last: pts[pts.length - 1][0], n: pts.length,
         partial: pts[0][0] > w.first, ongoing: !w.last,
         start, end, change: start === null || start === undefined ? null : measure === "rate" ? end - start : start ? (end / start - 1) * 100 : null,
-        avg: isGeometric(kind, measure)
+        avg: isAnnualized(kind, measure) && levels
+          ? (() => {
+              // Series starting mid-term: annualize from its first level in the term.
+              let b = idx.get(w.base);
+              if (b === undefined || !levels[b]) b = dates.findIndex((d, i) => d >= w.base && levels[i]);
+              const e = idx.get(pts[pts.length - 1][0]);
+              const months = b < 0 ? 0 : monthIndex(pts[pts.length - 1][0]) - monthIndex(dates[b]);
+              return b === undefined || !levels[b] || levels[e] === null || months <= 0 ? null
+                : (Math.pow(levels[e] / levels[b], 12 / months) - 1) * 100;
+            })()
+          : isGeometric(kind, measure)
           ? (Math.exp(vals.reduce((a, b) => a + Math.log(1 + b / 100), 0) / vals.length) - 1) * 100
           : vals.reduce((a, b) => a + b, 0) / vals.length,
         min: vals[iMin], minAt: pts[iMin][0], max: vals[iMax], maxAt: pts[iMax][0],
@@ -591,7 +604,7 @@
           hovertemplate: `%{x|${DF}}: <b>%{y:,.1f}${sfx}</b><extra>%{customdata}</extra>`,
         });
       } else {
-        const stats = new Map(termStats(ind.dates, main.y, state.transform === "level", ind.measure, ind.frequency, state.transform).map((s) => [s.p.id, s]));
+        const stats = new Map(termStats(ind.dates, main.y, state.transform === "level", ind.measure, ind.frequency, state.transform, main.v.values).map((s) => [s.p.id, s]));
         const visible = new Set(x);
         // Faint dashed original series behind a seasonally adjusted / trend view, as context.
         const bg = state.variant !== "original" && ind.variants.original ? series("original") : null;
@@ -602,7 +615,7 @@
             if (!ii.length) continue;
             const color = termColor(p);
             const st = stats.get(p.id);
-            const stat = st ? (t.change ? `avg ${fmtNum(st.avg, t)}` : `max ${fmtNum(st.max, t)}`) : "";
+            const stat = st && st.avg !== null ? (t.change ? `${isAnnualized(state.transform, ind.measure) ? "annualized" : "avg"} ${fmtNum(st.avg, t)}` : `max ${fmtNum(st.max, t)}`) : "";
             const common = { type: "scatter", mode: "lines", _light: termLight(p), legendgroup: p.id };
             if (faint) {
               traces.push({ ...common, x: ii.map((i) => ind.dates[i]), y: ii.map((i) => yy[i]), line: { color, width: 1.2, dash: "dash" }, opacity: 0.35, showlegend: false, hoverinfo: "skip", name: `${p.short} (original)` });
@@ -647,13 +660,13 @@
     function drawStats(main, t) {
       if (!state.byPres) { statsEl.hidden = true; return; }
       const isLevel = state.transform === "level";
-      const rows = termStats(ind.dates, main.y, isLevel, ind.measure, ind.frequency, state.transform);
-      const geo = isGeometric(state.transform, ind.measure);
+      const rows = termStats(ind.dates, main.y, isLevel, ind.measure, ind.frequency, state.transform, main.v.values);
+      const geo = isGeometric(state.transform, ind.measure), ann = isAnnualized(state.transform, ind.measure);
       const f = (v) => fmtNum(v, t);
       const fc = (v) => fmtNum(v, isRate ? RATE_TRANSFORMS.yoy : INDEX_TRANSFORMS.yoy);
       const head = isLevel
         ? ["Presidency", "Period", "Start", "Latest / end", "Change", "Average", "Min", "Max"]
-        : ["Presidency", "Period", geo ? "Average (geometric)" : "Average", "Min", "Max", "Latest / end"];
+        : ["Presidency", "Period", geo ? "Average (geometric)" : ann ? "Annualized over term" : "Average", "Min", "Max", "Latest / end"];
       const tbody = h("tbody", {}, rows.slice().reverse().map((r) => {
         const sw = h("span", { class: "sw" }); sw.style.background = termColor(r.p);
         const period = `${fP(r.first)} – ${r.ongoing ? "present" : fP(r.last)}${r.partial ? "*" : ""}`;
@@ -666,6 +679,7 @@
       const note = [
         `Statistics use each full term regardless of the time range shown. ${isLevel ? `Start is the base ${ind.frequency === "Q" ? "quarter" : "month"} (the last one before the term); change is latest/end vs. start.` : ""}`,
         geo ? ` The average ${T.mom.label.split(" ")[0]} rate is geometric: the constant rate that compounds to the term's cumulative change.` : "",
+        ann ? " Annualized over term: the constant annual rate that compounds to the term's cumulative change, from the base month to the latest/end month." : "",
         rows.some((r) => r.partial) ? " *Series begins after the term started." : "",
       ].join("");
       statsEl.replaceChildren(

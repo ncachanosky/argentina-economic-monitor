@@ -19,7 +19,7 @@
 site:
   title: Argentina Economic Monitor
   publisher: Economic Order
-  publisher_url: ""   # TODO: Economic Order Substack URL (used for header link and subscribe button)
+  publisher_url: https://economicorder.substack.com   # header link and subscribe button
   repo_url: https://github.com/ncachanosky/argentina-economic-monitor
 
 # Presidential terms, used to color charts by presidency, compute per-term
