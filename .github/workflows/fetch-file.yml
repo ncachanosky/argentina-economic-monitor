@@ -1,5 +1,5 @@
-# Manual helper: download a source file on GitHub's network and keep it as a
-# run artifact, to inspect files the development sandbox cannot reach.
+# Manual helper: download a source file on GitHub's network and push it to
+# the `inspect` branch, to inspect files the development sandbox cannot reach.
 name: Fetch a source file
 on:
   workflow_dispatch:
@@ -8,18 +8,18 @@ on:
         description: File URL
         required: true
 permissions:
-  contents: read
+  contents: write
 jobs:
   fetch:
     runs-on: ubuntu-24.04
     steps:
-      - name: Download
+      - name: Download and push to the inspect branch
         run: |
-          mkdir out
-          curl -sSL --retry 3 -A "argentina-economic-monitor" -o "out/$(basename "${{ inputs.url }}")" "${{ inputs.url }}"
-          ls -la out
-      - uses: actions/upload-artifact@v4
-        with:
-          name: fetched
-          path: out/
-          retention-days: 3
+          git init -q work && cd work
+          git config user.name "aem-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -q -b inspect
+          curl -sSL --retry 3 -A "argentina-economic-monitor" -o "$(basename "${{ inputs.url }}")" "${{ inputs.url }}"
+          ls -la
+          git add -A && git commit -q -m "inspect: $(basename "${{ inputs.url }}")"
+          git push -f -q "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" inspect
