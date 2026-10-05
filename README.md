@@ -39,6 +39,16 @@ first month is Jan 2024.
 Line colors follow party (`party_colors` in the registry): Peronism (FpV /
 FdT) light blue, PRO gold, La Libertad Avanza purple.
 
+## Quarterly data and contributions
+
+Indicators can be monthly (`frequency: M`) or quarterly (`Q`). Quarterly
+cards show q/q instead of m/m, and presidency rules apply to quarters (the
+handover quarter belongs to the outgoing president). `index_base: "2004"`
+shows levels as an index (that year's average = 100) while the "All data"
+CSV keeps source units. `kind: contributions` computes each component's
+contribution to y/y growth of a total (fixed-base accounts are additive),
+with one residual group closing the gap.
+
 ## Release calendar
 
 `registry/releases.yaml` holds INDEC's published release dates; each card

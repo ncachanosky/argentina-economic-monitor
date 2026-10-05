@@ -36,7 +36,11 @@ def run(dry_run: bool = False, strict: bool = False) -> int:
     vintage = now.strftime("%Y-%m-%d")
     today = pd.Timestamp(now.date())
     freq_of = {v.source_id: ind.frequency for ind in reg.indicators for v in ind.variants.values()}
-    measure_of = {v.source_id: ind.measure for ind in reg.indicators for v in ind.variants.values()}
+    measure_of = {}
+    for ind in reg.indicators:  # shared ids keep the strictest measure ("flow" only if never an index)
+        for v in ind.variants.values():
+            if measure_of.get(v.source_id) in (None, "flow"):
+                measure_of[v.source_id] = ind.measure
 
     status = _load_status()
     lines: list[str] = []

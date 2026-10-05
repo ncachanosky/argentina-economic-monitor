@@ -30,6 +30,44 @@ def _clean(values) -> list:
             for v in values]
 
 
+def contributions(ind, raw: pd.DataFrame) -> dict:
+    """Contributions to y/y growth of the total, in percentage points.
+
+    Fixed-base constant-price accounts are additive, so for each group
+    contribution_t = (G_t - G_{t-k}) / Total_{t-k} * 100, with k = 4 quarters
+    (12 months). The residual group closes the gap to total growth exactly.
+    """
+    spec = ind.contributions
+    sid = {k: v.source_id for k, v in ind.variants.items()}
+    lag = 4 if ind.frequency == "Q" else 12
+    total = raw[sid[spec["total"]]]
+    base = total.shift(lag)
+    total_yoy = (total / base - 1) * 100
+    groups, explained = [], 0
+    for g in spec.get("groups", []):
+        if g.get("residual"):
+            continue
+        level = sum(raw[sid[k]].fillna(0) for k in g.get("add", [])) - sum(raw[sid[k]].fillna(0) for k in g.get("subtract", []))
+        c = (level - level.shift(lag)) / base * 100
+        explained = explained + c
+        groups.append({"key": g["key"], "label": g["label"], "color": g.get("color"), "values": c})
+    for g in spec.get("groups", []):
+        if g.get("residual"):
+            groups.append({"key": g["key"], "label": g["label"], "color": g.get("color"), "values": total_yoy - explained})
+    valid = total_yoy.dropna().index
+    lines = {}
+    for k in spec.get("lines", []):
+        s = raw[sid[k]]
+        lines[k] = {"label": ind.variants[k].label, "values": _clean(((s / s.shift(lag) - 1) * 100).reindex(valid).tolist())}
+    return {
+        "dates": [d.strftime("%Y-%m-%d") for d in valid],
+        "total": {"label": ind.variants[spec["total"]].label, "values": _clean(total_yoy.reindex(valid).tolist())},
+        "groups": [{**{k: v for k, v in g.items() if k != "values"}, "values": _clean(g["values"].reindex(valid).tolist())} for g in groups],
+        "lines": lines,
+        "default_lines": spec.get("default_lines", spec.get("lines", [])[:3]),
+    }
+
+
 def export(out: Path) -> None:
     reg = registry.load()
     status = json.loads(STATUS_PATH.read_text(encoding="utf-8")) if STATUS_PATH.exists() else {}
@@ -43,6 +81,12 @@ def export(out: Path) -> None:
         if wide.empty:
             print(f"skip {ind.id}: no data yet")
             continue
+
+        raw_wide = wide.copy()
+        if ind.index_base:
+            # Show levels as an index: the base year's average = 100 (per series).
+            yr = wide.loc[str(ind.index_base)]
+            wide = wide.apply(lambda col: col / yr[col.name].mean() * 100 if yr[col.name].notna().any() else col)
 
         st = [status.get(sid, {}) for sid in ids]
         worst = "error" if any(s.get("status") == "error" for s in st) else (
@@ -62,6 +106,9 @@ def export(out: Path) -> None:
             "transforms": ind.transforms,
             "component_noun": ind.component_noun,
             "wide": ind.wide,
+            "frequency": ind.frequency,
+            "source_units": ind.source_units,
+            "note": ind.note,
             "frequency": ind.frequency,
             "source_label": ind.source_label,
             "default": ind.default,
@@ -83,9 +130,12 @@ def export(out: Path) -> None:
                 for k, v in ind.variants.items()
             },
         }
+        if ind.kind == "contributions":
+            payload["contributions"] = contributions(ind, raw_wide)
         (out / f"{ind.id}.json").write_text(json.dumps(payload, separators=(",", ":")), encoding="utf-8")
 
-        csv = wide.rename(columns={v.source_id: v.label for v in ind.variants.values()})
+        # The downloadable "all data" CSV keeps the source units (e.g. millions of 2004 pesos).
+        csv = raw_wide.rename(columns={v.source_id: v.label for v in ind.variants.values()})
         csv.index.name = "date"
         csv.to_csv(out / f"{ind.id}.csv", float_format="%.6g", date_format="%Y-%m-%d")
 

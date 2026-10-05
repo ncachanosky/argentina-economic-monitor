@@ -29,7 +29,12 @@
   function tfs(ind) {
     const all = ind.measure === "rate" ? RATE_TRANSFORMS : INDEX_TRANSFORMS;
     const keys = ind.transforms && ind.transforms.length ? ind.transforms : Object.keys(all);
-    return Object.fromEntries(keys.map((k) => [k, all[k]]));
+    const out = Object.fromEntries(keys.map((k) => [k, { ...all[k] }]));
+    if (ind.frequency === "Q" && out.mom) {
+      out.mom.label = out.mom.label.replace("m/m", "q/q");
+      out.mom.short = out.mom.short.replace("Month-over-month", "Quarter-over-quarter");
+    }
+    return out;
   }
   const RANGES = { "2Y": 2, "5Y": 5, "10Y": 10, "Max": null };
 
@@ -53,6 +58,12 @@
   };
   const fmtMonth = (iso) => new Date(iso + "T00:00:00Z").toLocaleDateString("en-US", { month: "long", year: "numeric", timeZone: "UTC" });
   const fmtShortMonth = (iso) => new Date(iso + "T00:00:00Z").toLocaleDateString("en-US", { month: "short", year: "numeric", timeZone: "UTC" });
+  // Period label: "Jul 2026" for monthly data, "Q3 2026" for quarterly.
+  const fmtPeriod = (iso, freq) => {
+    if (freq !== "Q") return fmtShortMonth(iso);
+    const [y, m] = iso.split("-").map(Number);
+    return `Q${Math.floor((m - 1) / 3) + 1} ${y}`;
+  };
   const specOf = (p) => (p && typeof p === "object" ? p : p ? INDEX_TRANSFORMS.yoy : INDEX_TRANSFORMS.level);
   const fmtNum = (v, p) => {
     if (v === null || v === undefined || Number.isNaN(v)) return "–";
@@ -69,10 +80,12 @@
   }
 
   // ---------- transformations ----------
-  function transform(dates, values, kind, measure) {
+  function transform(dates, values, kind, measure, freq) {
     if (kind === "level") return values.slice();
     const diff = measure === "rate";
-    const lag = kind === "yoy" ? 12 : 1;
+    // Lags in months: a year back is 12 months for both monthly and quarterly
+    // dates; one period back is 1 month, or 3 for quarters.
+    const lag = kind === "yoy" ? 12 : freq === "Q" ? 3 : 1;
     const mi = dates.map(monthIndex);
     const pos = new Map(mi.map((m, i) => [m, i]));
     return values.map((v, i) => {
@@ -171,12 +184,13 @@
       shapes: (extras.shapes || []).map((sh) => ({ ...sh, line: { ...(sh.line || {}), color: (sh.line && sh.line._light) || light.ink3 } })),
       annotations: [
         ...(extras.annotations || []).map((a) => ({ ...a, font: { ...(a.font || {}), size: 15, color: light.ink2 } })),
-        { text: `Source: ${ind.source_label}. Latest observation: ${fmtMonth(ind.last_obs)}.`, xref: "paper", yref: "paper", x: 0, y: -0.13, xanchor: "left", yanchor: "top", showarrow: false, font: { size: 15, color: light.ink3 } },
+        { text: `Source: ${ind.source_label}. Latest observation: ${ind.frequency === "Q" ? fmtPeriod(ind.last_obs, "Q") : fmtMonth(ind.last_obs)}.${ind.source_units ? ` Source data in ${ind.source_units}.` : ""}`, xref: "paper", yref: "paper", x: 0, y: -0.13, xanchor: "left", yanchor: "top", showarrow: false, font: { size: 15, color: light.ink3 } },
         { text: "<b>Argentina Economic Monitor</b> · Economic Order", xref: "paper", yref: "paper", x: 1, y: -0.13, xanchor: "right", yanchor: "top", showarrow: false, font: { size: 15, color: "#B87333" } },
       ],
       bargap: 0.25,
     };
     if (extras.uniformtext) layout.uniformtext = extras.uniformtext;
+    if (extras.barmode) layout.barmode = extras.barmode;
     if (data[0] && data[0].orientation === "h") { layout.xaxis.ticksuffix = (extras.xsuffix !== undefined ? extras.xsuffix : specOf(pct).suffix); if (extras.xrange) layout.xaxis.range = extras.xrange; layout.yaxis.ticksuffix = ""; layout.margin.l = 260; }
     const url = await Plotly.toImage({ data, layout }, { format: "png", width: EXPORT.width, height: EXPORT.height });
     const a = h("a", { href: url, download: filename });
@@ -197,26 +211,34 @@
   const addMonths = (iso, k) => { const m = monthIndex(iso) + k; return `${Math.floor(m / 12)}-${String((m % 12) + 1).padStart(2, "0")}-01`; };
   const monthOf = (isoDay) => isoDay.slice(0, 7) + "-01";
 
-  function termWindow(p) {
+  // For quarterly data the same rule applies to quarters: the handover
+  // quarter belongs to the outgoing president (Milei: base Q4 2023 = 100).
+  const quarterOf = (iso) => { const [y, m] = iso.split("-").map(Number); return `${y}-${String(Math.floor((m - 1) / 3) * 3 + 1).padStart(2, "0")}-01`; };
+  function termWindow(p, freq) {
+    if (freq === "Q") {
+      const q0 = quarterOf(p.start);
+      const first = p.start === q0 ? q0 : addMonths(q0, 3);
+      return { first, base: addMonths(first, -3), last: p.end ? quarterOf(p.end) : null };
+    }
     const startDay = Number(p.start.slice(8, 10));
     const first = startDay === 1 ? monthOf(p.start) : addMonths(monthOf(p.start), 1);
     return { first, base: addMonths(first, -1), last: p.end ? monthOf(p.end) : null };
   }
 
-  function termOf(iso) {
+  function termOf(iso, freq) {
     for (const p of PRESIDENCIES) {
-      const w = termWindow(p);
+      const w = termWindow(p, freq);
       if (iso >= w.first && (!w.last || iso <= w.last)) return p;
     }
     return null;
   }
 
   // Per-term statistics on a full (not range-clipped) series.
-  function termStats(dates, y, isLevel, measure) {
+  function termStats(dates, y, isLevel, measure, freq) {
     const idx = new Map(dates.map((d, i) => [d, i]));
     const out = [];
     for (const p of PRESIDENCIES) {
-      const w = termWindow(p);
+      const w = termWindow(p, freq);
       const pts = [];
       for (let i = 0; i < dates.length; i++) {
         const d = dates[i];
@@ -268,7 +290,7 @@
     if (!nr) return null;
     const today = new Date().toLocaleDateString("en-CA", { timeZone: "America/Argentina/Buenos_Aires" });
     const day = new Date(nr.date + "T12:00:00Z").toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", year: "numeric", timeZone: "UTC" });
-    const period = fmtShortMonth(nr.period + "-01");
+    const period = fmtPeriod(nr.period + "-01", ind.frequency);
     const text = nr.date > today ? `Next release: ${day} (${period} data)`
       : nr.date === today ? `Next release: today (${period} data)`
       : `${period} data was due ${day}; updating`;
@@ -281,24 +303,24 @@
     const nr = nextReleaseNote(ind);
     return h("div", { class: "card-foot" },
       h("span", {}, "Source: ", src ? h("a", { href: src, target: "_blank", rel: "noopener" }, ind.source_label) : ind.source_label,
-        ` · Latest: ${fmtShortMonth(ind.last_obs)}`, nr ? " · " : null, nr),
+        ` · Latest: ${fmtPeriod(ind.last_obs, ind.frequency)}`, nr ? " · " : null, nr),
       h("div", { class: "actions" },
         h("button", { class: "btn", type: "button", onclick: onPNG, title: "Download this chart as a 1200×800 PNG" }, "PNG"),
         h("button", { class: "btn", type: "button", onclick: onCSV, title: "Download the data in this view as CSV" }, "CSV"),
         h("a", { class: "btn", href: `${DATA}${ind.id}.csv`, download: `${ind.id}_all.csv`, title: "All variants, levels, as published" }, "All data")));
   }
 
-  function tableView(dates, cols, pct) {
+  function tableView(dates, cols, pct, freq) {
     const details = h("details", { class: "table-view" }, h("summary", {}, "Show data table"));
     const fill = () => {
       if (details.dataset.filled) return;
       const n = dates.length, start = Math.max(0, n - 36);
       const tbody = h("tbody");
       for (let i = n - 1; i >= start; i--) {
-        tbody.append(h("tr", {}, h("td", {}, fmtShortMonth(dates[i])), ...cols.map((c) => h("td", {}, fmtNum(c.values[i], pct)))));
+        tbody.append(h("tr", {}, h("td", {}, fmtPeriod(dates[i], freq)), ...cols.map((c) => h("td", {}, fmtNum(c.values[i], pct)))));
       }
       details.append(h("div", { class: "table-scroll" }, h("table", { class: "data" },
-        h("thead", {}, h("tr", {}, h("th", {}, "Month"), ...cols.map((c) => h("th", {}, c.label)))), tbody)));
+        h("thead", {}, h("tr", {}, h("th", {}, freq === "Q" ? "Quarter" : "Month"), ...cols.map((c) => h("th", {}, c.label)))), tbody)));
       details.dataset.filled = "1";
     };
     details.addEventListener("toggle", fill);
@@ -311,6 +333,8 @@
     const variantKeys = Object.keys(ind.variants);
     const T = tfs(ind);
     const isRate = ind.measure === "rate";
+    const DF = ind.frequency === "Q" ? "Q%q %Y" : "%b %Y";   // hover date format
+    const fP = (iso) => fmtPeriod(iso, ind.frequency);
     const state = {
       variant: ind.default.variant,
       transform: ind.default.transform || "level",
@@ -334,8 +358,8 @@
       h("option", { value: "published" }, `As published (${ind.units.replace(/^Index,?\s*/i, "") || "source base"})`),
       PRESIDENCIES.length ? h("optgroup", { label: "Start of presidential term" },
         PRESIDENCIES.slice().reverse().map((p) => {
-          const w = termWindow(p);
-          return h("option", { value: `term:${p.id}`, disabled: w.base < firstDate ? true : null }, `${p.short} (${fmtShortMonth(w.base)} = 100)`);
+          const w = termWindow(p, ind.frequency);
+          return h("option", { value: `term:${p.id}`, disabled: w.base < firstDate ? true : null }, `${p.short} (${fmtPeriod(w.base, ind.frequency)} = 100)`);
         })) : null,
       h("option", { value: "custom" }, "Custom month…"));
     const customIn = h("input", { type: "month", class: "select", "aria-label": "Custom base month", min: firstDate.slice(0, 7), max: ind.last_obs.slice(0, 7), hidden: true });
@@ -355,19 +379,19 @@
       if (state.transform !== "level" || state.base === "published") return null;
       if (state.base === "custom") return state.customBase;
       const p = PRESIDENCIES.find((q) => `term:${q.id}` === state.base);
-      return p ? termWindow(p).base : null;
+      return p ? termWindow(p, ind.frequency).base : null;
     }
 
     // Full transformed (and rebased) series for a variant, plus its label/units.
     function series(variantKey) {
       const v = ind.variants[variantKey];
-      let y = transform(ind.dates, v.values, state.transform, ind.measure);
+      let y = transform(ind.dates, v.values, state.transform, ind.measure, ind.frequency);
       const bm = isRate ? null : baseMonth();
       let units = ind.units, rebased = false;
       if (bm) {
         const bi = ind.dates.indexOf(bm);
         const b = bi >= 0 ? v.values[bi] : null;
-        if (b) { y = y.map((q) => (q === null ? null : (q / b) * 100)); units = `Index, ${fmtShortMonth(bm)} = 100`; rebased = true; }
+        if (b) { y = y.map((q) => (q === null ? null : (q / b) * 100)); units = `Index, ${fmtPeriod(bm, ind.frequency)} = 100`; rebased = true; }
       }
       return { v, y, units, rebased };
     }
@@ -388,27 +412,27 @@
 
       if (!state.byPres) {
         const color = cssVar(SERIES_VARS[0]);
-        const hover = `%{x|%b %Y}: <b>%{y:,.1f}${sfx}</b><extra>${main.v.label}</extra>`;
+        const hover = `%{x|${DF}}: <b>%{y:,.1f}${sfx}</b><extra>${main.v.label}</extra>`;
         traces.push(state.transform === "mom"
           ? { type: "bar", x, y, name: main.v.label, marker: { color }, hovertemplate: hover, _slot: 0 }
           : { type: "scatter", mode: "lines", x, y, name: main.v.label, line: { color, width: 2 }, hovertemplate: hover, _slot: 0 });
       } else if (state.transform === "mom") {
-        const terms = x.map(termOf);
+        const terms = x.map((d) => termOf(d, ind.frequency));
         traces.push({
           type: "bar", x, y, name: main.v.label,
           marker: { color: terms.map((p) => (p ? termColor(p) : cssVar("--ink-3"))) },
           _lightColors: terms.map((p) => (p ? termLight(p) : "#85909A")),
           customdata: terms.map((p) => (p ? p.short : "")),
-          hovertemplate: `%{x|%b %Y}: <b>%{y:,.1f}${sfx}</b><extra>%{customdata}</extra>`,
+          hovertemplate: `%{x|${DF}}: <b>%{y:,.1f}${sfx}</b><extra>%{customdata}</extra>`,
         });
       } else {
-        const stats = new Map(termStats(ind.dates, main.y, state.transform === "level", ind.measure).map((s) => [s.p.id, s]));
+        const stats = new Map(termStats(ind.dates, main.y, state.transform === "level", ind.measure, ind.frequency).map((s) => [s.p.id, s]));
         const visible = new Set(x);
         // Faint dashed original series behind a seasonally adjusted / trend view, as context.
         const bg = state.variant !== "original" && ind.variants.original ? series("original") : null;
         const segments = (yy, faint) => {
           for (const p of PRESIDENCIES) {
-            const w = termWindow(p);
+            const w = termWindow(p, ind.frequency);
             const ii = idx.filter((i) => ind.dates[i] >= w.first && (!w.last || ind.dates[i] <= w.last) && yy[i] !== null);
             if (!ii.length) continue;
             const color = termColor(p);
@@ -427,7 +451,7 @@
             traces.push({
               ...common, x: ii.map((i) => ind.dates[i]), y: ii.map((i) => yy[i]),
               name: `${p.short}${stat ? ` (${stat})` : ""}`, line: { color, width: 2 },
-              hovertemplate: `%{x|%b %Y}: <b>%{y:,.1f}${sfx}</b><extra>${p.short}</extra>`,
+              hovertemplate: `%{x|${DF}}: <b>%{y:,.1f}${sfx}</b><extra>${p.short}</extra>`,
             });
           }
         };
@@ -436,7 +460,7 @@
 
         // Term boundaries and labels.
         for (const p of PRESIDENCIES) {
-          const w = termWindow(p);
+          const w = termWindow(p, ind.frequency);
           if (x.length && w.base > x[0] && w.base <= x[x.length - 1]) {
             shapes.push({ type: "line", xref: "x", yref: "paper", x0: w.base, x1: w.base, y0: 0, y1: 1, line: { color: cssVar("--rule"), width: 1, dash: "dot", _light: "#C9CED3" } });
           }
@@ -457,7 +481,7 @@
     function drawStats(main, t) {
       if (!state.byPres) { statsEl.hidden = true; return; }
       const isLevel = state.transform === "level";
-      const rows = termStats(ind.dates, main.y, isLevel, ind.measure);
+      const rows = termStats(ind.dates, main.y, isLevel, ind.measure, ind.frequency);
       const f = (v) => fmtNum(v, t);
       const fc = (v) => fmtNum(v, isRate ? RATE_TRANSFORMS.yoy : INDEX_TRANSFORMS.yoy);
       const head = isLevel
@@ -465,15 +489,15 @@
         : ["Presidency", "Period", "Average", "Min", "Max", "Latest / end"];
       const tbody = h("tbody", {}, rows.slice().reverse().map((r) => {
         const sw = h("span", { class: "sw" }); sw.style.background = termColor(r.p);
-        const period = `${fmtShortMonth(r.first)} – ${r.ongoing ? "present" : fmtShortMonth(r.last)}${r.partial ? "*" : ""}`;
-        const mm = (v, at) => h("span", {}, f(v), h("span", { class: "at" }, ` ${fmtShortMonth(at)}`));
+        const period = `${fP(r.first)} – ${r.ongoing ? "present" : fP(r.last)}${r.partial ? "*" : ""}`;
+        const mm = (v, at) => h("span", {}, f(v), h("span", { class: "at" }, ` ${fP(at)}`));
         const cells = isLevel
           ? [r.start === null ? "–" : f(r.start), f(r.end), r.change === null ? "–" : fc(r.change), f(r.avg), mm(r.min, r.minAt), mm(r.max, r.maxAt)]
           : [f(r.avg), mm(r.min, r.minAt), mm(r.max, r.maxAt), f(r.end)];
         return h("tr", {}, h("td", { class: "pres" }, sw, r.p.short), h("td", {}, period), ...cells.map((c) => h("td", {}, c)));
       }));
       const note = [
-        `Statistics use each full term regardless of the time range shown. ${isLevel ? "Start is the base month (last month before the term); change is latest/end vs. start." : ""}`,
+        `Statistics use each full term regardless of the time range shown. ${isLevel ? `Start is the base ${ind.frequency === "Q" ? "quarter" : "month"} (the last one before the term); change is latest/end vs. start.` : ""}`,
         rows.some((r) => r.partial) ? " *Series begins after the term started." : "",
       ].join("");
       statsEl.replaceChildren(
@@ -493,7 +517,7 @@
       const { traces, shapes, annotations, main, t, x, y } = build();
       const msgs = [];
       if (isRate && state.transform !== "level") msgs.push("Changes in a rate are shown in percentage points.");
-      if (state.variant === "original" && T.mom) msgs.push("m/m changes are only meaningful on seasonally adjusted data.");
+      if (state.variant === "original" && T.mom) msgs.push(`${T.mom.label.split(" ")[0]} changes are only meaningful on seasonally adjusted data.`);
       if (state.transform !== "level" && state.base !== "published") msgs.push("Rebasing applies to levels only; percent changes are unaffected.");
       if (state.transform === "level" && state.base !== "published" && !main.rebased) msgs.push("No data for that base month; showing the series as published.");
       hint.textContent = msgs.join(" ");
@@ -523,7 +547,7 @@
       if (state.byPres) header.push("presidency");
       const rows = x.map((d, i) => {
         const r = [d, y[i] === null ? "" : +y[i].toFixed(4)];
-        if (state.byPres) { const p = termOf(d); r.push(p ? p.name : ""); }
+        if (state.byPres) { const p = termOf(d, ind.frequency); r.push(p ? p.name : ""); }
         return r;
       });
       downloadBlob(toCSV(header, rows), `${fileTag()}.csv`, "text/csv");
@@ -533,8 +557,8 @@
       h("div", { class: "controls" }, vSeg, tSeg, h("span", { class: "spacer" }), rSeg),
       h("div", { class: "controls" }, baseWrap, presBtn),
       hint, chartEl, statsEl);
-    table = tableView([], [], false);
-    card.append(table, footer(ind, onPNG, onCSV));
+    table = tableView([], [], false, ind.frequency);
+    card.append(table, ind.note ? h("p", { class: "chips-note" }, ind.note) : null, footer(ind, onPNG, onCSV));
     card.draw = draw;
     return card;
   }
@@ -570,7 +594,7 @@
     let table;
 
     // Bar metric for every component, at the most recent month they all share.
-    const metric = Object.fromEntries(keys.map((k) => [k, transform(ind.dates, ind.variants[k].values, barKind, ind.measure)]));
+    const metric = Object.fromEntries(keys.map((k) => [k, transform(ind.dates, ind.variants[k].values, barKind, ind.measure, ind.frequency)]));
     let refIdx = ind.dates.length - 1;
     while (refIdx > 0 && keys.some((k) => metric[k][refIdx] === null)) refIdx--;
     const refDate = ind.dates[refIdx];
@@ -605,7 +629,7 @@
         insidetextanchor: "end",
         textfont: { family: cssVar("--font-ui") || "Calibri, Arial, sans-serif", size: forExport ? 15 : 12, color: clipped.map((c, i) => (c && slots.has(order[i]) ? "#FFFFFF" : inkColor)) },
         cliponaxis: false,
-        hovertemplate: `%{y}: <b>%{customdata[1]:${barSpec.signed ? "+" : ""}.1f}${barSpec.suffix}</b><extra></extra>`,
+        hovertemplate: `%{y}: <b>%{customdata[1]:,.1f}${barSpec.suffix}</b><extra></extra>`,
         _lightColors: colors,
       };
       // Room for outside labels; the broken bar ends at the axis edge.
@@ -629,7 +653,7 @@
       const t = T[state.transform];
       const start = startDate(ind.last_obs, RANGES[state.range]);
       return [...slots.entries()].sort((a, b) => a[1] - b[1]).map(([k, slot]) => {
-        const y = state.transform === "level" ? ind.variants[k].values : transform(ind.dates, ind.variants[k].values, state.transform, ind.measure);
+        const y = state.transform === "level" ? ind.variants[k].values : transform(ind.dates, ind.variants[k].values, state.transform, ind.measure, ind.frequency);
         const idx = ind.dates.map((d, i) => i).filter((i) => (!start || ind.dates[i] >= start) && y[i] !== null);
         return {
           type: "scatter", mode: "lines", name: ind.variants[k].label,
@@ -698,8 +722,8 @@
       barEl,
       h("div", { class: "controls", style: "margin-top:14px" }, tSeg, h("span", { class: "spacer" }), rSeg),
       chipsEl, chipsNote, lineEl);
-    table = tableView([], [], T[state.transform]);
-    card.append(table, footer(ind, onPNG, onCSV));
+    table = tableView([], [], T[state.transform], ind.frequency);
+    card.append(table, ind.note ? h("p", { class: "chips-note" }, ind.note) : null, footer(ind, onPNG, onCSV));
     card.draw = () => {
       drawAll();
       if (!barEl.dataset.bound) {
@@ -710,12 +734,125 @@
     return card;
   }
 
+  // ---------- card: contributions to growth (GDP by expenditure) ----------
+  const GROUP_VARS = { copper: "--series-1", sky: "--series-2", sage: "--series-3", lavender: "--series-4" };
+  const GROUP_LIGHT = { copper: "#B87333", sky: "#5B9BD5", sage: "#87A96B", lavender: "#8E7AB5", neutral: "#B0B7BD" };
+  const groupColor = (c) => (GROUP_VARS[c] ? cssVar(GROUP_VARS[c]) : (isDark() ? "#5C6A74" : "#B0B7BD"));
+
+  function contributionsCard(ind) {
+    const C = ind.contributions;
+    const DF = ind.frequency === "Q" ? "Q%q %Y" : "%b %Y";
+    const fP = (iso) => fmtPeriod(iso, ind.frequency);
+    const pp = { suffix: " pp", signed: true };
+    const pct = INDEX_TRANSFORMS.yoy;
+    const state = { range: rangeFromDefault(ind) };
+    const lineKeys = Object.keys(C.lines);
+    // Lines keep the same color as their bar component (color follows the entity).
+    const LINE_COLOR = { c: "copper", g: "sky", i: "sage", x: "lavender", m: "neutral" };
+    const lineColor = (k) => (LINE_COLOR[k] === "neutral" ? cssVar("--ink-2") : groupColor(LINE_COLOR[k]));
+    const lineLight = (k) => (LINE_COLOR[k] === "neutral" ? "#5A6872" : GROUP_LIGHT[LINE_COLOR[k]]);
+    const shown = new Set(C.default_lines || lineKeys.slice(0, 3));
+
+    const card = cardFrame(ind, true);
+    const barEl = h("div", { class: "chart tall-ish", role: "img", "aria-label": "Contributions to GDP growth" });
+    const lineEl = h("div", { class: "chart", role: "img", "aria-label": "Components, year-over-year change" });
+    const chipsEl = h("div", { class: "chips", role: "group", "aria-label": "Components to compare" });
+    const rSeg = segmented(Object.keys(RANGES).map((k) => [k, k]), state.range, (k) => { state.range = k; drawAll(); }, "Time range");
+    let table;
+
+    const visible = () => {
+      const start = startDate(ind.last_obs, RANGES[state.range]);
+      return C.dates.map((d, i) => i).filter((i) => !start || C.dates[i] >= start);
+    };
+
+    function barTraces() {
+      const idx = visible(), x = idx.map((i) => C.dates[i]);
+      const tr = C.groups.map((g) => ({
+        type: "bar", name: g.label, x, y: idx.map((i) => g.values[i]),
+        marker: { color: groupColor(g.color), line: { width: 0 } }, _lightColors: idx.map(() => GROUP_LIGHT[g.color] || "#B0B7BD"),
+        hovertemplate: `${g.label}: <b>%{y:,.1f} pp</b><extra></extra>`,
+      }));
+      const ink = cssVar("--ink");
+      tr.push({
+        type: "scatter", mode: "markers+lines", name: `${C.total.label} growth`, x, y: idx.map((i) => C.total.values[i]),
+        line: { color: ink, width: 1 }, marker: { color: ink, size: 7, symbol: "diamond", line: { color: cssVar("--surface"), width: 1 } },
+        _light: "#36454F", hovertemplate: `<b>${C.total.label}: %{y:,.1f}%</b><extra></extra>`,
+      });
+      return tr;
+    }
+
+    function lineTraces() {
+      const idx = visible();
+      return lineKeys.filter((k) => shown.has(k)).map((k) => {
+        const ln = C.lines[k];
+        const ii = idx.filter((i) => ln.values[i] !== null);
+        return {
+          type: "scatter", mode: "lines", name: ln.label, x: ii.map((i) => C.dates[i]), y: ii.map((i) => ln.values[i]),
+          line: { color: lineColor(k), width: 2, dash: k === "m" ? "dot" : undefined }, _light: lineLight(k),
+          hovertemplate: `%{y:,.1f}%<extra>${ln.label}</extra>`,
+        };
+      });
+    }
+
+    function toggle(k) {
+      if (shown.has(k)) { if (shown.size > 1) shown.delete(k); } else shown.add(k);
+      drawAll();
+    }
+
+    function drawAll() {
+      rSeg.update(state.range);
+      const legend = { orientation: "h", x: 0, y: 1.02, yanchor: "bottom", font: { color: cssVar("--ink") } };
+      Plotly.react(barEl, barTraces(), baseLayout({
+        pct: pp, xaxis: { hoverformat: DF },
+        extra: { barmode: "relative", bargap: 0.25, showlegend: true, legend, margin: { l: 56, r: 16, t: 40, b: 36 } },
+      }), PLOT_CONFIG);
+      chipsEl.replaceChildren(...lineKeys.map((k) => {
+        const on = shown.has(k);
+        const sw = h("span", { class: "sw" });
+        if (on) sw.style.background = lineColor(k);
+        return h("button", { class: "chip", type: "button", "aria-pressed": String(on), onclick: () => toggle(k) }, sw, C.lines[k].label);
+      }));
+      const lt = lineTraces();
+      Plotly.react(lineEl, lt, baseLayout({ pct, xaxis: { hoverformat: DF }, extra: { showlegend: true, legend, margin: { l: 52, r: 16, t: 30, b: 36 } } }), PLOT_CONFIG);
+      const idx = visible();
+      table && table.refresh(idx.map((i) => C.dates[i]), [
+        { label: `${C.total.label} (y/y %)`, values: idx.map((i) => C.total.values[i]) },
+        ...C.groups.map((g) => ({ label: `${g.label} (pp)`, values: idx.map((i) => g.values[i]) })),
+      ], pp);
+    }
+
+    const latestI = C.dates.length - 1;
+    const onPNG = () => exportPNG(ind, barTraces(), `Contributions to year-over-year GDP growth, percentage points · latest: ${fP(C.dates[latestI])}`,
+      pp, `${ind.id}_contributions.png`, { barmode: "relative" });
+    const onLinePNG = () => exportPNG({ ...ind, title: "GDP components: year-over-year change" }, lineTraces(), "Percent change vs. same quarter a year earlier · constant 2004 prices", pct, `${ind.id}_components_yoy.png`);
+    const onCSV = () => {
+      const header = ["date", `${C.total.label} y/y %`, ...C.groups.map((g) => `${g.label} contribution (pp)`), ...lineKeys.map((k) => `${C.lines[k].label} y/y %`)];
+      const rows = C.dates.map((d, i) => [d, C.total.values[i], ...C.groups.map((g) => g.values[i]), ...lineKeys.map((k) => C.lines[k].values[i])]
+        .map((v, j) => (j === 0 || v === null ? v : +v.toFixed(4))));
+      downloadBlob(toCSV(header, rows), `${ind.id}_contributions.csv`, "text/csv");
+    };
+
+    // Latest-quarter summary line.
+    const parts = C.groups.map((g) => `${g.label} ${fmtNum(g.values[latestI], pp)}`).join(" · ");
+    card.append(
+      h("p", { class: "hint" }, `${fP(C.dates[latestI])}: GDP ${fmtNum(C.total.values[latestI], pct)} y/y — ${parts}`),
+      h("div", { class: "controls" }, h("span", { class: "spacer" }), rSeg),
+      barEl,
+      h("p", { class: "hint", style: "margin-top:14px" }, "Components, year-over-year change. ",
+        h("button", { class: "btn", type: "button", onclick: onLinePNG, style: "padding:1px 8px;font-size:12px" }, "PNG")),
+      chipsEl, lineEl);
+    table = tableView([], [], pp, ind.frequency);
+    card.append(table, ind.note ? h("p", { class: "chips-note" }, ind.note) : null, footer(ind, onPNG, onCSV));
+    card.draw = drawAll;
+    return card;
+  }
+
   // ---------- headline tiles ----------
   function tile(ind) {
     const hl = ind.headline;
     const T = tfs(ind);
     const v = ind.variants[hl.variant];
-    const series = transform(ind.dates, v.values, hl.transform, ind.measure);
+    const series = transform(ind.dates, v.values, hl.transform, ind.measure, ind.frequency);
     const last = lastValid(ind.dates, series);
     if (!last) return null;
     const t = T[hl.transform] || INDEX_TRANSFORMS[hl.transform];
@@ -723,14 +860,14 @@
     // Second line: y/y of the original series (indices) or of the same series in pp (rates).
     const yoySrc = isRate ? v : ind.variants.original;
     const yoySpec = isRate ? RATE_TRANSFORMS.yoy : INDEX_TRANSFORMS.yoy;
-    const yoy = yoySrc ? lastValid(ind.dates, transform(ind.dates, yoySrc.values, "yoy", ind.measure)) : null;
+    const yoy = yoySrc ? lastValid(ind.dates, transform(ind.dates, yoySrc.values, "yoy", ind.measure, ind.frequency)) : null;
     const cls = t.change ? (last.value > 0 ? " pos" : last.value < 0 ? " neg" : "") : "";
-    const what = isRate ? (t.change ? t.label : ind.units) : `${hl.transform === "mom" ? "m/m" : t.label}, ${v.label.toLowerCase()}`;
+    const what = isRate ? (t.change ? t.label : ind.units) : `${hl.transform === "mom" ? (ind.frequency === "Q" ? "q/q" : "m/m") : t.label}, ${v.label.toLowerCase()}`;
     return h("a", { class: "tile", href: `#ind-${ind.id}` },
       h("div", { class: "tile-label" }, ind.short_title),
       h("div", { class: "tile-value" + cls }, fmtNum(last.value, t)),
-      h("div", { class: "tile-sub" }, `${fmtShortMonth(last.date)} · ${what}`),
-      yoy ? h("div", { class: "tile-sub" }, isRate ? `${fmtNum(yoy.value, yoySpec)} vs. a year earlier` : `${fmtNum(yoy.value, yoySpec)} y/y (original series, ${fmtShortMonth(yoy.date)})`) : null);
+      h("div", { class: "tile-sub" }, `${fmtPeriod(last.date, ind.frequency)} · ${what}`),
+      yoy ? h("div", { class: "tile-sub" }, isRate ? `${fmtNum(yoy.value, yoySpec)} vs. a year earlier` : `${fmtNum(yoy.value, yoySpec)} y/y (original series, ${fmtPeriod(yoy.date, ind.frequency)})`) : null);
   }
 
   // ---------- page ----------
@@ -771,7 +908,10 @@
       nav.append(h("a", { href: `#topic-${topic.id}` }, topic.title));
       const cards = h("div", { class: "cards" });
       // Registry order; panels and cards flagged `wide` span the full row.
-      list.forEach((ind) => cards.append(ind.kind === "panel" ? panelCard(ind) : variantsCard(ind, !!ind.wide)));
+      list.forEach((ind) => cards.append(
+        ind.kind === "panel" ? panelCard(ind)
+          : ind.kind === "contributions" ? contributionsCard(ind)
+          : variantsCard(ind, !!ind.wide)));
       sections.push(h("section", { class: "topic", id: `topic-${topic.id}` },
         h("h2", {}, topic.title), h("p", {}, topic.description || ""), cards));
     }

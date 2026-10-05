@@ -50,6 +50,11 @@ topics:
     description: >-
       Monthly indicators of economic activity: the INDEC monthly activity
       estimator (EMAE), manufacturing, and construction.
+  - id: gdp
+    title: GDP & Demand
+    description: >-
+      Quarterly national accounts at constant 2004 prices: GDP and the
+      expenditure components behind it.
 
 indicators:
   - id: emae
@@ -195,3 +200,70 @@ indicators:
       autos:       {label: Motor vehicles,                 id: 31.3_UV_2004_M_25}
       metalwork:   {label: Metalworking (excl. autos),     id: 31.3_UMNIA_2004_M_42}
     default: {variant: [food, autos, metals], transform: level, start: "2016-01"}
+
+  # ---------------- GDP & Demand (quarterly) ----------------
+  - id: gdp
+    topic: gdp
+    wide: true
+    kind: variants
+    title: Gross Domestic Product (GDP)
+    short_title: GDP
+    description: >-
+      Real GDP at constant 2004 prices. The seasonally adjusted series is the
+      standard read on quarter-to-quarter momentum.
+    release: pib
+    source: datos_gob
+    source_label: INDEC, via datos.gob.ar
+    frequency: Q
+    units: Index, 2004 = 100
+    index_base: "2004"
+    source_units: millions of 2004 pesos
+    note: >-
+      Levels shown as an index (2004 average = 100); source data are in
+      millions of 2004 pesos ("All data" downloads them as published).
+    variants:
+      sa:       {label: Seasonally adjusted, id: 3.2_OGP_D_2004_T_17}
+      original: {label: Original,            id: 4.2_OGP_2004_T_17}
+    default: {variant: sa, transform: level, start: "2016-01"}
+    headline: {variant: sa, transform: mom}
+
+  - id: gdp_demand
+    topic: gdp
+    kind: contributions
+    measure: flow
+    title: What Drives GDP Growth
+    short_title: GDP contributions
+    description: >-
+      Contribution of each expenditure component to GDP growth versus the same
+      quarter a year earlier, in percentage points. Bars add up to GDP growth
+      (the marker).
+    release: pib
+    source: datos_gob
+    source_label: INDEC, via datos.gob.ar
+    frequency: Q
+    units: Percentage points
+    source_units: millions of 2004 pesos
+    note: >-
+      Computed from original (not seasonally adjusted) series at constant 2004
+      prices. Inventories & discrepancy is the residual that closes the gap to
+      GDP growth.
+    variants:
+      gdp:  {label: GDP,                              id: 4.2_OGP_2004_T_17}
+      c:    {label: Private consumption,              id: 4.2_MGCP_2004_T_25}
+      g:    {label: Public consumption,               id: 4.2_DGCP_2004_T_30}
+      i:    {label: Investment (gross fixed capital), id: 4.2_DGIT_2004_T_25}
+      x:    {label: Exports,                          id: 4.2_DGE_2004_T_26}
+      m:    {label: Imports,                          id: 4.2_OGI_2004_T_25}
+      ve:   {label: Change in inventories,            id: 4.2_VE_2004_T_21}
+      de:   {label: Statistical discrepancy,          id: 4.2_DE_2004_T_24}
+    contributions:
+      total: gdp
+      groups:
+        - {key: c,  label: Private consumption, add: [c], color: copper}
+        - {key: g,  label: Public consumption,  add: [g], color: sky}
+        - {key: i,  label: Investment,          add: [i], color: sage}
+        - {key: nx, label: Net exports,         add: [x], subtract: [m], color: lavender}
+        - {key: other, label: Inventories & discrepancy, residual: true, color: neutral}
+      lines: [c, g, i, x, m]
+      default_lines: [c, i, x]
+    default: {variant: gdp, transform: yoy, start: "2016-01"}

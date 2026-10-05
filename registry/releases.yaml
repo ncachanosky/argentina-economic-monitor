@@ -49,3 +49,10 @@ ucii:
     - {date: "2026-10-15", period: "2026-08"}
     - {date: "2026-11-13", period: "2026-09"}
     - {date: "2026-12-16", period: "2026-10"}
+
+pib:
+  name: Informe de avance del nivel de actividad (PIB trimestral)
+  calendar_url: https://www.indec.gob.ar/ftp/cuadros/publicaciones/calendario_2sem2026.pdf
+  dates:   # period = first month of the quarter
+    - {date: "2026-09-17", period: "2026-04"}
+    - {date: "2026-12-16", period: "2026-07"}

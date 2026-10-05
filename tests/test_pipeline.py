@@ -16,8 +16,11 @@ def monthly(values, start="2020-01-01"):
 def test_registry_loads_and_ids_unique():
     reg = registry.load()
     assert {i.id for i in reg.indicators} >= {"emae", "emae_sectors", "ipi", "isac"}
-    ids = [v.source_id for i in reg.indicators for v in i.variants.values()]
-    assert len(ids) == len(set(ids)), "a source id is mapped twice"
+    # A source id may feed several indicators, but always at the same frequency.
+    freq = {}
+    for i in reg.indicators:
+        for v in i.variants.values():
+            assert freq.setdefault(v.source_id, i.frequency) == i.frequency
 
 
 def test_registry_rejects_bad_default(tmp_path):
@@ -162,3 +165,30 @@ def test_next_release_picks_first_unpublished_period():
     # A release date that has passed but whose data hasn't landed is still "next".
     assert reg.next_release(emae, "2026-06-01")["period"] == "2026-07"
     assert reg.next_release(emae, "2026-10-01") is None  # calendar exhausted
+
+
+def test_validate_quarterly():
+    q = pd.Series([100.0, 101, 102, 103, 104], index=pd.date_range("2024-01-01", periods=5, freq="QS"))
+    assert validate.check_series(q, pd.Series(dtype=float), "Q").ok
+    assert not validate.check_series(q.drop(q.index[2]), pd.Series(dtype=float), "Q").ok
+    flow = pd.Series([-5.0, 3, -1, 2, 0.5], index=q.index)
+    assert validate.check_series(flow, pd.Series(dtype=float), "Q", "flow").ok
+
+
+def test_contributions_add_up_to_total():
+    from pipeline.export import contributions
+    reg = registry.load()
+    ind = next(i for i in reg.indicators if i.id == "gdp_demand")
+    idx = pd.date_range("2020-01-01", periods=12, freq="QS")
+    import numpy as np
+    rng = np.random.default_rng(0)
+    cols = {}
+    for k in ["c", "g", "i", "x", "m", "ve", "de"]:
+        cols[ind.variants[k].source_id] = pd.Series(rng.uniform(50, 150, 12), index=idx)
+    v = {k: cols[ind.variants[k].source_id] for k in ["c", "g", "i", "x", "m", "ve", "de"]}
+    cols[ind.variants["gdp"].source_id] = v["c"] + v["g"] + v["i"] + v["x"] - v["m"] + v["ve"] + v["de"] + 3
+    out = contributions(ind, pd.DataFrame(cols))
+    tot = np.array(out["total"]["values"])
+    s = np.sum([g["values"] for g in out["groups"]], axis=0)
+    assert np.allclose(tot, s, atol=1e-4)
+    assert len(out["dates"]) == 8

@@ -10,9 +10,9 @@ ROOT = Path(__file__).resolve().parents[1]
 REGISTRY_PATH = ROOT / "registry" / "series.yaml"
 RELEASES_PATH = ROOT / "registry" / "releases.yaml"
 
-KINDS = {"variants", "panel"}
+KINDS = {"variants", "panel", "contributions"}
 TRANSFORMS = {"level", "yoy", "mom"}
-FREQUENCIES = {"M"}  # extend as new frequencies are added
+FREQUENCIES = {"M", "Q"}
 
 
 @dataclass(frozen=True)
@@ -42,6 +42,10 @@ class Indicator:
     transforms: list[str] | None = None
     component_noun: str | None = None
     wide: bool = False
+    index_base: str | None = None     # e.g. "2004": levels shown as index, that year's average = 100
+    source_units: str | None = None   # units of the source data (noted on charts; kept in raw CSV)
+    note: str | None = None
+    contributions: dict | None = None
 
 
 HEX = __import__("re").compile(r"^#[0-9A-Fa-f]{6}$")
@@ -122,8 +126,18 @@ def load(path: Path = REGISTRY_PATH, releases_path: Path = RELEASES_PATH) -> Reg
             raise RegistryError(f"{where}: unknown default transform")
 
         headline = item.get("headline")
-        if item.get("measure", "index") not in {"index", "rate"}:
-            raise RegistryError(f"{where}: measure must be 'index' or 'rate'")
+        if item.get("measure", "index") not in {"index", "rate", "flow"}:
+            raise RegistryError(f"{where}: measure must be 'index', 'rate' or 'flow'")
+        contrib = item.get("contributions")
+        if item["kind"] == "contributions":
+            if not contrib or contrib.get("total") not in variants:
+                raise RegistryError(f"{where}: contributions need a 'total' variant")
+            for g in contrib.get("groups", []):
+                for k in (g.get("add", []) + g.get("subtract", [])):
+                    if k not in variants:
+                        raise RegistryError(f"{where}: group {g.get('key')} uses unknown variant {k}")
+            if sum(1 for g in contrib.get("groups", []) if g.get("residual")) > 1:
+                raise RegistryError(f"{where}: at most one residual group")
         if item.get("transforms") and not set(item["transforms"]) <= TRANSFORMS:
             raise RegistryError(f"{where}: unknown transforms {item['transforms']}")
         if item.get("release") and item["release"] not in releases:
@@ -151,6 +165,10 @@ def load(path: Path = REGISTRY_PATH, releases_path: Path = RELEASES_PATH) -> Reg
                 transforms=item.get("transforms"),
                 component_noun=item.get("component_noun"),
                 wide=bool(item.get("wide", False)),
+                index_base=str(item["index_base"]) if item.get("index_base") else None,
+                source_units=item.get("source_units"),
+                note=" ".join(str(item["note"]).split()) if item.get("note") else None,
+                contributions=contrib,
             )
         )
 

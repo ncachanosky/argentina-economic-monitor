@@ -35,13 +35,15 @@ def check_series(new: pd.Series, old: pd.Series, frequency: str = "M", measure: 
         return c
     if new.index.has_duplicates:
         c.errors.append("duplicate dates")
-    if frequency == "M":
+    if frequency in ("M", "Q"):
         if not (new.index.day == 1).all():
-            c.errors.append("monthly dates not on month start")
-        expected = pd.date_range(new.index.min(), new.index.max(), freq="MS")
+            c.errors.append("dates not on period start")
+        if frequency == "Q" and not new.index.month.isin([1, 4, 7, 10]).all():
+            c.errors.append("quarterly dates not on quarter start")
+        expected = pd.date_range(new.index.min(), new.index.max(), freq="MS" if frequency == "M" else "QS")
         missing = expected.difference(new.index)
         if len(missing):
-            c.errors.append(f"{len(missing)} missing month(s), first {missing[0]:%Y-%m}")
+            c.errors.append(f"{len(missing)} missing period(s), first {missing[0]:%Y-%m}")
     if measure == "index" and (new <= 0).any():
         c.errors.append("non-positive index values")
     if measure == "rate" and ((new < 0) | (new > 100)).any():
@@ -56,6 +58,8 @@ def check_series(new: pd.Series, old: pd.Series, frequency: str = "M", measure: 
         if len(lost) > 2:
             c.errors.append(f"{len(lost)} previously published observations disappeared")
 
+        if measure == "flow":
+            return c
         common = old.index.intersection(new.index)
         if measure == "rate":  # revisions to a percentage, in points (5 pp = "large")
             rel = ((new[common] - old[common]).abs() / 100).dropna()
@@ -82,7 +86,9 @@ def check_series(new: pd.Series, old: pd.Series, frequency: str = "M", measure: 
 
 
 def is_stale(last_obs: pd.Timestamp, today: pd.Timestamp, frequency: str = "M") -> bool:
+    months = (today.year - last_obs.year) * 12 + (today.month - last_obs.month)
     if frequency == "M":
-        months = (today.year - last_obs.year) * 12 + (today.month - last_obs.month)
         return months > STALE_MONTHS
+    if frequency == "Q":  # quarter start dates; GDP lags ~2.5 months after quarter end
+        return months > 9
     return False
