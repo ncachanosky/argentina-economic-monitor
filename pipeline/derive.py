@@ -32,6 +32,11 @@ flows     Monthly sources of a stock, in percentage points of the stock at
           daily flows in `sum_of`, over `stock` at the previous month end,
           x 100 (e.g. the factors that explain base money).
 
+formula   Arithmetic on stored series: `vars` maps short names to series ids;
+          each variant has an `expr` over those names (+ - * / and nz(x),
+          which treats a missing value as zero). Dates where the `anchor`
+          variable is missing are dropped.
+
 reweight  What a fixed-base CPI would show with a different basket, from the
           month the new basket would have started (`link`). With division
           indices I_i and price relatives r_i,t = I_i,t / I_i,link:
@@ -273,6 +278,33 @@ def expectations(ind, frames: dict[str, pd.Series]) -> tuple[pd.DataFrame, dict]
     return df.dropna(how="all").sort_index(), {}
 
 
+def formula(ind, frames: dict[str, pd.Series]) -> tuple[pd.DataFrame, dict]:
+    import ast
+    spec = ind.derive
+    names = spec["vars"]
+    idx = pd.DatetimeIndex(sorted(set().union(*[frames[i].index for i in names.values()])))
+    env = {k: frames[v].reindex(idx) for k, v in names.items()}
+    env["nz"] = lambda x: x.fillna(0)
+    allowed = (ast.Expression, ast.BinOp, ast.UnaryOp, ast.Add, ast.Sub, ast.Mult, ast.Div, ast.USub,
+               ast.Name, ast.Load, ast.Constant, ast.Call)
+    out = {}
+    for k, v in spec["variants"].items():
+        tree = ast.parse(v["expr"], mode="eval")
+        for node in ast.walk(tree):
+            if not isinstance(node, allowed) or (isinstance(node, ast.Call) and getattr(node.func, "id", None) != "nz"):
+                raise ValueError(f"{ind.id}.{k}: unsupported expression {v['expr']!r}")
+            if isinstance(node, ast.Name) and node.id not in env:
+                raise ValueError(f"{ind.id}.{k}: unknown name {node.id!r}")
+        res = eval(compile(tree, "<expr>", "eval"), {"__builtins__": {}}, env)
+        out[ind.variants[k].source_id] = res
+    df = pd.DataFrame(out)
+    anchor = env[spec["anchor"]] if spec.get("anchor") else None
+    if anchor is not None:
+        df = df[anchor.notna()]
+    df = df.replace([np.inf, -np.inf], np.nan)
+    return df.dropna(how="all").sort_index(), {}
+
+
 def compute(ind, reg) -> tuple[pd.DataFrame, dict]:
     ids = ind.input_ids()
     frames = {sid: store.as_of(sid) for sid in ids}
@@ -285,6 +317,8 @@ def compute(ind, reg) -> tuple[pd.DataFrame, dict]:
         return ratio(ind, frames)
     if ind.derive["method"] == "tracker":
         return tracker(ind, frames)
+    if ind.derive["method"] == "formula":
+        return formula(ind, frames)
     if ind.derive["method"] == "expectations":
         return expectations(ind, frames)
     if ind.derive["method"] == "monthly":

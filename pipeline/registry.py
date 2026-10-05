@@ -11,7 +11,7 @@ REGISTRY_PATH = ROOT / "registry" / "series.yaml"
 RELEASES_PATH = ROOT / "registry" / "releases.yaml"
 
 KINDS = {"variants", "panel", "contributions"}
-DERIVE_METHODS = {"splice", "reweight", "ratio", "tracker", "monthly", "flows", "expectations"}
+DERIVE_METHODS = {"splice", "reweight", "ratio", "tracker", "monthly", "flows", "expectations", "formula"}
 RANGE_KEYS = {"2Y", "5Y", "10Y", "25Y", "50Y", "Max"}
 TRANSFORMS = {"level", "yoy", "mom", "ytd", "acc"}
 FREQUENCIES = {"M", "Q", "D"}
@@ -79,6 +79,8 @@ class Indicator:
                 ids.append(self.derive["stock"])
             for v in self.derive["variants"].values():
                 ids += list(v["sum_of"])
+        elif self.derive.get("method") == "formula":
+            ids += list(self.derive["vars"].values())
         elif self.derive.get("method") == "expectations":
             ids += [self.derive["expected"], self.derive["cpi"]]
         elif self.derive.get("method") == "tracker":
@@ -222,7 +224,7 @@ def load(path: Path = REGISTRY_PATH, releases_path: Path = RELEASES_PATH) -> Reg
             raise RegistryError(f"{where}: measure must be 'index', 'rate' or 'flow'")
         contrib = item.get("contributions")
         if item["kind"] == "contributions":
-            if not contrib or contrib.get("total") not in variants:
+            if not contrib or (contrib.get("total") not in variants and not contrib.get("precomputed")):
                 raise RegistryError(f"{where}: contributions need a 'total' variant")
             for g in contrib.get("groups", []):
                 for k in (g.get("add", []) + g.get("subtract", [])):

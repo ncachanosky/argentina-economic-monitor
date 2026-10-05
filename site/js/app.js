@@ -1151,7 +1151,8 @@
     const C = ind.contributions;
     const DF = ind.frequency === "Q" ? "Q%q %Y" : "%b %Y";
     const fP = (iso) => fmtPeriod(iso, ind.frequency);
-    const pp = { suffix: " pp", signed: true };
+    // Shares (units "%") read as percent of the total; contributions as pp.
+    const pp = C.units === "%" ? { suffix: "%", signed: false } : { suffix: " pp", signed: true };
     const pct = INDEX_TRANSFORMS.yoy;
     const gdpLabel = C.total.label;
     // Precomputed contributions (e.g. sources of base money): no component lines,
@@ -1183,10 +1184,10 @@
       const tr = C.groups.map((g) => ({
         type: "bar", name: g.label, x, y: idx.map((i) => g.values[i]),
         marker: { color: groupColor(g.color), line: { width: 0 } }, _lightColors: idx.map(() => GROUP_LIGHT[g.color] || "#B0B7BD"),
-        hovertemplate: `${g.label}: <b>%{y:,.1f} pp</b><extra></extra>`,
+        hovertemplate: `${g.label}: <b>%{y:,.1f}${C.units === "%" ? "%" : " pp"}</b><extra></extra>`,
       }));
       const ink = cssVar("--ink");
-      tr.push({
+      if (!C.hide_total) tr.push({
         type: "scatter", mode: "markers+lines", name: PC ? C.total.label : `${C.total.label} growth`, x, y: idx.map((i) => C.total.values[i]),
         line: { color: ink, width: 1 }, marker: { color: ink, size: 7, symbol: "diamond", line: { color: cssVar("--surface"), width: 1 } },
         _light: "#36454F", hovertemplate: `<b>${C.total.label}: %{y:,.1f}%</b><extra></extra>`,
@@ -1248,7 +1249,7 @@
     // Latest-quarter summary line.
     const parts = C.groups.map((g) => `${g.label} ${fmtNum(g.values[latestI], pp)}`).join(" · ");
     appendAll(card, 
-      h("p", { class: "hint" }, `${fP(C.dates[latestI])}: ${C.total.label} ${fmtNum(C.total.values[latestI], pct)}${yoyWord} — ${parts}`),
+      h("p", { class: "hint" }, C.hide_total ? `${fP(C.dates[latestI])}: ${parts}` : `${fP(C.dates[latestI])}: ${C.total.label} ${fmtNum(C.total.values[latestI], pct)}${yoyWord} — ${parts}`),
       h("div", { class: "controls" }, h("span", { class: "spacer" }), rSeg),
       barEl,
       lineKeys.length ? h("p", { class: "hint", style: "margin-top:14px" }, `${C.lines_title || "Components, year-over-year change"}. `,

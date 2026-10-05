@@ -356,3 +356,20 @@ def test_monthly_and_flows_from_daily():
     df, info = derive.flows(ind("flows", {"f": {"sum_of": ["F"]}}, stock="S"), frames)
     assert df.loc["2026-02-01", "t:f"] == pytest.approx(10.0)    # pp of January's closing stock
     assert info["stock_change_pct"]["2026-02-01"] == pytest.approx(10.0)
+
+
+def test_formula_derivation_is_safe_and_anchored():
+    from pipeline import derive
+    from pipeline.registry import Indicator, Variant
+    idx = pd.date_range("2026-01-01", periods=3, freq="MS")
+    frames = {"A": pd.Series([10.0, 20.0, None], index=idx), "B": pd.Series([5.0, None, 5.0], index=idx)}
+    def ind(expr):
+        return Indicator(id="t", topic="t", kind="variants", title="t", short_title="t", description="",
+                         source="derived", source_label="", frequency="M", units="",
+                         variants={"x": Variant("x", "x", "t:x")}, default={},
+                         derive={"method": "formula", "anchor": "a", "vars": {"a": "A", "b": "B"},
+                                 "variants": {"x": {"expr": expr}}})
+    df, _ = derive.formula(ind("100 * (a + nz(b)) / a"), frames)
+    assert df["t:x"].tolist() == [150.0, 100.0]          # March dropped: anchor missing
+    with pytest.raises(ValueError):
+        derive.formula(ind("__import__('os')"), frames)

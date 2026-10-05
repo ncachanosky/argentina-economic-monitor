@@ -81,6 +81,26 @@ inputs:
   - {id: "bcra:57",  source: bcra, frequency: D, measure: flow, label: "Base money factor: redemption of quasi-currencies"}
   - {id: "bcra:58",  source: bcra, frequency: D, measure: flow, label: "Base money factor: fiscal liquidity notes (LEFI)"}
   - {id: "bcra:59",  source: bcra, frequency: D, measure: flow, label: "Base money factor: other operations"}
+  # BCRA historical balance sheet (monthly, 1940-), thousands of current pesos.
+  - {id: "bcrabal:86", source: bcra_balance, frequency: M, measure: flow, allow_gaps: true, label: "BCRA balance: Net external assets, total"}
+  - {id: "bcrabal:87", source: bcra_balance, frequency: M, measure: flow, allow_gaps: true, label: "BCRA balance: Gold and foreign currency (net)"}
+  - {id: "bcrabal:88", source: bcra_balance, frequency: M, measure: flow, allow_gaps: true, label: "BCRA balance: Foreign exchange valuation effect"}
+  - {id: "bcrabal:89", source: bcra_balance, frequency: M, measure: flow, allow_gaps: true, label: "BCRA balance: Contributions to international agencies"}
+  - {id: "bcrabal:3734", source: bcra_balance, frequency: M, measure: flow, allow_gaps: true, label: "BCRA balance: SDR allocations"}
+  - {id: "bcrabal:90", source: bcra_balance, frequency: M, measure: flow, allow_gaps: true, label: "BCRA balance: Loans from international agencies and others"}
+  - {id: "bcrabal:92", source: bcra_balance, frequency: M, measure: flow, allow_gaps: true, label: "BCRA balance: Credit to the official sector in pesos"}
+  - {id: "bcrabal:94", source: bcra_balance, frequency: M, measure: flow, allow_gaps: true, label: "BCRA balance: Temporary advances to the Treasury"}
+  - {id: "bcrabal:99", source: bcra_balance, frequency: M, measure: flow, allow_gaps: true, label: "BCRA balance: Credit to the official sector in foreign currency"}
+  - {id: "bcrabal:102", source: bcra_balance, frequency: M, measure: flow, allow_gaps: true, label: "BCRA balance: Credit to financial institutions"}
+  - {id: "bcrabal:103", source: bcra_balance, frequency: M, measure: flow, allow_gaps: true, label: "BCRA balance: Absorption, total"}
+  - {id: "bcrabal:104", source: bcra_balance, frequency: M, measure: flow, allow_gaps: true, label: "BCRA balance: Deposits, total"}
+  - {id: "bcrabal:105", source: bcra_balance, frequency: M, measure: flow, allow_gaps: true, label: "BCRA balance: Official deposits"}
+  - {id: "bcrabal:111", source: bcra_balance, frequency: M, measure: flow, allow_gaps: true, label: "BCRA balance: Banks' foreign-currency deposits at BCRA"}
+  - {id: "bcrabal:112", source: bcra_balance, frequency: M, measure: flow, allow_gaps: true, label: "BCRA balance: Deposits in institutions in liquidation (BCRA)"}
+  - {id: "bcrabal:113", source: bcra_balance, frequency: M, measure: flow, allow_gaps: true, label: "BCRA balance: Notes issued by the BCRA"}
+  - {id: "bcrabal:114", source: bcra_balance, frequency: M, measure: flow, allow_gaps: true, label: "BCRA balance: Miscellaneous accounts (incl. net worth)"}
+  - {id: "bcrabal:115", source: bcra_balance, frequency: M, measure: flow, allow_gaps: true, label: "BCRA balance: Base money"}
+  - {id: "bcrabal:fx", source: bcra_balance, frequency: M, measure: flow, allow_gaps: true, label: "BCRA balance: Valuation exchange rate (pesos per USD)"}
   - {id: "bcra:29",  source: bcra, frequency: M, measure: flow, allow_gaps: true, label: "REM: median expected inflation, next 12 months"}
   - {id: 4.4_DGI_2004_T_19, source: datos_gob, frequency: Q, measure: index,
      label: "INDEC gross fixed capital formation, current prices"}
@@ -1134,3 +1154,191 @@ indicators:
     variants:
       gross: {label: Gross reserves, id: "bcra:1"}
     default: {variant: gross, transform: level, start: "2019-01"}
+
+  - id: bcra_assets
+    topic: money
+    kind: contributions
+    measure: flow
+    title: "BCRA Balance Sheet: Assets"
+    short_title: BCRA assets
+    description: >-
+      What backs the central bank's liabilities, as a share of the total:
+      reserves, other external items, credit to the government and credit to
+      banks. Monthly, since 1940.
+    source: derived
+    source_label: BCRA (Balance del Banco Central, series since 1940)
+    frequency: M
+    units: "% of total"
+    ranges: [10Y, 25Y, 50Y, Max]
+    note: >-
+      BCRA's analytical presentation, grouped and valued for monetary
+      analysis. Other external items (net) are the exchange-rate valuation
+      effect, contributions to international agencies, SDR allocations and
+      loans from international agencies; they are mostly liabilities, so
+      negative. Credit to the government includes temporary advances and
+      Treasury securities (including the non-transferable letters).
+    contributions:
+      precomputed: true
+      hide_total: true
+      units: "%"
+      groups:
+        - {key: gold,  label: Gold and foreign currency,  add: [gold],  color: copper}
+        - {key: gov,   label: Credit to the government,   add: [gov],   color: sky}
+        - {key: banks, label: Credit to banks,            add: [banks], color: sage}
+        - {key: ext,   label: Other external items (net), add: [ext],   color: neutral}
+    default: {variant: gold, transform: level, range: 50Y}
+    derive:
+      method: formula
+      anchor: base
+      vars: &bal {nea: "bcrabal:86", gold: "bcrabal:87", val: "bcrabal:88", contrib: "bcrabal:89", sdr: "bcrabal:3734", intl: "bcrabal:90",
+            gov_ars: "bcrabal:92", adv: "bcrabal:94", gov_usd: "bcrabal:99", banks: "bcrabal:102", absorb: "bcrabal:103",
+            dep: "bcrabal:104", gov_dep: "bcrabal:105", bank_usd: "bcrabal:111", liq: "bcrabal:112", notes: "bcrabal:113",
+            misc: "bcrabal:114", base: "bcrabal:115", fx: "bcrabal:fx"}
+      variants:
+        gold:  {label: Gold and foreign currency, expr: "100 * gold / (absorb + base)"}
+        gov:   {label: Credit to the government,  expr: "100 * (nz(gov_ars) + nz(gov_usd)) / (absorb + base)"}
+        banks: {label: Credit to banks,           expr: "100 * nz(banks) / (absorb + base)"}
+        ext:   {label: Other external items,      expr: "100 * (nz(val) + nz(contrib) + nz(sdr) + nz(intl)) / (absorb + base)"}
+
+  - id: bcra_liabilities
+    topic: money
+    kind: contributions
+    measure: flow
+    title: "BCRA Balance Sheet: Liabilities"
+    short_title: BCRA liabilities
+    description: >-
+      What the central bank owes, as a share of the total: base money, its own
+      notes, government deposits, banks' dollar deposits and other accounts.
+      Monthly, since 1940.
+    source: derived
+    source_label: BCRA (Balance del Banco Central, series since 1940)
+    frequency: M
+    units: "% of total"
+    ranges: [10Y, 25Y, 50Y, Max]
+    note: >-
+      BCRA notes: the central bank's own securities over time (LEBAC, NOBAC,
+      LELIQ, NOTALIQ and others). Until April 2026, repos were netted within
+      other lines; from May 2026 they follow the accounting treatment of the
+      2025 financial statements. Other: remaining deposits and miscellaneous
+      accounts, which include net worth. Before December 1996 some items were
+      recorded gross in miscellaneous accounts (see BCRA's note 6), which
+      inflates "Other" in those years.
+    contributions:
+      precomputed: true
+      hide_total: true
+      units: "%"
+      groups:
+        - {key: base,     label: Base money,                 add: [base],     color: copper}
+        - {key: notes,    label: BCRA notes,                 add: [notes],    color: sky}
+        - {key: gov_dep,  label: Government deposits,        add: [gov_dep],  color: sage}
+        - {key: bank_usd, label: Banks' dollar deposits,     add: [bank_usd], color: lavender}
+        - {key: other,    label: Other (incl. net worth),    add: [other],    color: neutral}
+    default: {variant: base, transform: level, range: 50Y}
+    derive:
+      method: formula
+      anchor: base
+      vars: *bal
+      variants:
+        base:     {label: Base money,             expr: "100 * base / (absorb + base)"}
+        notes:    {label: BCRA notes,             expr: "100 * nz(notes) / (absorb + base)"}
+        gov_dep:  {label: Government deposits,    expr: "100 * nz(gov_dep) / (absorb + base)"}
+        bank_usd: {label: Banks' dollar deposits, expr: "100 * nz(bank_usd) / (absorb + base)"}
+        other:    {label: Other,                  expr: "100 * (dep - nz(gov_dep) + nz(liq) + nz(misc)) / (absorb + base)"}
+
+  - id: bcra_backing
+    topic: money
+    wide: true
+    kind: variants
+    overlay: true
+    measure: rate
+    title: Reserve Backing of the Peso
+    short_title: Reserve backing
+    description: >-
+      Gold and foreign-currency reserves as a percentage of base money, and of
+      base money plus the BCRA's notes. Above 100%, reserves cover the
+      liabilities at the official exchange rate. Monthly, since 1940.
+    source: derived
+    source_label: BCRA (Balance del Banco Central, series since 1940)
+    frequency: M
+    units: "% of liabilities"
+    transforms: [level, yoy]
+    ranges: [10Y, 25Y, 50Y, Max]
+    note: >-
+      Reserves are BCRA's "gold and foreign currency (net)" line, valued at
+      the official exchange rate: essentially gross reserves today, but net of
+      some foreign-currency liabilities in earlier decades (it was negative in
+      1986-1988). Net reserves, which
+      subtract short-term foreign-currency liabilities, will be added with
+      their methodologies.
+    default: {variant: base, transform: level, range: 50Y}
+    derive:
+      method: formula
+      anchor: base
+      vars: *bal
+      variants:
+        base:  {label: Reserves / base money,                expr: "100 * gold / base"}
+        broad: {label: Reserves / (base money + BCRA notes), expr: "100 * gold / (base + nz(notes))"}
+
+  - id: bcra_implied_fx
+    topic: money
+    wide: true
+    kind: variants
+    overlay: true
+    log_level: true
+    title: Implied Exchange Rates
+    short_title: Implied exchange rate
+    description: >-
+      The exchange rate at which gross reserves would cover base money, or base
+      money plus the BCRA's notes, against the official rate. Monthly, since
+      December 1989.
+    source: derived
+    source_label: BCRA (Balance del Banco Central)
+    frequency: M
+    units: Pesos per US dollar
+    transforms: [level, yoy, mom]
+    ranges: [10Y, 25Y, Max]
+    note: >-
+      Implied rate = peso liabilities / gross reserves in dollars, with
+      reserves converted at the official valuation rate in the balance sheet.
+      Gross reserves overstate what is available, so these implied rates are
+      a floor.
+    default: {variant: official, transform: level, range: 25Y}
+    derive:
+      method: formula
+      anchor: fx
+      vars: *bal
+      variants:
+        official: {label: Official rate,                            expr: "fx"}
+        base:     {label: Implied by base money,                    expr: "fx * base / gold"}
+        broad:    {label: Implied by base money plus BCRA notes,    expr: "fx * (base + nz(notes)) / gold"}
+
+  - id: bcra_government
+    topic: money
+    kind: variants
+    overlay: true
+    measure: rate
+    title: Central Bank Financing of the Government
+    short_title: Government financing
+    description: >-
+      Credit to the government as a share of the BCRA's total assets: temporary
+      advances and the rest (Treasury securities, including the
+      non-transferable letters, and other credit). Monthly, since 1940.
+    source: derived
+    source_label: BCRA (Balance del Banco Central, series since 1940)
+    frequency: M
+    units: "% of total assets"
+    transforms: [level, yoy]
+    ranges: [10Y, 25Y, 50Y, Max]
+    note: >-
+      The December 2019 revaluation of the non-transferable letters (Law
+      27,541) and the May 2024 change to amortized-cost valuation create
+      breaks in these series.
+    default: {variant: total, transform: level, range: 50Y}
+    derive:
+      method: formula
+      anchor: base
+      vars: *bal
+      variants:
+        total:    {label: Credit to the government, expr: "100 * (nz(gov_ars) + nz(gov_usd)) / (absorb + base)"}
+        advances: {label: Temporary advances,       expr: "100 * nz(adv) / (absorb + base)"}
+        other:    {label: Securities and other,     expr: "100 * (nz(gov_ars) - nz(adv) + nz(gov_usd)) / (absorb + base)"}

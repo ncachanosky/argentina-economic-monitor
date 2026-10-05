@@ -25,6 +25,10 @@ def get_adapter(name: str):
         from . import bcra
 
         return bcra
+    if name == "bcra_balance":
+        from . import bcra_balance
+
+        return bcra_balance
     if name == "manual":
         from . import manual
 

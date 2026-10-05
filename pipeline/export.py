@@ -50,7 +50,8 @@ def contributions(ind, raw: pd.DataFrame) -> dict:
         return {"dates": [d.strftime("%Y-%m-%d") for d in valid],
                 "total": {"label": spec.get("total_label", "Total"), "values": _clean(tot.reindex(valid).tolist())},
                 "groups": groups, "lines": {}, "default_lines": [], "lines_title": spec.get("lines_title"),
-                "units": spec.get("units", "pp"), "precomputed": True}
+                "units": spec.get("units", "pp"), "precomputed": True,
+                "hide_total": bool(spec.get("hide_total"))}
     lag = 4 if ind.frequency == "Q" else 12
     total = raw[sid[spec["total"]]]
     base = total.shift(lag)
