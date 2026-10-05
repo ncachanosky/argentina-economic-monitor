@@ -171,6 +171,8 @@ a:hover { color: var(--accent-ink); }
 .summary-line b { color: var(--ink); font-weight: 600; }
 .summary-line .sw { display: inline-block; width: 14px; height: 3px; vertical-align: middle; margin: 0 5px 2px 0; border-radius: 2px; }
 .summary-line .sw.dash { background: none !important; border-top: 2px dashed currentColor; height: 0; }
+.episode-key { font-family: var(--font-ui); font-size: 12.5px; color: var(--ink-2); margin: 0 0 6px; padding-left: 20px; }
+.episode-key li::marker { color: var(--highlight); font-weight: 700; }
 .band-key { display: flex; flex-wrap: wrap; gap: 4px 18px; font-family: var(--font-ui); font-size: 12.5px; color: var(--ink-2); margin: 0 0 4px; }
 .band-key > span { display: inline-flex; align-items: center; gap: 6px; }
 .band-sw { display: inline-block; width: 18px; height: 12px; background: var(--band); border-radius: 2px; }

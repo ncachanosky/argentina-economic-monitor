@@ -2,7 +2,8 @@
 
 Two methods, chosen by `derive.method` in registry/series.yaml:
 
-splice    Chain-link several source series into one long monthly index.
+splice    Chain-link several source series into one long index (monthly or
+          quarterly, as the indicator's frequency).
           Each variant lists `segments` ({id, as: index|mom, from, to});
           within a segment the month-on-month change comes from that source
           (`index`: I_t / I_{t-1}; `mom`: 1 + v/100). The chained level is
@@ -11,6 +12,10 @@ splice    Chain-link several source series into one long monthly index.
           covers is a gap: with `fill_gaps_from` the level carries on with
           that variant's changes (so the level after the gap is comparable)
           but the gap months themselves are left empty.
+
+ratio     num / den * scale per variant ({num, den, scale, rolling}); with
+          `rolling: k` both are summed over the last k periods first (e.g.
+          investment as a share of GDP over the last four quarters).
 
 reweight  What a fixed-base CPI would show with a different basket, from the
           month the new basket would have started (`link`). With division
@@ -56,7 +61,7 @@ def chain(segments: list[dict], frames: dict[str, pd.Series], months: pd.Datetim
 def splice(ind, frames: dict[str, pd.Series]) -> pd.DataFrame:
     spec = ind.derive
     months = pd.DatetimeIndex(sorted(set().union(*[s.index for s in frames.values()])))
-    months = pd.date_range(months.min(), months.max(), freq="MS")
+    months = pd.date_range(months.min(), months.max(), freq="QS" if ind.frequency == "Q" else "MS")
     gross = {k: chain(v["segments"], frames, months) for k, v in spec["variants"].items()}
     # Earliest month at which a segment starts is the first level point.
     starts = {}
@@ -160,6 +165,17 @@ def reweight(ind, reg, frames: dict[str, pd.Series]) -> tuple[pd.DataFrame, dict
     return df, info
 
 
+def ratio(ind, frames: dict[str, pd.Series]) -> tuple[pd.DataFrame, dict]:
+    out = {}
+    for k, v in ind.derive["variants"].items():
+        num, den = frames[v["num"]], frames[v["den"]]
+        if v.get("rolling"):
+            r = int(v["rolling"])
+            num, den = num.rolling(r).sum(), den.rolling(r).sum()
+        out[ind.variants[k].source_id] = (num / den * float(v.get("scale", 1))).dropna()
+    return pd.DataFrame(out).sort_index(), {}
+
+
 def compute(ind, reg) -> tuple[pd.DataFrame, dict]:
     ids = ind.input_ids()
     frames = {sid: store.as_of(sid) for sid in ids}
@@ -168,4 +184,6 @@ def compute(ind, reg) -> tuple[pd.DataFrame, dict]:
         raise ValueError(f"no stored data for {empty}")
     if ind.derive["method"] == "splice":
         return splice(ind, frames)
+    if ind.derive["method"] == "ratio":
+        return ratio(ind, frames)
     return reweight(ind, reg, frames)

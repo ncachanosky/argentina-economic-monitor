@@ -386,35 +386,63 @@
   // December, seasonally adjusted).
   function annualTable(ind) {
     const at = ind.annual_table;
-    if (!at || ind.frequency !== "M") return null;
+    if (!at) return null;
+    const Q = ind.frequency === "Q";
+    const per = Q ? [1, 4, 7, 10] : [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+    const last = per[per.length - 1];
     const acc = ind.variants[at.accumulated], wy = ind.variants[at.within_year];
-    const val = (v, y, m) => { const i = ind.dates.indexOf(`${y}-${String(m).padStart(2, "0")}-01`); return i < 0 ? null : v.values[i]; };
+    const pos = new Map(ind.dates.map((d, i) => [d, i]));
+    const val = (v, y, m) => { const i = pos.get(`${y}-${String(m).padStart(2, "0")}-01`); return i === undefined ? null : v.values[i]; };
+    const pName = (m) => (Q ? `Q${(m - 1) / 3 + 1}` : new Date(Date.UTC(2000, m - 1, 1)).toLocaleDateString("en-US", { month: "short", timeZone: "UTC" }));
+    const sumYear = (v, y, upto) => { let s = 0; for (const m of per) { if (m > upto) break; const x = val(v, y, m); if (x === null) return null; s += x; } return s; };
     const years = [...new Set(ind.dates.map((d) => +d.slice(0, 4)))].sort((a, b) => b - a);
+    const f = (v) => (v === null ? "–" : fmtNum(v, INDEX_TRANSFORMS.yoy));
     const rows = [];
     for (const y of years) {
-      // Last month of year y with data in the accumulated series.
-      let m = 12; while (m > 0 && val(acc, y, m) === null) m--;
-      if (!m) continue;
-      let a = 0, b = 0, ok = true;
-      for (let k = 1; k <= m; k++) { const cur = val(acc, y, k), prev = val(acc, y - 1, k); if (cur === null || prev === null) { ok = false; break; } a += cur; b += prev; }
-      const accum = ok && b ? (a / b - 1) * 100 : null;
-      let mw = 12; while (mw > 0 && val(wy, y, mw) === null) mw--;
-      const d0 = val(wy, y - 1, 12), d1 = mw ? val(wy, y, mw) : null;
+      const have = per.filter((m) => val(acc, y, m) !== null);
+      if (!have.length || have[0] !== per[0]) continue;
+      const m = have[have.length - 1];
+      const cur = sumYear(acc, y, m), prev = sumYear(acc, y - 1, m);
+      const accum = cur !== null && prev ? (cur / prev - 1) * 100 : null;
+      const haveW = per.filter((mm) => val(wy, y, mm) !== null);
+      const mw = haveW.length ? haveW[haveW.length - 1] : null;
+      const d0 = val(wy, y - 1, last), d1 = mw ? val(wy, y, mw) : null;
       const within = d0 && d1 !== null ? (d1 / d0 - 1) * 100 : null;
+      // Carryover (seasonally adjusted): growth next year if activity stays at
+      // this year's last level. For a year still in progress: the growth this
+      // year would show if the remaining periods stayed at the latest level.
+      let carry = null, carryNote = null;
+      if (at.carryover) {
+        const n = per.length;
+        if (mw === last) {
+          const s = sumYear(wy, y, last);
+          carry = s ? (val(wy, y, last) / (s / n) - 1) * 100 : null;
+        } else if (mw) {
+          const s = sumYear(wy, y, mw), sp = sumYear(wy, y - 1, last), k = per.indexOf(mw) + 1;
+          carry = s !== null && sp ? ((s + val(wy, y, mw) * (n - k)) / sp - 1) * 100 : null;
+          carryNote = "this year, if flat";
+        }
+      }
       if (accum === null && within === null) continue;
-      const mName = (mm) => new Date(Date.UTC(2000, mm - 1, 1)).toLocaleDateString("en-US", { month: "short", timeZone: "UTC" });
-      rows.push(h("tr", {}, h("td", {}, String(y)),
-        h("td", {}, accum === null ? "–" : fmtNum(accum, INDEX_TRANSFORMS.yoy), m < 12 ? h("span", { class: "at" }, ` Jan–${mName(m)}`) : null),
-        h("td", {}, within === null ? "–" : fmtNum(within, INDEX_TRANSFORMS.yoy), mw && mw < 12 ? h("span", { class: "at" }, ` to ${mName(mw)}`) : null)));
+      const cells = [h("td", {}, String(y)),
+        h("td", {}, f(accum), m !== last ? h("span", { class: "at" }, ` ${pName(per[0])}–${pName(m)}`) : null),
+        h("td", {}, f(within), mw && mw !== last ? h("span", { class: "at" }, ` to ${pName(mw)}`) : null)];
+      if (at.carryover) cells.push(h("td", {}, f(carry), carryNote ? h("span", { class: "at" }, ` ${carryNote}`) : null));
+      rows.push(h("tr", {}, cells));
     }
     if (!rows.length) return null;
+    const lastName = Q ? "Q4/Q4" : "Dec/Dec";
+    const head = [h("th", {}, "Year"),
+      h("th", {}, `${Q ? "Annual growth" : "Accumulated y/y"} (${acc.label.toLowerCase()})`),
+      h("th", {}, `Within year, ${lastName} (${wy.label.toLowerCase()})`)];
+    if (at.carryover) head.push(h("th", {}, `Carryover (${wy.label.toLowerCase()})`));
+    const unit = Q ? "quarters" : "months";
     return h("details", { class: "table-view" }, h("summary", {}, "Show yearly change"),
-      h("div", { class: "table-scroll" }, h("table", { class: "data" },
-        h("thead", {}, h("tr", {}, h("th", {}, "Year"),
-          h("th", { title: `Year to date vs. the same months of the previous year, ${acc.label.toLowerCase()} series` }, `Accumulated y/y (${acc.label.toLowerCase()})`),
-          h("th", { title: `Latest month of the year vs. the previous December, ${wy.label.toLowerCase()} series` }, `Within year, Dec/Dec (${wy.label.toLowerCase()})`))),
-        h("tbody", {}, rows))),
-      h("p", { class: "chips-note" }, `Accumulated y/y: average of the months published so far in the year over the same months a year earlier (${acc.label.toLowerCase()} series), as INDEC reports it. Within year: the year's last month vs. the previous December (${wy.label.toLowerCase()}).`));
+      h("div", { class: "table-scroll" }, h("table", { class: "data" }, h("thead", {}, h("tr", {}, head)), h("tbody", {}, rows))),
+      h("p", { class: "chips-note" },
+        `${Q ? "Annual growth" : "Accumulated y/y"}: the ${unit} published so far in the year over the same ${unit} a year earlier (${acc.label.toLowerCase()} series), as INDEC reports it. `,
+        `Within year: the year's last ${Q ? "quarter" : "month"} vs. the previous ${Q ? "Q4" : "December"} (${wy.label.toLowerCase()}).`,
+        at.carryover ? ` Carryover (statistical carry-over): next year's growth if the level stayed at the year's last ${Q ? "quarter" : "month"}; for the current year, this year's growth if the remaining ${unit} stayed at the latest level.` : ""));
   }
 
   // Old vs. new basket weights for a reweighted index.
@@ -447,6 +475,7 @@
       base: ind.default.base ? "custom" : "published",   // "published" | "term:<id>" | "custom"
       customBase: ind.default.base || null,               // "YYYY-MM-01"
       byPres: false,
+      episodes: false,            // mark dated shocks (registry `episodes`)
     };
     const card = cardFrame(ind, !!wide);
     const chartEl = h("div", { class: "chart" + (wide ? " tall-ish" : ""), role: "img", "aria-label": `${ind.title} chart` });
@@ -480,6 +509,13 @@
     customIn.addEventListener("change", () => { if (customIn.value) { state.customBase = customIn.value + "-01"; draw(); } });
     const baseWrap = isRate ? null : h("label", { class: "base-pick" }, h("span", {}, "Base = 100:"), baseSel, customIn);
 
+    const EP = ind.episodes || [];
+    const epBtn = EP.length ? h("button", { class: "btn toggle", type: "button", "aria-pressed": "false", title: "Mark dated shocks on the chart and show presidency averages without them",
+      onclick: () => { state.episodes = !state.episodes; draw(); } }, "Episodes") : null;
+    const epKey = EP.length ? h("ol", { class: "episode-key", hidden: true }, EP.map((e) =>
+      h("li", {}, h("b", {}, e.label), ` (${fmtShortMonth(e.start)}${e.end !== e.start ? "–" + fmtShortMonth(e.end) : ""})`, e.description ? `: ${e.description}.` : ""))) : null;
+    // Months inside any episode (for averages that leave them out).
+    const inEpisode = (iso) => EP.some((e) => iso >= e.start && iso <= e.end);
     const presBtn = PRESIDENCIES.length ? h("button", { class: "btn toggle", type: "button", "aria-pressed": "false", onclick: () => { state.byPres = !state.byPres; draw(); } }, "By presidency") : null;
     let table;
 
@@ -654,6 +690,15 @@
         shapes.push({ type: "line", xref: "paper", yref: "y", x0: 0, x1: 1, y0: 100, y1: 100, line: { color: cssVar("--ink-2"), width: 1, _light: "#5A6872" } });
       }
       const bs = bandShapes(x);
+      if (state.episodes && x.length) {
+        EP.forEach((e, n) => {
+          if (addMonths(e.end, 1) <= x[0] || e.start > x[x.length - 1]) return;
+          bs.shapes.push({ type: "rect", xref: "x", yref: "paper", x0: addMonths(e.start, 0), x1: addMonths(e.end, 1), y0: 0, y1: 1, layer: "below",
+            fillcolor: isDark() ? "rgba(212, 116, 94, 0.22)" : "rgba(212, 116, 94, 0.16)", _lightFill: "rgba(212, 116, 94, 0.16)", line: { width: 0 } });
+          bs.annotations.push({ xref: "x", yref: "paper", x: e.start, y: 1, xanchor: "left", yanchor: "top", showarrow: false,
+            text: `<b>${n + 1}</b>`, font: { size: 12, color: cssVar("--highlight") } });
+        });
+      }
       return { traces, shapes: [...bs.shapes, ...shapes], annotations: [...bs.annotations, ...annotations], main, t, x, y };
     }
 
@@ -661,24 +706,29 @@
       if (!state.byPres) { statsEl.hidden = true; return; }
       const isLevel = state.transform === "level";
       const rows = termStats(ind.dates, main.y, isLevel, ind.measure, ind.frequency, state.transform, main.v.values);
+      // With episodes on, m/m averages also shown without the episode months.
+      const exEp = state.episodes && EP.length && state.transform === "mom";
+      const exRows = exEp ? new Map(termStats(ind.dates, main.y.map((v, i) => (inEpisode(ind.dates[i]) ? null : v)), false, ind.measure, ind.frequency, state.transform).map((r) => [r.p.id, r])) : null;
       const geo = isGeometric(state.transform, ind.measure), ann = isAnnualized(state.transform, ind.measure);
       const f = (v) => fmtNum(v, t);
       const fc = (v) => fmtNum(v, isRate ? RATE_TRANSFORMS.yoy : INDEX_TRANSFORMS.yoy);
       const head = isLevel
         ? ["Presidency", "Period", "Start", "Latest / end", "Change", "Average", "Min", "Max"]
-        : ["Presidency", "Period", geo ? "Average (geometric)" : ann ? "Annualized over term" : "Average", "Min", "Max", "Latest / end"];
+        : ["Presidency", "Period", geo ? "Average (geometric)" : ann ? "Annualized over term" : "Average", ...(exEp ? ["Excl. episodes"] : []), "Min", "Max", "Latest / end"];
       const tbody = h("tbody", {}, rows.slice().reverse().map((r) => {
         const sw = h("span", { class: "sw" }); sw.style.background = termColor(r.p);
         const period = `${fP(r.first)} – ${r.ongoing ? "present" : fP(r.last)}${r.partial ? "*" : ""}`;
         const mm = (v, at) => h("span", {}, f(v), h("span", { class: "at" }, ` ${fP(at)}`));
         const cells = isLevel
           ? [r.start === null ? "–" : f(r.start), f(r.end), r.change === null ? "–" : fc(r.change), f(r.avg), mm(r.min, r.minAt), mm(r.max, r.maxAt)]
-          : [f(r.avg), mm(r.min, r.minAt), mm(r.max, r.maxAt), f(r.end)];
+          : [f(r.avg), ...(exEp ? [exRows.has(r.p.id) ? f(exRows.get(r.p.id).avg) : "–"] : []), mm(r.min, r.minAt), mm(r.max, r.maxAt), f(r.end)];
         return h("tr", {}, h("td", { class: "pres" }, sw, r.p.short), h("td", {}, period), ...cells.map((c) => h("td", {}, c)));
       }));
       const note = [
         `Statistics use each full term regardless of the time range shown. ${isLevel ? `Start is the base ${ind.frequency === "Q" ? "quarter" : "month"} (the last one before the term); change is latest/end vs. start.` : ""}`,
         geo ? ` The average ${T.mom.label.split(" ")[0]} rate is geometric: the constant rate that compounds to the term's cumulative change.` : "",
+        exEp ? ` Excl. episodes: the same average without the months marked as episodes (${EP.map((e, n) => n + 1).join(", ")}).` : "",
+        state.episodes && EP.length && state.transform !== "mom" ? " Averages without the episodes are shown in the m/m view." : "",
         ann ? " Annualized over term: the constant annual rate that compounds to the term's cumulative change, from the base month to the latest/end month." : "",
         rows.some((r) => r.partial) ? " *Series begins after the term started." : "",
       ].join("");
@@ -693,6 +743,8 @@
       tSeg.update(state.transform, { mom: state.variant === "original" });
       rSeg.update(state.range);
       presBtn && presBtn.setAttribute("aria-pressed", String(state.byPres));
+      epBtn && epBtn.setAttribute("aria-pressed", String(state.episodes));
+      if (epKey) epKey.hidden = !state.episodes;
       baseSel.disabled = state.transform !== "level";
       customIn.disabled = state.transform !== "level";
 
@@ -751,8 +803,8 @@
     appendAll(card, 
       h("div", { class: "controls" }, vSeg, tSeg, h("span", { class: "spacer" }), ind.view_start ? null : rSeg),
       // A short fixed window (view_start) has no use for rebasing or presidencies.
-      ind.view_start ? null : h("div", { class: "controls" }, baseWrap, presBtn),
-      summaryEl, hint, bandKey, chartEl, statsEl);
+      ind.view_start ? null : h("div", { class: "controls" }, baseWrap, presBtn, epBtn),
+      summaryEl, hint, bandKey, epKey, chartEl, statsEl);
     drawSummary();
     table = tableView([], [], false, ind.frequency);
     appendAll(card, table, annualTable(ind), weightsTable(ind), ind.note ? h("p", { class: "chips-note" }, ind.note) : null, footer(ind, onPNG, onCSV));

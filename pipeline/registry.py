@@ -11,7 +11,7 @@ REGISTRY_PATH = ROOT / "registry" / "series.yaml"
 RELEASES_PATH = ROOT / "registry" / "releases.yaml"
 
 KINDS = {"variants", "panel", "contributions"}
-DERIVE_METHODS = {"splice", "reweight"}
+DERIVE_METHODS = {"splice", "reweight", "ratio"}
 RANGE_KEYS = {"2Y", "5Y", "10Y", "25Y", "50Y", "Max"}
 TRANSFORMS = {"level", "yoy", "mom", "ytd", "acc"}
 FREQUENCIES = {"M", "Q"}
@@ -71,6 +71,9 @@ class Indicator:
                 ids += [seg["id"] for seg in v["segments"]]
         elif self.derive.get("method") == "reweight":
             ids.append(self.derive["headline"])
+        elif self.derive.get("method") == "ratio":
+            for v in self.derive["variants"].values():
+                ids += [v["num"], v["den"]]
         return list(dict.fromkeys(ids))
 
 
@@ -87,6 +90,10 @@ class Registry:
     releases: dict = field(default_factory=dict)
     # Source series fetched and stored only to feed derived indicators.
     inputs: list[dict] = field(default_factory=list)
+    episodes: list[dict] = field(default_factory=list)
+
+    def episodes_for(self, ind_id: str) -> list[dict]:
+        return [{k: v for k, v in e.items() if k != "indicators"} for e in self.episodes if ind_id in e["indicators"]]
 
     def series_meta(self) -> dict[str, dict]:
         """source_id -> {source, frequency, measure, static}, over indicators and inputs.
@@ -278,7 +285,7 @@ def load(path: Path = REGISTRY_PATH, releases_path: Path = RELEASES_PATH) -> Reg
         start, end = str(p["start"]), (str(p["end"]) if p.get("end") else None)
         if end and end <= start:
             raise RegistryError(f"{where}: end before start")
-        if prev_end and start < prev_end:
+        if prev_end and start < prev_end:   # gaps are allowed (interim presidents)
             raise RegistryError(f"{where}: overlaps the previous term")
         prev_end = end or "9999"
         presidencies.append({**p, "start": start, "end": end, "short": p.get("short", p["name"])})
@@ -295,9 +302,23 @@ def load(path: Path = REGISTRY_PATH, releases_path: Path = RELEASES_PATH) -> Reg
             raise RegistryError(f"{where}: bad measure")
         inputs.append({**inp, "id": str(inp["id"])})
 
+    ind_ids = {i.id for i in indicators}
+    episodes = []
+    for e in raw.get("episodes", []) or []:
+        where = f"episode '{e.get('id')}'"
+        for k in ("id", "start", "end", "label", "indicators"):
+            if not e.get(k):
+                raise RegistryError(f"{where}: missing {k}")
+        e = {**e, "start": str(e["start"]), "end": str(e["end"])}
+        if e["end"] < e["start"]:
+            raise RegistryError(f"{where}: end before start")
+        if not set(e["indicators"]) <= ind_ids:
+            raise RegistryError(f"{where}: unknown indicators {sorted(set(e['indicators']) - ind_ids)}")
+        episodes.append(e)
+
     reg = Registry(site=raw.get("site", {}), topics=topics, indicators=indicators,
                    presidencies=presidencies, party_colors=party_colors,
-                   releases=releases, inputs=inputs)
+                   releases=releases, inputs=inputs, episodes=episodes)
 
     # Every series a derivation reads must be fetched by something.
     known = set(reg.series_meta())

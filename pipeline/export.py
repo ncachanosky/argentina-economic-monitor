@@ -194,6 +194,7 @@ def export(out: Path) -> None:
             "annual_table": ind.annual_table,
             "bar_transforms": ind.bar_transforms,
             "view_start": ind.view_start,
+            "episodes": reg.episodes_for(ind.id) or None,
             "ranges": ind.ranges,
             "derived": derived_info,
             "status": worst,

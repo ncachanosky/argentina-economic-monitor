@@ -154,7 +154,7 @@ def test_registry_presidencies_ordered_and_non_overlapping():
     ids = [p["id"] for p in reg.presidencies]
     assert ids[-1] == "milei" and reg.presidencies[-1]["end"] is None
     for a, b in zip(reg.presidencies, reg.presidencies[1:]):
-        assert a["end"] == b["start"]
+        assert a["end"] <= b["start"]   # interim presidents may sit in between
 
 
 def test_next_release_picks_first_unpublished_period():

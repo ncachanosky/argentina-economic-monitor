@@ -46,19 +46,46 @@ inputs:
      label: "INDEC IPC-NU (national urban), Dec 2013 - Oct 2015"}
   - {id: 103.1_I2N_2016_M_19, source: datos_gob, frequency: M, measure: index,
      label: "INDEC CPI-GBA (base Apr 2016)"}
+  - {id: 2.2_OGP_1993_T_17, source: datos_gob, frequency: Q, measure: index, static: true,
+     label: "INDEC GDP at 1993 prices, 1993-2013"}
+  - {id: 4.4_DGI_2004_T_19, source: datos_gob, frequency: Q, measure: index,
+     label: "INDEC gross fixed capital formation, current prices"}
 
 party_colors:
-  peronism: {label: "Peronism (FpV / FdT)", light: "#4A9FDB", dark: "#6CB4E8"}
+  peronism: {label: "Peronism (PJ / FpV / FdT)", light: "#4A9FDB", dark: "#6CB4E8"}
+  ucr:      {label: "UCR / Alianza",        light: "#C0392B", dark: "#E57366"}
   pro:      {label: "PRO / Cambiemos",      light: "#D99B00", dark: "#F2BE3C"}
   lla:      {label: "La Libertad Avanza",   light: "#6A3FB5", dark: "#9A78D6"}
 
+# Interim presidents between De la Rúa's resignation (20 Dec 2001) and
+# Duhalde (sworn in 2 Jan 2002) are not listed: Dec 2001 stays with De la Rúa
+# under the handover rule, and Duhalde's term starts Jan 2002.
 presidencies:
+  - {id: alfonsin,  name: Raúl Alfonsín,    short: Alfonsín,    start: "1983-12-10", end: "1989-07-08", party: ucr}
+  - {id: menem1,    name: Carlos Menem (1st term), short: Menem I,  start: "1989-07-08", end: "1995-07-08", party: peronism}
+  - {id: menem2,    name: Carlos Menem (2nd term), short: Menem II, start: "1995-07-08", end: "1999-12-10", party: peronism}
+  - {id: delarua,   name: Fernando de la Rúa, short: De la Rúa, start: "1999-12-10", end: "2001-12-20", party: ucr}
+  - {id: duhalde,   name: Eduardo Duhalde,  short: Duhalde,     start: "2002-01-01", end: "2003-05-25", party: peronism}
   - {id: nkirchner, name: Néstor Kirchner,  short: N. Kirchner, start: "2003-05-25", end: "2007-12-10", party: peronism}
   - {id: cfk1,      name: Cristina Fernández de Kirchner (1st term), short: CFK I,  start: "2007-12-10", end: "2011-12-10", party: peronism}
   - {id: cfk2,      name: Cristina Fernández de Kirchner (2nd term), short: CFK II, start: "2011-12-10", end: "2015-12-10", party: peronism}
   - {id: macri,     name: Mauricio Macri,   short: Macri,       start: "2015-12-10", end: "2019-12-10", party: pro}
   - {id: afernandez, name: Alberto Fernández, short: A. Fernández, start: "2019-12-10", end: "2023-12-10", party: peronism}
   - {id: milei,     name: Javier Milei,     short: Milei,       start: "2023-12-10", end: null,         party: lla}
+
+# Episodes: dated shocks marked on charts (optional shading, off by default)
+# and optionally left out of the presidency averages. Neutral descriptions;
+# interpretation belongs in Economic Order posts, not here.
+episodes:
+  - {id: deval_2023, start: "2023-08-01", end: "2023-09-01", indicators: [cpi, cpi_long],
+     label: "Post-primary devaluation",
+     description: "The official exchange rate was raised about 22% the day after the August 2023 primaries"}
+  - {id: platita, start: "2023-11-01", end: "2023-12-01", indicators: [cpi, cpi_long],
+     label: "Plan Platita and the December devaluation",
+     description: "Pre-election fiscal and monetary expansion; the official exchange rate then more than doubled on 13 December 2023"}
+  - {id: correction_2024, start: "2024-01-01", end: "2024-04-01", indicators: [cpi, cpi_long],
+     label: "Correction of relative prices",
+     description: "Pass-through of the December devaluation and the adjustment of regulated prices"}
 
 # Each topic is a page of the site at /<slug>/, in this order in the navbar.
 topics:
@@ -105,7 +132,7 @@ indicators:
     headline: {variant: sa, transform: mom}
     # Yearly table: cumulative change of the year to date vs. the same months a
     # year earlier (original series, as INDEC reports it) and Dec-to-Dec (SA).
-    annual_table: {accumulated: original, within_year: sa}
+    annual_table: {accumulated: original, within_year: sa, carryover: true}
 
   - id: emae_sectors
     topic: real_sector
@@ -271,6 +298,44 @@ indicators:
       original: {label: Original,            id: 4.2_OGP_2004_T_17}
     default: {variant: sa, transform: level, start: "2016-01"}
     headline: {variant: sa, transform: mom}
+    # Yearly table: annual growth (average of the year's quarters, original
+    # series), Q4/Q4 and the carryover into the next year (seasonally adjusted).
+    annual_table: {accumulated: original, within_year: sa, carryover: true}
+
+  - id: gdp_long
+    topic: gdp
+    wide: true
+    kind: variants
+    title: Real GDP since 1993
+    short_title: GDP, long run
+    description: >-
+      INDEC's national accounts at 1993 prices (1993-2003) and 2004 prices
+      (from 2004), chain-linked by their quarterly growth rates into one
+      series. Original (not seasonally adjusted) data.
+    release: pib
+    source: derived
+    source_label: INDEC, via datos.gob.ar (1993 and 2004 bases, chain-linked)
+    frequency: Q
+    units: Index, 2004 = 100
+    index_base: "2004"
+    transforms: [yoy, level]
+    ranges: [10Y, 25Y, Max]
+    note: >-
+      Growth through Q1 2004 comes from the 1993-base accounts and from Q2
+      2004 from the 2004-base accounts; the level is that of the 2004 base.
+      Rebasing changed measured growth in the overlapping years, so the
+      splice is a growth-rate splice, not a revision of the 1993-2003 data.
+    annual_table: {accumulated: original, within_year: original}
+    default: {variant: original, transform: yoy, range: Max}
+    derive:
+      method: splice
+      anchor: {id: 4.2_OGP_2004_T_17, date: "2004-01-01"}
+      variants:
+        original:
+          label: Original
+          segments:
+            - {id: 2.2_OGP_1993_T_17, as: index, to: "2004-01-01"}
+            - {id: 4.2_OGP_2004_T_17, as: index, from: "2004-04-01"}
 
   - id: gdp_demand
     topic: gdp
@@ -368,6 +433,103 @@ indicators:
       lines_title: Industry groups, year-over-year change
     default: {variant: gdp, transform: yoy, start: "2016-01"}
 
+  - id: investment
+    topic: gdp
+    kind: contributions
+    measure: flow
+    title: Investment by Type
+    short_title: Investment
+    description: >-
+      Contribution of construction, machinery and equipment, and transport
+      equipment to the growth of gross fixed capital formation versus the same
+      quarter a year earlier, in percentage points.
+    release: pib
+    source: datos_gob
+    source_label: INDEC, via datos.gob.ar
+    frequency: Q
+    units: Percentage points
+    source_units: millions of 2004 pesos
+    note: >-
+      Original (not seasonally adjusted) series at constant 2004 prices. Other
+      is the residual (other fixed assets) that closes the gap to total
+      investment growth.
+    variants:
+      total:        {label: Gross fixed capital formation, id: 4.2_DGIT_2004_T_25}
+      construction: {label: Construction,                  id: 4.2_DGIC_2004_T_32}
+      machinery:    {label: Machinery & equipment,         id: 4.2_DGIEDPMET_2004_T_51}
+      transport:    {label: Transport equipment,           id: 4.2_DGIEDPMTT_2004_T_53}
+    contributions:
+      total: total
+      groups:
+        - {key: construction, label: Construction,          add: [construction], color: copper}
+        - {key: machinery,    label: Machinery & equipment, add: [machinery],    color: sky}
+        - {key: transport,    label: Transport equipment,   add: [transport],    color: sage}
+        - {key: other,        label: Other,                 residual: true,      color: neutral}
+      lines: [total, construction, machinery, transport]
+      line_colors: {total: neutral, construction: copper, machinery: sky, transport: sage}
+      default_lines: [construction, machinery, transport]
+      lines_title: Investment components, year-over-year change
+    default: {variant: total, transform: yoy, start: "2016-01"}
+
+  - id: investment_rate
+    topic: gdp
+    kind: variants
+    measure: rate
+    title: Investment Rate
+    short_title: Investment rate
+    description: >-
+      Gross fixed capital formation as a share of GDP, at current prices, over
+      the last four quarters.
+    release: pib
+    source: derived
+    source_label: INDEC, via datos.gob.ar
+    frequency: Q
+    units: "% of GDP"
+    transforms: [level, yoy]
+    default: {variant: rate, transform: level, start: "2016-01"}
+    derive:
+      method: ratio
+      variants:
+        rate: {label: Gross fixed capital formation, num: 4.4_DGI_2004_T_19, den: 4.4_OGP_2004_T_17, scale: 100, rolling: 4}
+
+  - id: gdp_nominal
+    topic: gdp
+    kind: variants
+    title: Nominal GDP
+    short_title: Nominal GDP
+    description: >-
+      GDP at current prices. Its growth is real growth plus the change in the
+      GDP deflator.
+    release: pib
+    source: datos_gob
+    source_label: INDEC, via datos.gob.ar
+    frequency: Q
+    units: Millions of current pesos
+    log_level: true
+    transforms: [yoy, level]
+    variants:
+      original: {label: Original, id: 4.4_OGP_2004_T_17}
+    default: {variant: original, transform: yoy, start: "2016-01"}
+
+  - id: gdp_deflator
+    topic: gdp
+    kind: variants
+    title: GDP Deflator
+    short_title: GDP deflator
+    description: >-
+      The implicit price index of GDP: the price of everything produced in
+      Argentina, not just the consumer basket.
+    release: pib
+    source: datos_gob
+    source_label: INDEC, via datos.gob.ar
+    frequency: Q
+    units: Index, 2004 = 100
+    log_level: true
+    transforms: [yoy, mom, level]
+    variants:
+      deflator: {label: GDP deflator, id: 25.2_OGP_2004_T_17}
+    default: {variant: deflator, transform: yoy, start: "2016-01"}
+
   # ======================= PRICES & MONEY =======================
   - id: cpi
     topic: prices_money
@@ -408,7 +570,7 @@ indicators:
       for both periods; the official series is the CPI as INDEC published it.
     release: ipc
     source: derived
-    source_label: "INDEC; composite of private estimates for Jan 2007 - Apr 2016"
+    source_label: "INDEC; IPC Congreso (Jan 2007 - Apr 2016)"
     frequency: M
     units: Index, Dec 2016 = 100
     transforms: [yoy, mom, level]
@@ -420,7 +582,11 @@ indicators:
       official level carries on through that gap with the corrected series'
       changes. Both series are equal through Dec 2006, so in levels the
       distance between them is the inflation the official figures left out.
-      Corrected: the same, with the private composite from Jan 2007 to Apr 2016.
+      Corrected: the same, with the "IPC Congreso" from Jan 2007 to Apr 2016:
+      the average of private estimates published by members of Congress
+      while INDEC was intervened. The private sources were kept confidential
+      to shield them from the fines and lawsuits the Secretariat of Domestic
+      Trade under Guillermo Moreno brought against private estimators.
     # Two different periods, drawn differently and explained in a key above
     # the chart: manipulated figures (shaded) and no figures at all (outlined).
     bands:
