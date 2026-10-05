@@ -56,3 +56,19 @@ pib:
   dates:   # period = first month of the quarter
     - {date: "2026-09-17", period: "2026-04"}
     - {date: "2026-12-16", period: "2026-07"}
+
+ipc:
+  name: Índice de precios al consumidor (IPC)
+  calendar_url: https://www.indec.gob.ar/ftp/cuadros/publicaciones/calendario_2sem2026.pdf
+  dates:
+    - {date: "2026-10-13", period: "2026-09"}
+    - {date: "2026-11-12", period: "2026-10"}
+    - {date: "2026-12-15", period: "2026-11"}
+
+sipm:
+  name: Sistema de índices de precios mayoristas (SIPM)
+  calendar_url: https://www.indec.gob.ar/ftp/cuadros/publicaciones/calendario_2sem2026.pdf
+  dates:
+    - {date: "2026-10-16", period: "2026-09"}
+    - {date: "2026-11-17", period: "2026-10"}
+    - {date: "2026-12-17", period: "2026-11"}

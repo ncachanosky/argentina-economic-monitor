@@ -581,11 +581,11 @@
     // contribution to the total in pp, when fixed-base sector weights exist).
     const W = ind.weights && ind.weights.values;
     const INC = { label: "Incidence (pp)", short: "Contribution to total y/y change, percentage points", suffix: " pp", signed: true, change: true };
-    const barState = { kind: isRate ? "level" : "yoy" };
-    let barKind = barState.kind, barSpec = T[barKind];
+    const baseKind = ind.bar_transform || (isRate ? "level" : "yoy");   // bars: level, y/y or m/m
+    let barKind = baseKind, barSpec = T[barKind];
     const defaults = [].concat(ind.default.variant).slice(0, MAX_PANEL_SERIES);
     const slots = new Map(defaults.map((k, i) => [k, i]));   // color follows the component, not its rank
-    const state = { transform: ind.default.transform || barKind, range: rangeFromDefault(ind) };
+    const state = { transform: ind.default.transform || baseKind, range: rangeFromDefault(ind) };
     const noun = ind.component_noun || "series";
 
     const card = cardFrame(ind, true);
@@ -593,19 +593,20 @@
     const lineEl = h("div", { class: "chart", role: "img", "aria-label": `Selected ${noun} over time` });
     const chipsEl = h("div", { class: "chips", role: "group", "aria-label": `${noun} to compare` });
     const chipsNote = h("span", { class: "chips-note" });
-    const lineKinds = Object.keys(T).filter((k) => k !== "mom");
+    const lineKinds = ind.transforms && ind.transforms.length ? Object.keys(T) : Object.keys(T).filter((k) => k !== "mom");
     const tSeg = segmented(lineKinds.map((k) => [k, T[k].label]), state.transform, (k) => { state.transform = k; drawLines(); }, "Transformation");
     const rSeg = segmented(Object.keys(RANGES).map((k) => [k, k]), state.range, (k) => { state.range = k; drawLines(); }, "Time range");
     let table;
 
     // Bar metric for every component, at the most recent month they all share.
-    const yoyMetric = Object.fromEntries(keys.map((k) => [k, transform(ind.dates, ind.variants[k].values, isRate ? "level" : "yoy", ind.measure, ind.frequency)]));
+    const yoyMetric = Object.fromEntries(keys.map((k) => [k, transform(ind.dates, ind.variants[k].values, baseKind, ind.measure, ind.frequency)]));
     let refIdx = ind.dates.length - 1;
     while (refIdx > 0 && keys.some((k) => yoyMetric[k][refIdx] === null)) refIdx--;
     const refDate = ind.dates[refIdx];
-    // Incidence_k,t = w_k (X_k,t - X_k,t-12) / sum_j w_j X_j,t-12 * 100
+    // Incidence_k,t = w_k (X_k,t - X_k,t-L) / sum_j w_j X_j,t-L * 100, with L
+    // the lag of the bar metric (12 months for y/y, 1 for m/m).
     const incMetric = W ? (() => {
-      const lag = ind.frequency === "Q" ? 4 : 12;
+      const lag = baseKind === "mom" ? (ind.frequency === "Q" ? 1 : 1) : (ind.frequency === "Q" ? 4 : 12);
       const out = Object.fromEntries(keys.map((k) => [k, ind.dates.map(() => null)]));
       for (let i = lag; i < ind.dates.length; i++) {
         let den = 0, ok = true;
@@ -620,13 +621,15 @@
     })() : null;
     let metric = yoyMetric;
     const totalInc = () => keys.reduce((a, k) => a + (incMetric[k][refIdx] || 0), 0);
+    const changeWord = baseKind === "mom" ? "month-over-month" : "year-over-year";
+    const changeShort = baseKind === "mom" ? "m/m" : "y/y";
     const barTitleFor = () => isRate ? `${ind.units}, ${fmtMonth(refDate)}`
-      : barKind === "incidence" ? `Incidence (contribution to total y/y change), ${fmtMonth(refDate)}; total ${(totalInc() > 0 ? "+" : "") + totalInc().toFixed(2)} pp`
-      : `Year-over-year change, ${fmtMonth(refDate)}`;
+      : barKind === "incidence" ? `Incidence (contribution to total ${changeShort} change), ${fmtMonth(refDate)}; total ${(totalInc() > 0 ? "+" : "") + totalInc().toFixed(2)} pp`
+      : `${changeWord.charAt(0).toUpperCase() + changeWord.slice(1)} change, ${fmtMonth(refDate)}`;
     let barTitle = barTitleFor();
     const barTitleEl = h("span", {}, `${barTitle}. `);
-    const bSeg = W ? segmented([["yoy", "y/y %"], ["incidence", "Incidence (pp)"]], barKind, (k) => {
-      barKind = k; barSpec = k === "incidence" ? INC : T.yoy; metric = k === "incidence" ? incMetric : yoyMetric;
+    const bSeg = W ? segmented([[baseKind, T[baseKind].label], ["incidence", "Incidence (pp)"]], barKind, (k) => {
+      barKind = k; barSpec = k === "incidence" ? INC : T[baseKind]; metric = k === "incidence" ? incMetric : yoyMetric;
       barTitle = barTitleFor(); barTitleEl.textContent = `${barTitle}. `; bSeg.update(k); drawBars();
     }, "Bar metric") : null;
 
@@ -659,7 +662,7 @@
         insidetextanchor: "end",
         textfont: { family: cssVar("--font-ui") || "Calibri, Arial, sans-serif", size: forExport ? 15 : 12, color: clipped.map((c, i) => (c && slots.has(order[i]) ? "#FFFFFF" : inkColor)) },
         cliponaxis: false,
-        hovertemplate: `%{y}: <b>%{customdata[1]:,${barKind === "incidence" ? ".2f" : ".1f"}}${barSpec.suffix}</b>${W ? `<br>Weight: %{customdata[2]:.1f}% of ${ind.weights.year} GDP` : ""}<extra></extra>`,
+        hovertemplate: `%{y}: <b>%{customdata[1]:,${barKind === "incidence" ? ".2f" : ".1f"}}${barSpec.suffix}</b>${W ? `<br>Weight: %{customdata[2]:.1f}% (${ind.weights.label || "weight"})` : ""}<extra></extra>`,
         _lightColors: colors,
       };
       // Room for outside labels; the broken bar ends at the axis edge.
@@ -725,7 +728,7 @@
 
     function drawAll() { drawChips(); drawBars(); drawLines(); }
 
-    const seriesNote = isRate ? "" : " · original series";
+    const seriesNote = isRate || ind.topic === "prices_money" ? "" : " · original series";
     const onPNG = () => {
       const t = T[state.transform];
       exportPNG(ind, lineTraces(), `${t.change ? t.short : ind.units}${seriesNote}`, t, `${ind.id}_${state.transform}.png`);
@@ -733,7 +736,7 @@
     const onBarPNG = () => {
       const b = bars(true);
       exportPNG({ ...ind, title: `${ind.title}: ${barTitle.charAt(0).toLowerCase() + barTitle.slice(1)}` }, b.traces,
-        isRate ? `Latest month, by ${noun}` : barKind === "incidence" ? `Percentage points; weights: shares of ${ind.weights.year} GDP${seriesNote}` : `Percent change vs. same month a year earlier${seriesNote}`, barSpec, `${ind.id}_latest_${barKind}.png`,
+        isRate ? `Latest month, by ${noun}` : barKind === "incidence" ? `Percentage points; weights: ${ind.weights.label}${seriesNote}` : baseKind === "mom" ? `Percent change vs. previous month${seriesNote}` : `Percent change vs. same month a year earlier${seriesNote}`, barSpec, `${ind.id}_latest_${barKind}.png`,
         { shapes: b.shapes, xrange: b.range, xsuffix: barSpec.suffix });
     };
     const onCSV = () => {
@@ -746,9 +749,9 @@
     };
 
     barNote = h("span", {});
-    const weightsTable = W ? h("details", { class: "table-view" }, h("summary", {}, `Sector weights (share of ${ind.weights.year} GDP at constant prices)`),
+    const weightsTable = W ? h("details", { class: "table-view" }, h("summary", {}, ind.weights.method === "fit" ? `Weights (${ind.weights.label}, recovered from the published indices)` : `Weights (${ind.weights.label} at constant prices)`),
       h("div", { class: "table-scroll" }, h("table", { class: "data" },
-        h("thead", {}, h("tr", {}, h("th", {}, "Sector"), h("th", {}, "Weight"))),
+        h("thead", {}, h("tr", {}, h("th", {}, noun.charAt(0).toUpperCase() + noun.slice(1, -1).replace(/ie$/, "y")), h("th", {}, "Weight"))),
         h("tbody", {}, keys.filter((k) => W[k] !== undefined).sort((a, b) => W[b] - W[a]).map((k) => h("tr", {}, h("td", {}, ind.variants[k].label), h("td", {}, W[k].toFixed(1) + "%"))))))) : null;
     appendAll(card, 
       bSeg ? h("div", { class: "controls" }, bSeg) : null,

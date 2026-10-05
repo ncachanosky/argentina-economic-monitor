@@ -78,11 +78,41 @@ def contributions(ind, raw: pd.DataFrame) -> dict:
     }
 
 
+def fitted_weights(ind, reg, target) -> dict | None:
+    """Recover fixed-base Laspeyres weights from the published indices.
+
+    With a common base period, total_t = sum_i w_i * component_i,t exactly (up
+    to rounding), so least squares without intercept returns the weights.
+    Reports the fit so a bad recovery is visible, and is skipped if poor.
+    """
+    import numpy as np
+    tgt_ind = next((i for i in reg.indicators if i.id == target["indicator"]), None)
+    if tgt_ind is None:
+        return None
+    y = store.as_of(tgt_ind.variants[target["variant"]].source_id)
+    X = store.latest_frame([v.source_id for v in ind.variants.values()])
+    X.columns = list(ind.variants)
+    df = pd.concat([X, y.rename("_y")], axis=1).dropna()
+    if len(df) < 24:
+        return None
+    w, *_ = np.linalg.lstsq(df[list(ind.variants)].values, df["_y"].values, rcond=None)
+    fitted = df[list(ind.variants)].values @ w
+    max_err = float(np.max(np.abs(fitted / df["_y"].values - 1)) * 100)
+    if max_err > 0.5 or (w < 0).any():
+        print(f"  weights for {ind.id}: poor fit (max error {max_err:.2f}%), skipped")
+        return None
+    w = w / w.sum() * 100
+    return {"year": "Dec 2016 base", "method": "fit", "label": "CPI basket weight", "max_error_pct": round(max_err, 4),
+            "values": {k: round(float(v), 4) for k, v in zip(ind.variants, w)}}
+
+
 def sector_weights(ind, reg) -> dict | None:
     """Fixed-base sector weights (% of base-year GDP) for incidence calculations."""
     spec = ind.weights
     if not spec:
         return None
+    if spec.get("fit_to"):
+        return fitted_weights(ind, reg, spec["fit_to"])
     src = next((i for i in reg.indicators if i.id == spec["from"]), None)
     if src is None or not src.contributions:
         return None
@@ -96,7 +126,7 @@ def sector_weights(ind, reg) -> dict | None:
     if spec.get("residual"):
         excl = set(spec.get("exclude_from_residual", []))
         out[spec["residual"]] = 100 - sum(v for k, v in share.items() if k not in excl)
-    return {"year": str(spec["year"]), "values": {k: round(v, 4) for k, v in out.items()}}
+    return {"year": str(spec["year"]), "label": f"share of {spec['year']} GDP", "values": {k: round(v, 4) for k, v in out.items()}}
 
 
 def export(out: Path) -> None:
@@ -137,6 +167,7 @@ def export(out: Path) -> None:
             "transforms": ind.transforms,
             "component_noun": ind.component_noun,
             "wide": ind.wide,
+            "bar_transform": ind.bar_transform,
             "frequency": ind.frequency,
             "source_units": ind.source_units,
             "note": ind.note,

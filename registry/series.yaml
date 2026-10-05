@@ -51,6 +51,11 @@ topics:
       Economic activity: the monthly activity estimator (EMAE) by sector,
       manufacturing, construction and capacity utilization, plus quarterly
       GDP by expenditure and by industry.
+  - id: prices_money
+    title: Prices & Money
+    description: >-
+      Consumer prices (headline, core, regulated, seasonal; by division and
+      region) and wholesale prices. National CPI starts in December 2016.
 
 indicators:
   - id: emae
@@ -331,3 +336,127 @@ indicators:
       lines: groups
       lines_title: Industry groups, year-over-year change
     default: {variant: gdp, transform: yoy, start: "2016-01"}
+
+  # ======================= PRICES & MONEY =======================
+  - id: cpi
+    topic: prices_money
+    wide: true
+    kind: variants
+    title: Consumer Price Index (CPI)
+    short_title: CPI
+    description: >-
+      INDEC's national consumer price index. Monthly inflation is the m/m
+      change; rebase to a presidential term to read cumulative inflation since
+      it began.
+    release: ipc
+    source: datos_gob
+    source_label: INDEC, via datos.gob.ar
+    frequency: M
+    units: Index, Dec 2016 = 100
+    variants:
+      headline:  {label: Headline,  id: 148.3_INIVELNAL_DICI_M_26}
+      core:      {label: Core,      id: 148.3_INUCLEONAL_DICI_M_19}
+      regulated: {label: Regulated, id: 148.3_IREGULANAL_DICI_M_22}
+      seasonal:  {label: Seasonal,  id: 148.3_IESTACINAL_DICI_M_25}
+    default: {variant: headline, transform: mom, start: "2017-01"}
+    headline: {variant: headline, transform: mom}
+
+  - id: cpi_categories
+    topic: prices_money
+    kind: panel
+    component_noun: categories
+    bar_transform: mom
+    transforms: [mom, yoy, level]
+    title: CPI by Category
+    short_title: CPI categories
+    description: >-
+      Core, regulated and seasonal prices. Incidence shows how many points of
+      monthly inflation each category contributed.
+    release: ipc
+    source: datos_gob
+    source_label: INDEC, via datos.gob.ar
+    frequency: M
+    units: Index, Dec 2016 = 100
+    variants:
+      core:      {label: Core,      id: 148.3_INUCLEONAL_DICI_M_19}
+      regulated: {label: Regulated, id: 148.3_IREGULANAL_DICI_M_22}
+      seasonal:  {label: Seasonal,  id: 148.3_IESTACINAL_DICI_M_25}
+    default: {variant: [core, regulated, seasonal], transform: mom, start: "2017-01"}
+    # Weights recovered from the index itself: a fixed-base Laspeyres CPI is
+    # sum_i w_i * I_i,t, so least squares on headline vs. components returns w.
+    weights: {fit_to: {indicator: cpi, variant: headline}}
+
+  - id: cpi_divisions
+    topic: prices_money
+    kind: panel
+    component_noun: divisions
+    bar_transform: mom
+    transforms: [mom, yoy, level]
+    title: CPI by Division
+    short_title: CPI divisions
+    description: >-
+      The twelve COICOP divisions of the national CPI. Select divisions to
+      compare their paths.
+    release: ipc
+    source: datos_gob
+    source_label: INDEC, via datos.gob.ar
+    frequency: M
+    units: Index, Dec 2016 = 100
+    variants:
+      food:       {label: Food & non-alcoholic beverages, id: 146.3_IALIMENNAL_DICI_M_45}
+      alcohol:    {label: Alcoholic beverages & tobacco,  id: 146.3_IBEBIDANAL_DICI_M_39}
+      clothing:   {label: Clothing & footwear,            id: 146.3_IPRENDANAL_DICI_M_35}
+      housing:    {label: "Housing, water, electricity & fuels", id: 146.3_IVIVIENNAL_DICI_M_52}
+      household:  {label: Household equipment,            id: 146.3_IEQUIPANAL_DICI_M_46}
+      health:     {label: Health,                         id: 146.3_ISALUDNAL_DICI_M_18}
+      transport:  {label: Transport,                      id: 146.3_ITRANSPNAL_DICI_M_23}
+      comms:      {label: Communication,                  id: 146.3_ICOMUNINAL_DICI_M_27}
+      recreation: {label: Recreation & culture,           id: 146.3_IRECREANAL_DICI_M_31}
+      education:  {label: Education,                      id: 146.3_IEDUCACNAL_DICI_M_22}
+      restaurants: {label: Restaurants & hotels,          id: 146.3_IRESTAUNAL_DICI_M_33}
+      misc:       {label: Miscellaneous goods & services, id: 146.3_IBIENIESNAL_DICI_M_36}
+    default: {variant: [food, housing, transport], transform: mom, start: "2017-01"}
+    weights: {fit_to: {indicator: cpi, variant: headline}}
+
+  - id: cpi_regions
+    topic: prices_money
+    kind: panel
+    component_noun: regions
+    bar_transform: mom
+    transforms: [mom, yoy, level]
+    title: CPI by Region
+    short_title: CPI regions
+    description: >-
+      Headline CPI in each of INDEC's six regions.
+    release: ipc
+    source: datos_gob
+    source_label: INDEC, via datos.gob.ar
+    frequency: M
+    units: Index, Dec 2016 = 100
+    variants:
+      gba:       {label: Greater Buenos Aires, id: 148.3_INIVELGBA_DICI_M_21}
+      pampeana:  {label: Pampas,               id: 148.3_INIVELANA_DICI_M_26}
+      noa:       {label: Northwest,            id: 148.3_INIVELNOA_DICI_M_21}
+      nea:       {label: Northeast,            id: 148.3_INIVELNEA_DICI_M_21}
+      cuyo:      {label: Cuyo,                 id: 148.3_INIVELUYO_DICI_M_22}
+      patagonia: {label: Patagonia,            id: 148.3_INIVELNIA_DICI_M_27}
+    default: {variant: [gba, nea, patagonia], transform: yoy, start: "2017-01"}
+
+  - id: ipim
+    topic: prices_money
+    wide: true
+    kind: variants
+    title: Wholesale Prices (IPIM)
+    short_title: Wholesale prices
+    description: >-
+      INDEC's domestic wholesale price index: prices of domestic and imported
+      goods at the first stage of sale. Often a leading signal for consumer
+      goods inflation.
+    release: sipm
+    source: datos_gob
+    source_label: INDEC, via datos.gob.ar
+    frequency: M
+    units: Index, Dec 2015 = 100
+    variants:
+      total: {label: Wholesale prices (IPIM), id: 448.1_NIVEL_GENERAL_0_0_13_46}
+    default: {variant: total, transform: mom, start: "2017-01"}

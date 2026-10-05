@@ -47,6 +47,7 @@ class Indicator:
     note: str | None = None
     contributions: dict | None = None
     weights: dict | None = None
+    bar_transform: str | None = None   # panels: metric for the ranked bars (yoy, mom, level)
 
 
 HEX = __import__("re").compile(r"^#[0-9A-Fa-f]{6}$")
@@ -171,6 +172,7 @@ def load(path: Path = REGISTRY_PATH, releases_path: Path = RELEASES_PATH) -> Reg
                 note=" ".join(str(item["note"]).split()) if item.get("note") else None,
                 contributions=contrib,
                 weights=item.get("weights"),
+                bar_transform=item.get("bar_transform"),
             )
         )
 
