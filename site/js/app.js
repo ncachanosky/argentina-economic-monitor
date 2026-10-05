@@ -569,7 +569,7 @@
   // so the others stay readable. Returns the axis cap, or null if no break.
   function axisBreak(vals) {
     const abs = vals.filter((v) => v !== null).map(Math.abs).sort((a, b) => b - a);
-    if (abs.length < 3 || abs[1] === 0 || abs[0] < 2.5 * abs[1]) return null;
+    if (abs.length < 6 || abs[1] === 0 || abs[0] < 2.5 * abs[1]) return null;
     return abs[1] * 1.35;
   }
 
