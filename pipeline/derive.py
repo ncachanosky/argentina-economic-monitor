@@ -23,6 +23,15 @@ tracker   Quarterly averages of a monthly activity index (EMAE), next to
           y/y of the same months (original series). INDEC reconciles EMAE with
           quarterly GDP, so once GDP is out the two match.
 
+monthly   Monthly series from daily ones: per variant, the daily sum of
+          `sum_of` ids (days missing any of them are dropped), then the
+          month's average (`how: mean`, default) or last value (`how: last`).
+
+flows     Monthly sources of a stock, in percentage points of the stock at
+          the end of the previous month: per variant, the month's sum of the
+          daily flows in `sum_of`, over `stock` at the previous month end,
+          x 100 (e.g. the factors that explain base money).
+
 reweight  What a fixed-base CPI would show with a different basket, from the
           month the new basket would have started (`link`). With division
           indices I_i and price relatives r_i,t = I_i,t / I_i,link:
@@ -213,6 +222,51 @@ def tracker(ind, frames: dict[str, pd.Series]) -> tuple[pd.DataFrame, dict]:
     return df.sort_index(), {"tracker": info}
 
 
+def _daily_sum(frames: dict[str, pd.Series], ids: list[str]) -> pd.Series:
+    df = pd.concat([frames[i] for i in ids], axis=1)
+    return df.dropna().sum(axis=1)
+
+
+def monthly(ind, frames: dict[str, pd.Series]) -> tuple[pd.DataFrame, dict]:
+    out = {}
+    for k, v in ind.derive["variants"].items():
+        d = _daily_sum(frames, v["sum_of"])
+        g = d.resample("MS")
+        out[ind.variants[k].source_id] = g.last() if v.get("how") == "last" else g.mean()
+    df = pd.DataFrame(out).sort_index()
+    # The current month is partial: keep it, and say so.
+    last = max(f.index.max() for f in frames.values())
+    partial = last + pd.offsets.Day(1) <= last + pd.offsets.MonthEnd(0)
+    return df, {"partial_month": last.strftime("%Y-%m-%d") if partial else None}
+
+
+def flows(ind, frames: dict[str, pd.Series]) -> tuple[pd.DataFrame, dict]:
+    spec = ind.derive
+    stock = frames[spec["stock"]]
+    prev_end = stock.resample("MS").last().shift(1)
+    out = {}
+    for k, v in spec["variants"].items():
+        f = _daily_sum(frames, v["sum_of"]).resample("MS").sum(min_count=1)
+        out[ind.variants[k].source_id] = (f / prev_end * 100).dropna()
+    df = pd.DataFrame(out).sort_index()
+    end = stock.resample("MS").last()
+    info = {"stock_change_pct": {d.strftime("%Y-%m-%d"): round(float(v), 4)
+                                 for d, v in ((end / prev_end - 1) * 100).dropna().items()}}
+    return df, info
+
+
+def expectations(ind, frames: dict[str, pd.Series]) -> tuple[pd.DataFrame, dict]:
+    """Expected inflation for the next 12 months (survey month t) against
+    realized inflation P_{t+12}/P_t - 1 and past inflation P_t/P_{t-12} - 1."""
+    spec = ind.derive
+    p = frames[spec["cpi"]]
+    cols = {"expected": frames[spec["expected"]],
+            "realized": (p.shift(-12) / p - 1) * 100,
+            "past": (p / p.shift(12) - 1) * 100}
+    df = pd.DataFrame({ind.variants[k].source_id: v for k, v in cols.items() if k in ind.variants})
+    return df.dropna(how="all").sort_index(), {}
+
+
 def compute(ind, reg) -> tuple[pd.DataFrame, dict]:
     ids = ind.input_ids()
     frames = {sid: store.as_of(sid) for sid in ids}
@@ -225,4 +279,10 @@ def compute(ind, reg) -> tuple[pd.DataFrame, dict]:
         return ratio(ind, frames)
     if ind.derive["method"] == "tracker":
         return tracker(ind, frames)
+    if ind.derive["method"] == "expectations":
+        return expectations(ind, frames)
+    if ind.derive["method"] == "monthly":
+        return monthly(ind, frames)
+    if ind.derive["method"] == "flows":
+        return flows(ind, frames)
     return reweight(ind, reg, frames)

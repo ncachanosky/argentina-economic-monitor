@@ -48,6 +48,40 @@ inputs:
      label: "INDEC CPI-GBA (base Apr 2016)"}
   - {id: 2.2_OGP_1993_T_17, source: datos_gob, frequency: Q, measure: index, static: true,
      label: "INDEC GDP at 1993 prices, 1993-2013"}
+  # BCRA statistics API (daily). Ids are BCRA's idVariable numbers.
+  - {id: "bcra:15",  source: bcra, frequency: D, measure: index, label: "Base money"}
+  - {id: "bcra:17",  source: bcra, frequency: D, measure: index, label: "Currency held by the public"}
+  - {id: "bcra:85",  source: bcra, frequency: D, measure: flow, label: "Current accounts, public and private non-financial sectors (pesos)"}
+  - {id: "bcra:86",  source: bcra, frequency: D, measure: flow, label: "Savings accounts, public and private non-financial sectors (pesos)"}
+  - {id: "bcra:91",  source: bcra, frequency: D, measure: flow, label: "Peso deposits, public and private non-financial sectors"}
+  - {id: "bcra:94",  source: bcra, frequency: D, measure: flow, label: "Current accounts, private non-financial sector (pesos)"}
+  - {id: "bcra:95",  source: bcra, frequency: D, measure: flow, label: "Savings accounts, private non-financial sector (pesos)"}
+  - {id: "bcra:96",  source: bcra, frequency: D, measure: flow, label: "Time deposits, not CER/UVA-adjusted, private (pesos)"}
+  - {id: "bcra:97",  source: bcra, frequency: D, measure: flow, label: "Time deposits, CER/UVA-adjusted, private (pesos)"}
+  - {id: "bcra:108", source: bcra, frequency: D, measure: flow, label: "Dollar deposits, private non-financial sector (USD)"}
+  - {id: "bcra:110", source: bcra, frequency: D, measure: flow, label: "Loans to the private sector: overdrafts (pesos)"}
+  - {id: "bcra:111", source: bcra, frequency: D, measure: flow, label: "Loans to the private sector: promissory notes (pesos)"}
+  - {id: "bcra:112", source: bcra, frequency: D, measure: flow, label: "Loans to the private sector: mortgages (pesos)"}
+  - {id: "bcra:113", source: bcra, frequency: D, measure: flow, label: "Loans to the private sector: secured/pledge (pesos)"}
+  - {id: "bcra:114", source: bcra, frequency: D, measure: flow, label: "Loans to the private sector: personal (pesos)"}
+  - {id: "bcra:115", source: bcra, frequency: D, measure: flow, label: "Loans to the private sector: credit cards (pesos)"}
+  - {id: "bcra:116", source: bcra, frequency: D, measure: flow, label: "Loans to the private sector: other (pesos)"}
+  - {id: "bcra:125", source: bcra, frequency: D, measure: flow, label: "Dollar loans to the private sector (USD)"}
+  - {id: "bcra:46",  source: bcra, frequency: D, measure: flow, label: "Base money: total explanatory factors"}
+  - {id: "bcra:47",  source: bcra, frequency: D, measure: flow, label: "Base money factor: net FX purchases from the private sector"}
+  - {id: "bcra:48",  source: bcra, frequency: D, measure: flow, label: "Base money factor: net FX purchases from the Treasury"}
+  - {id: "bcra:49",  source: bcra, frequency: D, measure: flow, label: "Base money factor: temporary advances to the Treasury"}
+  - {id: "bcra:50",  source: bcra, frequency: D, measure: flow, label: "Base money factor: profit transfers to the Treasury"}
+  - {id: "bcra:51",  source: bcra, frequency: D, measure: flow, label: "Base money factor: other Treasury operations"}
+  - {id: "bcra:52",  source: bcra, frequency: D, measure: flow, label: "Base money factor: repos (pases)"}
+  - {id: "bcra:53",  source: bcra, frequency: D, measure: flow, label: "Base money factor: LELIQ and NOTALIQ"}
+  - {id: "bcra:54",  source: bcra, frequency: D, measure: flow, label: "Base money factor: rediscounts and advances"}
+  - {id: "bcra:55",  source: bcra, frequency: D, measure: flow, label: "Base money factor: interest, premiums and remuneration of current accounts"}
+  - {id: "bcra:56",  source: bcra, frequency: D, measure: flow, label: "Base money factor: LEBAC and NOBAC"}
+  - {id: "bcra:57",  source: bcra, frequency: D, measure: flow, label: "Base money factor: redemption of quasi-currencies"}
+  - {id: "bcra:58",  source: bcra, frequency: D, measure: flow, label: "Base money factor: fiscal liquidity notes (LEFI)"}
+  - {id: "bcra:59",  source: bcra, frequency: D, measure: flow, label: "Base money factor: other operations"}
+  - {id: "bcra:29",  source: bcra, frequency: M, measure: flow, label: "REM: median expected inflation, next 12 months"}
   - {id: 4.4_DGI_2004_T_19, source: datos_gob, frequency: Q, measure: index,
      label: "INDEC gross fixed capital formation, current prices"}
 
@@ -111,6 +145,13 @@ topics:
       Consumer prices (headline, core, regulated, seasonal; by division and
       region), inflation since 1943 corrected for the 2007-2015 INDEC
       intervention, and wholesale prices.
+  - id: money
+    slug: money-banking
+    title: Money & Banking
+    description: >-
+      Base money and what creates it, monetary aggregates, deposits and loans,
+      interest rates, the official exchange rate and reserves. From the
+      central bank (BCRA). Peso amounts can be shown in real terms.
 
 indicators:
   - id: emae
@@ -752,6 +793,38 @@ indicators:
         official:   {label: "Official (2004/05 basket)"}
         reweighted: {label: "2017/18 basket (estimate)"}
 
+  - id: inflation_expectations
+    topic: prices
+    wide: true
+    kind: variants
+    overlay: true
+    measure: rate
+    title: Expected vs. Actual Inflation
+    short_title: Expectations
+    description: >-
+      The median inflation expected for the next 12 months in the BCRA's
+      survey of analysts (REM), against the inflation that followed and the
+      inflation of the past 12 months.
+    source: derived
+    source_label: BCRA (REM); INDEC
+    frequency: M
+    units: "%"
+    transforms: [level]
+    note: >-
+      Each point is the month the survey was taken. "Realized" is CPI
+      inflation over the 12 months after that month, so it ends a year before
+      the latest survey. "Past 12 months" is the y/y CPI inflation known when
+      the survey was taken.
+    default: {variant: expected, transform: level, start: "2017-01"}
+    derive:
+      method: expectations
+      expected: "bcra:29"
+      cpi: 148.3_INIVELNAL_DICI_M_26
+      variants:
+        expected: {label: Expected (REM median)}
+        realized: {label: Realized next 12 months}
+        past:     {label: Past 12 months}
+
   - id: cpi_regions
     topic: prices
     kind: panel
@@ -795,3 +868,269 @@ indicators:
     variants:
       total: {label: Wholesale prices (IPIM), id: 448.1_NIVEL_GENERAL_0_0_13_46}
     default: {variant: total, transform: mom, start: "2017-01"}
+
+  # ======================= MONEY & BANKING =======================
+  - id: base_money
+    topic: money
+    wide: true
+    kind: variants
+    title: Base Money
+    short_title: Base money
+    description: >-
+      Currency in circulation plus banks' current accounts at the BCRA.
+      Monthly average of daily data, or the stock on the last day of the
+      month.
+    source: derived
+    source_label: BCRA
+    frequency: M
+    units: Millions of pesos
+    log_level: true
+    transforms: [yoy, mom, ytd, level]
+    deflate_with: {indicator: cpi_long, variant: corrected, label: CPI}
+    note: >-
+      Real terms: deflated by the CPI (corrected for 2007-2016, see the long-run
+      CPI), in pesos of the latest month with CPI data. The current month is
+      partial until it ends.
+    default: {variant: avg, transform: yoy, start: "2016-01"}
+    derive:
+      method: monthly
+      variants:
+        avg: {label: Monthly average, sum_of: ["bcra:15"]}
+        eom: {label: End of month,    sum_of: ["bcra:15"], how: last}
+
+  - id: base_money_sources
+    topic: money
+    kind: contributions
+    measure: flow
+    title: What Creates Base Money
+    short_title: Base money sources
+    description: >-
+      The central bank operations that changed base money each month, in
+      percentage points of base money at the end of the previous month. Bars
+      add up to the month's change (the marker).
+    source: derived
+    source_label: BCRA (factores de explicación de la base monetaria)
+    frequency: M
+    units: Percentage points of base money
+    note: >-
+      Sterilization: repos, LEBAC, LELIQ and LEFI (negative when the BCRA
+      absorbs pesos). Treasury: net FX purchases from the Treasury, temporary
+      advances, profit transfers and other operations. Other: rediscounts,
+      interest and remuneration of bank accounts, quasi-currencies and other.
+    contributions:
+      precomputed: true
+      total: total
+      total_label: Change in base money
+      units: pp
+      groups:
+        - {key: fx,       label: FX purchases from the private sector, add: [fx],       color: copper}
+        - {key: treasury, label: Treasury,                              add: [treasury], color: sky}
+        - {key: steril,   label: Sterilization (repos and BCRA notes),  add: [steril],   color: sage}
+        - {key: other,    label: Other,                                 add: [other],    color: neutral}
+    default: {variant: total, transform: level, start: "2022-01"}
+    derive:
+      method: flows
+      stock: "bcra:15"
+      variants:
+        total:    {label: Total,        sum_of: ["bcra:46"]}
+        fx:       {label: FX purchases, sum_of: ["bcra:47"]}
+        treasury: {label: Treasury,     sum_of: ["bcra:48", "bcra:49", "bcra:50", "bcra:51"]}
+        steril:   {label: Sterilization, sum_of: ["bcra:52", "bcra:53", "bcra:56", "bcra:58"]}
+        other:    {label: Other,        sum_of: ["bcra:54", "bcra:55", "bcra:57", "bcra:59"]}
+
+  - id: money_aggregates
+    topic: money
+    kind: panel
+    component_noun: aggregates
+    title: Monetary Aggregates
+    short_title: Aggregates
+    description: >-
+      Currency held by the public and the broader aggregates, monthly
+      averages of daily data.
+    source: derived
+    source_label: BCRA
+    frequency: M
+    units: Millions of pesos
+    bar_transform: yoy
+    bar_transforms: [yoy, mom, ytd]
+    transforms: [yoy, mom, ytd, level]
+    deflate_with: {indicator: cpi_long, variant: corrected, label: CPI}
+    note: >-
+      M1 = currency held by the public + current accounts; M2 = M1 + savings
+      accounts; M3 = currency + all peso deposits (public and private
+      non-financial sectors). Private M2 uses private deposits only. Peso
+      deposits only.
+    default: {variant: [currency, m2_private, m3], transform: yoy, start: "2016-01"}
+    derive:
+      method: monthly
+      variants:
+        currency:   {label: Currency held by the public, sum_of: ["bcra:17"]}
+        m1:         {label: M1,         sum_of: ["bcra:17", "bcra:85"]}
+        m2:         {label: M2,         sum_of: ["bcra:17", "bcra:85", "bcra:86"]}
+        m2_private: {label: Private M2, sum_of: ["bcra:17", "bcra:94", "bcra:95"]}
+        m3:         {label: M3,         sum_of: ["bcra:17", "bcra:91"]}
+
+  - id: deposits_pesos
+    topic: money
+    kind: panel
+    component_noun: deposits
+    title: Private Peso Deposits
+    short_title: Peso deposits
+    description: >-
+      Peso deposits of the private non-financial sector by type, monthly
+      averages of daily data.
+    source: derived
+    source_label: BCRA
+    frequency: M
+    units: Millions of pesos
+    bar_transform: yoy
+    bar_transforms: [yoy, mom, ytd]
+    transforms: [yoy, mom, ytd, level]
+    deflate_with: {indicator: cpi_long, variant: corrected, label: CPI}
+    default: {variant: [current, savings, time], transform: yoy, start: "2016-01"}
+    derive:
+      method: monthly
+      variants:
+        current:  {label: Current accounts, sum_of: ["bcra:94"]}
+        savings:  {label: Savings accounts, sum_of: ["bcra:95"]}
+        time:     {label: Time deposits,    sum_of: ["bcra:96"]}
+        time_cer: {label: "Time deposits, inflation-adjusted (CER/UVA)", sum_of: ["bcra:97"]}
+
+  - id: loans_pesos
+    topic: money
+    kind: panel
+    component_noun: loans
+    title: Private Peso Loans
+    short_title: Peso loans
+    description: >-
+      Bank loans in pesos to the private sector by type, monthly averages of
+      daily data.
+    source: derived
+    source_label: BCRA
+    frequency: M
+    units: Millions of pesos
+    bar_transform: yoy
+    bar_transforms: [yoy, mom, ytd]
+    transforms: [yoy, mom, ytd, level]
+    deflate_with: {indicator: cpi_long, variant: corrected, label: CPI}
+    default: {variant: [personal, cards, mortgages], transform: yoy, start: "2016-01"}
+    derive:
+      method: monthly
+      variants:
+        overdrafts: {label: Overdrafts,        sum_of: ["bcra:110"]}
+        documents:  {label: Promissory notes,  sum_of: ["bcra:111"]}
+        mortgages:  {label: Mortgages,         sum_of: ["bcra:112"]}
+        pledge:     {label: Secured (pledge),  sum_of: ["bcra:113"]}
+        personal:   {label: Personal loans,    sum_of: ["bcra:114"]}
+        cards:      {label: Credit cards,      sum_of: ["bcra:115"]}
+        other:      {label: Other,             sum_of: ["bcra:116"]}
+
+  - id: dollar_banking
+    topic: money
+    kind: variants
+    overlay: true
+    title: Dollar Deposits and Loans
+    short_title: Dollar banking
+    description: >-
+      Private dollar deposits and dollar loans to the private sector, in
+      millions of US dollars, monthly averages of daily data.
+    source: derived
+    source_label: BCRA
+    frequency: M
+    units: Millions of US dollars
+    transforms: [level, yoy, mom]
+    default: {variant: deposits, transform: level, start: "2016-01"}
+    derive:
+      method: monthly
+      variants:
+        deposits: {label: Dollar deposits, sum_of: ["bcra:108"]}
+        loans:    {label: Dollar loans,    sum_of: ["bcra:125"]}
+
+  - id: interest_rates
+    topic: money
+    kind: panel
+    component_noun: rates
+    measure: rate
+    validate_as: flow
+    title: Interest Rates
+    short_title: Interest rates
+    description: >-
+      Market interest rates in pesos, nominal annual, daily.
+    source: bcra
+    source_label: BCRA
+    frequency: D
+    units: "% nominal annual"
+    transforms: [level, yoy]
+    ranges: [2Y, 5Y, 10Y, Max]
+    variants:
+      badlar:   {label: "BADLAR (time deposits over 1M pesos, private banks)", id: "bcra:7"}
+      tamar:    {label: "TAMAR (wholesale time deposits, private banks)",       id: "bcra:44"}
+      deposits: {label: 30-day time deposits,                                  id: "bcra:12"}
+      call:     {label: Interbank call (BAIBAR),                               id: "bcra:11"}
+      overdraft: {label: Overdrafts,                                           id: "bcra:13"}
+      personal: {label: Personal loans,                                        id: "bcra:14"}
+    default: {variant: [badlar, deposits, personal], transform: level, start: "2023-01"}
+
+  - id: policy_rate
+    topic: money
+    kind: variants
+    measure: rate
+    validate_as: flow
+    static: true
+    title: Monetary Policy Rate
+    short_title: Policy rate
+    description: >-
+      The BCRA's policy rate, nominal annual, until the policy-rate framework
+      was discontinued in July 2025.
+    source: bcra
+    source_label: BCRA
+    frequency: D
+    units: "% nominal annual"
+    transforms: [level]
+    ranges: [5Y, 10Y, Max]
+    variants:
+      rate: {label: Policy rate, id: "bcra:160"}
+    default: {variant: rate, transform: level, range: 10Y}
+
+  - id: fx_official
+    topic: money
+    wide: true
+    kind: variants
+    overlay: true
+    log_level: true
+    title: Official Exchange Rate
+    short_title: Exchange rate
+    description: >-
+      Pesos per US dollar: the wholesale reference rate (Communication A 3500)
+      and the average retail selling rate, daily.
+    source: bcra
+    source_label: BCRA
+    frequency: D
+    units: Pesos per US dollar
+    transforms: [level, yoy, mom, ytd]
+    ranges: [2Y, 5Y, 10Y, Max]
+    variants:
+      wholesale: {label: Wholesale (A 3500), id: "bcra:5"}
+      retail:    {label: Retail,             id: "bcra:4"}
+    default: {variant: wholesale, transform: level, start: "2023-01"}
+
+  - id: reserves
+    topic: money
+    wide: true
+    kind: variants
+    title: Gross International Reserves
+    short_title: Reserves
+    description: >-
+      The BCRA's gross international reserves, millions of US dollars, daily.
+      Net reserves, which subtract short-term liabilities such as swaps and
+      bank reserve requirements in dollars, have no official definition; they
+      will be added with their methodologies.
+    source: bcra
+    source_label: BCRA
+    frequency: D
+    units: Millions of US dollars
+    transforms: [level, yoy, mom, ytd]
+    ranges: [2Y, 5Y, 10Y, Max]
+    variants:
+      gross: {label: Gross reserves, id: "bcra:1"}
+    default: {variant: gross, transform: level, start: "2019-01"}

@@ -40,6 +40,17 @@ def contributions(ind, raw: pd.DataFrame) -> dict:
     """
     spec = ind.contributions
     sid = {k: v.source_id for k, v in ind.variants.items()}
+    if spec.get("precomputed"):
+        # Variants already are contributions (pp); the total is their sum, or a
+        # published total when one is given.
+        valid = raw.dropna(how="all").index
+        groups = [{"key": g["key"], "label": g["label"], "color": g.get("color"),
+                   "values": _clean(raw[sid[g["add"][0]]].reindex(valid).tolist())} for g in spec["groups"]]
+        tot = raw[sid[spec["total"]]] if spec.get("total") else raw[[sid[g["add"][0]] for g in spec["groups"]]].sum(axis=1)
+        return {"dates": [d.strftime("%Y-%m-%d") for d in valid],
+                "total": {"label": spec.get("total_label", "Total"), "values": _clean(tot.reindex(valid).tolist())},
+                "groups": groups, "lines": {}, "default_lines": [], "lines_title": spec.get("lines_title"),
+                "units": spec.get("units", "pp"), "precomputed": True}
     lag = 4 if ind.frequency == "Q" else 12
     total = raw[sid[spec["total"]]]
     base = total.shift(lag)
@@ -130,6 +141,32 @@ def sector_weights(ind, reg) -> dict | None:
     return {"year": str(spec["year"]), "label": f"share of {spec['year']} GDP", "values": {k: round(v, 4) for k, v in out.items()}}
 
 
+_SERIES_CACHE: dict = {}
+
+
+def indicator_series(reg, ind_id: str, variant: str) -> pd.Series:
+    """One variant of an indicator as exported (derived ones computed once)."""
+    key = (ind_id, variant)
+    if key not in _SERIES_CACHE:
+        ind = next(i for i in reg.indicators if i.id == ind_id)
+        sid = ind.variants[variant].source_id
+        _SERIES_CACHE[key] = derive.compute(ind, reg)[0][sid].dropna() if ind.derive else store.as_of(sid)
+    return _SERIES_CACHE[key]
+
+
+def deflator_for(ind, reg, dates: pd.DatetimeIndex) -> dict | None:
+    """Price index aligned to the indicator's dates (each date takes its month's value)."""
+    spec = ind.deflate_with
+    if not spec:
+        return None
+    p = indicator_series(reg, spec["indicator"], spec["variant"])
+    months = dates.to_period("M").to_timestamp()
+    vals = p.reindex(months).tolist()
+    last = p.index.max()
+    return {"values": _clean(vals), "latest": last.strftime("%Y-%m-%d"), "latest_value": float(p.iloc[-1]),
+            "label": spec.get("label", "CPI")}
+
+
 def export(out: Path) -> None:
     reg = registry.load()
     status = json.loads(STATUS_PATH.read_text(encoding="utf-8")) if STATUS_PATH.exists() else {}
@@ -214,6 +251,8 @@ def export(out: Path) -> None:
                 for k, v in ind.variants.items()
             },
         }
+        if ind.deflate_with:
+            payload["deflator"] = deflator_for(ind, reg, wide.index)
         if ind.kind == "contributions":
             payload["contributions"] = contributions(ind, raw_wide)
         if ind.weights:

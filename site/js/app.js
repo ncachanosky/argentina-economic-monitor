@@ -67,7 +67,9 @@
   const fmtMonth = (iso) => new Date(iso + "T00:00:00Z").toLocaleDateString("en-US", { month: "long", year: "numeric", timeZone: "UTC" });
   const fmtShortMonth = (iso) => new Date(iso + "T00:00:00Z").toLocaleDateString("en-US", { month: "short", year: "numeric", timeZone: "UTC" });
   // Period label: "Jul 2026" for monthly data, "Q3 2026" for quarterly.
+  const fmtDay = (iso) => new Date(iso + "T00:00:00Z").toLocaleDateString("en-US", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" });
   const fmtPeriod = (iso, freq) => {
+    if (freq === "D") return fmtDay(iso);
     if (freq !== "Q") return fmtShortMonth(iso);
     const [y, m] = iso.split("-").map(Number);
     return `Q${Math.floor((m - 1) / 3) + 1} ${y}`;
@@ -109,8 +111,41 @@
       return ok ? acc : null;
     });
   }
+  // Daily data: compare with the last observation on or before the same day a
+  // month or a year earlier (or the last day of the previous year, for YTD),
+  // if one exists within a week of it.
+  const dayMs = 864e5;
+  const isoMs = (iso) => Date.parse(iso + "T00:00:00Z");
+  function shiftedTarget(iso, kind) {
+    const [y, m, d] = iso.split("-").map(Number);
+    if (kind === "ytd") return Date.UTC(y - 1, 11, 31);
+    const ty = kind === "yoy" ? y - 1 : (m === 1 ? y - 1 : y);
+    const tm = kind === "yoy" ? m - 1 : (m === 1 ? 11 : m - 2);
+    const dim = new Date(Date.UTC(ty, tm + 1, 0)).getUTCDate();
+    return Date.UTC(ty, tm, Math.min(d, dim));
+  }
+  function lastOnOrBefore(ms, target) {
+    let lo = 0, hi = ms.length - 1, ans = -1;
+    while (lo <= hi) { const mid = (lo + hi) >> 1; if (ms[mid] <= target) { ans = mid; lo = mid + 1; } else hi = mid - 1; }
+    return ans;
+  }
+  function transformDaily(dates, values, kind, measure) {
+    const ms = dates.map(isoMs);
+    const diff = measure === "rate";
+    return values.map((v, i) => {
+      if (v === null) return null;
+      const target = shiftedTarget(dates[i], kind);
+      let j = lastOnOrBefore(ms, target);
+      while (j >= 0 && values[j] === null) j--;
+      if (j < 0 || target - ms[j] > 7 * dayMs) return null;
+      const prev = values[j];
+      if (diff) return v - prev;
+      return prev === 0 ? null : (v / prev - 1) * 100;
+    });
+  }
   function transform(dates, values, kind, measure, freq) {
     if (kind === "level") return values.slice();
+    if (freq === "D") return transformDaily(dates, values, kind, measure);
     if (kind === "acc") return transform(dates, yearToDateSum(dates, values), "yoy", measure, freq);
     const diff = measure === "rate";
     const mi = dates.map(monthIndex);
@@ -247,7 +282,10 @@
   // For quarterly data the same rule applies to quarters: the handover
   // quarter belongs to the outgoing president (Milei: base Q4 2023 = 100).
   const quarterOf = (iso) => { const [y, m] = iso.split("-").map(Number); return `${y}-${String(Math.floor((m - 1) / 3) * 3 + 1).padStart(2, "0")}-01`; };
+  const isoAddDays = (iso, k) => new Date(isoMs(iso) + k * dayMs).toISOString().slice(0, 10);
   function termWindow(p, freq) {
+    // Daily data: the inauguration day starts the term; the day before is its base.
+    if (freq === "D") return { first: p.start, base: isoAddDays(p.start, -1), last: p.end ? isoAddDays(p.end, -1) : null };
     if (freq === "Q") {
       const q0 = quarterOf(p.start);
       const first = p.start === q0 ? q0 : addMonths(q0, 3);
@@ -286,7 +324,9 @@
       if (!pts.length) continue;
       const vals = pts.map((q) => q[1]);
       const iMin = vals.indexOf(Math.min(...vals)), iMax = vals.indexOf(Math.max(...vals));
-      const bi = idx.get(w.base);
+      // Base: the base period, or the last observation before the term (daily data).
+      let bi = idx.get(w.base);
+      if (bi === undefined) { const j = dates.findIndex((d) => d >= w.first) - 1; bi = j >= 0 ? j : undefined; }
       const start = isLevel && bi !== undefined ? y[bi] : null;
       const end = vals[vals.length - 1];
       out.push({
@@ -297,9 +337,10 @@
           ? (() => {
               // Series starting mid-term: annualize from its first level in the term.
               let b = idx.get(w.base);
+              if (b === undefined && freq === "D") { const j = dates.findIndex((d) => d >= w.first) - 1; b = j >= 0 && levels[j] ? j : undefined; }
               if (b === undefined || !levels[b]) b = dates.findIndex((d, i) => d >= w.base && levels[i]);
               const e = idx.get(pts[pts.length - 1][0]);
-              const months = b < 0 ? 0 : monthIndex(pts[pts.length - 1][0]) - monthIndex(dates[b]);
+              const months = b < 0 ? 0 : (isoMs(pts[pts.length - 1][0]) - isoMs(dates[b])) / (30.4375 * dayMs);
               return b === undefined || !levels[b] || levels[e] === null || months <= 0 ? null
                 : (Math.pow(levels[e] / levels[b], 12 / months) - 1) * 100;
             })()
@@ -461,12 +502,33 @@
       h("p", { class: "chips-note" }, `2004/05 weights recovered from the published indices (they reproduce the official index within ${ind.derived.replication_max_error_pct.toFixed(2)}% since ${fmtShortMonth(ind.derived.link)}).`));
   }
 
+  // Nominal / real switch for peso amounts: real = nominal / CPI x CPI of the
+  // latest month with data (pesos of that month). Swaps the values in place.
+  function realSwitch(ind, onChange) {
+    const D = ind.deflator;
+    if (!D || !D.latest_value) return null;
+    const nominal = Object.fromEntries(Object.entries(ind.variants).map(([k, v]) => [k, v.values]));
+    const real = Object.fromEntries(Object.entries(nominal).map(([k, vals]) =>
+      [k, vals.map((x, i) => (x === null || !D.values[i] ? null : (x / D.values[i]) * D.latest_value))]));
+    ind._realUnits = `${ind.units}, ${fmtShortMonth(D.latest)} prices`;
+    const seg = segmented([["nominal", "Nominal"], ["real", "Real"]], "nominal", (k) => {
+      for (const kk of Object.keys(ind.variants)) ind.variants[kk].values = k === "real" ? real[kk] : nominal[kk];
+      ind._real = k === "real"; seg.update(k); onChange();
+    }, "Nominal or real terms");
+    seg.title = `Real: deflated by the ${D.label}, in pesos of ${fmtMonth(D.latest)}`;
+    return seg;
+  }
+  const unitsOf = (ind) => (ind._real ? ind._realUnits : ind.units);
+  // The latest month of a monthly average built from daily data may be partial.
+  const partialNote = (ind) => (ind.derived && ind.derived.partial_month
+    ? `${fmtMonth(ind.derived.partial_month.slice(0, 7) + "-01")} is partial: data through ${fmtDay(ind.derived.partial_month)}.` : "");
+
   // ---------- card: one series with variants ----------
   function variantsCard(ind, wide) {
     const variantKeys = Object.keys(ind.variants);
     const T = tfs(ind);
     const isRate = ind.measure === "rate";
-    const DF = ind.frequency === "Q" ? "Q%q %Y" : "%b %Y";   // hover date format
+    const DF = ind.frequency === "Q" ? "Q%q %Y" : ind.frequency === "D" ? "%d %b %Y" : "%b %Y";   // hover date format
     const fP = (iso) => fmtPeriod(iso, ind.frequency);
     const state = {
       variant: ind.default.variant,
@@ -516,6 +578,7 @@
       h("li", {}, h("b", {}, e.label), ` (${fmtShortMonth(e.start)}${e.end !== e.start ? "–" + fmtShortMonth(e.end) : ""})`, e.description ? `: ${e.description}.` : ""))) : null;
     // Months inside any episode (for averages that leave them out).
     const inEpisode = (iso) => EP.some((e) => iso >= e.start && iso <= e.end);
+    const realSeg = realSwitch(ind, () => draw());
     const presBtn = PRESIDENCIES.length ? h("button", { class: "btn toggle", type: "button", "aria-pressed": "false", onclick: () => { state.byPres = !state.byPres; draw(); } }, "By presidency") : null;
     let table;
 
@@ -537,9 +600,11 @@
         y = y.map((q, i) => { const m = monthIndex(ind.dates[i]), lag = lagOf(state.transform, ind.dates[i], ind.frequency); return spans.some(([a, b]) => a <= m && b > m - lag) ? null : q; });
       }
       const bm = isRate ? null : baseMonth();
-      let units = ind.units, rebased = false;
+      let units = unitsOf(ind), rebased = false;
       if (bm) {
-        const bi = ind.dates.indexOf(bm);
+        let bi = ind.dates.indexOf(bm);
+        // Daily data: the last observation on or before the base date.
+        if (bi < 0 && ind.frequency === "D") bi = lastOnOrBefore(ind.dates.map(isoMs), isoMs(bm));
         const b = bi >= 0 ? v.values[bi] : null;
         if (b) { y = y.map((q) => (q === null ? null : (q / b) * 100)); units = `Index, ${fmtPeriod(bm, ind.frequency)} = 100`; rebased = true; }
       }
@@ -777,6 +842,8 @@
       if (state.transform === "level" && state.base !== "published" && !main.rebased) msgs.push("No data for that base month; showing the series as published.");
       if (ind.overlay && state.byPres) msgs.push(`By presidency shows the ${main.v.label.toLowerCase()} series.`);
       if (isLog()) msgs.push("Log scale: equal distances are equal percentage changes.");
+      if (ind._real) msgs.push(`Real terms: deflated by the ${ind.deflator.label}, in pesos of ${fmtMonth(ind.deflator.latest)}; months after that have no CPI yet.`);
+      if (partialNote(ind)) msgs.push(partialNote(ind));
       hint.textContent = msgs.join(" ");
 
       Plotly.react(chartEl, traces, baseLayout({
@@ -823,7 +890,7 @@
     appendAll(card, 
       h("div", { class: "controls" }, vSeg, tSeg, h("span", { class: "spacer" }), ind.view_start ? null : rSeg),
       // A short fixed window (view_start) has no use for rebasing or presidencies.
-      ind.view_start ? null : h("div", { class: "controls" }, baseWrap, presBtn, epBtn),
+      ind.view_start ? null : h("div", { class: "controls" }, realSeg, baseWrap, presBtn, epBtn),
       trackerLine(), summaryEl, hint, bandKey, epKey, chartEl, statsEl);
     drawSummary();
     table = tableView([], [], false, ind.frequency);
@@ -925,6 +992,7 @@
       drawBars();
     }
     const bSeg = barKinds.length > 1 ? segmented(barKinds.map((k) => [k, specFor(k).label]), bstate.kind, (k) => { bstate.kind = k; setBars(); }, "Bar metric") : null;
+    const realSeg = realSwitch(ind, () => { cache.clear(); setBars(); drawLines(); });
     const incBtn = W && !isRate ? h("button", { class: "btn toggle", type: "button", "aria-pressed": "false", title: "Show each component's contribution to the total's change",
       onclick: () => { bstate.inc = !bstate.inc; setBars(); } }, "Incidence (pp)") : null;
 
@@ -1015,6 +1083,7 @@
 
     function drawLines() {
       tSeg.update(state.transform); rSeg.update(state.range);
+      if (card._realHint) card._realHint.textContent = [ind._real ? `Real terms: deflated by the ${ind.deflator.label}, in pesos of ${fmtMonth(ind.deflator.latest)}.` : "", partialNote(ind)].filter(Boolean).join(" ");
       const t = T[state.transform];
       const tr = lineTraces();
       Plotly.react(lineEl, tr, baseLayout({ pct: t, extra: { showlegend: true, legend: { orientation: "h", x: 0, y: 1.02, yanchor: "bottom", font: { color: cssVar("--ink") } }, margin: { l: 52, r: 16, t: 30, b: 36 } } }), PLOT_CONFIG);
@@ -1052,7 +1121,8 @@
         h("thead", {}, h("tr", {}, h("th", {}, noun.charAt(0).toUpperCase() + noun.slice(1, -1).replace(/ie$/, "y")), h("th", {}, "Weight"))),
         h("tbody", {}, keys.filter((k) => W[k] !== undefined).sort((a, b) => W[b] - W[a]).map((k) => h("tr", {}, h("td", {}, ind.variants[k].label), h("td", {}, W[k].toFixed(1) + "%"))))))) : null;
     appendAll(card, 
-      bSeg || incBtn ? h("div", { class: "controls" }, bSeg, incBtn) : null,
+      bSeg || incBtn || realSeg ? h("div", { class: "controls" }, bSeg, incBtn, realSeg) : null,
+      partialNote(ind) || realSeg ? (() => { const p = h("p", { class: "hint" }); card._realHint = p; p.textContent = partialNote(ind); return p; })() : null,
       h("p", { class: "hint" }, barTitleEl,
         h("button", { class: "btn", type: "button", onclick: onBarPNG, style: "padding:1px 8px;font-size:12px" }, "PNG"), barNote),
       barEl, weightsTable,
@@ -1082,6 +1152,10 @@
     const pp = { suffix: " pp", signed: true };
     const pct = INDEX_TRANSFORMS.yoy;
     const gdpLabel = C.total.label;
+    // Precomputed contributions (e.g. sources of base money): no component lines,
+    // and the total is a change in the stock, not y/y growth.
+    const PC = !!C.precomputed;
+    const yoyWord = PC ? "" : " y/y";
     const state = { range: rangeFromDefault(ind) };
     const lineKeys = Object.keys(C.lines);
     // Lines keep the same color as their bar component (color follows the entity).
@@ -1111,7 +1185,7 @@
       }));
       const ink = cssVar("--ink");
       tr.push({
-        type: "scatter", mode: "markers+lines", name: `${C.total.label} growth`, x, y: idx.map((i) => C.total.values[i]),
+        type: "scatter", mode: "markers+lines", name: PC ? C.total.label : `${C.total.label} growth`, x, y: idx.map((i) => C.total.values[i]),
         line: { color: ink, width: 1 }, marker: { color: ink, size: 7, symbol: "diamond", line: { color: cssVar("--surface"), width: 1 } },
         _light: "#36454F", hovertemplate: `<b>${C.total.label}: %{y:,.1f}%</b><extra></extra>`,
       });
@@ -1150,16 +1224,16 @@
         return h("button", { class: "chip", type: "button", "aria-pressed": String(on), onclick: () => toggle(k) }, sw, C.lines[k].label);
       }));
       const lt = lineTraces();
-      Plotly.react(lineEl, lt, baseLayout({ pct, xaxis: { hoverformat: DF }, extra: { showlegend: true, legend, margin: { l: 52, r: 16, t: 30, b: 36 } } }), PLOT_CONFIG);
+      if (lineKeys.length) Plotly.react(lineEl, lt, baseLayout({ pct, xaxis: { hoverformat: DF }, extra: { showlegend: true, legend, margin: { l: 52, r: 16, t: 30, b: 36 } } }), PLOT_CONFIG);
       const idx = visible();
       table && table.refresh(idx.map((i) => C.dates[i]), [
-        { label: `${C.total.label} (y/y %)`, values: idx.map((i) => C.total.values[i]) },
+        { label: `${C.total.label} (${PC ? "%" : "y/y %"})`, values: idx.map((i) => C.total.values[i]) },
         ...C.groups.map((g) => ({ label: `${g.label} (pp)`, values: idx.map((i) => g.values[i]) })),
       ], pp);
     }
 
     const latestI = C.dates.length - 1;
-    const onPNG = () => exportPNG(ind, barTraces(), `Contributions to year-over-year ${C.total.label} growth, percentage points · latest: ${fP(C.dates[latestI])}`,
+    const onPNG = () => exportPNG(ind, barTraces(), `${PC ? ind.units : `Contributions to year-over-year ${C.total.label} growth, percentage points`} · latest: ${fP(C.dates[latestI])}`,
       pp, `${ind.id}_contributions.png`, { barmode: "relative" });
     const onLinePNG = () => exportPNG({ ...ind, title: C.lines_title || "Components, year-over-year change" }, lineTraces(), `Percent change vs. same ${ind.frequency === "Q" ? "quarter" : "month"} a year earlier · constant 2004 prices`, pct, `${ind.id}_lines_yoy.png`);
     const onCSV = () => {
@@ -1172,12 +1246,12 @@
     // Latest-quarter summary line.
     const parts = C.groups.map((g) => `${g.label} ${fmtNum(g.values[latestI], pp)}`).join(" · ");
     appendAll(card, 
-      h("p", { class: "hint" }, `${fP(C.dates[latestI])}: ${C.total.label} ${fmtNum(C.total.values[latestI], pct)} y/y — ${parts}`),
+      h("p", { class: "hint" }, `${fP(C.dates[latestI])}: ${C.total.label} ${fmtNum(C.total.values[latestI], pct)}${yoyWord} — ${parts}`),
       h("div", { class: "controls" }, h("span", { class: "spacer" }), rSeg),
       barEl,
-      h("p", { class: "hint", style: "margin-top:14px" }, `${C.lines_title || "Components, year-over-year change"}. `,
-        h("button", { class: "btn", type: "button", onclick: onLinePNG, style: "padding:1px 8px;font-size:12px" }, "PNG")),
-      chipsEl, lineEl);
+      lineKeys.length ? h("p", { class: "hint", style: "margin-top:14px" }, `${C.lines_title || "Components, year-over-year change"}. `,
+        h("button", { class: "btn", type: "button", onclick: onLinePNG, style: "padding:1px 8px;font-size:12px" }, "PNG")) : null,
+      lineKeys.length ? chipsEl : null, lineKeys.length ? lineEl : null);
     table = tableView([], [], pp, ind.frequency);
     appendAll(card, table, ind.note ? h("p", { class: "chips-note" }, ind.note) : null, footer(ind, onPNG, onCSV));
     card.draw = drawAll;

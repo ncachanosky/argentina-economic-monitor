@@ -11,6 +11,7 @@
   <a href="#gdp">GDP</a>
   <a href="#cpi-long">CPI since 1943</a>
   <a href="#cpi-basket">CPI with the 2017/18 basket</a>
+  <a href="#money">Money & Banking</a>
   <a href="#references">References</a>
 </nav>
 
@@ -75,6 +76,14 @@
 <p>The national CPI weights each of its twelve divisions by spending shares from the 2004/05 household expenditure survey (<a href="https://www.indec.gob.ar/ftp/cuadros/economia/metodologia_ipc_nacional_2019.pdf">INDEC, CPI methodology</a>). INDEC prepared a new index with weights from the 2017/18 survey, due to start with January 2026 data; its introduction was postponed. The estimate applies the new division weights to the published division indices from December 2025:</p>
 <p class="formula">CF<sub>t</sub> = <i>H<sub>t</sub></i> × Σ<sub>i</sub> <i>w</i><sup>new</sup><sub>i</sub> <i>r<sub>i,t</sub></i> / Σ<sub>i</sub> <i>w</i><sup>old</sup><sub>i</sub> <i>r<sub>i,t</sub></i>, &nbsp; <i>r<sub>i,t</sub></i> = <i>I<sub>i,t</sub></i> / <i>I<sub>i</sub></i><sub>,Dec 2025</sub></p>
 <p><i>H</i> is the official headline index; <i>w</i><sup>old</sup> are the current basket's weights (recovered as above) at December 2025 prices; <i>w</i><sup>new</sup> are the 2017/18 division weights, taken as applying in December 2025. The denominator rebuilds the official index from the same division data, so the gap between the two series is the effect of reweighting alone (the rebuilt index matches the official one within 0.02%). The estimate captures only the shift in weights across divisions; the new index would also change the items and weights within divisions and by region, which cannot be reproduced from published data.</p>
+
+<h2 id="money">Money & Banking</h2>
+<p>Data come from the BCRA's statistics API, daily. Exchange rates, interest rates and reserves are shown daily. For daily data, a month-on-month or year-on-year change compares with the last business day on or before the same date a month or a year earlier.</p>
+<p><b>Monthly averages, not end of month.</b> Money stocks (base money, aggregates, deposits, loans) are shown as monthly averages of daily data by default, as in the BCRA's own monetary reports, for three reasons. Month-end figures swing with the payments calendar (wages paid around the turn of the month, the June and December bonus, holidays). Banks manage their reserve requirements on monthly averages, so the average is the figure that reflects their behavior. And the CPI and activity data measure a whole month, so real money balances should compare the month's average money with the month's average prices; with month-end stocks, the timing mismatch is half a month of inflation, which in 2023 and early 2024 was several percentage points. End-of-month stocks are right where flows have to add up to a change in a stock, as in the sources of base money, and base money can also be shown at month end.</p>
+<p><b>Aggregates.</b> M1 = currency held by the public + current accounts; M2 = M1 + savings accounts; M3 = currency + all peso deposits of the public and private non-financial sectors; private M2 uses private deposits only. All in pesos.</p>
+<p><b>Sources of base money.</b> The BCRA attributes each day's change in base money to its operations (<i>factores de explicación</i>). Each month's sum of each group is shown in percentage points of base money at the end of the previous month, so the bars add up to the month's change in end-of-month base money.</p>
+<p><b>Real terms.</b> Peso amounts can be shown deflated by the CPI, in pesos of the latest month with CPI data. For 2007–2016 the deflator is the corrected CPI (see <a href="#cpi-long">CPI since 1943</a>), since deflating by the official figures would overstate real growth in those years.</p>
+<p><b>Inflation expectations.</b> The median 12-month-ahead expectation in the BCRA's Survey of Market Expectations (REM), dated by the month of the survey, against CPI inflation over the following 12 months and over the previous 12 months.</p>
 
 <h2 id="references">References</h2>
 <ul class="refs">

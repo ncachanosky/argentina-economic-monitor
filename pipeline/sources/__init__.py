@@ -21,6 +21,10 @@ def get_adapter(name: str):
         from . import datos_gob
 
         return datos_gob
+    if name == "bcra":
+        from . import bcra
+
+        return bcra
     if name == "manual":
         from . import manual
 

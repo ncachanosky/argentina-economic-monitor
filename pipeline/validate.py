@@ -44,6 +44,12 @@ def check_series(new: pd.Series, old: pd.Series, frequency: str = "M", measure: 
         missing = expected.difference(new.index)
         if len(missing):
             c.errors.append(f"{len(missing)} missing period(s), first {missing[0]:%Y-%m}")
+    if frequency == "D":
+        # Business days: weekends and holidays are normal gaps; long ones get a look.
+        gaps = new.index.to_series().diff().dt.days
+        long = gaps[gaps > 15]
+        if len(long):
+            c.warnings.append(f"{len(long)} gap(s) longer than 15 days, longest {int(long.max())} days before {long.idxmax():%Y-%m-%d}")
     if measure == "index" and (new <= 0).any():
         c.errors.append("non-positive index values")
     if measure == "rate" and ((new < 0) | (new > 100)).any():
@@ -55,7 +61,7 @@ def check_series(new: pd.Series, old: pd.Series, frequency: str = "M", measure: 
                 f"latest date went backwards ({old.index.max():%Y-%m} -> {new.index.max():%Y-%m})"
             )
         lost = old.index.difference(new.index)
-        if len(lost) > 2:
+        if len(lost) > (10 if frequency == "D" else 2):
             c.errors.append(f"{len(lost)} previously published observations disappeared")
 
         if measure == "flow":
@@ -74,7 +80,7 @@ def check_series(new: pd.Series, old: pd.Series, frequency: str = "M", measure: 
             )
 
         fresh = new.index.difference(old.index)
-        if len(fresh) and len(new) > 24:
+        if len(fresh) and len(new) > 24 and frequency != "D":
             pct = new.diff() / 100 if measure == "rate" else new.pct_change()
             mad = (pct - pct.median()).abs().median()
             threshold = max(JUMP_FLOOR, JUMP_MADS * mad)
@@ -86,6 +92,8 @@ def check_series(new: pd.Series, old: pd.Series, frequency: str = "M", measure: 
 
 
 def is_stale(last_obs: pd.Timestamp, today: pd.Timestamp, frequency: str = "M") -> bool:
+    if frequency == "D":
+        return (today - last_obs).days > 10
     months = (today.year - last_obs.year) * 12 + (today.month - last_obs.month)
     if frequency == "M":
         return months > STALE_MONTHS

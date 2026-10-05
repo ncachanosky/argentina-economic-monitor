@@ -303,3 +303,56 @@ def test_datos_gob_pages_past_misleading_count(monkeypatch):
     monkeypatch.setattr(datos_gob.requests.Session, "get", fake_get)
     res = datos_gob.fetch(["A", "B"])
     assert res.data[res.data.series_id == "B"]["value"].tolist() == [0.0, 1.0, 2.0, 3.0, 4.0]
+
+
+# --- daily data and the BCRA adapter --------------------------------------
+
+def test_bcra_adapter_pages_and_normalizes_monthly_dates(monkeypatch):
+    from pipeline.sources import bcra
+    monkeypatch.setattr(bcra, "PAGE_SIZE", 2)
+    daily = [{"fecha": f"2026-09-{d:02d}", "valor": float(d)} for d in (30, 29, 26, 25, 24)]
+    monthly = [{"fecha": d, "valor": v} for d, v in (("2026-08-31", 21.0), ("2026-07-31", 22.0), ("2026-06-30", 23.0))]
+
+    def fake_get(self, url, params=None, timeout=None):
+        rows = daily if url.endswith("/15") else monthly
+        o, l = params["offset"], params["limit"]
+        return FakeResp({"status": 200, "metadata": {"resultset": {"count": len(rows), "offset": o, "limit": l}},
+                         "results": [{"idVariable": 1, "detalle": rows[o:o + l]}]})
+
+    monkeypatch.setattr(bcra.requests.Session, "get", fake_get)
+    monkeypatch.setattr(bcra.time, "sleep", lambda s: None)
+    res = bcra.fetch(["bcra:15", "bcra:29"])
+    d = res.data[res.data.series_id == "bcra:15"].set_index("date")["value"]
+    assert d.tolist() == [24.0, 25.0, 26.0, 29.0, 30.0]          # all pages, oldest first
+    m = res.data[res.data.series_id == "bcra:29"].set_index("date")["value"]
+    assert list(m.index.strftime("%Y-%m-%d")) == ["2026-06-01", "2026-07-01", "2026-08-01"]
+    assert validate.check_series(d, pd.Series(dtype=float), "D").ok
+
+
+def test_daily_validation_allows_weekends_and_staleness():
+    idx = pd.bdate_range("2026-01-01", "2026-03-31")
+    s = pd.Series(range(1, len(idx) + 1), index=idx, dtype=float)
+    assert validate.check_series(s, pd.Series(dtype=float), "D").ok
+    assert validate.is_stale(pd.Timestamp("2026-09-20"), pd.Timestamp("2026-10-05"), "D")
+    assert not validate.is_stale(pd.Timestamp("2026-10-01"), pd.Timestamp("2026-10-05"), "D")
+
+
+def test_monthly_and_flows_from_daily():
+    from pipeline import derive
+    from pipeline.registry import Indicator, Variant
+    idx = pd.bdate_range("2026-01-01", "2026-03-31")
+    stock = pd.Series(100.0, index=idx)
+    flow = pd.Series(0.0, index=idx)
+    flow[pd.Timestamp("2026-02-02")] = 10.0          # +10 in February
+    stock[stock.index >= "2026-02-02"] = 110.0
+    def ind(method, variants, **kw):
+        return Indicator(id="t", topic="t", kind="variants", title="t", short_title="t", description="",
+                         source="derived", source_label="", frequency="M", units="",
+                         variants={k: Variant(k, k, f"t:{k}") for k in variants}, default={},
+                         derive={"method": method, "variants": variants, **kw})
+    frames = {"S": stock, "F": flow}
+    df, _ = derive.monthly(ind("monthly", {"avg": {"sum_of": ["S"]}, "eom": {"sum_of": ["S"], "how": "last"}}), frames)
+    assert df.loc["2026-02-01", "t:eom"] == 110 and df.loc["2026-01-01", "t:avg"] == 100
+    df, info = derive.flows(ind("flows", {"f": {"sum_of": ["F"]}}, stock="S"), frames)
+    assert df.loc["2026-02-01", "t:f"] == pytest.approx(10.0)    # pp of January's closing stock
+    assert info["stock_change_pct"]["2026-02-01"] == pytest.approx(10.0)
