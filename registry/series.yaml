@@ -414,7 +414,7 @@ indicators:
       recreation: {label: Recreation & culture,           id: 146.3_IRECREANAL_DICI_M_31}
       education:  {label: Education,                      id: 146.3_IEDUCACNAL_DICI_M_22}
       restaurants: {label: Restaurants & hotels,          id: 146.3_IRESTAUNAL_DICI_M_33}
-      misc:       {label: Miscellaneous goods & services, id: 146.3_IBIENIESNAL_DICI_M_36}
+      misc:       {label: Miscellaneous goods & services, id: 146.3_IBIENESNAL_DICI_M_36}
     default: {variant: [food, housing, transport], transform: mom, start: "2017-01"}
     weights: {fit_to: {indicator: cpi, variant: headline}}
 

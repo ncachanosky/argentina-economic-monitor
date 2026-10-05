@@ -73,11 +73,16 @@ class Registry:
                         "calendar_url": cal.get("calendar_url")}
         return None
 
-    def series_by_source(self) -> dict[str, set[str]]:
-        """Unique source series ids, grouped by source adapter."""
-        out: dict[str, set[str]] = {}
+    def series_by_source(self) -> dict[tuple[str, str], set[str]]:
+        """Unique source series ids, grouped by (source adapter, frequency).
+
+        Frequencies must be fetched separately: the datos.gob.ar API collapses
+        every series in a request to the lowest common frequency, so mixing
+        monthly and quarterly ids silently returns quarterly averages.
+        """
+        out: dict[tuple[str, str], set[str]] = {}
         for ind in self.indicators:
-            out.setdefault(ind.source, set()).update(v.source_id for v in ind.variants.values())
+            out.setdefault((ind.source, ind.frequency), set()).update(v.source_id for v in ind.variants.values())
         return out
 
 

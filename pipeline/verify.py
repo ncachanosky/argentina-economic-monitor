@@ -18,7 +18,7 @@ def main() -> int:
     reg = registry.load()
     label = {v.source_id: f"{ind.id}.{v.key}" for ind in reg.indicators for v in ind.variants.values()}
     bad = 0
-    for source, ids in reg.series_by_source().items():
+    for (source, _freq), ids in reg.series_by_source().items():
         res = get_adapter(source).fetch(ids)
         for sid in sorted(ids):
             if sid in res.errors:

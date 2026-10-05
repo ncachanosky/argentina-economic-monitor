@@ -46,7 +46,7 @@ def run(dry_run: bool = False, strict: bool = False) -> int:
     lines: list[str] = []
     n_err = n_changed = 0
 
-    for source, ids in reg.series_by_source().items():
+    for (source, _freq), ids in reg.series_by_source().items():
         adapter = get_adapter(source)
         try:
             res = adapter.fetch(ids)

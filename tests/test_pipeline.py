@@ -204,3 +204,11 @@ def test_registry_flow_maps_have_no_stray_keys():
             assert set(v) <= {"label", "id"}, (ind["id"], k, v)
         for g in (ind.get("contributions") or {}).get("groups", []):
             assert set(g) <= {"key", "label", "color", "add", "subtract", "residual"}, (ind["id"], g)
+
+
+def test_series_grouped_by_frequency():
+    """Monthly and quarterly ids must never share an API request."""
+    reg = registry.load()
+    freq = {v.source_id: i.frequency for i in reg.indicators for v in i.variants.values()}
+    for (source, f), ids in reg.series_by_source().items():
+        assert all(freq[sid] == f for sid in ids)
