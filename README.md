@@ -49,6 +49,28 @@ CSV keeps source units. `kind: contributions` computes each component's
 contribution to y/y growth of a total (fixed-base accounts are additive),
 with one residual group closing the gap.
 
+## Derived series and hand-maintained inputs
+
+Some cards are computed rather than fetched (`source: derived` in the
+registry; code in `pipeline/derive.py`). Their source series are listed under
+`inputs:` and go through the same fetch, validation and vintage store as
+everything else.
+
+- **CPI, long run (`cpi_long`)** chain-links INDEC's historical CPI (from
+  1943), CPI-GBA, IPC-NU and the national CPI. The *corrected* series replaces
+  Jan 2007 - Apr 2016 (the INDEC intervention and the Nov 2015 - Apr 2016
+  blackout) with a composite of private estimates; the *official* series
+  keeps INDEC's figures, has no data during the blackout, and changes across
+  that gap are left blank.
+- **CPI, new basket (`cpi_newbasket`)** applies the 2017/18 (ENGHo) division
+  weights to the published division indices from Jan 2026, when the new
+  index was due. It captures the shift in weights across the 12 divisions
+  only, not changes within divisions or by region.
+
+Hand-maintained series live in `data/manual/<id>.csv` (`date,value`) and are
+read by the `manual` source. Editing a file is recorded as a revision on the
+next run. See `data/manual/README.md` for provenance.
+
 ## Release calendar
 
 `registry/releases.yaml` holds INDEC's published release dates; each card

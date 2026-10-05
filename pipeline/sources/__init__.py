@@ -21,4 +21,8 @@ def get_adapter(name: str):
         from . import datos_gob
 
         return datos_gob
+    if name == "manual":
+        from . import manual
+
+        return manual
     raise KeyError(f"no adapter for source {name!r}")

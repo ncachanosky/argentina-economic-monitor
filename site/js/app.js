@@ -36,7 +36,8 @@
     }
     return out;
   }
-  const RANGES = { "2Y": 2, "5Y": 5, "10Y": 10, "Max": null };
+  const RANGES = { "2Y": 2, "5Y": 5, "10Y": 10, "25Y": 25, "50Y": 50, "Max": null };
+  const rangeKeys = (ind) => (ind.ranges && ind.ranges.length ? ind.ranges : ["2Y", "5Y", "10Y", "Max"]);
 
   // ---------- small helpers ----------
   const $ = (sel, el = document) => el.querySelector(sel);
@@ -110,6 +111,7 @@
   }
 
   function rangeFromDefault(ind) {
+    if (ind.default && ind.default.range) return ind.default.range;
     const s = ind.default && ind.default.start;
     if (!s) return "10Y";
     const yrs = (monthIndex(ind.last_obs) - monthIndex(s + (s.length === 7 ? "-01" : ""))) / 12;
@@ -181,8 +183,8 @@
       showlegend: data.filter((t) => t.showlegend !== false).length > 1,
       legend: { orientation: "h", x: 0, y: 1.02, xanchor: "left", yanchor: "bottom", font: { size: 16, color: light.ink } },
       xaxis: { type: data[0] && data[0].orientation === "h" ? "linear" : "date", gridcolor: light.grid, linecolor: light.rule, ticks: "outside", tickcolor: light.rule },
-      yaxis: { gridcolor: light.grid, linecolor: light.rule, zerolinecolor: light.ink2, ticksuffix: specOf(pct).suffix, automargin: true },
-      shapes: (extras.shapes || []).map((sh) => ({ ...sh, line: { ...(sh.line || {}), color: (sh.line && sh.line._light) || light.ink3 } })),
+      yaxis: { gridcolor: light.grid, linecolor: light.rule, zerolinecolor: light.ink2, ticksuffix: specOf(pct).suffix, automargin: true, ...(extras.ylog ? { type: "log", ticksuffix: "" } : {}) },
+      shapes: (extras.shapes || []).map((sh) => ({ ...sh, ...(sh._lightFill ? { fillcolor: sh._lightFill } : {}), line: { ...(sh.line || {}), color: (sh.line && sh.line._light) || light.ink3 } })),
       annotations: [
         ...(extras.annotations || []).map((a) => ({ ...a, font: { ...(a.font || {}), size: 15, color: light.ink2 } })),
         { text: `Source: ${ind.source_label}. Latest observation: ${ind.frequency === "Q" ? fmtPeriod(ind.last_obs, "Q") : fmtMonth(ind.last_obs)}.${ind.source_units ? ` Source data in ${ind.source_units}.` : ""}`, xref: "paper", yref: "paper", x: 0, y: -0.13, xanchor: "left", yanchor: "top", showarrow: false, font: { size: 15, color: light.ink3 } },
@@ -329,6 +331,22 @@
     return details;
   }
 
+  // Old vs. new basket weights for a reweighted index.
+  function weightsTable(ind) {
+    const w = ind.derived && ind.derived.weights;
+    if (!w) return null;
+    const keys = Object.keys(w.labels).sort((a, b) => w.new[b] - w.new[a]);
+    const f = (v) => v.toFixed(1) + "%";
+    const tbody = h("tbody", {}, keys.map((k) => {
+      const d = Math.round((w.new[k] - w.old_at_link[k]) * 10) / 10 || 0;
+      return h("tr", {}, h("td", { class: "pres" }, w.labels[k]), h("td", {}, f(w.old_at_link[k])), h("td", {}, f(w.new[k])), h("td", {}, (d > 0 ? "+" : "") + d.toFixed(1) + " pp"));
+    }));
+    return h("details", { class: "table-view" }, h("summary", {}, "Show basket weights"),
+      h("div", { class: "table-scroll" }, h("table", { class: "data" },
+        h("thead", {}, h("tr", {}, h("th", {}, "Division"), h("th", {}, `2004/05 basket, at ${fmtShortMonth(ind.derived.link)} prices`), h("th", {}, "2017/18 basket"), h("th", {}, "Change"))), tbody)),
+      h("p", { class: "chips-note" }, `2004/05 weights recovered from the published indices (they reproduce the official index within ${ind.derived.replication_max_error_pct.toFixed(2)}% since ${fmtShortMonth(ind.derived.link)}).`));
+  }
+
   // ---------- card: one series with variants ----------
   function variantsCard(ind, wide) {
     const variantKeys = Object.keys(ind.variants);
@@ -340,8 +358,8 @@
       variant: ind.default.variant,
       transform: ind.default.transform || "level",
       range: rangeFromDefault(ind),
-      base: "published",          // "published" | "term:<id>" | "custom"
-      customBase: null,           // "YYYY-MM-01"
+      base: ind.default.base ? "custom" : "published",   // "published" | "term:<id>" | "custom"
+      customBase: ind.default.base || null,               // "YYYY-MM-01"
       byPres: false,
     };
     const card = cardFrame(ind, !!wide);
@@ -349,9 +367,11 @@
     const hint = h("p", { class: "hint" });
     const statsEl = h("div", { class: "term-stats", hidden: true });
 
-    const vSeg = variantKeys.length > 1 ? segmented(variantKeys.map((k) => [k, ind.variants[k].label]), state.variant, (k) => { state.variant = k; if (k === "original" && state.transform === "mom") state.transform = "yoy"; draw(); }, "Series") : null;
+    // Overlay cards draw every variant at once; the default one leads and is the
+    // series used by the presidency view.
+    const vSeg = variantKeys.length > 1 && !ind.overlay ? segmented(variantKeys.map((k) => [k, ind.variants[k].label]), state.variant, (k) => { state.variant = k; if (k === "original" && state.transform === "mom") state.transform = "yoy"; draw(); }, "Series") : null;
     const tSeg = segmented(Object.entries(T).map(([k, t]) => [k, t.label]), state.transform, (k) => { state.transform = k; draw(); }, "Transformation");
-    const rSeg = segmented(Object.keys(RANGES).map((k) => [k, k]), state.range, (k) => { state.range = k; draw(); }, "Time range");
+    const rSeg = segmented(rangeKeys(ind).map((k) => [k, k]), state.range, (k) => { state.range = k; draw(); }, "Time range");
 
     // Index base: as published, start of a presidential term, or a custom month.
     const firstDate = ind.dates[0];
@@ -364,6 +384,7 @@
         })) : null,
       h("option", { value: "custom" }, "Custom month…"));
     const customIn = h("input", { type: "month", class: "select", "aria-label": "Custom base month", min: firstDate.slice(0, 7), max: ind.last_obs.slice(0, 7), hidden: true });
+    if (state.base === "custom") { baseSel.value = "custom"; customIn.hidden = false; customIn.value = state.customBase.slice(0, 7); }
     baseSel.addEventListener("change", () => {
       state.base = baseSel.value;
       customIn.hidden = state.base !== "custom";
@@ -387,6 +408,13 @@
     function series(variantKey) {
       const v = ind.variants[variantKey];
       let y = transform(ind.dates, v.values, state.transform, ind.measure, ind.frequency);
+      // A derived series bridged over a gap has no meaningful change across it.
+      const gaps = ind.derived && ind.derived.gaps && ind.derived.gaps[variantKey];
+      if (gaps && state.transform !== "level") {
+        const lag = state.transform === "yoy" ? 12 : 1;
+        const spans = gaps.map(([a, b]) => [monthIndex(a), monthIndex(b)]);
+        y = y.map((q, i) => { const m = monthIndex(ind.dates[i]); return spans.some(([a, b]) => a <= m && b > m - lag) ? null : q; });
+      }
       const bm = isRate ? null : baseMonth();
       let units = ind.units, rebased = false;
       if (bm) {
@@ -401,6 +429,54 @@
       const start = startDate(ind.last_obs, RANGES[state.range]);
       return ind.dates.map((d, i) => i).filter((i) => (!start || ind.dates[i] >= start) && y[i] !== null);
     }
+    const isLog = () => ind.log_level && state.transform === "level";
+    const yFmt = () => (isLog() ? ".4~g" : ",.1f");
+    // Annotations on a log axis are placed in log10 units (shapes take data values).
+    const annY = (v) => (isLog() ? Math.log10(v) : v);
+
+    // Shaded periods (e.g. the INDEC intervention), clipped to the visible range.
+    function bandShapes(x) {
+      const shapes = [], annotations = [];
+      if (!ind.bands || !x.length) return { shapes, annotations };
+      const x0 = x[0], x1 = x[x.length - 1];
+      for (const b of ind.bands) {
+        const end = addMonths(b.end || x1, 1);
+        if (end <= x0 || b.start > x1) continue;
+        const s0 = b.start < x0 ? x0 : b.start;
+        shapes.push({ type: "rect", xref: "x", yref: "paper", x0: s0, x1: end, y0: 0, y1: 1, layer: "below",
+          fillcolor: cssVar("--band"), _lightFill: "rgba(54, 69, 79, 0.07)", line: { width: 0 } });
+        annotations.push({ xref: "x", yref: "paper", x: s0, y: 1, xanchor: "left", yanchor: "top", showarrow: false,
+          text: b.label, font: { size: 11, color: cssVar("--ink-3") } });
+      }
+      return { shapes, annotations };
+    }
+
+    // Cumulative change of each variant over fixed windows, on the levels.
+    const summaryEl = h("p", { class: "summary-line", hidden: true });
+    function drawSummary() {
+      if (!ind.summary_windows || !ind.summary_windows.length) return;
+      const keys = [ind.default.variant, ...variantKeys.filter((k) => k !== ind.default.variant)];
+      const parts = ind.summary_windows.map((w) => {
+        const bi = ind.dates.indexOf(w.base);
+        const res = keys.map((k) => {
+          const vals = ind.variants[k].values;
+          let ei = w.end ? ind.dates.indexOf(w.end) : lastValid(ind.dates, vals)?.i;
+          if (bi < 0 || ei === undefined || ei < 0 || !vals[bi] || vals[ei] === null) return null;
+          return { k, ratio: vals[ei] / vals[bi], end: ind.dates[ei] };
+        });
+        if (res.some((r) => r === null)) return null;
+        const label = w.end ? w.label : `${w.label} (to ${fP(res[0].end)})`;
+        const items = res.map((r, i) => {
+          const sw = h("span", { class: "sw" + (i ? " dash" : "") }); sw.style.background = cssVar(SERIES_VARS[i]); sw.style.color = cssVar(SERIES_VARS[i]);
+          return h("span", {}, sw, `${ind.variants[r.k].label} `, h("b", {}, fmtNum((r.ratio - 1) * 100, INDEX_TRANSFORMS.yoy)));
+        });
+        const gap = res.length === 2 ? (res[0].ratio / res[1].ratio - 1) * 100 : null;
+        return h("span", {}, `Cumulative change, ${label}: `, ...items.flatMap((it, i) => (i ? [" · ", it] : [it])),
+          gap === null ? null : h("span", { title: `${ind.variants[res[0].k].label} price level relative to ${ind.variants[res[1].k].label} at the end of the window` }, ` · price-level gap `, h("b", {}, fmtNum(gap, INDEX_TRANSFORMS.yoy))));
+      }).filter(Boolean);
+      summaryEl.replaceChildren(...parts.flatMap((p, i) => (i ? [h("br"), p] : [p])));
+      summaryEl.hidden = !parts.length;
+    }
 
     // Build traces; each carries _light (export color) so the PNG matches.
     function build() {
@@ -412,11 +488,20 @@
       const traces = [], shapes = [], annotations = [];
 
       if (!state.byPres) {
-        const color = cssVar(SERIES_VARS[0]);
-        const hover = `%{x|${DF}}: <b>%{y:,.1f}${sfx}</b><extra>${main.v.label}</extra>`;
-        traces.push(state.transform === "mom"
-          ? { type: "bar", x, y, name: main.v.label, marker: { color }, hovertemplate: hover, _slot: 0 }
-          : { type: "scatter", mode: "lines", x, y, name: main.v.label, line: { color, width: 2 }, hovertemplate: hover, _slot: 0 });
+        const keys = ind.overlay ? [state.variant, ...variantKeys.filter((k) => k !== state.variant)] : [state.variant];
+        const start = startDate(ind.last_obs, RANGES[state.range]);
+        keys.forEach((k, slot) => {
+          const s = k === state.variant ? main : series(k);
+          // Overlays keep empty months in range so a gap in one series shows as a gap.
+          const ii = ind.overlay ? ind.dates.map((d, i) => i).filter((i) => (!start || ind.dates[i] >= start) && (!x.length || ind.dates[i] <= x[x.length - 1])) : idx;
+          const xx = ii.map((i) => ind.dates[i]), yy = ii.map((i) => s.y[i]);
+          const color = cssVar(SERIES_VARS[slot]);
+          const hover = `%{x|${DF}}: <b>%{y:${yFmt()}}${sfx}</b><extra>${s.v.label}</extra>`;
+          traces.push(state.transform === "mom"
+            ? { type: "bar", x: xx, y: yy, name: s.v.label, marker: { color }, hovertemplate: hover, _slot: slot }
+            : { type: "scatter", mode: "lines", x: xx, y: yy, name: s.v.label, connectgaps: false,
+                line: slot ? { color, width: 1.8, dash: "dash" } : { color, width: 2 }, hovertemplate: hover, _slot: slot });
+        });
       } else if (state.transform === "mom") {
         const terms = x.map((d) => termOf(d, ind.frequency));
         traces.push({
@@ -452,7 +537,7 @@
             traces.push({
               ...common, x: ii.map((i) => ind.dates[i]), y: ii.map((i) => yy[i]),
               name: `${p.short}${stat ? ` (${stat})` : ""}`, line: { color, width: 2 },
-              hovertemplate: `%{x|${DF}}: <b>%{y:,.1f}${sfx}</b><extra>${p.short}</extra>`,
+              hovertemplate: `%{x|${DF}}: <b>%{y:${yFmt()}}${sfx}</b><extra>${p.short}</extra>`,
             });
           }
         };
@@ -470,13 +555,14 @@
         if (state.transform === "level" && y.length) {
           const lastV = y[y.length - 1];
           shapes.push({ type: "line", xref: "paper", yref: "y", x0: 0, x1: 1, y0: lastV, y1: lastV, line: { color: cssVar("--ink-3"), width: 1, dash: "dash", _light: "#85909A" } });
-          annotations.push({ xref: "paper", yref: "y", x: 0.005, y: lastV, xanchor: "left", yanchor: "bottom", showarrow: false, text: `Latest: ${fmtNum(lastV, t)}`, font: { size: 12, color: cssVar("--ink-2") } });
+          annotations.push({ xref: "paper", yref: "y", x: 0.005, y: annY(lastV), xanchor: "left", yanchor: "bottom", showarrow: false, text: `Latest: ${fmtNum(lastV, t)}`, font: { size: 12, color: cssVar("--ink-2") } });
         }
       }
       if (main.rebased && state.transform === "level") {
         shapes.push({ type: "line", xref: "paper", yref: "y", x0: 0, x1: 1, y0: 100, y1: 100, line: { color: cssVar("--ink-2"), width: 1, _light: "#5A6872" } });
       }
-      return { traces, shapes, annotations, main, t, x, y };
+      const bs = bandShapes(x);
+      return { traces, shapes: [...bs.shapes, ...shapes], annotations: [...bs.annotations, ...annotations], main, t, x, y };
     }
 
     function drawStats(main, t) {
@@ -519,35 +605,48 @@
       const msgs = [];
       if (isRate && state.transform !== "level") msgs.push("Changes in a rate are shown in percentage points.");
       if (state.variant === "original" && T.mom) msgs.push(`${T.mom.label.split(" ")[0]} changes are only meaningful on seasonally adjusted data.`);
-      if (state.transform !== "level" && state.base !== "published") msgs.push("Rebasing applies to levels only; percent changes are unaffected.");
+      const defaultBase = ind.default.base && state.base === "custom" && state.customBase === ind.default.base;
+      if (state.transform !== "level" && state.base !== "published" && !defaultBase) msgs.push("Rebasing applies to levels only; percent changes are unaffected.");
       if (state.transform === "level" && state.base !== "published" && !main.rebased) msgs.push("No data for that base month; showing the series as published.");
+      if (ind.overlay && state.byPres) msgs.push(`By presidency shows the ${main.v.label.toLowerCase()} series.`);
+      if (isLog()) msgs.push("Log scale: equal distances are equal percentage changes.");
       hint.textContent = msgs.join(" ");
 
       Plotly.react(chartEl, traces, baseLayout({
         pct: t,
+        yaxis: isLog() ? { type: "log", ticksuffix: "", exponentformat: "power" } : { type: "linear" },
         extra: {
-          bargap: 0.2, shapes, annotations,
-          showlegend: state.byPres && state.transform !== "mom",
+          bargap: 0.2, shapes, annotations, barmode: "group",
+          showlegend: (state.byPres && state.transform !== "mom") || (ind.overlay && !state.byPres),
           legend: { orientation: "h", x: 0, y: 1.02, yanchor: "bottom", font: { color: cssVar("--ink") } },
           margin: { l: 52, r: 16, t: state.byPres ? 30 : 10, b: 36 },
         },
       }), PLOT_CONFIG);
       drawStats(main, t);
-      table && table.refresh(x, [{ label: `${main.v.label}${t.change ? " (" + t.label + ")" : main.rebased ? ` (${main.units})` : ""}`, values: y }], t);
+      const suffix = t.change ? " (" + t.label + ")" : main.rebased ? ` (${main.units})` : "";
+      const cols = overlayKeys().map((k) => {
+        const s = k === state.variant ? main : series(k);
+        return { label: `${s.v.label}${suffix}`, values: x.map((d) => s.y[ind.dates.indexOf(d)]) };
+      });
+      table && table.refresh(x, cols, t);
     }
 
-    const subtitle = (main, t) => `${main.v.label} · ${t.change ? t.short : main.units}`;
+    const overlayKeys = () => (ind.overlay && !state.byPres ? [state.variant, ...variantKeys.filter((k) => k !== state.variant)] : [state.variant]);
+    const subtitle = (main, t) => `${overlayKeys().map((k) => ind.variants[k].label).join(" vs. ")} · ${t.change ? t.short : main.units}`;
     const fileTag = () => `${ind.id}_${state.variant}_${state.transform}${baseMonth() ? "_base" + baseMonth().slice(0, 7) : ""}${state.byPres ? "_presidencies" : ""}`;
     const onPNG = () => {
       const { traces, shapes, annotations, main, t } = build();
-      exportPNG(ind, traces, subtitle(main, t), t, `${fileTag()}.png`, { shapes, annotations });
+      exportPNG(ind, traces, subtitle(main, t), t, `${fileTag()}.png`, { shapes, annotations, ylog: isLog(), barmode: "group" });
     };
     const onCSV = () => {
       const { main, t, x, y } = build();
-      const header = ["date", `${ind.short_title} — ${main.v.label} — ${t.change ? t.short : main.units}`];
+      const ks = overlayKeys();
+      const ys = ks.map((k) => (k === state.variant ? main.y : series(k).y));
+      const header = ["date", ...ks.map((k) => `${ind.short_title} — ${ind.variants[k].label} — ${t.change ? t.short : main.units}`)];
       if (state.byPres) header.push("presidency");
       const rows = x.map((d, i) => {
-        const r = [d, y[i] === null ? "" : +y[i].toFixed(4)];
+        const j = ind.dates.indexOf(d);
+        const r = [d, ...ys.map((yy) => (yy[j] === null || yy[j] === undefined ? "" : +yy[j].toPrecision(8)))];
         if (state.byPres) { const p = termOf(d, ind.frequency); r.push(p ? p.name : ""); }
         return r;
       });
@@ -557,9 +656,10 @@
     appendAll(card, 
       h("div", { class: "controls" }, vSeg, tSeg, h("span", { class: "spacer" }), rSeg),
       h("div", { class: "controls" }, baseWrap, presBtn),
-      hint, chartEl, statsEl);
+      summaryEl, hint, chartEl, statsEl);
+    drawSummary();
     table = tableView([], [], false, ind.frequency);
-    appendAll(card, table, ind.note ? h("p", { class: "chips-note" }, ind.note) : null, footer(ind, onPNG, onCSV));
+    appendAll(card, table, weightsTable(ind), ind.note ? h("p", { class: "chips-note" }, ind.note) : null, footer(ind, onPNG, onCSV));
     card.draw = draw;
     return card;
   }
@@ -595,7 +695,7 @@
     const chipsNote = h("span", { class: "chips-note" });
     const lineKinds = ind.transforms && ind.transforms.length ? Object.keys(T) : Object.keys(T).filter((k) => k !== "mom");
     const tSeg = segmented(lineKinds.map((k) => [k, T[k].label]), state.transform, (k) => { state.transform = k; drawLines(); }, "Transformation");
-    const rSeg = segmented(Object.keys(RANGES).map((k) => [k, k]), state.range, (k) => { state.range = k; drawLines(); }, "Time range");
+    const rSeg = segmented(rangeKeys(ind).map((k) => [k, k]), state.range, (k) => { state.range = k; drawLines(); }, "Time range");
     let table;
 
     // Bar metric for every component, at the most recent month they all share.
@@ -796,7 +896,7 @@
     const barEl = h("div", { class: "chart tall-ish", role: "img", "aria-label": "Contributions to GDP growth" });
     const lineEl = h("div", { class: "chart", role: "img", "aria-label": "Components, year-over-year change" });
     const chipsEl = h("div", { class: "chips", role: "group", "aria-label": "Components to compare" });
-    const rSeg = segmented(Object.keys(RANGES).map((k) => [k, k]), state.range, (k) => { state.range = k; drawAll(); }, "Time range");
+    const rSeg = segmented(rangeKeys(ind).map((k) => [k, k]), state.range, (k) => { state.range = k; drawAll(); }, "Time range");
     let table;
 
     const visible = () => {

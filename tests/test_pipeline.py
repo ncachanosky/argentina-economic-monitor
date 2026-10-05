@@ -200,7 +200,7 @@ def test_registry_flow_maps_have_no_stray_keys():
     import yaml
     raw = yaml.safe_load(registry.REGISTRY_PATH.read_text(encoding="utf-8"))
     for ind in raw["indicators"]:
-        for k, v in ind["variants"].items():
+        for k, v in (ind.get("variants") or {}).items():
             assert set(v) <= {"label", "id"}, (ind["id"], k, v)
         for g in (ind.get("contributions") or {}).get("groups", []):
             assert set(g) <= {"key", "label", "color", "add", "subtract", "residual"}, (ind["id"], g)
@@ -209,6 +209,81 @@ def test_registry_flow_maps_have_no_stray_keys():
 def test_series_grouped_by_frequency():
     """Monthly and quarterly ids must never share an API request."""
     reg = registry.load()
-    freq = {v.source_id: i.frequency for i in reg.indicators for v in i.variants.values()}
+    meta = reg.series_meta()
     for (source, f), ids in reg.series_by_source().items():
-        assert all(freq[sid] == f for sid in ids)
+        assert all(meta[sid]["frequency"] == f for sid in ids)
+    # Derived indicators are never fetched; their inputs are.
+    assert not any(src == "derived" for src, _ in reg.series_by_source())
+    fetched = {sid for ids in reg.series_by_source().values() for sid in ids}
+    for ind in reg.indicators:
+        if ind.derive:
+            assert set(ind.input_ids()) <= fetched, ind.id
+
+
+# --- manual source and derived indicators ---------------------------------
+
+def test_manual_adapter_and_composite_file(tmp_path):
+    from pipeline.sources import manual
+    (tmp_path / "x.csv").write_text("date,value\n2020-01-01,1.5\n2020-02-01,\n2020-03-01,2\n")
+    res = manual.fetch(["x", "missing"], base=tmp_path)
+    assert res.data["value"].tolist() == [1.5, 2.0] and set(res.errors) == {"missing"}
+    # The committed composite is a gap-free monthly index.
+    comp = manual.fetch(["cpi_private_composite"]).data.set_index("date")["value"]
+    assert validate.check_series(comp, pd.Series(dtype=float)).ok
+    assert comp.index.min() <= pd.Timestamp("2007-01-01") and comp.index.max() >= pd.Timestamp("2016-04-01")
+
+
+def _splice_ind(spec):
+    from pipeline.registry import Indicator, Variant
+    return Indicator(id="t", topic="t", kind="variants", title="t", short_title="t", description="",
+                     source="derived", source_label="", frequency="M", units="",
+                     variants={k: Variant(k, k, f"t:{k}") for k in spec["variants"]}, default={}, derive=spec)
+
+
+def test_splice_chains_anchors_aligns_and_leaves_gaps():
+    from pipeline import derive
+    a = monthly([100, 110, 121, 133.1, 146.41, 161.051])          # +10%/month, Jan-Jun 2020
+    b = monthly([1.0, 1.0, 1.0], start="2020-02-01")               # +1%/month (as m/m %), Feb-Apr
+    c = monthly([50, 55, 60.5], start="2020-04-01")                # +10%/month, Apr-Jun
+    spec = {"method": "splice", "anchor": {"id": "A", "date": "2020-06-01"}, "variants": {
+        "corr": {"segments": [{"id": "A", "as": "index"}]},
+        "off": {"fill_gaps_from": "corr", "align": {"variant": "corr", "date": "2020-01-01"},
+                "segments": [{"id": "A", "as": "index", "to": "2020-01-01"},
+                             {"id": "B", "as": "mom", "from": "2020-02-01", "to": "2020-03-01"},
+                             {"id": "C", "as": "index", "from": "2020-05-01"}]}}}
+    df, info = derive.splice(_splice_ind(spec), {"A": a, "B": b, "C": c})
+    corr, off = df["t:corr"], df["t:off"]
+    assert corr.iloc[-1] == pytest.approx(161.051)                 # anchored
+    assert off.iloc[0] == pytest.approx(corr.iloc[0])              # aligned at the start
+    assert off["2020-03-01"] / off["2020-01-01"] == pytest.approx(1.01 ** 2)
+    assert pd.isna(off["2020-04-01"])                              # gap month left empty...
+    assert info["gaps"] == {"off": [["2020-04-01", "2020-04-01"]]}
+    # ...but the level carries on with the corrected series' change through it.
+    assert off["2020-05-01"] / off["2020-03-01"] == pytest.approx(1.1 * 1.1)
+
+
+def test_reweight_with_unchanged_weights_reproduces_official(tmp_path, monkeypatch):
+    import numpy as np
+    from pipeline import derive, export
+    monkeypatch.setattr(store, "VINTAGE_DIR", tmp_path)
+    reg = registry.load()
+    div = next(i for i in reg.indicators if i.id == "cpi_divisions")
+    ind = next(i for i in reg.indicators if i.id == "cpi_newbasket")
+    rng = np.random.default_rng(1)
+    idx = pd.date_range("2016-12-01", "2026-06-01", freq="MS")
+    w = pd.Series(rng.uniform(1, 10, len(div.variants)), index=list(div.variants))
+    w = w / w.sum() * 100
+    comps = {}
+    for k, v in div.variants.items():
+        s = pd.Series(100 * np.cumprod(1 + rng.uniform(0, 0.06, len(idx))), index=idx)
+        s.iloc[0] = 100
+        comps[k] = s
+        store.append(v.source_id, s, "2026-07-01")
+    head = sum(w[k] / 100 * comps[k] for k in comps)
+    store.append(ind.derive["headline"], head, "2026-07-01")
+    # New weights equal to the old basket at base-period prices, price-updated the same way.
+    spec = {**ind.derive, "new_weights": w.to_dict(), "new_weights_reference": ["2016-12-01", "2016-12-01"]}
+    monkeypatch.setattr(ind, "derive", spec)
+    df, info = derive.reweight(ind, reg, {ind.derive["headline"]: store.as_of(ind.derive["headline"])})
+    pd.testing.assert_series_equal(df.iloc[:, 0], df.iloc[:, 1], check_names=False, rtol=1e-6)
+    assert info["replication_max_error_pct"] < 1e-4

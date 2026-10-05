@@ -31,6 +31,22 @@ site:
 #
 # Party colors (light mode / dark mode). Checked for color-blind separation;
 # the gold is darkened from PRO yellow so it stays visible on white.
+# Source series fetched and versioned like any other, but not shown on their
+# own: they feed derived indicators (`source: derived`, see pipeline/derive.py).
+# `static: true` marks discontinued or hand-maintained history, which is never
+# flagged stale. `source: manual` reads data/manual/<id>.csv.
+inputs:
+  - {id: cpi_private_composite, source: manual, frequency: M, measure: index, static: true,
+     label: "Private CPI composite (replaces INDEC, Jan 2007 - Apr 2016)"}
+  - {id: 178.1_NL_GENERAL_0_0_13, source: datos_gob, frequency: M, measure: index, static: true,
+     label: "INDEC historical CPI, 1943-2008"}
+  - {id: 96.3_INGV_2008_M_20, source: datos_gob, frequency: M, measure: flow, static: true,
+     label: "INDEC CPI-GBA (base Apr 2008), m/m %, 1993-2013"}
+  - {id: 98.3_INNG_2013_0_20, source: datos_gob, frequency: M, measure: index, static: true,
+     label: "INDEC IPC-NU (national urban), Dec 2013 - Oct 2015"}
+  - {id: 103.1_I2N_2016_M_19, source: datos_gob, frequency: M, measure: index,
+     label: "INDEC CPI-GBA (base Apr 2016)"}
+
 party_colors:
   peronism: {label: "Peronism (FpV / FdT)", light: "#4A9FDB", dark: "#6CB4E8"}
   pro:      {label: "PRO / Cambiemos",      light: "#D99B00", dark: "#F2BE3C"}
@@ -361,6 +377,62 @@ indicators:
     default: {variant: headline, transform: mom, start: "2017-01"}
     headline: {variant: headline, transform: mom}
 
+  - id: cpi_long
+    topic: prices_money
+    wide: true
+    kind: variants
+    overlay: true
+    log_level: true
+    title: Consumer Prices since 1943, Corrected for the INDEC Intervention
+    short_title: CPI, long run
+    description: >-
+      From January 2007 until the statistical emergency of late 2015, INDEC's
+      CPI understated inflation. The corrected series replaces January 2007 to
+      April 2016 with a composite of private estimates; the official series
+      is the CPI as INDEC published it.
+    release: ipc
+    source: derived
+    source_label: "INDEC; composite of private estimates for Jan 2007 - Apr 2016"
+    frequency: M
+    units: Index, Dec 2016 = 100
+    transforms: [yoy, mom, level]
+    ranges: [10Y, 25Y, 50Y, Max]
+    note: >-
+      Official: INDEC's historical CPI to Dec 2006, CPI-GBA (2007-2013),
+      IPC-NU (Jan 2014 - Oct 2015), CPI-GBA (May - Dec 2016) and the national
+      CPI from Jan 2017. INDEC published no CPI from Nov 2015 to Apr 2016; the
+      official level carries on through that gap with the corrected series'
+      changes. Both series are equal through Dec 2006, so in levels the
+      distance between them is the inflation the official figures left out.
+      Corrected: the same, with the private composite from Jan 2007 to Apr 2016.
+    bands:
+      - {start: "2007-01-01", end: "2015-10-01", label: INDEC intervention}
+      - {start: "2015-11-01", end: "2016-04-01", label: No official CPI}
+    summary_windows:
+      - {label: "Jan 2007 - Oct 2015", base: "2006-12-01", end: "2015-10-01"}
+    default: {variant: corrected, transform: yoy, range: 25Y, base: "2006-12-01"}
+    derive:
+      method: splice
+      anchor: {id: 148.3_INIVELNAL_DICI_M_26, date: "2016-12-01"}
+      variants:
+        corrected:
+          label: Corrected
+          segments:
+            - {id: 178.1_NL_GENERAL_0_0_13, as: index, to: "2006-12-01"}
+            - {id: cpi_private_composite, as: index, from: "2007-01-01", to: "2016-04-01"}
+            - {id: 103.1_I2N_2016_M_19, as: index, from: "2016-05-01", to: "2016-12-01"}
+            - {id: 148.3_INIVELNAL_DICI_M_26, as: index, from: "2017-01-01"}
+        official:
+          label: Official (as published)
+          fill_gaps_from: corrected
+          align: {variant: corrected, date: "2006-12-01"}
+          segments:
+            - {id: 178.1_NL_GENERAL_0_0_13, as: index, to: "2006-12-01"}
+            - {id: 96.3_INGV_2008_M_20, as: mom, from: "2007-01-01", to: "2013-12-01"}
+            - {id: 98.3_INNG_2013_0_20, as: index, from: "2014-01-01", to: "2015-10-01"}
+            - {id: 103.1_I2N_2016_M_19, as: index, from: "2016-05-01", to: "2016-12-01"}
+            - {id: 148.3_INIVELNAL_DICI_M_26, as: index, from: "2017-01-01"}
+
   - id: cpi_categories
     topic: prices_money
     kind: panel
@@ -417,6 +489,47 @@ indicators:
       misc:       {label: Miscellaneous goods & services, id: 146.3_IBIENESNAL_DICI_M_36}
     default: {variant: [food, housing, transport], transform: mom, start: "2017-01"}
     weights: {fit_to: {indicator: cpi, variant: headline}}
+
+  - id: cpi_newbasket
+    topic: prices_money
+    wide: true
+    kind: variants
+    overlay: true
+    title: CPI with the 2017/18 Basket (Estimate)
+    short_title: CPI, new basket
+    description: >-
+      INDEC was to replace the 2004/05 basket with weights from the 2017/18
+      household spending survey starting with January 2026 data; the change
+      was postponed. This estimate applies the new division weights to the
+      published division indices.
+    release: ipc
+    source: derived
+    source_label: "INDEC, via datos.gob.ar; reweighting by AEM"
+    frequency: M
+    units: Index, Dec 2016 = 100
+    transforms: [mom, yoy, level]
+    note: >-
+      Only the shift in weights across the twelve divisions is captured. The
+      new index would also change items and weights within divisions and by
+      region, which this estimate cannot reproduce. The current basket's
+      weights are recovered from the index itself and price-updated to Dec
+      2025; the new weights are taken as applying in Dec 2025.
+    summary_windows:
+      - {label: "since Dec 2025", base: "2025-12-01", end: null}
+    bands:
+      - {start: "2026-01-01", end: null, label: New basket due}
+    default: {variant: reweighted, transform: mom, start: "2025-01", base: "2025-12-01"}
+    derive:
+      method: reweight
+      link: "2025-12-01"
+      headline: 148.3_INIVELNAL_DICI_M_26
+      components: cpi_divisions
+      new_weights_reference: link     # or [first, last] survey month to price-update, e.g. ["2017-07-01", "2018-06-01"]
+      new_weights: {food: 22.7, alcohol: 1.9, clothing: 6.8, housing: 14.5, household: 5.4, health: 6.4,
+                    transport: 14.3, comms: 5.2, recreation: 8.6, education: 3.1, restaurants: 6.6, misc: 4.3}
+      variants:
+        official:   {label: "Official (2004/05 basket)"}
+        reweighted: {label: "2017/18 basket (estimate)"}
 
   - id: cpi_regions
     topic: prices_money

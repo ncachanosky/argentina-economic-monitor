@@ -18,7 +18,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from . import registry, store
+from . import derive, registry, store
 from .registry import ROOT
 from .update import STATUS_PATH
 
@@ -26,7 +26,8 @@ DATOS_GOB_SERIES_URL = "https://datos.gob.ar/series/api/series/?ids={id}"
 
 
 def _clean(values) -> list:
-    return [None if (v is None or (isinstance(v, float) and math.isnan(v))) else round(float(v), 6)
+    # Significant digits, not decimals: long-run price indices reach 1e-12.
+    return [None if (v is None or (isinstance(v, float) and math.isnan(v))) else float(f"{float(v):.9g}")
             for v in values]
 
 
@@ -138,7 +139,15 @@ def export(out: Path) -> None:
     manifest_inds = []
     for ind in reg.indicators:
         ids = [v.source_id for v in ind.variants.values()]
-        wide = store.latest_frame(ids)
+        derived_info = None
+        if ind.derive:
+            try:
+                wide, derived_info = derive.compute(ind, reg)
+            except Exception as exc:
+                print(f"skip {ind.id}: {exc}")
+                continue
+        else:
+            wide = store.latest_frame(ids)
         if wide.empty:
             print(f"skip {ind.id}: no data yet")
             continue
@@ -149,7 +158,11 @@ def export(out: Path) -> None:
             yr = wide.loc[str(ind.index_base)]
             wide = wide.apply(lambda col: col / yr[col.name].mean() * 100 if yr[col.name].notna().any() else col)
 
-        st = [status.get(sid, {}) for sid in ids]
+        status_ids = ind.input_ids()
+        if ind.derive and ind.derive["method"] == "reweight":
+            comp = next(i for i in reg.indicators if i.id == ind.derive["components"])
+            status_ids += [v.source_id for v in comp.variants.values()]
+        st = [status.get(sid, {}) for sid in status_ids]
         worst = "error" if any(s.get("status") == "error" for s in st) else (
             "stale" if any(s.get("status") == "stale" for s in st) else "ok")
         changed = [s.get("last_changed") for s in st if s.get("last_changed")]
@@ -171,10 +184,15 @@ def export(out: Path) -> None:
             "frequency": ind.frequency,
             "source_units": ind.source_units,
             "note": ind.note,
-            "frequency": ind.frequency,
             "source_label": ind.source_label,
             "default": ind.default,
             "headline": ind.headline,
+            "overlay": ind.overlay,
+            "log_level": ind.log_level,
+            "bands": ind.bands,
+            "summary_windows": ind.summary_windows,
+            "ranges": ind.ranges,
+            "derived": derived_info,
             "status": worst,
             "last_obs": wide.dropna(how="all").index.max().strftime("%Y-%m-%d"),
             "last_changed": max(changed) if changed else None,

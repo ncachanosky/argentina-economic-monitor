@@ -17,6 +17,7 @@ from .sources import get_adapter
 def main() -> int:
     reg = registry.load()
     label = {v.source_id: f"{ind.id}.{v.key}" for ind in reg.indicators for v in ind.variants.values()}
+    label.update({inp["id"]: f"input:{inp['id'][:20]}" for inp in reg.inputs})
     bad = 0
     for (source, _freq), ids in reg.series_by_source().items():
         res = get_adapter(source).fetch(ids)

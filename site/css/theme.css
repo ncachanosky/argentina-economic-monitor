@@ -40,6 +40,7 @@
   --series-3: #87A96B;
   --series-4: #8E7AB5;
   --highlight: #D4745E;
+  --band: rgba(54, 69, 79, .07);       /* shaded periods on charts */
 
   --font-body: "Palatino Linotype", Palatino, "Book Antiqua", "TeX Gyre Pagella", Georgia, serif;
   --font-ui: Calibri, Carlito, "Segoe UI", "Helvetica Neue", Arial, system-ui, sans-serif;
@@ -56,6 +57,7 @@
     --accent: #C98A4F; --accent-ink: #E0A46C;
     --pos: #9CC27F; --neg: #E58C77; --warn-bg: #3A2F25;
     --series-1: #C98A4F; --series-2: #6FA9DD; --series-3: #93B477; --series-4: #A08DC4;
+    --band: rgba(238, 241, 243, .07);
     --shadow: none; color-scheme: dark;
   }
 }
@@ -66,6 +68,7 @@
   --accent: #C98A4F; --accent-ink: #E0A46C;
   --pos: #9CC27F; --neg: #E58C77; --warn-bg: #3A2F25;
   --series-1: #C98A4F; --series-2: #6FA9DD; --series-3: #93B477; --series-4: #A08DC4;
+  --band: rgba(238, 241, 243, .07);
   --shadow: none; color-scheme: dark;
 }
 
@@ -150,6 +153,10 @@ a:hover { color: var(--accent-ink); }
 .card-foot { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; justify-content: space-between; border-top: 1px solid var(--rule); margin-top: 6px; padding-top: 10px; font-family: var(--font-ui); font-size: 13px; color: var(--ink-3); }
 .card-foot .actions { display: flex; gap: 6px; }
 .status-badge { display: inline-block; font-size: 12px; padding: 1px 8px; border-radius: 999px; background: var(--warn-bg); color: var(--accent-ink); margin-left: 6px; }
+.summary-line { font-family: var(--font-ui); font-size: 14px; color: var(--ink-2); margin: 2px 0 6px; }
+.summary-line b { color: var(--ink); font-weight: 600; }
+.summary-line .sw { display: inline-block; width: 14px; height: 3px; vertical-align: middle; margin: 0 5px 2px 0; border-radius: 2px; }
+.summary-line .sw.dash { background: none !important; border-top: 2px dashed currentColor; height: 0; }
 .hint { font-family: var(--font-ui); font-size: 13px; color: var(--ink-3); margin: 0 0 4px; min-height: 1em; }
 
 .term-stats { margin-top: 10px; font-family: var(--font-ui); font-size: 13px; }

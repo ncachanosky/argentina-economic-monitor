@@ -11,6 +11,8 @@ REGISTRY_PATH = ROOT / "registry" / "series.yaml"
 RELEASES_PATH = ROOT / "registry" / "releases.yaml"
 
 KINDS = {"variants", "panel", "contributions"}
+DERIVE_METHODS = {"splice", "reweight"}
+RANGE_KEYS = {"2Y", "5Y", "10Y", "25Y", "50Y", "Max"}
 TRANSFORMS = {"level", "yoy", "mom"}
 FREQUENCIES = {"M", "Q"}
 
@@ -48,6 +50,25 @@ class Indicator:
     contributions: dict | None = None
     weights: dict | None = None
     bar_transform: str | None = None   # panels: metric for the ranked bars (yoy, mom, level)
+    derive: dict | None = None         # computed indicator (source: derived); see pipeline/derive.py
+    overlay: bool = False              # variants card: draw all variants together
+    log_level: bool = False            # variants card: log scale for levels
+    bands: list | None = None          # shaded periods [{start, end, label}]
+    summary_windows: list | None = None  # cumulative change over [{label, base, end}]
+    ranges: list | None = None         # time-range buttons, e.g. ["10Y", "25Y", "Max"]
+
+    def input_ids(self) -> list[str]:
+        """Source series this indicator reads (its variants, or a derivation's inputs)."""
+        if not self.derive:
+            return [v.source_id for v in self.variants.values()]
+        ids: list[str] = []
+        if self.derive.get("method") == "splice":
+            ids.append(self.derive["anchor"]["id"])
+            for v in self.derive["variants"].values():
+                ids += [seg["id"] for seg in v["segments"]]
+        elif self.derive.get("method") == "reweight":
+            ids.append(self.derive["headline"])
+        return list(dict.fromkeys(ids))
 
 
 HEX = __import__("re").compile(r"^#[0-9A-Fa-f]{6}$")
@@ -61,6 +82,30 @@ class Registry:
     presidencies: list[dict] = field(default_factory=list)
     party_colors: dict = field(default_factory=dict)
     releases: dict = field(default_factory=dict)
+    # Source series fetched and stored only to feed derived indicators.
+    inputs: list[dict] = field(default_factory=list)
+
+    def series_meta(self) -> dict[str, dict]:
+        """source_id -> {source, frequency, measure, static}, over indicators and inputs.
+
+        A shared id keeps the strictest measure ("flow" only if never an index).
+        """
+        out: dict[str, dict] = {}
+        for ind in self.indicators:
+            if ind.source == "derived":
+                continue
+            for v in ind.variants.values():
+                m = out.setdefault(v.source_id, {"source": ind.source, "frequency": ind.frequency,
+                                                 "measure": ind.measure, "static": False})
+                if m["measure"] == "flow":
+                    m["measure"] = ind.measure
+        for inp in self.inputs:
+            m = out.setdefault(inp["id"], {"source": inp["source"], "frequency": inp["frequency"],
+                                           "measure": inp.get("measure", "index"),
+                                           "static": bool(inp.get("static"))})
+            if m["measure"] == "flow":
+                m["measure"] = inp.get("measure", "index")
+        return out
 
     def next_release(self, ind: "Indicator", last_obs: str) -> dict | None:
         """First scheduled release covering a month after `last_obs` (YYYY-MM-DD)."""
@@ -81,8 +126,8 @@ class Registry:
         monthly and quarterly ids silently returns quarterly averages.
         """
         out: dict[tuple[str, str], set[str]] = {}
-        for ind in self.indicators:
-            out.setdefault((ind.source, ind.frequency), set()).update(v.source_id for v in ind.variants.values())
+        for sid, m in self.series_meta().items():
+            out.setdefault((m["source"], m["frequency"]), set()).add(sid)
         return out
 
 
@@ -116,6 +161,20 @@ def load(path: Path = REGISTRY_PATH, releases_path: Path = RELEASES_PATH) -> Reg
         if item.get("frequency") not in FREQUENCIES:
             raise RegistryError(f"{where}: unsupported frequency {item.get('frequency')!r}")
 
+        derive = item.get("derive")
+        if derive:
+            if item.get("source") != "derived":
+                raise RegistryError(f"{where}: a derived indicator needs source: derived")
+            if derive.get("method") not in DERIVE_METHODS:
+                raise RegistryError(f"{where}: derive.method must be one of {sorted(DERIVE_METHODS)}")
+            if item.get("variants"):
+                raise RegistryError(f"{where}: derived indicators define variants under derive")
+            item = {**item, "variants": {k: {"label": v.get("label"), "id": f"{iid}:{k}"}
+                                         for k, v in (derive.get("variants") or {}).items()}}
+        elif item.get("source") == "derived":
+            raise RegistryError(f"{where}: source: derived needs a derive block")
+        if item.get("ranges") and not set(item["ranges"]) <= RANGE_KEYS:
+            raise RegistryError(f"{where}: unknown ranges {item['ranges']}")
         variants = {}
         for key, v in (item.get("variants") or {}).items():
             if not v.get("id") or not v.get("label"):
@@ -178,6 +237,13 @@ def load(path: Path = REGISTRY_PATH, releases_path: Path = RELEASES_PATH) -> Reg
                 contributions=contrib,
                 weights=item.get("weights"),
                 bar_transform=item.get("bar_transform"),
+                derive=derive,
+                overlay=bool(item.get("overlay", False)),
+                log_level=bool(item.get("log_level", False)),
+                bands=[{k: (str(v) if v is not None else None) for k, v in b.items()} for b in item.get("bands") or []] or None,
+                summary_windows=[{k: (str(v) if v is not None else None) for k, v in w.items()}
+                                 for w in item.get("summary_windows") or []] or None,
+                ranges=item.get("ranges"),
             )
         )
 
@@ -203,6 +269,37 @@ def load(path: Path = REGISTRY_PATH, releases_path: Path = RELEASES_PATH) -> Reg
         prev_end = end or "9999"
         presidencies.append({**p, "start": start, "end": end, "short": p.get("short", p["name"])})
 
-    return Registry(site=raw.get("site", {}), topics=topics, indicators=indicators,
-                    presidencies=presidencies, party_colors=party_colors,
-                    releases=releases)
+    inputs = []
+    for inp in raw.get("inputs", []) or []:
+        where = f"input '{inp.get('id')}'"
+        for k in ("id", "source", "frequency", "label"):
+            if not inp.get(k):
+                raise RegistryError(f"{where}: missing {k}")
+        if inp["frequency"] not in FREQUENCIES:
+            raise RegistryError(f"{where}: unsupported frequency")
+        if inp.get("measure", "index") not in {"index", "rate", "flow"}:
+            raise RegistryError(f"{where}: bad measure")
+        inputs.append({**inp, "id": str(inp["id"])})
+
+    reg = Registry(site=raw.get("site", {}), topics=topics, indicators=indicators,
+                   presidencies=presidencies, party_colors=party_colors,
+                   releases=releases, inputs=inputs)
+
+    # Every series a derivation reads must be fetched by something.
+    known = set(reg.series_meta())
+    for ind in indicators:
+        if not ind.derive:
+            continue
+        missing = [sid for sid in ind.input_ids() if sid not in known]
+        if missing:
+            raise RegistryError(f"indicator '{ind.id}': inputs not in the registry: {missing}")
+        if ind.derive["method"] == "reweight":
+            comp = next((i for i in indicators if i.id == ind.derive.get("components")), None)
+            if comp is None:
+                raise RegistryError(f"indicator '{ind.id}': components indicator not found")
+            nw = ind.derive.get("new_weights") or {}
+            if set(nw) != set(comp.variants):
+                raise RegistryError(f"indicator '{ind.id}': new_weights keys must match {comp.id} variants")
+            if set(ind.derive["variants"]) != {"official", "reweighted"}:
+                raise RegistryError(f"indicator '{ind.id}': reweight variants must be official and reweighted")
+    return reg

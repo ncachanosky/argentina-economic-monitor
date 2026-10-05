@@ -35,12 +35,9 @@ def run(dry_run: bool = False, strict: bool = False) -> int:
     now = datetime.now(timezone.utc)
     vintage = now.strftime("%Y-%m-%d")
     today = pd.Timestamp(now.date())
-    freq_of = {v.source_id: ind.frequency for ind in reg.indicators for v in ind.variants.values()}
-    measure_of = {}
-    for ind in reg.indicators:  # shared ids keep the strictest measure ("flow" only if never an index)
-        for v in ind.variants.values():
-            if measure_of.get(v.source_id) in (None, "flow"):
-                measure_of[v.source_id] = ind.measure
+    meta = reg.series_meta()
+    freq_of = {sid: m["frequency"] for sid, m in meta.items()}
+    measure_of = {sid: m["measure"] for sid, m in meta.items()}
 
     status = _load_status()
     lines: list[str] = []
@@ -101,7 +98,8 @@ def run(dry_run: bool = False, strict: bool = False) -> int:
             latest = store.as_of(sid) if not dry_run else old
             if not latest.empty:
                 entry["last_obs"] = latest.index.max().strftime("%Y-%m-%d")
-                stale = validate.is_stale(latest.index.max(), today, freq_of[sid])
+                # Discontinued or hand-maintained history is never "stale".
+                stale = not meta[sid]["static"] and validate.is_stale(latest.index.max(), today, freq_of[sid])
             else:
                 stale = True
             entry["status"] = "error" if problem else ("stale" if stale else "ok")
@@ -111,7 +109,7 @@ def run(dry_run: bool = False, strict: bool = False) -> int:
     for ind in reg.indicators:
         if not ind.release:
             continue
-        ids = [v.source_id for v in ind.variants.values()]
+        ids = ind.input_ids()
         lasts = [status.get(i, {}).get("last_obs") for i in ids if status.get(i, {}).get("last_obs")]
         if lasts and reg.next_release(ind, max(lasts)) is None:
             msg = f"no upcoming '{ind.release}' release in registry/releases.yaml; add the next INDEC calendar"
