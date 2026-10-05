@@ -1023,7 +1023,7 @@
 
     function drawAll() { drawChips(); drawBars(); drawLines(); }
 
-    const seriesNote = isRate || ind.topic === "prices_money" ? "" : " · original series";
+    const seriesNote = isRate || ind.topic === "prices" ? "" : " · original series";
     const onPNG = () => {
       const t = T[state.transform];
       exportPNG(ind, lineTraces(), `${t.change ? t.short : ind.units}${seriesNote}`, t, `${ind.id}_${state.transform}.png`);
@@ -1238,7 +1238,8 @@
     // …/#topic-real_sector) land on the home page: send them on.
     if (PAGE === "home") {
       const m = location.hash.match(/^#(ind|topic)-(.+)$/);
-      const topicId = m && (m[1] === "ind" ? topicOf.get(m[2]) : m[2]);
+      const oldId = (id) => (manifest.topics.find((t) => (t.old_ids || []).includes(id)) || {}).id || id;
+      const topicId = m && (m[1] === "ind" ? topicOf.get(m[2]) : oldId(m[2]));
       if (topicId && slugOf.has(topicId)) { location.replace(pageHref(topicId, m[1] === "ind" ? `ind-${m[2]}` : "")); return; }
     }
 

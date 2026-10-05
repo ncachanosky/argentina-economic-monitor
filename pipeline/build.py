@@ -52,6 +52,19 @@ def build(out: Path, tag: str, with_data: bool = True) -> None:
         (d / "index.html").write_text(render(
             template, page=t["id"], root="../", title=f"{t['title']} · {site_name}", h1=t["title"],
             lede=t.get("description", ""), desc=f"{t['title']}: {t.get('description', '')}", tag=tag), encoding="utf-8")
+    # Renamed pages: a redirect from each old path keeps shared links working.
+    for t in reg.topics:
+        for old in t.get("old_slugs") or []:
+            d = out / old
+            d.mkdir(parents=True, exist_ok=True)
+            target = f"../{t['slug']}/"
+            (d / "index.html").write_text(
+                f'<!doctype html><meta charset="utf-8"><title>Moved</title>'
+                f'<meta http-equiv="refresh" content="0; url={target}">'
+                f'<link rel="canonical" href="{target}">'
+                f'<script>location.replace("{target}" + location.hash)</script>'
+                f'<a href="{target}">This page moved.</a>\n', encoding="utf-8")
+
     # Methodology: a static page from the same template.
     d = out / "methodology"
     d.mkdir(parents=True, exist_ok=True)

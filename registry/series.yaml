@@ -101,9 +101,12 @@ topics:
     description: >-
       Quarterly GDP at constant 2004 prices, and its growth by expenditure
       component and by industry.
-  - id: prices_money
-    slug: prices-money
-    title: Prices & Money
+  - id: prices
+    slug: prices
+    # Earlier page names, kept as redirects so shared links keep working.
+    old_slugs: [prices-money]
+    old_ids: [prices_money]
+    title: Prices
     description: >-
       Consumer prices (headline, core, regulated, seasonal; by division and
       region), inflation since 1943 corrected for the 2007-2015 INDEC
@@ -565,7 +568,7 @@ indicators:
 
   # ======================= PRICES & MONEY =======================
   - id: cpi
-    topic: prices_money
+    topic: prices
     wide: true
     kind: variants
     title: Consumer Price Index (CPI)
@@ -588,7 +591,7 @@ indicators:
     headline: {variant: headline, transform: mom}
 
   - id: cpi_long
-    topic: prices_money
+    topic: prices
     wide: true
     kind: variants
     overlay: true
@@ -651,7 +654,7 @@ indicators:
             - {id: 148.3_INIVELNAL_DICI_M_26, as: index, from: "2017-01-01"}
 
   - id: cpi_categories
-    topic: prices_money
+    topic: prices
     kind: panel
     component_noun: categories
     bar_transform: mom
@@ -677,7 +680,7 @@ indicators:
     weights: {fit_to: {indicator: cpi, variant: headline}}
 
   - id: cpi_divisions
-    topic: prices_money
+    topic: prices
     kind: panel
     component_noun: divisions
     bar_transform: mom
@@ -710,7 +713,7 @@ indicators:
     weights: {fit_to: {indicator: cpi, variant: headline}}
 
   - id: cpi_newbasket
-    topic: prices_money
+    topic: prices
     wide: true
     kind: variants
     overlay: true
@@ -750,7 +753,7 @@ indicators:
         reweighted: {label: "2017/18 basket (estimate)"}
 
   - id: cpi_regions
-    topic: prices_money
+    topic: prices
     kind: panel
     component_noun: regions
     bar_transform: mom
@@ -775,7 +778,7 @@ indicators:
     default: {variant: [gba, nea, patagonia], transform: yoy, start: "2017-01"}
 
   - id: ipim
-    topic: prices_money
+    topic: prices
     wide: true
     kind: variants
     title: Wholesale Prices (IPIM)
