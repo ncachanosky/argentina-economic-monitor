@@ -56,15 +56,25 @@ def contributions(ind, raw: pd.DataFrame) -> dict:
             groups.append({"key": g["key"], "label": g["label"], "color": g.get("color"), "values": total_yoy - explained})
     valid = total_yoy.dropna().index
     lines = {}
-    for k in spec.get("lines", []):
-        s = raw[sid[k]]
-        lines[k] = {"label": ind.variants[k].label, "values": _clean(((s / s.shift(lag) - 1) * 100).reindex(valid).tolist())}
+    yoy = lambda s: _clean(((s / s.shift(lag) - 1) * 100).reindex(valid).tolist())
+    if spec.get("lines") == "groups":
+        # One line per (non-residual) group: y/y growth of the group's level.
+        for g in spec.get("groups", []):
+            if g.get("residual"):
+                continue
+            level = sum(raw[sid[k]].fillna(0) for k in g.get("add", [])) - sum(raw[sid[k]].fillna(0) for k in g.get("subtract", []))
+            lines[g["key"]] = {"label": g["label"], "color": g.get("color"), "values": yoy(level)}
+    else:
+        colors = spec.get("line_colors", {})
+        for k in spec.get("lines", []):
+            lines[k] = {"label": ind.variants[k].label, "color": colors.get(k), "values": yoy(raw[sid[k]])}
     return {
         "dates": [d.strftime("%Y-%m-%d") for d in valid],
         "total": {"label": ind.variants[spec["total"]].label, "values": _clean(total_yoy.reindex(valid).tolist())},
         "groups": [{**{k: v for k, v in g.items() if k != "values"}, "values": _clean(g["values"].reindex(valid).tolist())} for g in groups],
         "lines": lines,
-        "default_lines": spec.get("default_lines", spec.get("lines", [])[:3]),
+        "default_lines": spec.get("default_lines") or list(lines)[:3],
+        "lines_title": spec.get("lines_title", "Components, year-over-year change"),
     }
 
 

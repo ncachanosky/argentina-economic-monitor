@@ -265,5 +265,60 @@ indicators:
         - {key: nx, label: Net exports,         add: [x], subtract: [m], color: lavender}
         - {key: other, label: Inventories & discrepancy, residual: true, color: neutral}
       lines: [c, g, i, x, m]
+      line_colors: {c: copper, g: sky, i: sage, x: lavender, m: neutral}
       default_lines: [c, i, x]
+      lines_title: Demand components, year-over-year change
+    default: {variant: gdp, transform: yoy, start: "2016-01"}
+
+  - id: gdp_supply
+    topic: gdp
+    kind: contributions
+    measure: flow
+    title: Which Industries Drive GDP Growth
+    short_title: GDP by industry
+    description: >-
+      Contribution of each group of industries to GDP growth versus the same
+      quarter a year earlier, in percentage points. Bars add up to GDP growth
+      (the marker).
+    release: pib
+    source: datos_gob
+    source_label: INDEC, via datos.gob.ar
+    frequency: Q
+    units: Percentage points
+    source_units: millions of 2004 pesos
+    note: >-
+      Value added by industry at constant 2004 prices (original series).
+      Goods: agriculture, fishing, mining, manufacturing, utilities and
+      construction. "Other services & net taxes" (other community services,
+      domestic service, and taxes net of subsidies on products) is the residual
+      that closes the gap to GDP growth.
+    variants:
+      gdp:          {label: GDP,                                id: 6.2_PIBPM_2004_T_38}
+      agro:         {label: Agriculture & livestock,            id: 6.2_AGCS_2004_T_39}
+      fishing:      {label: Fishing,                            id: 6.2_P_2004_T_5}
+      mining:       {label: Mining & quarrying,                 id: 6.2_EMC_2004_T_26}
+      manufacturing: {label: Manufacturing,                     id: 6.2_IM_2004_T_23}
+      utilities:    {label: Electricity, gas & water,           id: 6.2_SEGA_2004_T_32}
+      construction: {label: Construction,                       id: 6.2_C_2004_T_12}
+      trade:        {label: Wholesale & retail trade,           id: 6.2_CMMR_2004_T_41}
+      hotels:       {label: Hotels & restaurants,               id: 6.2_HR_2004_T_20}
+      transport:    {label: Transport & communications,         id: 6.2_TAC_2004_T_40}
+      finance:      {label: Financial intermediation,           id: 6.2_IF_2004_T_25}
+      real_estate:  {label: Real estate & business services,    id: 6.2_AIEA_2004_T_48}
+      public_admin: {label: Public administration,              id: 6.2_APDPSSAO_2004_T_60}
+      education:    {label: Education,                          id: 6.2_E_2004_T_10}
+      health:       {label: Health & social services,           id: 6.2_SSS_2004_T_24}
+      other_services: {label: Other community services,         id: 6.2_OASCSP_2004_T_60}
+      households:   {label: Domestic service,                   id: 6.2_HPSD_2004_T_32}
+      net_taxes:    {label: Net taxes on products,              id: 6.2_IPNS_2004_T_35}
+    contributions:
+      total: gdp
+      groups:
+        - {key: goods,    label: Goods,                         color: copper,   add: [agro, fishing, mining, manufacturing, utilities, construction]}
+        - {key: trade,    label: Trade & transport,             color: sky,      add: [trade, hotels, transport]}
+        - {key: business, label: Finance & business services,   color: sage,     add: [finance, real_estate]}
+        - {key: public,   label: Public admin, education & health, color: lavender, add: [public_admin, education, health]}
+        - {key: other,    label: Other services & net taxes,    color: neutral,  residual: true}
+      lines: groups
+      lines_title: Industry groups, year-over-year change
     default: {variant: gdp, transform: yoy, start: "2016-01"}

@@ -745,12 +745,13 @@
     const fP = (iso) => fmtPeriod(iso, ind.frequency);
     const pp = { suffix: " pp", signed: true };
     const pct = INDEX_TRANSFORMS.yoy;
+    const gdpLabel = C.total.label;
     const state = { range: rangeFromDefault(ind) };
     const lineKeys = Object.keys(C.lines);
     // Lines keep the same color as their bar component (color follows the entity).
-    const LINE_COLOR = { c: "copper", g: "sky", i: "sage", x: "lavender", m: "neutral" };
-    const lineColor = (k) => (LINE_COLOR[k] === "neutral" ? cssVar("--ink-2") : groupColor(LINE_COLOR[k]));
-    const lineLight = (k) => (LINE_COLOR[k] === "neutral" ? "#5A6872" : GROUP_LIGHT[LINE_COLOR[k]]);
+    const lc = (k) => C.lines[k].color || "neutral";
+    const lineColor = (k) => (lc(k) === "neutral" ? cssVar("--ink-2") : groupColor(lc(k)));
+    const lineLight = (k) => (lc(k) === "neutral" ? "#5A6872" : GROUP_LIGHT[lc(k)]);
     const shown = new Set(C.default_lines || lineKeys.slice(0, 3));
 
     const card = cardFrame(ind, true);
@@ -788,7 +789,7 @@
         const ii = idx.filter((i) => ln.values[i] !== null);
         return {
           type: "scatter", mode: "lines", name: ln.label, x: ii.map((i) => C.dates[i]), y: ii.map((i) => ln.values[i]),
-          line: { color: lineColor(k), width: 2, dash: k === "m" ? "dot" : undefined }, _light: lineLight(k),
+          line: { color: lineColor(k), width: 2, dash: lc(k) === "neutral" ? "dot" : undefined }, _light: lineLight(k),
           hovertemplate: `%{y:,.1f}%<extra>${ln.label}</extra>`,
         };
       });
@@ -824,7 +825,7 @@
     const latestI = C.dates.length - 1;
     const onPNG = () => exportPNG(ind, barTraces(), `Contributions to year-over-year GDP growth, percentage points · latest: ${fP(C.dates[latestI])}`,
       pp, `${ind.id}_contributions.png`, { barmode: "relative" });
-    const onLinePNG = () => exportPNG({ ...ind, title: "GDP components: year-over-year change" }, lineTraces(), "Percent change vs. same quarter a year earlier · constant 2004 prices", pct, `${ind.id}_components_yoy.png`);
+    const onLinePNG = () => exportPNG({ ...ind, title: C.lines_title || "Components, year-over-year change" }, lineTraces(), `Percent change vs. same ${ind.frequency === "Q" ? "quarter" : "month"} a year earlier · constant 2004 prices`, pct, `${ind.id}_lines_yoy.png`);
     const onCSV = () => {
       const header = ["date", `${C.total.label} y/y %`, ...C.groups.map((g) => `${g.label} contribution (pp)`), ...lineKeys.map((k) => `${C.lines[k].label} y/y %`)];
       const rows = C.dates.map((d, i) => [d, C.total.values[i], ...C.groups.map((g) => g.values[i]), ...lineKeys.map((k) => C.lines[k].values[i])]
@@ -838,7 +839,7 @@
       h("p", { class: "hint" }, `${fP(C.dates[latestI])}: GDP ${fmtNum(C.total.values[latestI], pct)} y/y — ${parts}`),
       h("div", { class: "controls" }, h("span", { class: "spacer" }), rSeg),
       barEl,
-      h("p", { class: "hint", style: "margin-top:14px" }, "Components, year-over-year change. ",
+      h("p", { class: "hint", style: "margin-top:14px" }, `${C.lines_title || "Components, year-over-year change"}. `,
         h("button", { class: "btn", type: "button", onclick: onLinePNG, style: "padding:1px 8px;font-size:12px" }, "PNG")),
       chipsEl, lineEl);
     table = tableView([], [], pp, ind.frequency);
