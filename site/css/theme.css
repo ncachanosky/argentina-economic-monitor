@@ -132,6 +132,18 @@ a:hover { color: var(--accent-ink); }
 .section-nav a:hover { color: var(--ink); border-color: var(--ink-3); }
 .card { scroll-margin-top: 84px; }
 
+/* Methodology page */
+.prose { max-width: 76ch; margin: 24px 0 56px; line-height: 1.6; }
+.prose h2 { font-family: var(--font-ui); font-size: 22px; margin: 36px 0 8px; color: var(--accent-ink); scroll-margin-top: 84px; }
+.prose dt { font-family: var(--font-ui); font-weight: 600; margin-top: 10px; }
+.prose dd { margin: 2px 0 0 0; color: var(--ink-2); }
+.prose li { margin: 4px 0; }
+.prose .formula { font-family: var(--font-body); background: var(--surface-2); border-radius: 6px; padding: 8px 14px; overflow-x: auto; }
+.prose .refs li { color: var(--ink-2); }
+.toc { display: flex; flex-wrap: wrap; gap: 6px; font-family: var(--font-ui); font-size: 14px; }
+.toc a { text-decoration: none; color: var(--ink-2); border: 1px solid var(--rule); border-radius: 999px; padding: 3px 12px; background: var(--surface); }
+.toc a:hover { color: var(--ink); border-color: var(--ink-3); }
+
 /* Home: one card per topic */
 .topic-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin: 24px 0 48px; }
 .topic-card { display: block; text-decoration: none; color: var(--ink); background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius); padding: 18px 20px; box-shadow: var(--shadow); }

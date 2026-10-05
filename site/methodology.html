@@ -1,0 +1,90 @@
+<!-- Methodology page body. pipeline/build.py inserts it into the page
+     template as /methodology/. Plain HTML; keep claims sourced. -->
+<article class="prose">
+
+<nav class="toc" aria-label="Contents">
+  <a href="#data">Data and updates</a>
+  <a href="#transforms">Changes and averages</a>
+  <a href="#presidencies">Presidencies</a>
+  <a href="#episodes">Episodes</a>
+  <a href="#weights">Weights and incidence</a>
+  <a href="#gdp">GDP</a>
+  <a href="#cpi-long">CPI since 1943</a>
+  <a href="#cpi-basket">CPI with the 2017/18 basket</a>
+  <a href="#references">References</a>
+</nav>
+
+<h2 id="data">Data and updates</h2>
+<p>Every series comes from official sources through the Argentine government's time-series API (<a href="https://datos.gob.ar/">datos.gob.ar</a>), which republishes INDEC's data. The only exception is the IPC Congreso used in the long-run CPI (see <a href="#cpi-long">below</a>). An automated job fetches every series twice a day, checks it and publishes the site.</p>
+<p>Each download is checked before it is accepted: no missing months or quarters, no dates moving backwards, no published observations disappearing, no non-positive index values, and rates between 0 and 100. A series that fails keeps its last good data and its chart shows a notice. Large revisions and unusually large moves are accepted but logged for review.</p>
+<p>Sources revise their data, sometimes years back. Every value the site has ever received is stored with the date it was received, so any chart can be rebuilt as it looked on a past date. The full revision histories are in the <a href="https://github.com/ncachanosky/argentina-economic-monitor/tree/main/data/vintages">project repository</a>.</p>
+<p>Seasonally adjusted series are INDEC's. Where INDEC publishes only the original series (for example, EMAE by sector), the site shows changes that compare like periods (year over year, accumulated) and does not show month-on-month changes, which would mostly reflect seasonality.</p>
+
+<h2 id="transforms">Changes and averages</h2>
+<dl>
+  <dt>m/m, q/q</dt><dd>Change from the previous month or quarter: <i>X<sub>t</sub></i> / <i>X<sub>t−1</sub></i> − 1.</dd>
+  <dt>y/y</dt><dd>Change from the same month or quarter a year earlier.</dd>
+  <dt>YTD (year to date)</dt><dd>Change since December of the previous year. In December it equals the December-to-December change.</dd>
+  <dt>Accumulated y/y</dt><dd>INDEC's <i>variación acumulada</i>: the sum (equivalently, the average) of the months published so far in the year, over the same months a year earlier. For GDP this is annual growth once all four quarters are in.</dd>
+  <dt>Rates</dt><dd>Changes in a rate (capacity utilization, investment rate) are differences in percentage points, not percent changes.</dd>
+  <dt>Rebasing</dt><dd>Any index can be rebased so that a chosen month (for example, the month before a presidency starts) equals 100. Rebasing changes levels only, never percent changes.</dd>
+  <dt>Carryover</dt><dd>The statistical carry-over (<i>arrastre estadístico</i>): next year's growth if activity stayed for the whole year at the level of this year's last month or quarter (seasonally adjusted). For the year in progress, the table shows this year's growth if the remaining periods stayed at the latest level.</dd>
+</dl>
+
+<h2 id="presidencies">Presidencies</h2>
+<p>Charts can be colored and summarized by presidential term. A term's first period is the first full month (or quarter) after the inauguration; the month of a handover belongs to the outgoing president, since the incoming one has had no time to change anything. Milei, inaugurated on 10 December 2023, starts in January 2024 (index base December 2023 = 100), and December 2023 counts for Alberto Fernández. Between Fernando de la Rúa's resignation on 20 December 2001 and Eduardo Duhalde's inauguration on 2 January 2002, three interim presidents served for a few days each; December 2001 stays with De la Rúa and Duhalde's term starts in January 2002.</p>
+<p>Term statistics use each full term, whatever time range a chart shows:</p>
+<ul>
+  <li><b>Average of m/m or q/q changes:</b> geometric, (∏(1 + <i>r<sub>t</sub></i>))<sup>1/<i>n</i></sup> − 1. This is the constant rate that compounds to the term's cumulative change; an arithmetic mean of compounding rates overstates it.</li>
+  <li><b>y/y views:</b> inflation or growth <i>annualized over the term</i>, (<i>X</i><sub>end</sub> / <i>X</i><sub>base</sub>)<sup>12/<i>m</i></sup> − 1, where <i>m</i> is the number of months from the base month to the latest month. An average of overlapping y/y rates is not the term's inflation.</li>
+  <li><b>Levels:</b> start (base month), latest or final value, change, average, minimum and maximum.</li>
+</ul>
+<p>Party colors: Peronism (PJ, Frente para la Victoria, Frente de Todos) light blue; UCR and the Alianza red; PRO and Cambiemos gold; La Libertad Avanza purple.</p>
+
+<h2 id="episodes">Episodes</h2>
+<p>Some charts can mark dated shocks ("Episodes"), with a short neutral description of each. With episodes switched on, the presidency table also shows the average monthly rate without the marked months, so readers can see how much a few months drive a term's average. Episodes are off by default; which months to exclude is a judgment the reader can inspect and switch off. The current list:</p>
+<ol>
+  <li><b>Post-primary devaluation</b> (Aug–Sep 2023): the official exchange rate was raised about 22% the day after the August 2023 primaries.</li>
+  <li><b>Plan Platita and the December devaluation</b> (Nov–Dec 2023): pre-election fiscal and monetary expansion; the official exchange rate then more than doubled on 13 December 2023.</li>
+  <li><b>Correction of relative prices</b> (Jan–Apr 2024): pass-through of the December devaluation and the adjustment of regulated prices.</li>
+</ol>
+
+<h2 id="weights">Weights and incidence</h2>
+<p><b>EMAE sector weights</b> are each sector's share of 2004 GDP at constant prices, the base year of the index, from INDEC's quarterly value added by industry. Net taxes on products are the remainder. With these weights the sector changes add up to the change in total EMAE.</p>
+<p><b>CPI weights</b> are recovered from the published indices. A fixed-base (Laspeyres-type) index with every component on the same base satisfies <i>I</i><sub>t</sub> = Σ<sub>i</sub> <i>w<sub>i</sub></i> <i>I<sub>i,t</sub></i> in every month, so regressing the headline index on its components without a constant returns the weights. The recovered weights reproduce the published headline index within 0.05% (categories) and 0.22% (divisions) since December 2016. They are the weights at December 2016 prices.</p>
+<p><b>Incidence</b> is a component's contribution to the change in the total, in percentage points:</p>
+<p class="formula">incidence<sub>k</sub> = <i>w<sub>k</sub></i> (<i>X<sub>k,t</sub></i> − <i>X<sub>k,b</sub></i>) / Σ<sub>j</sub> <i>w<sub>j</sub></i> <i>X<sub>j,b</sub></i> × 100</p>
+<p>where <i>b</i> is the comparison period: the previous month (m/m), the same month a year earlier (y/y) or the previous December (YTD). For the accumulated change the same formula is applied to year-to-date sums. Incidences add up to the total's change.</p>
+
+<h2 id="gdp">GDP</h2>
+<p><b>Contributions to growth</b> use the original (not seasonally adjusted) series at constant 2004 prices, which are additive. The contribution of a component <i>C</i> to y/y GDP growth is (<i>C<sub>t</sub></i> − <i>C<sub>t−4</sub></i>) / GDP<sub><i>t</i>−4</sub> × 100. A residual group (inventories and statistical discrepancy on the demand side; other services and net taxes on the supply side; other assets in investment) closes the gap to total growth exactly.</p>
+<p><b>Real GDP since 1993</b> chain-links INDEC's accounts at 1993 prices (quarterly growth through the first quarter of 2004) with the accounts at 2004 prices (from the second quarter of 2004). Growth rates are kept from each base; the level is that of the 2004 base. INDEC's 2004 rebasing raised the measured level of GDP and changed growth in the overlapping years; the splice does not revise the 1993–2003 figures.</p>
+<p><b>Investment rate</b>: gross fixed capital formation over GDP, both at current prices, summed over the last four quarters to remove seasonality.</p>
+
+<h2 id="cpi-long">CPI since 1943</h2>
+<p>From January 2007, INDEC was intervened by the national government, under Secretary of Domestic Trade Guillermo Moreno, and its CPI understated inflation. In February 2013 the IMF issued a declaration of censure against Argentina over the quality of its CPI and GDP data (<a href="https://www.imf.org/en/news/articles/2015/09/14/01/49/pr1333">IMF Press Release 13/33</a>). After the change of government, Decree 55/2016 declared an administrative emergency of the national statistical system in January 2016 (<a href="https://servicios.infoleg.gob.ar/infolegInternet/anexos/310000-314999/311627/norma.htm">InfoLEG</a>), and INDEC suspended the CPI while it was rebuilt. A new CPI for Greater Buenos Aires started with May 2016 and the national CPI with December 2016; the IMF removed the censure in November 2016 (<a href="https://www.imf.org/en/news/articles/2016/11/09/pr16497-argentina-imf-executive-board-removes-declaration-of-censure">IMF Press Release 16/497</a>).</p>
+<p>The chart shows two series, chain-linked by monthly changes:</p>
+<ul>
+  <li><b>Official (as published):</b> INDEC's historical CPI to December 2006; CPI-GBA (2007–2013); the national urban IPC-NU (January 2014 – October 2015, the last figure published before the change of government); CPI-GBA base April 2016 (May–December 2016); and the national CPI from January 2017. There is no official CPI for November 2015 – April 2016.</li>
+  <li><b>Corrected:</b> the same, with the <b>IPC Congreso</b>, a composite of private inflation estimates, for January 2007 – April 2016, including the November 2015 – April 2016 gap. While INDEC was intervened, members of Congress published the average of private estimates and kept the private sources confidential, to shield them from the fines and lawsuits the Secretariat of Domestic Trade brought against private estimators.</li>
+</ul>
+<p>Both series are equal through December 2006, so in levels the distance between them is the inflation the official figures left out: from January 2007 to October 2015, official CPI inflation was 159.6% and corrected inflation 631.8%, so the corrected price level ends 2.8 times the official one. Across the November 2015 – April 2016 gap, the official level carries on with the corrected series' changes so that later levels stay comparable, but the gap months are left blank and no change spanning them is shown.</p>
+
+<h2 id="cpi-basket">CPI with the 2017/18 basket</h2>
+<p>The national CPI weights each of its twelve divisions by spending shares from the 2004/05 household expenditure survey (<a href="https://www.indec.gob.ar/ftp/cuadros/economia/metodologia_ipc_nacional_2019.pdf">INDEC, CPI methodology</a>). INDEC prepared a new index with weights from the 2017/18 survey, due to start with January 2026 data; its introduction was postponed. The estimate applies the new division weights to the published division indices from December 2025:</p>
+<p class="formula">CF<sub>t</sub> = <i>H<sub>t</sub></i> × Σ<sub>i</sub> <i>w</i><sup>new</sup><sub>i</sub> <i>r<sub>i,t</sub></i> / Σ<sub>i</sub> <i>w</i><sup>old</sup><sub>i</sub> <i>r<sub>i,t</sub></i>, &nbsp; <i>r<sub>i,t</sub></i> = <i>I<sub>i,t</sub></i> / <i>I<sub>i</sub></i><sub>,Dec 2025</sub></p>
+<p><i>H</i> is the official headline index; <i>w</i><sup>old</sup> are the current basket's weights (recovered as above) at December 2025 prices; <i>w</i><sup>new</sup> are the 2017/18 division weights, taken as applying in December 2025. The denominator rebuilds the official index from the same division data, so the gap between the two series is the effect of reweighting alone (the rebuilt index matches the official one within 0.02%). The estimate captures only the shift in weights across divisions; the new index would also change the items and weights within divisions and by region, which cannot be reproduced from published data.</p>
+
+<h2 id="references">References</h2>
+<ul class="refs">
+  <li>INDEC. <i>Índice de precios al consumidor. Cobertura nacional. Metodología</i> (2019). <a href="https://www.indec.gob.ar/ftp/cuadros/economia/metodologia_ipc_nacional_2019.pdf">PDF</a>; English version (2017): <a href="https://www.indec.gob.ar/ftp/cuadros/economia/metodologia_ingles_ipc_nacional_05_17.pdf">PDF</a>.</li>
+  <li>INDEC. <i>Metodología del estimador mensual de actividad económica</i> (2016). <a href="https://www.indec.gob.ar/ftp/cuadros/economia/metodologia_emae_ago_16.pdf">PDF</a>.</li>
+  <li>INDEC. <i>Cuentas nacionales. Metodología de estimación. Base 2004</i> (Metodología INDEC N° 21). <a href="https://www.indec.gob.ar/ftp/cuadros/economia/metodologia_21_cuentas_nacionales.pdf">PDF</a>.</li>
+  <li>INDEC. <i>¿Cómo usar un índice de precios? Preguntas frecuentes</i> (2022). <a href="https://www.indec.gob.ar/ftp/cuadros/economia/como_usar_indice_precios_2022.pdf">PDF</a>.</li>
+  <li>Decree 55/2016, administrative emergency of the national statistical system and INDEC. <a href="https://servicios.infoleg.gob.ar/infolegInternet/anexos/310000-314999/311627/norma.htm">InfoLEG</a>.</li>
+  <li>IMF. Press Release 13/33, declaration of censure (February 2013). <a href="https://www.imf.org/en/news/articles/2015/09/14/01/49/pr1333">imf.org</a>.</li>
+  <li>IMF. Press Release 16/497, removal of the declaration of censure (November 2016). <a href="https://www.imf.org/en/news/articles/2016/11/09/pr16497-argentina-imf-executive-board-removes-declaration-of-censure">imf.org</a>.</li>
+  <li>Datos Argentina. Time-series API. <a href="https://datos.gob.ar/">datos.gob.ar</a>.</li>
+</ul>
+<p class="chips-note">Corrections and questions are welcome on <a href="https://github.com/ncachanosky/argentina-economic-monitor/issues">GitHub</a>.</p>
+</article>

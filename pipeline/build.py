@@ -22,11 +22,15 @@ HOME_LEDE = ("Official statistics, checked every morning against the source and 
              "as a new release lands. Every chart is interactive and exportable as an image or data file.")
 
 
-def render(template: str, *, page: str, root: str, title: str, desc: str, h1: str, lede: str, tag: str) -> str:
+LOADING = '<div class="loading">Loading data…</div>'
+
+
+def render(template: str, *, page: str, root: str, title: str, desc: str, h1: str, lede: str, tag: str,
+           content: str = LOADING) -> str:
     esc = lambda s: html.escape(" ".join(str(s).split()), quote=True)
     out = template
     for key, val in {"__TITLE__": esc(title), "__DESC__": esc(desc), "__H1__": esc(h1), "__LEDE__": esc(lede),
-                     "__PAGE__": page, "__ROOT__": root, "__BUILD__": tag}.items():
+                     "__PAGE__": page, "__ROOT__": root, "__BUILD__": tag, "__CONTENT__": content}.items():
         out = out.replace(key, val)
     return out
 
@@ -48,9 +52,18 @@ def build(out: Path, tag: str, with_data: bool = True) -> None:
         (d / "index.html").write_text(render(
             template, page=t["id"], root="../", title=f"{t['title']} · {site_name}", h1=t["title"],
             lede=t.get("description", ""), desc=f"{t['title']}: {t.get('description', '')}", tag=tag), encoding="utf-8")
+    # Methodology: a static page from the same template.
+    d = out / "methodology"
+    d.mkdir(parents=True, exist_ok=True)
+    (d / "index.html").write_text(render(
+        template, page="methodology", root="../", title=f"Methodology · {site_name}", h1="Methodology",
+        lede="Sources, checks and every calculation behind the charts.",
+        desc="How the Argentina Economic Monitor gets, checks and transforms its data.", tag=tag,
+        content=(SITE / "methodology.html").read_text(encoding="utf-8")), encoding="utf-8")
+    (out / "methodology.html").unlink(missing_ok=True)
     if with_data:
         export.export(out / "data")
-    print(f"built {1 + len(reg.topics)} pages in {out}")
+    print(f"built {2 + len(reg.topics)} pages in {out}")
 
 
 def main(argv: list[str] | None = None) -> int:

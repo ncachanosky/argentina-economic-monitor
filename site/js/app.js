@@ -1227,6 +1227,7 @@
       if (!manifest.indicators.some((m) => m.topic === t.id)) continue;
       nav.append(h("a", { href: pageHref(t.id), "aria-current": t.id === PAGE ? "true" : null }, t.title));
     }
+    nav.append(h("a", { href: `${ROOT}methodology/`, "aria-current": PAGE === "methodology" ? "true" : null }, "Methodology"));
 
     // Charts are redrawn on a theme change (set once the page has charts).
     let redraw = () => {};
@@ -1239,6 +1240,7 @@
     window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => { if (!document.documentElement.dataset.theme) redraw(); });
 
     const topicsEl2 = $("#topics");
+    if (PAGE === "methodology") return;   // static page: nothing to load
     if (PAGE === "home") {
       // Home: latest headline readings and one card per topic; no charts to draw.
       const heads = await Promise.all(manifest.indicators.filter((m) => m.headline)
