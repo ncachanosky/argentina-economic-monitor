@@ -38,11 +38,15 @@ class Indicator:
     headline: dict | None = None
 
 
+PERIOD_COLORS = {"copper", "sky", "sage", "lavender"}
+
+
 @dataclass
 class Registry:
     site: dict
     topics: list[dict]
     indicators: list[Indicator] = field(default_factory=list)
+    presidencies: list[dict] = field(default_factory=list)
 
     def series_by_source(self) -> dict[str, set[str]]:
         """Unique source series ids, grouped by source adapter."""
@@ -114,4 +118,22 @@ def load(path: Path = REGISTRY_PATH) -> Registry:
             )
         )
 
-    return Registry(site=raw.get("site", {}), topics=topics, indicators=indicators)
+    presidencies = []
+    prev_end = None
+    for p in raw.get("presidencies", []) or []:
+        where = f"presidency '{p.get('id')}'"
+        for k in ("id", "name", "start", "color"):
+            if not p.get(k):
+                raise RegistryError(f"{where}: missing {k}")
+        if p["color"] not in PERIOD_COLORS:
+            raise RegistryError(f"{where}: color must be one of {sorted(PERIOD_COLORS)}")
+        start, end = str(p["start"]), (str(p["end"]) if p.get("end") else None)
+        if end and end <= start:
+            raise RegistryError(f"{where}: end before start")
+        if prev_end and start < prev_end:
+            raise RegistryError(f"{where}: overlaps the previous term")
+        prev_end = end or "9999"
+        presidencies.append({**p, "start": start, "end": end, "short": p.get("short", p["name"])})
+
+    return Registry(site=raw.get("site", {}), topics=topics, indicators=indicators,
+                    presidencies=presidencies)

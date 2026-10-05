@@ -144,3 +144,11 @@ def test_datos_gob_parses_paginates_and_isolates_bad_ids(monkeypatch):
     assert a.tolist() == [1.0, 2.0, 3.0]
     assert b.tolist() == [10.0, 30.0]  # nulls dropped
     assert res.meta["A"]["units"] == "idx"
+
+
+def test_registry_presidencies_ordered_and_non_overlapping():
+    reg = registry.load()
+    ids = [p["id"] for p in reg.presidencies]
+    assert ids[-1] == "milei" and reg.presidencies[-1]["end"] is None
+    for a, b in zip(reg.presidencies, reg.presidencies[1:]):
+        assert a["end"] == b["start"]

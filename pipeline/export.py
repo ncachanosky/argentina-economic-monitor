@@ -102,6 +102,7 @@ def export(out: Path) -> None:
     manifest = {
         "site": reg.site,
         "topics": reg.topics,
+        "presidencies": reg.presidencies,
         "indicators": manifest_inds,
         "built_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
     }

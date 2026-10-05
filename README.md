@@ -27,6 +27,15 @@ registry/series.yaml  ──►  pipeline.update  ──►  data/vintages/*.csv
 - **`.github/workflows/update.yml`** runs twice a day (07:30 and 17:30
   Buenos Aires), commits any new data, and redeploys.
 
+## Presidential terms
+
+`registry/series.yaml` lists presidential terms (`presidencies`). Series
+cards can color the line by term, show per-term statistics (start, end,
+change, average, min, max), and rebase the index to the start of any term or
+to a custom month. Convention: the handover month belongs to the outgoing
+president, so for Milei (inaugurated 10 Dec 2023) Dec 2023 = 100 and his
+first month is Jan 2024.
+
 ## Revision history (real-time data)
 
 Because the store only records changes, the value of any observation *as it
