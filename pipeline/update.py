@@ -118,6 +118,11 @@ def run(dry_run: bool = False, strict: bool = False) -> int:
             lines.append(f"- ⚠️ `{ind.id}`: {msg}")
             print(f"::warning title={ind.id}::{msg}")
 
+    # Forget series that are no longer in the registry.
+    registered = {sid for ids in reg.series_by_source().values() for sid in ids}
+    for sid in [k for k in status if k not in registered]:
+        del status[sid]
+
     header = (
         f"## Data update {vintage}\n\n"
         f"{len(status)} series checked · {n_changed} changed · {n_err} with errors\n\n"
