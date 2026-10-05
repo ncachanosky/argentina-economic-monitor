@@ -61,6 +61,26 @@ def test_store_same_day_rerun_replaces(tmp_path):
     assert store.as_of(sid, base=tmp_path).iloc[-1] == 104
 
 
+def test_store_full_reconciliation_every_run(tmp_path):
+    """Each run must leave the latest vintage identical to what the source sent:
+    every NSA value revised, a new month added, a dropped month removed."""
+    sid = "TEST_3"
+    first = monthly([100, 101, 102, 103, 104])
+    store.append(sid, first, "2026-01-10", base=tmp_path)
+
+    # Next release: all history revised (as with NSA and SA re-estimation),
+    # one new month, and the first month no longer published.
+    second = monthly([101.2, 102.3, 103.1, 104.4, 105.0], start="2020-02-01")
+    r = store.append(sid, second, "2026-02-10", base=tmp_path)
+    assert (r.new_obs, r.revised_obs, r.deleted_obs) == (1, 4, 1)
+
+    latest = store.as_of(sid, base=tmp_path)
+    pd.testing.assert_series_equal(latest, second, check_names=False, check_freq=False)
+    # ...and the earlier vintage is still recoverable exactly.
+    pd.testing.assert_series_equal(store.as_of(sid, "2026-01-31", base=tmp_path), first,
+                                   check_names=False, check_freq=False)
+
+
 # --- validation -----------------------------------------------------------
 
 def test_validate_rejects_gaps_shrinks_and_empty():

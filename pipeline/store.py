@@ -1,8 +1,11 @@
 """Append-only vintage store.
 
 Each source series lives in data/vintages/<series_id>.csv with columns
-`vintage, date, value`. A row is written only when an observation is new
-or its value changed, so the file is a compact revision history:
+`vintage, date, value`. Every run passes the source's FULL history; each date
+is compared with the stored value and a row is written only when an
+observation is new, revised, or removed (empty value). So the file is a
+compact revision history, and the latest vintage always equals the full
+series exactly as the source last published it:
 
     the value of `date` as known on day V
         = the value in the last row for `date` with vintage <= V
@@ -46,12 +49,10 @@ def as_of(series_id: str, vintage: str | None = None, base: Path | None = None) 
         df = df[df["vintage"] <= vintage]
     if df.empty:
         return pd.Series(dtype="float64", name=series_id)
-    s = (
-        df.sort_values(["date", "vintage"], kind="stable")
-        .groupby("date")["value"]
-        .last()
-        .sort_index()
-    )
+    # Latest row per date wins. An empty value is a deletion marker: the
+    # source stopped publishing that date, so it drops out of the series.
+    last = df.sort_values(["date", "vintage"], kind="stable").drop_duplicates("date", keep="last")
+    s = last.set_index("date")["value"].dropna().sort_index()
     s.name = series_id
     return s
 
@@ -64,10 +65,11 @@ def vintages(series_id: str, base: Path | None = None) -> list[str]:
 class AppendResult:
     new_obs: int
     revised_obs: int
+    deleted_obs: int = 0
 
     @property
     def changed(self) -> bool:
-        return bool(self.new_obs or self.revised_obs)
+        return bool(self.new_obs or self.revised_obs or self.deleted_obs)
 
 
 def append(series_id: str, values: pd.Series, vintage: str, base: Path | None = None) -> AppendResult:
@@ -80,9 +82,12 @@ def append(series_id: str, values: pd.Series, vintage: str, base: Path | None = 
     both = joined["old"].notna() & joined["new"].notna()
     rel = (joined["new"] - joined["old"]).abs() / joined["old"].abs().clip(lower=1e-12)
     is_rev = both & (rel > REL_TOL)
-    delta = joined.loc[is_new | is_rev, "new"]
+    is_del = joined["old"].notna() & joined["new"].isna()
+    # Deleted dates are written with an empty value (NaN) as a marker.
+    delta = joined.loc[is_new | is_rev | is_del, "new"]
 
-    result = AppendResult(new_obs=int(is_new.sum()), revised_obs=int(is_rev.sum()))
+    result = AppendResult(new_obs=int(is_new.sum()), revised_obs=int(is_rev.sum()),
+                          deleted_obs=int(is_del.sum()))
     if delta.empty:
         return result
 

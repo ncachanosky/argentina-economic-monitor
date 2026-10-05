@@ -78,7 +78,7 @@ def run(dry_run: bool = False, strict: bool = False) -> int:
                             n_changed += 1
                             entry["last_changed"] = vintage
                         lines.append(
-                            f"- `{sid}`: OK, {ar.new_obs} new / {ar.revised_obs} revised obs"
+                            f"- `{sid}`: OK, {ar.new_obs} new / {ar.revised_obs} revised / {ar.deleted_obs} removed obs"
                         )
                     entry["warnings"] = chk.warnings
                     for w in chk.warnings:
