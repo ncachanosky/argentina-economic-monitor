@@ -13,7 +13,7 @@ RELEASES_PATH = ROOT / "registry" / "releases.yaml"
 KINDS = {"variants", "panel", "contributions"}
 DERIVE_METHODS = {"splice", "reweight", "ratio", "tracker", "monthly", "flows", "expectations", "formula"}
 RANGE_KEYS = {"2Y", "5Y", "10Y", "25Y", "50Y", "Max"}
-TRANSFORMS = {"level", "yoy", "mom", "ytd", "acc"}
+TRANSFORMS = {"level", "yoy", "mom", "ytd", "acc", "share"}
 FREQUENCIES = {"M", "Q", "D"}
 
 
@@ -60,6 +60,9 @@ class Indicator:
     bar_transforms: list | None = None # panels: bar metrics to choose from (first is the default)
     view_start: str | None = None      # charts never start before this month (fixed window, no range buttons)
     static: bool = False               # discontinued source: never flagged stale
+    hidden: bool = False               # defined and fetched, but not shown on the site yet
+    emphasis: str | None = None        # overlay cards: variant drawn as a thick dark line (e.g. a total)
+    composition: list | None = None    # variants whose shares of their sum form the "share" view
     validate_as: str | None = None     # measure used to check source data, if not `measure` (e.g. rates above 100%)
     deflate_with: dict | None = None   # {indicator, variant}: offer a real-terms view deflated by this price index
 
@@ -280,6 +283,9 @@ def load(path: Path = REGISTRY_PATH, releases_path: Path = RELEASES_PATH) -> Reg
                 annual_table=item.get("annual_table"),
                 bar_transforms=item.get("bar_transforms"),
                 static=bool(item.get("static", False)),
+                hidden=bool(item.get("hidden", False)),
+                emphasis=item.get("emphasis"),
+                composition=item.get("composition"),
                 validate_as=item.get("validate_as"),
                 deflate_with=item.get("deflate_with"),
                 view_start=str(item["view_start"]) + ("-01" if len(str(item["view_start"])) == 7 else "") if item.get("view_start") else None,

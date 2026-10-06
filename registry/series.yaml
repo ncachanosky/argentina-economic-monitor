@@ -720,7 +720,7 @@ indicators:
     component_noun: categories
     bar_transform: mom
     bar_transforms: [mom, yoy, ytd]
-    transforms: [mom, yoy, ytd, level]
+    transforms: [mom, yoy, level]
     title: CPI by Category
     short_title: CPI categories
     description: >-
@@ -746,7 +746,7 @@ indicators:
     component_noun: divisions
     bar_transform: mom
     bar_transforms: [mom, yoy, ytd]
-    transforms: [mom, yoy, ytd, level]
+    transforms: [mom, yoy, level]
     title: CPI by Division
     short_title: CPI divisions
     description: >-
@@ -851,7 +851,7 @@ indicators:
     component_noun: regions
     bar_transform: mom
     bar_transforms: [mom, yoy, ytd]
-    transforms: [mom, yoy, ytd, level]
+    transforms: [mom, yoy, level]
     title: CPI by Region
     short_title: CPI regions
     description: >-
@@ -905,7 +905,7 @@ indicators:
     frequency: M
     units: Millions of pesos
     log_level: true
-    transforms: [yoy, mom, ytd, level]
+    transforms: [yoy, mom, level]
     deflate_with: {indicator: cpi_long, variant: corrected, label: CPI}
     note: >-
       Real terms: deflated by the CPI (corrected for 2007-2016, see the long-run
@@ -973,7 +973,7 @@ indicators:
     units: Millions of pesos
     bar_transform: yoy
     bar_transforms: [yoy, mom, ytd]
-    transforms: [yoy, mom, ytd, level]
+    transforms: [yoy, mom, level]
     deflate_with: {indicator: cpi_long, variant: corrected, label: CPI}
     note: >-
       M1 = currency held by the public + current accounts; M2 = M1 + savings
@@ -1005,7 +1005,7 @@ indicators:
     units: Millions of pesos
     bar_transform: yoy
     bar_transforms: [yoy, mom, ytd]
-    transforms: [yoy, mom, ytd, level]
+    transforms: [yoy, mom, level]
     deflate_with: {indicator: cpi_long, variant: corrected, label: CPI}
     default: {variant: [current, savings, time], transform: yoy, start: "2016-01"}
     derive:
@@ -1031,7 +1031,7 @@ indicators:
     units: Millions of pesos
     bar_transform: yoy
     bar_transforms: [yoy, mom, ytd]
-    transforms: [yoy, mom, ytd, level]
+    transforms: [yoy, mom, level]
     deflate_with: {indicator: cpi_long, variant: corrected, label: CPI}
     default: {variant: [personal, cards, mortgages], transform: yoy, start: "2016-01"}
     derive:
@@ -1127,7 +1127,7 @@ indicators:
     source_label: BCRA
     frequency: D
     units: Pesos per US dollar
-    transforms: [level, yoy, mom, ytd]
+    transforms: [level, yoy, mom]
     ranges: [2Y, 5Y, 10Y, Max]
     variants:
       wholesale: {label: Wholesale (A 3500), id: "bcra:5"}
@@ -1149,7 +1149,7 @@ indicators:
     source_label: BCRA
     frequency: D
     units: Millions of US dollars
-    transforms: [level, yoy, mom, ytd]
+    transforms: [level, yoy, mom]
     ranges: [2Y, 5Y, 10Y, Max]
     variants:
       gross: {label: Gross reserves, id: "bcra:1"}
@@ -1180,6 +1180,7 @@ indicators:
     contributions:
       precomputed: true
       hide_total: true
+      style: area
       units: "%"
       groups:
         - {key: gold,  label: Gold and foreign currency,  add: [gold],  color: copper}
@@ -1226,6 +1227,7 @@ indicators:
     contributions:
       precomputed: true
       hide_total: true
+      style: area
       units: "%"
       groups:
         - {key: base,     label: Base money,                 add: [base],     color: copper}
@@ -1247,6 +1249,7 @@ indicators:
 
   - id: bcra_backing
     topic: money
+    hidden: true        # waits for net reserves
     wide: true
     kind: variants
     overlay: true
@@ -1281,6 +1284,7 @@ indicators:
 
   - id: bcra_implied_fx
     topic: money
+    hidden: true        # waits for net reserves
     wide: true
     kind: variants
     overlay: true
@@ -1314,11 +1318,14 @@ indicators:
 
   - id: bcra_government
     topic: money
+    wide: true
     kind: variants
     overlay: true
     measure: rate
     title: Central Bank Financing of the Government
     short_title: Government financing
+    emphasis: total                       # drawn as a thick dark line
+    composition: [advances, other]        # "Composition" view: shares of the total
     description: >-
       Credit to the government as a share of the BCRA's total assets: temporary
       advances and the rest (Treasury securities, including the
@@ -1327,12 +1334,15 @@ indicators:
     source_label: BCRA (Balance del Banco Central, series since 1940)
     frequency: M
     units: "% of total assets"
-    transforms: [level, yoy]
+    transforms: [level, share, yoy]
     ranges: [10Y, 25Y, 50Y, Max]
     note: >-
       The December 2019 revaluation of the non-transferable letters (Law
       27,541) and the May 2024 change to amortized-cost valuation create
-      breaks in these series.
+      breaks in these series. Total assets are the BCRA's analytical total, which nets
+      external liabilities (SDR allocations, loans from international
+      agencies), so the share can exceed 100%. Composition: advances and
+      the rest as shares of total credit to the government.
     default: {variant: total, transform: level, range: 50Y}
     derive:
       method: formula

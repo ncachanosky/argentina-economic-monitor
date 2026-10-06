@@ -24,12 +24,14 @@
     yoy:   { label: "y/y %", short: "Year-over-year change, %", suffix: "%", signed: true, change: true },
     mom:   { label: "m/m %", short: "Month-over-month change, %", suffix: "%", signed: true, change: true },
     ytd:   { label: "YTD %", short: "Year to date: change since December of the previous year, %", suffix: "%", signed: true, change: true },
+    share: { label: "Composition", short: "Share of each component in the total, %", suffix: "%", signed: false, change: false },
     acc:   { label: "Accum. y/y %", short: "Accumulated: year to date vs. the same months a year earlier, %", suffix: "%", signed: true, change: true },
   };
   const RATE_TRANSFORMS = {
     level: { label: "Level", short: null, suffix: "%", signed: false, change: false },
     yoy:   { label: "y/y (pp)", short: "Year-over-year change, percentage points", suffix: " pp", signed: true, change: true },
     mom:   { label: "m/m (pp)", short: "Month-over-month change, percentage points", suffix: " pp", signed: true, change: true },
+    share: { label: "Composition", short: "Share of each component in the total, %", suffix: "%", signed: false, change: false },
   };
   const TRANSFORMS = INDEX_TRANSFORMS;
   function tfs(ind) {
@@ -144,7 +146,7 @@
     });
   }
   function transform(dates, values, kind, measure, freq) {
-    if (kind === "level") return values.slice();
+    if (kind === "level" || kind === "share") return values.slice();
     if (freq === "D") return transformDaily(dates, values, kind, measure);
     if (kind === "acc") return transform(dates, yearToDateSum(dates, values), "yoy", measure, freq);
     const diff = measure === "rate";
@@ -695,6 +697,21 @@
       const sfx = t.suffix;
       const traces = [], shapes = [], annotations = [];
 
+      if (state.transform === "share" && ind.composition) {
+        // Composition: each component's share of their sum, stacked to 100.
+        const parts = ind.composition;
+        const start = viewStart(ind, state.range);
+        const ii = ind.dates.map((d, i) => i).filter((i) => (!start || ind.dates[i] >= start) && parts.every((k) => ind.variants[k].values[i] !== null));
+        const xs = ii.map((i) => ind.dates[i]);
+        const tot = ii.map((i) => parts.reduce((a, k) => a + ind.variants[k].values[i], 0));
+        parts.forEach((k, n) => {
+          const slot = Math.min(n + 1, SERIES_VARS.length - 1);
+          traces.push({ type: "bar", x: xs, y: ii.map((i, j) => (tot[j] ? (ind.variants[k].values[i] / tot[j]) * 100 : null)),
+            name: ind.variants[k].label, marker: { color: cssVar(SERIES_VARS[slot]) }, _slot: slot,
+            hovertemplate: `%{x|${DF}}: <b>%{y:,.1f}%</b><extra>${ind.variants[k].label}</extra>` });
+        });
+        return { traces, shapes: [], annotations: [], main, t, x: xs, y: traces.length ? traces[0].y : [] };
+      }
       if (!state.byPres) {
         const keys = ind.overlay ? [state.variant, ...variantKeys.filter((k) => k !== state.variant)] : [state.variant];
         const start = viewStart(ind, state.range);
@@ -705,10 +722,12 @@
           const xx = ii.map((i) => ind.dates[i]), yy = ii.map((i) => s.y[i]);
           const color = cssVar(SERIES_VARS[slot]);
           const hover = `%{x|${DF}}: <b>%{y:${yFmt()}}${sfx}</b><extra>${s.v.label}</extra>`;
+          const emph = ind.emphasis === k;   // e.g. a total: thick and dark
           traces.push(state.transform === "mom"
             ? { type: "bar", x: xx, y: yy, name: s.v.label, marker: { color }, hovertemplate: hover, _slot: slot }
             : { type: "scatter", mode: "lines", x: xx, y: yy, name: s.v.label, connectgaps: false,
-                line: slot ? { color, width: 1.8, dash: "dash" } : { color, width: 2 }, hovertemplate: hover, _slot: slot });
+                line: emph ? { color: cssVar("--ink"), width: 3.2 } : slot && !ind.emphasis ? { color, width: 1.8, dash: "dash" } : { color, width: 2 },
+                ...(emph ? { _light: "#36454F" } : {}), hovertemplate: hover, _slot: slot });
         });
       } else if (state.transform === "mom") {
         const terms = x.map((d) => termOf(d, ind.frequency));
@@ -835,7 +854,7 @@
 
       const { traces, shapes, annotations, main, t, x, y } = build();
       const msgs = [];
-      if (isRate && state.transform !== "level") msgs.push("Changes in a rate are shown in percentage points.");
+      if (isRate && T[state.transform] && T[state.transform].change) msgs.push("Changes in a rate are shown in percentage points.");
       if (state.variant === "original" && T.mom) msgs.push(`${T.mom.label.split(" ")[0]} changes are only meaningful on seasonally adjusted data.`);
       const defaultBase = ind.default.base && state.base === "custom" && state.customBase === ind.default.base;
       if (state.transform !== "level" && state.base !== "published" && !defaultBase) msgs.push("Rebasing applies to levels only; percent changes are unaffected.");
@@ -851,7 +870,7 @@
         // Plain numbers on log axes unless the values are tiny (long-run price indices).
         yaxis: isLog() ? { type: "log", ticksuffix: "", exponentformat: Math.min(...y.filter((q) => q > 0)) < 0.01 ? "power" : "none", tickformat: Math.min(...y.filter((q) => q > 0)) < 0.01 ? undefined : ",~r" } : { type: "linear" },
         extra: {
-          bargap: 0.2, shapes, annotations, barmode: "group",
+          bargap: 0.2, shapes, annotations, barmode: state.transform === "share" ? "stack" : "group",
           showlegend: (state.byPres && state.transform !== "mom") || (ind.overlay && !state.byPres),
           legend: { orientation: "h", x: 0, y: 1.02, yanchor: "bottom", font: { color: cssVar("--ink") } },
           margin: { l: 52, r: 16, t: state.byPres ? 30 : 10, b: 36 },
@@ -871,7 +890,7 @@
     const fileTag = () => `${ind.id}_${state.variant}_${state.transform}${baseMonth() ? "_base" + baseMonth().slice(0, 7) : ""}${state.byPres ? "_presidencies" : ""}`;
     const onPNG = () => {
       const { traces, shapes, annotations, main, t } = build();
-      exportPNG(ind, traces, subtitle(main, t), t, `${fileTag()}.png`, { shapes, annotations, ylog: isLog(), barmode: "group" });
+      exportPNG(ind, traces, subtitle(main, t), t, `${fileTag()}.png`, { shapes, annotations, ylog: isLog(), barmode: state.transform === "share" ? "stack" : "group" });
     };
     const onCSV = () => {
       const { main, t, x, y } = build();
@@ -1181,6 +1200,16 @@
 
     function barTraces() {
       const idx = visible(), x = idx.map((i) => C.dates[i]);
+      if (C.style === "area") {
+        // Filled areas: components that are mostly negative stack downward from zero.
+        const median = (a) => { const v = a.filter((q) => q !== null).sort((p, q) => p - q); return v.length ? v[v.length >> 1] : 0; };
+        return C.groups.map((g) => ({
+          type: "scatter", mode: "lines", name: g.label, x, y: idx.map((i) => g.values[i]),
+          stackgroup: median(g.values) < 0 ? "neg" : "pos", line: { width: 0.6, color: groupColor(g.color) },
+          fillcolor: groupColor(g.color), _light: GROUP_LIGHT[g.color] || "#B0B7BD",
+          hovertemplate: `${g.label}: <b>%{y:,.1f}${C.units === "%" ? "%" : " pp"}</b><extra></extra>`,
+        }));
+      }
       const tr = C.groups.map((g) => ({
         type: "bar", name: g.label, x, y: idx.map((i) => g.values[i]),
         marker: { color: groupColor(g.color), line: { width: 0 } }, _lightColors: idx.map(() => GROUP_LIGHT[g.color] || "#B0B7BD"),

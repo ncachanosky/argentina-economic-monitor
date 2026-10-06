@@ -26,10 +26,22 @@ USER_AGENT = "argentina-economic-monitor (+https://github.com/ncachanosky/argent
 FX_COL = 42
 
 
-def download() -> bytes:
-    r = requests.get(URL, timeout=TIMEOUT, headers={"User-Agent": USER_AGENT})
-    r.raise_for_status()
-    return r.content
+def download(retries: int = 4) -> bytes:
+    """The BCRA server sometimes drops the connection mid-file: retry."""
+    import time
+    last = None
+    for attempt in range(retries):
+        try:
+            r = requests.get(URL, timeout=TIMEOUT, headers={"User-Agent": USER_AGENT})
+            r.raise_for_status()
+            expected = r.headers.get("Content-Length")
+            if expected and int(expected) != len(r.content):
+                raise IOError(f"incomplete download: {len(r.content)} of {expected} bytes")
+            return r.content
+        except Exception as exc:
+            last = exc
+            time.sleep(10 * (attempt + 1))
+    raise RuntimeError(f"could not download the balance sheet file: {last}")
 
 
 def parse(content: bytes) -> pd.DataFrame:

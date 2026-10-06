@@ -51,7 +51,7 @@ def contributions(ind, raw: pd.DataFrame) -> dict:
                 "total": {"label": spec.get("total_label", "Total"), "values": _clean(tot.reindex(valid).tolist())},
                 "groups": groups, "lines": {}, "default_lines": [], "lines_title": spec.get("lines_title"),
                 "units": spec.get("units", "pp"), "precomputed": True,
-                "hide_total": bool(spec.get("hide_total"))}
+                "hide_total": bool(spec.get("hide_total")), "style": spec.get("style", "bars")}
     lag = 4 if ind.frequency == "Q" else 12
     total = raw[sid[spec["total"]]]
     base = total.shift(lag)
@@ -176,6 +176,8 @@ def export(out: Path) -> None:
 
     manifest_inds = []
     for ind in reg.indicators:
+        if ind.hidden:
+            continue
         ids = [v.source_id for v in ind.variants.values()]
         derived_info = None
         if ind.derive:
@@ -232,6 +234,8 @@ def export(out: Path) -> None:
             "annual_table": ind.annual_table,
             "bar_transforms": ind.bar_transforms,
             "view_start": ind.view_start,
+            "emphasis": ind.emphasis,
+            "composition": ind.composition,
             "episodes": reg.episodes_for(ind.id) or None,
             "ranges": ind.ranges,
             "derived": derived_info,
