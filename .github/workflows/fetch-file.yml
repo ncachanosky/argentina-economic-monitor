@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
     inputs:
       url:
-        description: File URL
+        description: File URL(s), space separated; optionally name=URL
         required: true
 permissions:
   contents: write
@@ -19,7 +19,13 @@ jobs:
           git config user.name "aem-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git checkout -q -b inspect
-          curl -sSL --retry 3 -A "argentina-economic-monitor" -o "$(basename "${{ inputs.url }}")" "${{ inputs.url }}"
+          for item in ${{ inputs.url }}; do
+            case "$item" in
+              *=http*) name="${item%%=http*}"; url="http${item#*=http}" ;;
+              *) url="$item"; name="$(basename "${url%%\?*}")" ;;
+            esac
+            curl -sSL --retry 3 -A "argentina-economic-monitor" -o "$name" "$url" || echo "failed: $url"
+          done
           ls -la
-          git add -A && git commit -q -m "inspect: $(basename "${{ inputs.url }}")"
+          git add -A && git commit -q -m "inspect: files"
           git push -f -q "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" inspect
