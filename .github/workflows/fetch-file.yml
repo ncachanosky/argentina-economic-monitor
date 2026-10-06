@@ -14,12 +14,15 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - name: Download and push to the inspect branch
+        env:
+          URLS: ${{ inputs.url }}
         run: |
+          set -f
           git init -q work && cd work
           git config user.name "aem-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git checkout -q -b inspect
-          for item in ${{ inputs.url }}; do
+          for item in $URLS; do
             case "$item" in
               *=http*) name="${item%%=http*}"; url="http${item#*=http}" ;;
               *) url="$item"; name="$(basename "${url%%\?*}")" ;;
