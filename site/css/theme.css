@@ -240,3 +240,12 @@ table.data thead th { position: sticky; top: 0; background: var(--surface-2); co
 details.table-view { display: none; }
   .card { break-inside: avoid; box-shadow: none; }
 }
+
+/* Net reserves: estimate caveat and line-by-line construction table */
+.caveat { font-family: var(--font-ui); font-size: 13px; color: var(--ink-2); background: var(--warn-bg); border-left: 3px solid var(--accent); border-radius: 4px; padding: 8px 12px; margin: 4px 0 10px; }
+.breakdown { margin: 14px 0 6px; }
+.breakdown-title { font-family: var(--font-ui); font-size: 14px; font-weight: 600; margin: 0 0 6px; color: var(--ink); }
+.breakdown table.data td:not(:first-child), .breakdown table.data th:not(:first-child) { text-align: right; font-variant-numeric: tabular-nums; }
+.breakdown tr.total td { border-top: 2px solid var(--ink-3); }
+.breakdown table.data td:first-child { white-space: normal; min-width: 14em; }
+.breakdown .table-scroll { max-height: none; }

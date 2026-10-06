@@ -504,6 +504,28 @@
       h("p", { class: "chips-note" }, `2004/05 weights recovered from the published indices (they reproduce the official index within ${ind.derived.replication_max_error_pct.toFixed(2)}% since ${fmtShortMonth(ind.derived.link)}).`));
   }
 
+  // Net reserves: how each convention is built at the latest balance, line by
+  // line, one column per convention ("–" where a convention does not deduct it).
+  function breakdownTable(ind) {
+    const b = ind.derived && ind.derived.breakdown;
+    if (!b) return null;
+    const f = (v) => (v === null || v === undefined ? "–" : (v < 0 ? "−" : "") + Math.abs(Math.round(v)).toLocaleString("en-US"));
+    const neg = (v) => (v === null || v === undefined ? "–" : Math.round(v) === 0 ? "0" : f(-v));
+    const head = h("tr", {}, h("th", {}, "USD millions"), b.columns.map((c) => h("th", {}, c.label)));
+    const body = b.rows.map((r) => h("tr", {}, h("td", { class: "pres" }, r.sign < 0 ? `less: ${r.label}` : r.label),
+      b.columns.map((c) => h("td", {}, r.sign < 0 ? neg(r.values[c.key]) : f(r.values[c.key])))));
+    const total = h("tr", { class: "total" }, h("td", { class: "pres" }, h("b", {}, "Net reserves")),
+      b.columns.map((c) => h("td", {}, h("b", {}, f(b.total[c.key])))));
+    const notes = [`BCRA weekly balance of ${fmtDay(b.date)}, at that balance's exchange rates.`];
+    if (b.swap_cny_bn && b.cny_usd) notes.push(` China swap: CNY ${b.swap_cny_bn.toFixed(0)} bn at ${(1 / b.cny_usd).toFixed(2)} yuan per dollar.`);
+    if (b.treasury_as_of) notes.push(` Treasury deposits: monthly balance sheet, end of ${fmtMonth(b.treasury_as_of.slice(0, 7) + "-01")}.`);
+    if (b.notes && b.notes.imf_repos) notes.push(` ${b.notes.imf_repos}`);
+    return h("div", { class: "breakdown" },
+      h("h3", { class: "breakdown-title" }, `How each estimate is built (${fmtDay(b.date)})`),
+      h("div", { class: "table-scroll" }, h("table", { class: "data" }, h("thead", {}, head), h("tbody", {}, body, total))),
+      h("p", { class: "chips-note" }, notes));
+  }
+
   // Nominal / real switch for peso amounts: real = nominal / CPI x CPI of the
   // latest month with data (pesos of that month). Swaps the values in place.
   function realSwitch(ind, onChange) {
@@ -549,7 +571,7 @@
     // Overlay cards draw every variant at once; the default one leads and is the
     // series used by the presidency view.
     const vSeg = variantKeys.length > 1 && !ind.overlay ? segmented(variantKeys.map((k) => [k, ind.variants[k].label]), state.variant, (k) => { state.variant = k; if (k === "original" && state.transform === "mom") state.transform = "yoy"; draw(); }, "Series") : null;
-    const tSeg = segmented(Object.entries(T).map(([k, t]) => [k, t.label]), state.transform, (k) => { state.transform = k; draw(); }, "Transformation");
+    const tSeg = Object.keys(T).length > 1 ? segmented(Object.entries(T).map(([k, t]) => [k, t.label]), state.transform, (k) => { state.transform = k; draw(); }, "Transformation") : null;
     const rSeg = segmented(rangeKeys(ind).map((k) => [k, k]), state.range, (k) => { state.range = k; draw(); }, "Time range");
 
     // Index base: as published, start of a presidential term, or a custom month.
@@ -571,7 +593,7 @@
       draw();
     });
     customIn.addEventListener("change", () => { if (customIn.value) { state.customBase = customIn.value + "-01"; draw(); } });
-    const baseWrap = isRate ? null : h("label", { class: "base-pick" }, h("span", {}, "Base = 100:"), baseSel, customIn);
+    const baseWrap = isRate || ind.plain_level ? null : h("label", { class: "base-pick" }, h("span", {}, "Base = 100:"), baseSel, customIn);
 
     const EP = ind.episodes || [];
     const epBtn = EP.length ? h("button", { class: "btn toggle", type: "button", "aria-pressed": "false", title: "Mark dated shocks on the chart and show presidency averages without them",
@@ -581,7 +603,7 @@
     // Months inside any episode (for averages that leave them out).
     const inEpisode = (iso) => EP.some((e) => iso >= e.start && iso <= e.end);
     const realSeg = realSwitch(ind, () => draw());
-    const presBtn = PRESIDENCIES.length ? h("button", { class: "btn toggle", type: "button", "aria-pressed": "false", onclick: () => { state.byPres = !state.byPres; draw(); } }, "By presidency") : null;
+    const presBtn = PRESIDENCIES.length && !ind.plain_level ? h("button", { class: "btn toggle", type: "button", "aria-pressed": "false", onclick: () => { state.byPres = !state.byPres; draw(); } }, "By presidency") : null;
     let table;
 
     function baseMonth() {
@@ -844,7 +866,7 @@
 
     function draw() {
       vSeg && vSeg.update(state.variant);
-      tSeg.update(state.transform, { mom: state.variant === "original" });
+      tSeg && tSeg.update(state.transform, { mom: state.variant === "original" });
       rSeg.update(state.range);
       presBtn && presBtn.setAttribute("aria-pressed", String(state.byPres));
       epBtn && epBtn.setAttribute("aria-pressed", String(state.episodes));
@@ -911,10 +933,11 @@
       h("div", { class: "controls" }, vSeg, tSeg, h("span", { class: "spacer" }), ind.view_start ? null : rSeg),
       // A short fixed window (view_start) has no use for rebasing or presidencies.
       ind.view_start ? null : h("div", { class: "controls" }, realSeg, baseWrap, presBtn, epBtn),
+      ind.caveat ? h("p", { class: "caveat" }, ind.caveat) : null,
       trackerLine(), summaryEl, hint, bandKey, epKey, chartEl, statsEl);
     drawSummary();
     table = tableView([], [], false, ind.frequency);
-    appendAll(card, table, annualTable(ind), weightsTable(ind), ind.note ? h("p", { class: "chips-note" }, ind.note) : null, footer(ind, onPNG, onCSV));
+    appendAll(card, breakdownTable(ind), table, annualTable(ind), weightsTable(ind), ind.note ? h("p", { class: "chips-note" }, ind.note) : null, footer(ind, onPNG, onCSV));
     card.draw = draw;
     return card;
   }

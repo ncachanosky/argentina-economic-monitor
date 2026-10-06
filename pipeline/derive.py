@@ -35,7 +35,13 @@ flows     Monthly sources of a stock, in percentage points of the stock at
 formula   Arithmetic on stored series: `vars` maps short names to series ids;
           each variant has an `expr` over those names (+ - * / and nz(x),
           which treats a missing value as zero). Dates where the `anchor`
-          variable is missing are dropped.
+          variable is missing are dropped. `positive_only: true` blanks
+          results <= 0 (e.g. an implied exchange rate when net reserves are
+          negative); `max: <expr>` blanks results above that bound. A var may name another derived indicator's series as
+          "@indicator:variant" (taken at month end for monthly indicators).
+
+net_reserves  Gross reserves minus foreign-currency liabilities, under
+          several conventions, weekly; see NET_CONVENTIONS below.
 
 reweight  What a fixed-base CPI would show with a different basket, from the
           month the new basket would have started (`link`). With division
@@ -296,6 +302,14 @@ def formula(ind, frames: dict[str, pd.Series]) -> tuple[pd.DataFrame, dict]:
             if isinstance(node, ast.Name) and node.id not in env:
                 raise ValueError(f"{ind.id}.{k}: unknown name {node.id!r}")
         res = eval(compile(tree, "<expr>", "eval"), {"__builtins__": {}}, env)
+        if v.get("positive_only"):
+            res = res.where(res > 0)
+        if v.get("max"):
+            mtree = ast.parse(v["max"], mode="eval")
+            for node in ast.walk(mtree):
+                if not isinstance(node, allowed) or isinstance(node, ast.Call) or (isinstance(node, ast.Name) and node.id not in env):
+                    raise ValueError(f"{ind.id}.{k}: unsupported max {v['max']!r}")
+            res = res.where(res <= eval(compile(mtree, "<max>", "eval"), {"__builtins__": {}}, env))
         out[ind.variants[k].source_id] = res
     df = pd.DataFrame(out)
     anchor = env[spec["anchor"]] if spec.get("anchor") else None
@@ -305,9 +319,132 @@ def formula(ind, frames: dict[str, pd.Series]) -> tuple[pd.DataFrame, dict]:
     return df.dropna(how="all").sort_index(), {}
 
 
+# ---------- net international reserves ----------
+#
+# Net reserves have no official or universal definition. Three conventions,
+# each gross reserves minus a set of foreign-currency liabilities (USD
+# millions, at each weekly balance's exchange rates):
+#
+#   standard  the usual market estimate: minus banks' dollar reserve
+#             requirements, the China swap in full, obligations with
+#             international agencies (BIS and others), the BCRA's repos with
+#             foreign banks and the Treasury's dollar deposits at the BCRA.
+#   liquid    standard, minus gold.
+#   imf       the IMF program's NIR (TMU, May 2026): minus reserve
+#             requirements, swaps, obligations with international agencies,
+#             repos of one year or less, and the Fund's net purchases since the
+#             program started (April 2025). Treasury deposits are not
+#             deducted. Items the weekly balance does not show (deposit
+#             insurance, BOPREAL due within a year, forwards) are left out, so
+#             this is an approximation.
+NET_CONVENTIONS = [("standard", "Standard (market)"), ("liquid", "Liquid"), ("imf", "IMF-style (approx.)")]
+NET_ROWS = [
+    # key, label, conventions that deduct it ("imf" reads the short-maturity repos)
+    ("encaje", "Banks' dollar reserve requirements (encajes)", ("standard", "liquid", "imf")),
+    ("swap", "China swap (PBoC), full amount", ("standard", "liquid", "imf")),
+    ("intl_org", "Obligations with international agencies (BIS, others)", ("standard", "liquid", "imf")),
+    ("repos", "BCRA repos with foreign banks", ("standard", "liquid", "imf")),
+    ("treasury", "Treasury dollar deposits at the BCRA", ("standard", "liquid")),
+    ("gold", "Gold", ("liquid",)),
+    ("imf_credit", "IMF net purchases since April 2025", ("imf",)),
+]
+REPO_CHECK_FROM = "2024-08-01"     # peso repos ended in July 2024: the line is dollar items only
+REPO_CHECK_USD_M = 500
+
+
+def _asof(s: pd.Series, idx: pd.DatetimeIndex) -> pd.Series:
+    """Value in force at each date of `idx` (last observation on or before it)."""
+    s = s.dropna().sort_index()
+    return s.reindex(s.index.union(idx)).ffill().reindex(idx)
+
+
+def net_reserves(ind, frames: dict[str, pd.Series]) -> tuple[pd.DataFrame, dict]:
+    spec = ind.derive
+    i = spec["inputs"]
+    gross = frames[i["gross"]]
+    gross = gross[gross.index >= pd.Timestamp(spec.get("start", "2003-01-01"))].dropna()
+    idx = gross.index
+    c = {"gross": gross}
+    c["encaje"] = _asof(frames[i["encaje"]], idx).fillna(0)
+    c["intl_org"] = _asof(frames[i["intl_org"]], idx).fillna(0)
+    c["gold"] = _asof(frames[i["gold"]], idx).fillna(0)
+    cny = _asof(frames[i["swap_cny"]], idx).fillna(0)
+    rate = _asof(frames[i["cny_usd"]], idx)
+    c["swap"] = (cny * 1000 * rate).where(cny > 0, 0.0)
+    c["repos"] = _asof(frames[i["repos"]], idx).fillna(0)
+    c["repos_short"] = _asof(frames[i["repos_short"]], idx).fillna(0)
+    # Treasury dollar deposits: monthly balance sheet, end-of-month stock
+    # (dated by month start), in force from that month's end.
+    tre = (frames[i["treasury"]] / frames[i["treasury_fx"]] / 1000).dropna()
+    tre.index = tre.index + pd.offsets.MonthEnd(0)
+    c["treasury"] = _asof(tre, idx).fillna(0)
+    imf = frames[i["imf_purchases"]].sort_index().cumsum()
+    c["imf_credit"] = _asof(imf, idx).fillna(0)
+
+    deduct = {conv: sum(c[k if not (conv == "imf" and k == "repos") else "repos_short"]
+                        for k, _, convs in NET_ROWS if conv in convs) for conv, _ in NET_CONVENTIONS}
+    out = {"gross": gross}
+    out.update({conv: gross - deduct[conv] for conv, _ in NET_CONVENTIONS})
+    df = pd.DataFrame({ind.variants[k].source_id: s for k, s in out.items() if k in ind.variants}).sort_index()
+
+    # Line-by-line construction at the latest balance.
+    t = idx.max()
+    r = lambda v: round(float(v), 1)
+    rows = [{"key": "gross", "label": "Gross reserves", "sign": 1,
+             "values": {conv: r(gross[t]) for conv, _ in NET_CONVENTIONS}}]
+    for k, label, convs in NET_ROWS:
+        vals = {}
+        for conv, _ in NET_CONVENTIONS:
+            if conv not in convs:
+                vals[conv] = None
+            else:
+                vals[conv] = r(c["repos_short" if (conv == "imf" and k == "repos") else k][t])
+        rows.append({"key": k, "label": label, "sign": -1, "values": vals})
+    breakdown = {
+        "date": t.strftime("%Y-%m-%d"),
+        "columns": [{"key": k, "label": lab} for k, lab in NET_CONVENTIONS],
+        "rows": rows,
+        "total": {conv: r(out[conv][t]) for conv, _ in NET_CONVENTIONS},
+        "fx": r(frames[i["fx"]].get(t, float("nan"))) if i.get("fx") else None,
+        "cny_usd": float(rate[t]) if pd.notna(rate[t]) else None,
+        "swap_cny_bn": float(cny[t]),
+        "treasury_as_of": (tre.index[tre.index <= t].max().strftime("%Y-%m-%d") if (tre.index <= t).any() else None),
+        "notes": {"imf_repos": "IMF-style deducts only repos with an original maturity of one year or less; "
+                               "the BCRA's current repos run longer."},
+    }
+
+    # Hand-kept files need a person when the BCRA moves: flag a change in the
+    # balance sheet's repo line that the repo file does not explain.
+    checks = []
+    line = frames.get(i.get("repo_line", ""), pd.Series(dtype=float))
+    line = line[line.index >= pd.Timestamp(REPO_CHECK_FROM)]
+    if len(line) > 4:
+        gap = (line - _asof(frames[i["repos"]], line.index).fillna(0)).dropna()
+        if len(gap) > 4:
+            move = gap.iloc[-1] - gap.iloc[-5]
+            events = frames[i["repos"]].index
+            recent = (events > gap.index[-5]).any()
+            if abs(move) > REPO_CHECK_USD_M and not recent:
+                checks.append(f"the BCRA's repo liability line moved by USD {move:,.0f}m over the last four balances "
+                              f"(to {gap.index[-1]:%Y-%m-%d}) with no matching entry in data/manual/bcra_fx_repos.csv")
+    for msg in checks:
+        print(f"::warning title={ind.id}::{msg}")
+    return df, {"breakdown": breakdown, "checks": checks}
+
+
+def _resolve(ref: str, reg, freq: str) -> pd.Series:
+    """'@indicator:variant' -> that derived series, at month ends for monthly targets."""
+    ind_id, var = ref[1:].split(":", 1)
+    other = next(x for x in reg.indicators if x.id == ind_id)
+    s = compute(other, reg)[0][other.variants[var].source_id].dropna()
+    if freq == "M":
+        s = s.resample("MS").last()
+    return s
+
+
 def compute(ind, reg) -> tuple[pd.DataFrame, dict]:
     ids = ind.input_ids()
-    frames = {sid: store.as_of(sid) for sid in ids}
+    frames = {sid: (_resolve(sid, reg, ind.frequency) if sid.startswith("@") else store.as_of(sid)) for sid in ids}
     empty = [sid for sid, s in frames.items() if s.empty]
     if empty:
         raise ValueError(f"no stored data for {empty}")
@@ -325,4 +462,6 @@ def compute(ind, reg) -> tuple[pd.DataFrame, dict]:
         return monthly(ind, frames)
     if ind.derive["method"] == "flows":
         return flows(ind, frames)
+    if ind.derive["method"] == "net_reserves":
+        return net_reserves(ind, frames)
     return reweight(ind, reg, frames)

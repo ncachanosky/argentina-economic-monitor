@@ -11,7 +11,7 @@ REGISTRY_PATH = ROOT / "registry" / "series.yaml"
 RELEASES_PATH = ROOT / "registry" / "releases.yaml"
 
 KINDS = {"variants", "panel", "contributions"}
-DERIVE_METHODS = {"splice", "reweight", "ratio", "tracker", "monthly", "flows", "expectations", "formula"}
+DERIVE_METHODS = {"splice", "reweight", "ratio", "tracker", "monthly", "flows", "expectations", "formula", "net_reserves"}
 RANGE_KEYS = {"2Y", "5Y", "10Y", "25Y", "50Y", "Max"}
 TRANSFORMS = {"level", "yoy", "mom", "ytd", "acc", "share"}
 FREQUENCIES = {"M", "Q", "D"}
@@ -65,6 +65,8 @@ class Indicator:
     composition: list | None = None    # variants whose shares of their sum form the "share" view
     validate_as: str | None = None     # measure used to check source data, if not `measure` (e.g. rates above 100%)
     deflate_with: dict | None = None   # {indicator, variant}: offer a real-terms view deflated by this price index
+    caveat: str | None = None          # highlighted warning shown above the chart
+    plain_level: bool = False          # levels only: no rebasing or presidency view (e.g. series that go negative)
 
     def input_ids(self) -> list[str]:
         """Source series this indicator reads (its variants, or a derivation's inputs)."""
@@ -84,6 +86,8 @@ class Indicator:
                 ids += list(v["sum_of"])
         elif self.derive.get("method") == "formula":
             ids += list(self.derive["vars"].values())
+        elif self.derive.get("method") == "net_reserves":
+            ids += [str(x) for x in self.derive["inputs"].values()]
         elif self.derive.get("method") == "expectations":
             ids += [self.derive["expected"], self.derive["cpi"]]
         elif self.derive.get("method") == "tracker":
@@ -130,7 +134,8 @@ class Registry:
         for inp in self.inputs:
             m = out.setdefault(inp["id"], {"source": inp["source"], "frequency": inp["frequency"],
                                            "measure": inp.get("measure", "index"),
-                                           "static": bool(inp.get("static")), "allow_gaps": bool(inp.get("allow_gaps"))})
+                                           "static": bool(inp.get("static")), "allow_gaps": bool(inp.get("allow_gaps")),
+                                           "stale_days": inp.get("stale_days")})
             if m["measure"] == "flow":
                 m["measure"] = inp.get("measure", "index")
         return out
@@ -288,6 +293,8 @@ def load(path: Path = REGISTRY_PATH, releases_path: Path = RELEASES_PATH) -> Reg
                 composition=item.get("composition"),
                 validate_as=item.get("validate_as"),
                 deflate_with=item.get("deflate_with"),
+                caveat=" ".join(str(item["caveat"]).split()) if item.get("caveat") else None,
+                plain_level=bool(item.get("plain_level", False)),
                 view_start=str(item["view_start"]) + ("-01" if len(str(item["view_start"])) == 7 else "") if item.get("view_start") else None,
             )
         )
@@ -349,7 +356,11 @@ def load(path: Path = REGISTRY_PATH, releases_path: Path = RELEASES_PATH) -> Reg
     for ind in indicators:
         if not ind.derive:
             continue
-        missing = [sid for sid in ind.input_ids() if sid not in known]
+        refs = [sid for sid in ind.input_ids() if sid.startswith("@")]
+        bad = [r for r in refs if r[1:].split(":", 1)[0] not in {i.id for i in indicators}]
+        if bad:
+            raise RegistryError(f"indicator '{ind.id}': unknown indicator references {bad}")
+        missing = [sid for sid in ind.input_ids() if sid not in known and not sid.startswith("@")]
         if missing:
             raise RegistryError(f"indicator '{ind.id}': inputs not in the registry: {missing}")
         if ind.derive["method"] == "reweight":

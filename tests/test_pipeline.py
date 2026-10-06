@@ -217,7 +217,8 @@ def test_series_grouped_by_frequency():
     fetched = {sid for ids in reg.series_by_source().values() for sid in ids}
     for ind in reg.indicators:
         if ind.derive:
-            assert set(ind.input_ids()) <= fetched, ind.id
+            # "@indicator:variant" reads another derived indicator, not a fetched series.
+            assert {i for i in ind.input_ids() if not i.startswith("@")} <= fetched, ind.id
 
 
 # --- manual source and derived indicators ---------------------------------
@@ -373,3 +374,75 @@ def test_formula_derivation_is_safe_and_anchored():
     assert df["t:x"].tolist() == [150.0, 100.0]          # March dropped: anchor missing
     with pytest.raises(ValueError):
         derive.formula(ind("__import__('os')"), frames)
+
+
+def test_formula_bounds_and_positive_only():
+    from pipeline import derive
+    from pipeline.registry import Indicator, Variant
+    idx = pd.date_range("2026-01-01", periods=3, freq="MS")
+    frames = {"A": pd.Series([100.0, 100.0, 100.0], index=idx), "N": pd.Series([50.0, -5.0, 5.0], index=idx)}
+    ind = Indicator(id="t", topic="t", kind="variants", title="t", short_title="t", description="",
+                    source="derived", source_label="", frequency="M", units="",
+                    variants={"x": Variant("x", "x", "t:x")}, default={},
+                    derive={"method": "formula", "anchor": "a", "vars": {"a": "A", "n": "N"},
+                            "variants": {"x": {"expr": "a / n", "positive_only": True, "max": "10"}}})
+    df, _ = derive.formula(ind, frames)
+    assert df["t:x"].tolist() == [2.0]          # Feb negative, Mar above max: blank (and dropped)
+
+
+def test_manual_adapter_reads_named_column(tmp_path):
+    from pipeline.sources import manual
+    (tmp_path / "r.csv").write_text("date,value,short,source\n2016-01-29,5000,5000,x\n2025-01-03,1000,0,y\n")
+    res = manual.fetch(["r", "r#short"], base=tmp_path)
+    assert not res.errors
+    got = res.data.pivot(index="date", columns="series_id", values="value")
+    assert got["r"].tolist() == [5000, 1000] and got["r#short"].tolist() == [5000, 0]
+
+
+def test_net_reserves_conventions_and_breakdown():
+    from pipeline import derive
+    from pipeline.registry import Indicator, Variant
+    w = pd.to_datetime(["2025-12-23", "2025-12-31", "2026-01-07", "2026-01-15", "2026-01-23", "2026-01-31"])
+    s = lambda v: pd.Series(v, index=w, dtype=float)
+    frames = {
+        "g": s([40000] * 6), "e": s([10000] * 6), "o": s([100] * 6), "au": s([8000] * 6),
+        "rl": s([3500, 3500, 3500, 6500, 6500, 6500]), "fx": s([1450] * 6),
+        "cny": pd.Series([130.0], index=pd.to_datetime(["2018-12-17"])),
+        "rate": pd.Series([0.14, 0.15], index=pd.to_datetime(["2025-12-01", "2026-01-10"])),
+        "rp": pd.Series([3000.0, 6000.0], index=pd.to_datetime(["2025-06-11", "2026-01-07"])),
+        "rps": pd.Series([0.0], index=pd.to_datetime(["2025-01-03"])),
+        # Treasury dollar deposits: thousands of pesos at month end (dated by month start) and the balance-sheet rate.
+        "t": pd.Series([2000 * 1450 * 1000.0], index=pd.to_datetime(["2025-11-01"])),
+        "tfx": pd.Series([1450.0], index=pd.to_datetime(["2025-11-01"])),
+        "imf": pd.Series([12000.0, 2000.0], index=pd.to_datetime(["2025-04-15", "2025-08-05"])),
+    }
+    keys = ["standard", "liquid", "imf", "gross"]
+    ind = Indicator(id="nr", topic="t", kind="variants", title="t", short_title="t", description="",
+                    source="derived", source_label="", frequency="D", units="",
+                    variants={k: Variant(k, k, f"nr:{k}") for k in keys}, default={},
+                    derive={"method": "net_reserves", "start": "2003-01-01", "inputs": {
+                        "gross": "g", "encaje": "e", "intl_org": "o", "gold": "au", "repo_line": "rl", "fx": "fx",
+                        "swap_cny": "cny", "cny_usd": "rate", "repos": "rp", "repos_short": "rps",
+                        "treasury": "t", "treasury_fx": "tfx", "imf_purchases": "imf"}})
+    df, info = derive.net_reserves(ind, frames)
+    last = df.iloc[-1]
+    swap = 130 * 1000 * 0.15
+    assert last["nr:standard"] == pytest.approx(40000 - 10000 - swap - 100 - 6000 - 2000)
+    assert last["nr:liquid"] == pytest.approx(last["nr:standard"] - 8000)
+    assert last["nr:imf"] == pytest.approx(40000 - 10000 - swap - 100 - 0 - 14000)
+    b = info["breakdown"]
+    assert b["date"] == "2026-01-31" and b["treasury_as_of"] == "2025-11-30"
+    for conv in ("standard", "liquid", "imf"):
+        rows = sum(r["sign"] * (r["values"][conv] or 0) for r in b["rows"])
+        assert rows == pytest.approx(b["total"][conv], abs=0.5)
+    # The repo line rose by 3,000 with a matching file entry: no warning.
+    assert info["checks"] == []
+    frames["rp"] = pd.Series([3000.0], index=pd.to_datetime(["2025-06-11"]))
+    _, info = derive.net_reserves(ind, frames)
+    assert info["checks"] and "bcra_fx_repos" in info["checks"][0]
+
+
+def test_stale_days_override():
+    t = pd.Timestamp("2026-10-06")
+    assert not validate.is_stale(pd.Timestamp("2026-09-23"), t, "D", stale_days=21)
+    assert validate.is_stale(pd.Timestamp("2026-09-23"), t, "D")

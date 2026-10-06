@@ -224,6 +224,8 @@ def export(out: Path) -> None:
             "frequency": ind.frequency,
             "source_units": ind.source_units,
             "note": ind.note,
+            "caveat": ind.caveat,
+            "plain_level": ind.plain_level,
             "source_label": ind.source_label,
             "default": ind.default,
             "headline": ind.headline,

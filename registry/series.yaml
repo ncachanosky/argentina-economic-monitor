@@ -101,6 +101,25 @@ inputs:
   - {id: "bcrabal:114", source: bcra_balance, frequency: M, measure: flow, allow_gaps: true, label: "BCRA balance: Miscellaneous accounts (incl. net worth)"}
   - {id: "bcrabal:115", source: bcra_balance, frequency: M, measure: flow, allow_gaps: true, label: "BCRA balance: Base money"}
   - {id: "bcrabal:fx", source: bcra_balance, frequency: M, measure: flow, allow_gaps: true, label: "BCRA balance: Valuation exchange rate (pesos per USD)"}
+  - {id: "bcrabal:107", source: bcra_balance, frequency: M, measure: flow, allow_gaps: true, label: "BCRA balance: Treasury deposits in foreign currency"}
+  # Net reserves. The weekly summary balance (2002-) gives most liabilities;
+  # values are millions of dollars at each balance's exchange rate. Balances
+  # are weekly and published with a lag, hence allow_gaps and stale_days.
+  - {id: "bcrawk:gross",    source: bcra_weekly, frequency: D, measure: flow, allow_gaps: true, stale_days: 21, label: "BCRA weekly balance: gross international reserves (USD m)"}
+  - {id: "bcrawk:encaje",   source: bcra_weekly, frequency: D, measure: flow, allow_gaps: true, stale_days: 21, label: "BCRA weekly balance: banks' current accounts in foreign currency (USD m)"}
+  - {id: "bcrawk:intl_org", source: bcra_weekly, frequency: D, measure: flow, allow_gaps: true, stale_days: 21, label: "BCRA weekly balance: obligations with international agencies (USD m)"}
+  - {id: "bcrawk:gold",     source: bcra_weekly, frequency: D, measure: flow, allow_gaps: true, stale_days: 21, label: "BCRA weekly balance: gold (USD m)"}
+  - {id: "bcrawk:repo_line", source: bcra_weekly, frequency: D, measure: flow, allow_gaps: true, stale_days: 21, label: "BCRA weekly balance: obligations from repo transactions (USD m)"}
+  - {id: "bcrawk:fx",       source: bcra_weekly, frequency: D, measure: flow, allow_gaps: true, stale_days: 21, label: "BCRA weekly balance: exchange rate (pesos per USD)"}
+  - {id: "bcracot:CNY",     source: bcra_fx, frequency: D, measure: index, label: "BCRA quote: US dollars per yuan"}
+  # Hand-kept files (data/manual/*.csv, with sources): the China swap amount
+  # booked in reserves (CNY bn), the BCRA's repos with foreign banks (USD m
+  # outstanding; #short_usd_m: original maturity of one year or less) and IMF
+  # purchases (+) and repurchases (-) under the 2025 program (USD m).
+  - {id: china_swap_cny, source: manual, frequency: D, measure: flow, static: true, allow_gaps: true, label: "China swap booked in reserves (CNY bn)"}
+  - {id: bcra_fx_repos, source: manual, frequency: D, measure: flow, static: true, allow_gaps: true, label: "BCRA repos with foreign banks (USD m)"}
+  - {id: "bcra_fx_repos#short_usd_m", source: manual, frequency: D, measure: flow, static: true, allow_gaps: true, label: "BCRA repos with foreign banks, original maturity up to one year (USD m)"}
+  - {id: imf_purchases, source: manual, frequency: D, measure: flow, static: true, allow_gaps: true, label: "IMF purchases and repurchases since April 2025 (USD m)"}
   - {id: "bcra:29",  source: bcra, frequency: M, measure: flow, allow_gaps: true, label: "REM: median expected inflation, next 12 months"}
   - {id: 4.4_DGI_2004_T_19, source: datos_gob, frequency: Q, measure: index,
      label: "INDEC gross fixed capital formation, current prices"}
@@ -1143,8 +1162,8 @@ indicators:
     description: >-
       The BCRA's gross international reserves, millions of US dollars, daily.
       Net reserves, which subtract short-term liabilities such as swaps and
-      bank reserve requirements in dollars, have no official definition; they
-      will be added with their methodologies.
+      bank reserve requirements in dollars, are estimates with no official
+      definition; see Net International Reserves for three conventions.
     source: bcra
     source_label: BCRA
     frequency: D
@@ -1154,6 +1173,68 @@ indicators:
     variants:
       gross: {label: Gross reserves, id: "bcra:1"}
     default: {variant: gross, transform: level, start: "2019-01"}
+
+  - id: net_reserves
+    topic: money
+    wide: true
+    kind: variants
+    overlay: true
+    plain_level: true
+    title: Net International Reserves
+    short_title: Net reserves
+    description: >-
+      Gross reserves minus the BCRA's short-term foreign-currency liabilities,
+      under three conventions: the standard market estimate, a liquid measure
+      that also leaves out gold, and an approximation of the IMF program's
+      definition. Millions of US dollars, weekly, since 2003.
+    caveat: >-
+      Net reserves are estimates, not official statistics. There is no
+      official or universal definition: analysts, the BCRA and the IMF
+      subtract different liabilities, so each convention gives a different
+      number. The table below shows how each one is built.
+    source: derived
+    source_label: BCRA (weekly summary balance, balance sheet, FX quotes); IMF; hand-kept files
+    frequency: D
+    units: Millions of US dollars
+    transforms: [level]
+    ranges: [2Y, 5Y, 10Y, Max]
+    note: >-
+      Weekly balances (the 7th, 15th, 23rd and last day of each month), at
+      each balance's exchange rates. The China swap is deducted in full (CNY
+      130 bn since December 2018), valued at the BCRA's yuan quote; the BCRA
+      stopped announcing tranches in February 2015, so the 2015 build-up is
+      read from its balance sheet. Repos with foreign banks and IMF purchases
+      come from hand-kept files with sources (data/manual). Treasury dollar
+      deposits come from the monthly balance sheet. The IMF-style line leaves
+      out items the weekly balance does not show (deposit insurance, BOPREAL
+      due within a year, forwards, the US Treasury swap), so it runs about
+      USD 2-3 bn above the IMF's published figures (-2.4 bn at end-2024,
+      -11.8 bn at end-2025). Month-end balances are lower than mid-month
+      ones because banks move their dollar reserve requirements around the
+      turn of the month.
+    default: {variant: standard, transform: level, start: "2019-01"}
+    derive:
+      method: net_reserves
+      start: "2003-01-01"
+      inputs:
+        gross: "bcrawk:gross"
+        encaje: "bcrawk:encaje"
+        intl_org: "bcrawk:intl_org"
+        gold: "bcrawk:gold"
+        repo_line: "bcrawk:repo_line"
+        fx: "bcrawk:fx"
+        swap_cny: china_swap_cny
+        cny_usd: "bcracot:CNY"
+        repos: bcra_fx_repos
+        repos_short: "bcra_fx_repos#short_usd_m"
+        treasury: "bcrabal:107"
+        treasury_fx: "bcrabal:fx"
+        imf_purchases: imf_purchases
+      variants:
+        standard: {label: Standard (market)}
+        liquid:   {label: Liquid}
+        imf:      {label: IMF-style (approx.)}
+        gross:    {label: Gross}
 
   - id: bcra_assets
     topic: money
@@ -1249,7 +1330,6 @@ indicators:
 
   - id: bcra_backing
     topic: money
-    hidden: true        # waits for net reserves
     wide: true
     kind: variants
     overlay: true
@@ -1257,34 +1337,39 @@ indicators:
     title: Reserve Backing of the Peso
     short_title: Reserve backing
     description: >-
-      Gold and foreign-currency reserves as a percentage of base money, and of
-      base money plus the BCRA's notes. Above 100%, reserves cover the
-      liabilities at the official exchange rate. Monthly, since 1940.
+      Reserves as a percentage of base money, and of base money plus the
+      BCRA's notes: gross reserves since 1940, and net reserves (standard
+      market estimate) since 2003. Above 100%, reserves cover the liabilities
+      at the official exchange rate. Monthly.
     source: derived
-    source_label: BCRA (Balance del Banco Central, series since 1940)
+    source_label: BCRA (Balance del Banco Central, series since 1940; weekly summary balance)
     frequency: M
     units: "% of liabilities"
     transforms: [level, yoy]
     ranges: [10Y, 25Y, 50Y, Max]
     note: >-
-      Reserves are BCRA's "gold and foreign currency (net)" line, valued at
-      the official exchange rate: essentially gross reserves today, but net of
-      some foreign-currency liabilities in earlier decades (it was negative in
-      1986-1988). Net reserves, which
-      subtract short-term foreign-currency liabilities, will be added with
-      their methodologies.
-    default: {variant: base, transform: level, range: 50Y}
+      Gross reserves are BCRA's "gold and foreign currency (net)" line, valued
+      at the official exchange rate: essentially gross reserves today, but net
+      of some foreign-currency liabilities in earlier decades (it was negative
+      in 1986-1988). Net reserves are the standard estimate in the Net
+      International Reserves chart, at the month's last weekly balance,
+      converted to pesos at the balance-sheet exchange rate; they are an
+      estimate with no official definition.
+    default: {variant: net_base, transform: level, range: 25Y}
     derive:
       method: formula
       anchor: base
-      vars: *bal
+      vars:
+        <<: *bal
+        net: "@net_reserves:standard"
       variants:
-        base:  {label: Reserves / base money,                expr: "100 * gold / base"}
-        broad: {label: Reserves / (base money + BCRA notes), expr: "100 * gold / (base + nz(notes))"}
+        net_base:  {label: Net reserves / base money,                   expr: "100 * net * fx * 1000 / base"}
+        base:      {label: Gross reserves / base money,                 expr: "100 * gold / base"}
+        net_broad: {label: Net reserves / (base money + BCRA notes),    expr: "100 * net * fx * 1000 / (base + nz(notes))"}
+        broad:     {label: Gross reserves / (base money + BCRA notes),  expr: "100 * gold / (base + nz(notes))"}
 
   - id: bcra_implied_fx
     topic: money
-    hidden: true        # waits for net reserves
     wide: true
     kind: variants
     overlay: true
@@ -1292,29 +1377,36 @@ indicators:
     title: Implied Exchange Rates
     short_title: Implied exchange rate
     description: >-
-      The exchange rate at which gross reserves would cover base money, or base
-      money plus the BCRA's notes, against the official rate. Monthly, since
-      December 1989.
+      The exchange rate at which reserves would cover base money, or base
+      money plus the BCRA's notes, against the official rate: with gross
+      reserves since December 1989, and with net reserves (standard market
+      estimate) since 2003. Monthly.
     source: derived
-    source_label: BCRA (Balance del Banco Central)
+    source_label: BCRA (Balance del Banco Central; weekly summary balance)
     frequency: M
     units: Pesos per US dollar
     transforms: [level, yoy, mom]
     ranges: [10Y, 25Y, Max]
     note: >-
-      Implied rate = peso liabilities / gross reserves in dollars, with
-      reserves converted at the official valuation rate in the balance sheet.
-      Gross reserves overstate what is available, so these implied rates are
-      a floor.
+      Implied rate = peso liabilities / reserves in dollars. Gross reserves
+      overstate what is available, so the gross-based rates are a floor. The
+      net-based rate is shown only while net reserves are positive and the
+      implied rate is at most ten times the official one: as net reserves
+      approach zero the implied rate explodes (and with negative net reserves
+      no exchange rate covers the liabilities). Net reserves are an estimate
+      with no official definition.
     default: {variant: official, transform: level, range: 25Y}
     derive:
       method: formula
       anchor: fx
-      vars: *bal
+      vars:
+        <<: *bal
+        net: "@net_reserves:standard"
       variants:
-        official: {label: Official rate,                            expr: "fx"}
-        base:     {label: Implied by base money,                    expr: "fx * base / gold"}
-        broad:    {label: Implied by base money plus BCRA notes,    expr: "fx * (base + nz(notes)) / gold"}
+        official: {label: Official rate,                         expr: "fx"}
+        net_base: {label: Implied by base money (net reserves),  expr: "base / (net * 1000)", positive_only: true, max: "10 * fx"}
+        base:     {label: Implied by base money (gross reserves), expr: "fx * base / gold"}
+        broad:    {label: Implied by base money plus BCRA notes (gross reserves), expr: "fx * (base + nz(notes)) / gold"}
 
   - id: bcra_government
     topic: money

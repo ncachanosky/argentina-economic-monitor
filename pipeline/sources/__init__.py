@@ -29,6 +29,14 @@ def get_adapter(name: str):
         from . import bcra_balance
 
         return bcra_balance
+    if name == "bcra_weekly":
+        from . import bcra_weekly
+
+        return bcra_weekly
+    if name == "bcra_fx":
+        from . import bcra_fx
+
+        return bcra_fx
     if name == "manual":
         from . import manual
 

@@ -1,0 +1,13 @@
+date,value,basis,source
+2014-10-30,5.0,"Tranche 1, USD 814m (announced)",https://www.cronista.com/finanzas-mercados/el-banco-central-activo-el-swap-con-china-y-suma-mas-de-us-800-millones-a-las-reservas-20141030-0106.html
+2014-11-17,8.1,"Tranche 2, USD 500m (announced)",https://www.eldestapeweb.com/nota/el-bcra-cerro-un-nuevo-desembolso-del-swap-con-china-por-u-s500-millones-2014-11-17-19-30-0
+2014-12-11,14.2,"Tranche 3, USD 1,000m (announced)",https://www.lanueva.com/nota/2015-1-14-0-12-0-mas-reservas-gracias-al-swap-chino
+2015-01-13,16.7,"Tranche 4, USD 400m (announced)",https://www.lanueva.com/nota/2015-1-14-0-12-0-mas-reservas-gracias-al-swap-chino
+2015-01-31,19.2,"Cumulative USD 3,114m (last reported)",https://unr.edu.ar/radiografia-del-swap-argentina-china/
+2015-03-31,34.3,Inferred from BCRA weekly balance (repo-liability line net of peso repos),BCRA weekly summary balance
+2015-04-30,38.0,Inferred from BCRA weekly balance,BCRA weekly summary balance
+2015-05-31,44.1,Inferred from BCRA weekly balance,BCRA weekly summary balance
+2015-06-30,50.0,Inferred from BCRA weekly balance,BCRA weekly summary balance
+2015-08-31,64.2,Inferred from BCRA weekly balance,BCRA weekly summary balance
+2015-09-30,70.0,Full CNY 70bn (inferred; balance-sheet path stays at ~70 Oct 2015-Jan 2016),BCRA weekly summary balance
+2018-12-17,130.0,"CNY 60bn expansion credited to reserves (USD 8,725m)",https://www.ambito.com/edicion-impresa/banco-central/reservas-mejoran-swap-china-n5005949

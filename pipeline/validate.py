@@ -47,7 +47,7 @@ def check_series(new: pd.Series, old: pd.Series, frequency: str = "M", measure: 
             msg = f"{len(missing)} missing period(s), first {missing[0]:%Y-%m}"
             # Some sources have known historical holes (e.g. the REM survey).
             (c.warnings if allow_gaps else c.errors).append(msg)
-    if frequency == "D":
+    if frequency == "D" and not allow_gaps:
         # Business days: weekends and holidays are normal gaps; long ones get a look.
         gaps = new.index.to_series().diff().dt.days
         long = gaps[gaps > 15]
@@ -94,7 +94,9 @@ def check_series(new: pd.Series, old: pd.Series, frequency: str = "M", measure: 
     return c
 
 
-def is_stale(last_obs: pd.Timestamp, today: pd.Timestamp, frequency: str = "M") -> bool:
+def is_stale(last_obs: pd.Timestamp, today: pd.Timestamp, frequency: str = "M", stale_days: int | None = None) -> bool:
+    if stale_days:
+        return (today - last_obs).days > stale_days
     if frequency == "D":
         return (today - last_obs).days > 10
     months = (today.year - last_obs.year) * 12 + (today.month - last_obs.month)

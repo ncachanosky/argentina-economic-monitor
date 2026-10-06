@@ -100,7 +100,8 @@ def run(dry_run: bool = False, strict: bool = False) -> int:
             if not latest.empty:
                 entry["last_obs"] = latest.index.max().strftime("%Y-%m-%d")
                 # Discontinued or hand-maintained history is never "stale".
-                stale = not meta[sid]["static"] and validate.is_stale(latest.index.max(), today, freq_of[sid])
+                stale = not meta[sid]["static"] and validate.is_stale(latest.index.max(), today, freq_of[sid],
+                                                                          meta[sid].get("stale_days"))
             else:
                 stale = True
             entry["status"] = "error" if problem else ("stale" if stale else "ok")
