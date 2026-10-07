@@ -257,7 +257,7 @@ inputs:
   - {id: "fin:a1|advances", source: finanzas, frequency: M, measure: flow, label: "BCRA temporary advances to the Treasury (stock)"}
   - {id: "fin:hold|public", source: finanzas, frequency: M, measure: flow, allow_gaps: true, stale_days: 200, label: "Gross debt held by public-sector agencies (quarter ends, US$ m)"}
   - {id: "fin:hold|private", source: finanzas, frequency: M, measure: flow, allow_gaps: true, stale_days: 200, label: "Gross debt held by the private sector (quarter ends, US$ m)"}
-  - {id: "fin:hold|total", source: finanzas, frequency: M, measure: flow, allow_gaps: true, stale_days: 200, label: "Gross debt, total incl. eligible pending restructuring (quarter ends, US$ m)"}
+  - {id: "fin:hold|total", source: finanzas, frequency: M, measure: flow, allow_gaps: true, stale_days: 200, label: "Gross debt by holder, total (quarter ends, US$ m)"}
   # IMIG revenue by tax (national share, cash basis), millions of current pesos.
   - {id: 452.2_IVA_NETO_RROS_0_T_19_67, source: datos_gob, frequency: M, measure: flow, label: "Revenue: VAT, net of refunds"}
   - {id: 452.2_GANANCIASIAS_0_T_9_51, source: datos_gob, frequency: M, measure: flow, label: "Revenue: income tax"}
@@ -2976,10 +2976,11 @@ indicators:
       sector: as the Finance Secretariat computes it, the rest after
       public agencies and multilateral and bilateral lenders. Multilateral
       and bilateral: the IMF, IDB, World Bank, CAF and others and the Paris
-      Club, plus about US$2.4 billion of debt eligible for but not presented
-      to the restructurings. Only the private and multilateral parts are
-      owed outside the state. Quarter ends; valued at the exchange rate of
-      the quarter's last day.
+      Club. Excludes about US$2.4 billion of debt eligible for but not
+      presented to the restructurings. Only the private and multilateral
+      parts are owed outside the state. Quarter ends; valued at the exchange
+      rate of the quarter's last day. A few quarters are missing where the
+      presentation's table could not be read.
     method_links: [{anchor: debt-gdp, label: "How debt / GDP is calculated"}]
     contributions:
       precomputed: true

@@ -383,6 +383,8 @@ def schedule_table(q: dict, monthly: dict | None) -> dict:
 # ---------- quarterly presentations: debt by holder ----------
 
 HOLDERS = [("public", "agencias del sector publico"), ("private", "sector privado"), ("total", "total deuda publica bruta")]
+HOLDER_LABELS = {"public": "agencias del sector", "private": "sector privado", "multi": "multilaterales",
+                 "eligible": "deuda elegible", "total": "total deuda publica"}
 HOLDERS_FROM_STORE_MIN = 8          # with this much history stored, only the latest presentations are read
 
 
@@ -402,26 +404,57 @@ def find_presentations(html: str) -> list[tuple[dt.date, str]]:
     return out
 
 
+def _amounts(line: str) -> list[float]:
+    """Amounts with thousands separators (129.078, (3.304)); percentages and footnote marks are not."""
+    out = []
+    for m in re.finditer(r"(\(?)(-?\d{1,3}(?:\.\d{3})+)(\)?)(?![\d,%])", line):
+        v = float(m.group(2).replace(".", ""))
+        out.append(-v if m.group(1) and m.group(3) else v)
+    return out
+
+
+def holders_from_text(text: str) -> dict[str, float]:
+    """The table's second date column for each holder. Layouts vary across years: a label may
+    be split over two lines, with its numbers on the label's line, the next or the previous."""
+    lines = text.splitlines()
+    norm = [_norm(l) for l in lines]
+    is_label = lambda n: any(n.startswith(lab) for lab in HOLDER_LABELS.values())
+    out = {}
+    for key, lab in HOLDER_LABELS.items():
+        i = next((k for k, n in enumerate(norm) if n.startswith(lab)), None)
+        if i is None:
+            continue
+        for j in (i, i + 1, i - 1):
+            if 0 <= j < len(lines) and (j == i or not is_label(norm[j])):
+                a = [x for x in _amounts(lines[j]) if x > 0]
+                if len(a) >= 2:
+                    out[key] = a[1]
+                    break
+    # Fill one missing piece from the total (public + private + multilateral; the debt eligible
+    # for the restructurings is shown apart and not added in).
+    elig = 0.0
+    if "total" in out:
+        parts = ["public", "private", "multi"]
+        missing = [k for k in parts if k not in out]
+        if len(missing) == 1:
+            out[missing[0]] = out["total"] - elig - sum(out[k] for k in parts if k != missing[0])
+    return out
+
+
 def parse_holders(content: bytes) -> dict[str, float]:
-    """Debt by holder at the report's date (US$ millions): the table "Deuda Bruta de la
-    Administración Central por acreedor", second date column."""
+    """Debt by holder at the report's date (US$ millions), from the table "Deuda Bruta de la
+    Administración Central por acreedor" of the quarterly presentation."""
     import pdfplumber
     with pdfplumber.open(io.BytesIO(content)) as pdf:
         for page in pdf.pages:
             text = page.extract_text() or ""
-            if "Agencias del Sector" not in text or "Sector Privado" not in text:
+            if "Privado" not in text or "Total Deuda" not in text:
                 continue
-            out = {}
-            for line in text.splitlines():
-                n = _norm(line)
-                for key, lab in HOLDERS:
-                    if n.startswith(lab) and key not in out:
-                        nums = [t for t in re.findall(r"[\d.,()%-]+", line) if re.search(r"\d", t)]
-                        amounts = [t for t in nums if "%" not in t]
-                        if len(amounts) >= 2:
-                            v = amounts[1].strip("()").replace(".", "")
-                            out[key] = float(v)
+            out = holders_from_text(text)
             if {"public", "private", "total"} <= set(out):
+                tot_parts = out["public"] + out["private"] + out.get("multi", 0)
+                if out.get("multi") and abs(tot_parts / out["total"] - 1) > 0.01:
+                    continue                      # the columns did not line up
                 return out
     raise ValueError("holder table not found")
 
