@@ -1375,8 +1375,10 @@
   }
 
   // ---------- card: contributions to growth (GDP by expenditure) ----------
-  const GROUP_VARS = { copper: "--series-1", sky: "--series-2", sage: "--series-3", lavender: "--series-4" };
-  const GROUP_LIGHT = { copper: "#B87333", sky: "#5B9BD5", sage: "#87A96B", lavender: "#8E7AB5", neutral: "#B0B7BD" };
+  const GROUP_VARS = { copper: "--series-1", sky: "--series-2", sage: "--series-3", lavender: "--series-4",
+    gold: "--series-5", rose: "--series-6", teal: "--series-7", slate: "--series-8" };
+  const GROUP_LIGHT = { copper: "#B87333", sky: "#5B9BD5", sage: "#87A96B", lavender: "#8E7AB5",
+    gold: "#C9A227", rose: "#C96B7E", teal: "#3E9C9A", slate: "#6C7A89", neutral: "#B0B7BD" };
   const groupColor = (c) => (GROUP_VARS[c] ? cssVar(GROUP_VARS[c]) : (isDark() ? "#5C6A74" : "#B0B7BD"));
 
   function contributionsCard(ind) {

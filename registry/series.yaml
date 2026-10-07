@@ -160,6 +160,56 @@ inputs:
   - {id: "bcrabk:bal_ars|system|disponibilidades", source: bcra_banks, frequency: M, measure: flow, allow_gaps: true, label: "Banks (system): cash and BCRA accounts in pesos only, millions of pesos"}
   - {id: "bcrabk:bal_ars|system|depositos", source: bcra_banks, frequency: M, measure: flow, allow_gaps: true, label: "Banks (system): deposits in pesos only, millions of pesos"}
   - {id: "bcrabk:bal_ars|system|prestamos", source: bcra_banks, frequency: M, measure: flow, allow_gaps: true, label: "Banks (system): loans in pesos only, millions of pesos"}
+  - {id: "bcrabk:bal|system|patrimonio_neto", source: bcra_banks, frequency: M, measure: flow, allow_gaps: true, label: "Banks (system): net equity, millions of pesos"}
+  - {id: "bcrabk:bal|private|patrimonio_neto", source: bcra_banks, frequency: M, measure: flow, allow_gaps: true, label: "Banks (private): net equity, millions of pesos"}
+  - {id: "bcrabk:bal|public|patrimonio_neto", source: bcra_banks, frequency: M, measure: flow, allow_gaps: true, label: "Banks (public): net equity, millions of pesos"}
+  - {id: "bcrabk:res|system|ingresos_por_intereses_2", source: bcra_banks, frequency: M, measure: flow, allow_gaps: true, label: "Banks (system): interest income, % of netted assets, annualized"}
+  - {id: "bcrabk:res|system|egresos_por_intereses_2", source: bcra_banks, frequency: M, measure: flow, allow_gaps: true, label: "Banks (system): interest expense, % of netted assets, annualized"}
+  - {id: "bcrabk:res|system|ajustes_cer_y_cvs_2", source: bcra_banks, frequency: M, measure: flow, allow_gaps: true, label: "Banks (system): CER/CVS adjustments, % of netted assets, annualized"}
+  - {id: "bcrabk:res|system|diferencias_de_cotizacion_2", source: bcra_banks, frequency: M, measure: flow, allow_gaps: true, label: "Banks (system): exchange-rate differences, % of netted assets, annualized"}
+  - {id: "bcrabk:res|system|resultado_por_titulos_valores_2", source: bcra_banks, frequency: M, measure: flow, allow_gaps: true, label: "Banks (system): results on securities, % of netted assets, annualized"}
+  - {id: "bcrabk:res|system|primas_por_pases_2", source: bcra_banks, frequency: M, measure: flow, allow_gaps: true, label: "Banks (system): repo premiums, % of netted assets, annualized"}
+  - {id: "bcrabk:res|system|otros_resultados_financieros_2", source: bcra_banks, frequency: M, measure: flow, allow_gaps: true, label: "Banks (system): other financial results, % of netted assets, annualized"}
+  - {id: "bcrabk:res|system|resultado_por_servicios_2", source: bcra_banks, frequency: M, measure: flow, allow_gaps: true, label: "Banks (system): net fees, % of netted assets, annualized"}
+  - {id: "bcrabk:res|system|cargos_por_incobrabilidad_2", source: bcra_banks, frequency: M, measure: flow, allow_gaps: true, label: "Banks (system): loan-loss charges, % of netted assets, annualized"}
+  - {id: "bcrabk:res|system|gastos_de_administracion_2", source: bcra_banks, frequency: M, measure: flow, allow_gaps: true, label: "Banks (system): administrative expenses, % of netted assets, annualized"}
+  - {id: "bcrabk:res|system|cargas_impositivas_2", source: bcra_banks, frequency: M, measure: flow, allow_gaps: true, label: "Banks (system): taxes other than income, % of netted assets, annualized"}
+  - {id: "bcrabk:res|system|diversos_2", source: bcra_banks, frequency: M, measure: flow, allow_gaps: true, label: "Banks (system): miscellaneous, % of netted assets, annualized"}
+  - {id: "bcrabk:res|system|resultado_monetario_2", source: bcra_banks, frequency: M, measure: flow, allow_gaps: true, label: "Banks (system): monetary (inflation) result, % of netted assets, annualized"}
+  - {id: "bcrabk:res|system|impuesto_a_las_ganancias_2", source: bcra_banks, frequency: M, measure: flow, allow_gaps: true, label: "Banks (system): income tax, % of netted assets, annualized"}
+  - {id: "bcrabk:res|system|resultado_total_2", source: bcra_banks, frequency: M, measure: flow, allow_gaps: true, label: "Banks (system): total result, % of netted assets, annualized"}
+  - {id: "bcrabk:npl_lines|system|1_total_sector_privado/saldo_total_de_financiaciones/adelantos", source: bcra_banks, frequency: M, measure: flow, allow_gaps: true, label: "Banks (system): private financing, Overdrafts, millions of pesos"}
+  - {id: "bcrabk:npl_lines|system|1_total_sector_privado/saldo_total_de_financiaciones/documentos", source: bcra_banks, frequency: M, measure: flow, allow_gaps: true, label: "Banks (system): private financing, Promissory notes, millions of pesos"}
+  - {id: "bcrabk:npl_lines|system|1_total_sector_privado/saldo_total_de_financiaciones/con_garantia_hipotecaria", source: bcra_banks, frequency: M, measure: flow, allow_gaps: true, label: "Banks (system): private financing, Mortgage-backed, millions of pesos"}
+  - {id: "bcrabk:npl_lines|system|1_total_sector_privado/saldo_total_de_financiaciones/con_garantia_prendaria", source: bcra_banks, frequency: M, measure: flow, allow_gaps: true, label: "Banks (system): private financing, Pledge-backed, millions of pesos"}
+  - {id: "bcrabk:npl_lines|system|1_total_sector_privado/saldo_total_de_financiaciones/personales", source: bcra_banks, frequency: M, measure: flow, allow_gaps: true, label: "Banks (system): private financing, Personal, millions of pesos"}
+  - {id: "bcrabk:npl_lines|system|1_total_sector_privado/saldo_total_de_financiaciones/tarjetas_de_credito", source: bcra_banks, frequency: M, measure: flow, allow_gaps: true, label: "Banks (system): private financing, Credit cards, millions of pesos"}
+  - {id: "bcrabk:npl_lines|system|1_total_sector_privado/saldo_total_de_financiaciones/prefinanciacion_y_financiacion_de_exportaciones", source: bcra_banks, frequency: M, measure: flow, allow_gaps: true, label: "Banks (system): private financing, Export finance, millions of pesos"}
+  - {id: "bcrabk:npl_lines|system|1_total_sector_privado/saldo_total_de_financiaciones/otros", source: bcra_banks, frequency: M, measure: flow, allow_gaps: true, label: "Banks (system): private financing, Other, millions of pesos"}
+  - {id: "bcrabk:npl_lines|system|1_total_sector_privado/saldo_total_de_financiaciones/cartera_total", source: bcra_banks, frequency: M, measure: flow, allow_gaps: true, label: "Banks (system): private financing, Total, millions of pesos"}
+  - {id: "bcrabk:npl_lines|system|1_1_sector_privado_en_uva/saldo_total_de_financiaciones/cartera_total", source: bcra_banks, frequency: M, measure: flow, allow_gaps: true, label: "Banks (system): private financing in UVA, millions of pesos"}
+  - {id: "bcrabk:npl_lines|system|2_familias_total/saldo_total_de_financiaciones/cartera_total", source: bcra_banks, frequency: M, measure: flow, allow_gaps: true, label: "Banks (system): financing to households, millions of pesos"}
+  - {id: "bcrabk:npl_lines|system|2_1_familias_en_uva/saldo_total_de_financiaciones/cartera_total", source: bcra_banks, frequency: M, measure: flow, allow_gaps: true, label: "Banks (system): financing to households in UVA, millions of pesos"}
+  - {id: "bcraef:hold_treasury_nacion", source: bcra_entities, frequency: M, measure: flow, allow_gaps: true, stale_days: 150, label: "Banks: share of treasury holdings, nacion"}
+  - {id: "bcraef:hold_treasury_provincia", source: bcra_entities, frequency: M, measure: flow, allow_gaps: true, stale_days: 150, label: "Banks: share of treasury holdings, provincia"}
+  - {id: "bcraef:hold_treasury_galicia", source: bcra_entities, frequency: M, measure: flow, allow_gaps: true, stale_days: 150, label: "Banks: share of treasury holdings, galicia"}
+  - {id: "bcraef:hold_treasury_santander", source: bcra_entities, frequency: M, measure: flow, allow_gaps: true, stale_days: 150, label: "Banks: share of treasury holdings, santander"}
+  - {id: "bcraef:hold_treasury_bbva", source: bcra_entities, frequency: M, measure: flow, allow_gaps: true, stale_days: 150, label: "Banks: share of treasury holdings, bbva"}
+  - {id: "bcraef:hold_treasury_macro", source: bcra_entities, frequency: M, measure: flow, allow_gaps: true, stale_days: 150, label: "Banks: share of treasury holdings, macro"}
+  - {id: "bcraef:hold_treasury_credicoop", source: bcra_entities, frequency: M, measure: flow, allow_gaps: true, stale_days: 150, label: "Banks: share of treasury holdings, credicoop"}
+  - {id: "bcraef:hold_treasury_icbc", source: bcra_entities, frequency: M, measure: flow, allow_gaps: true, stale_days: 150, label: "Banks: share of treasury holdings, icbc"}
+  - {id: "bcraef:hold_treasury_other", source: bcra_entities, frequency: M, measure: flow, allow_gaps: true, stale_days: 150, label: "Banks: share of treasury holdings, other"}
+  - {id: "bcraef:hhi_treasury", source: bcra_entities, frequency: M, measure: flow, allow_gaps: true, stale_days: 150, label: "Banks: HHI of treasury holdings"}
+  - {id: "bcraef:hold_bcra_nacion", source: bcra_entities, frequency: M, measure: flow, allow_gaps: true, stale_days: 150, label: "Banks: share of bcra holdings, nacion"}
+  - {id: "bcraef:hold_bcra_provincia", source: bcra_entities, frequency: M, measure: flow, allow_gaps: true, stale_days: 150, label: "Banks: share of bcra holdings, provincia"}
+  - {id: "bcraef:hold_bcra_galicia", source: bcra_entities, frequency: M, measure: flow, allow_gaps: true, stale_days: 150, label: "Banks: share of bcra holdings, galicia"}
+  - {id: "bcraef:hold_bcra_santander", source: bcra_entities, frequency: M, measure: flow, allow_gaps: true, stale_days: 150, label: "Banks: share of bcra holdings, santander"}
+  - {id: "bcraef:hold_bcra_bbva", source: bcra_entities, frequency: M, measure: flow, allow_gaps: true, stale_days: 150, label: "Banks: share of bcra holdings, bbva"}
+  - {id: "bcraef:hold_bcra_macro", source: bcra_entities, frequency: M, measure: flow, allow_gaps: true, stale_days: 150, label: "Banks: share of bcra holdings, macro"}
+  - {id: "bcraef:hold_bcra_credicoop", source: bcra_entities, frequency: M, measure: flow, allow_gaps: true, stale_days: 150, label: "Banks: share of bcra holdings, credicoop"}
+  - {id: "bcraef:hold_bcra_icbc", source: bcra_entities, frequency: M, measure: flow, allow_gaps: true, stale_days: 150, label: "Banks: share of bcra holdings, icbc"}
+  - {id: "bcraef:hold_bcra_other", source: bcra_entities, frequency: M, measure: flow, allow_gaps: true, stale_days: 150, label: "Banks: share of bcra holdings, other"}
+  - {id: "bcraef:hhi_bcra", source: bcra_entities, frequency: M, measure: flow, allow_gaps: true, stale_days: 150, label: "Banks: HHI of bcra holdings"}
   # Banks: concentration from the BCRA's monthly data on each institution (since Nov 1994).
   - {id: "bcraef:hhi_assets", source: bcra_entities, frequency: M, measure: flow, allow_gaps: true, stale_days: 150, label: "Banks: hhi of assets"}
   - {id: "bcraef:hhi_deposits", source: bcra_entities, frequency: M, measure: flow, allow_gaps: true, stale_days: 150, label: "Banks: hhi of deposits"}
@@ -1590,6 +1640,148 @@ indicators:
         private: {label: Private banks, expr: "pub_p + 100 * (nz(lel_p) + (l2_p - l3_p) / 100 * dep_p * (1 - nz(lefi))) / act_p"}
         system:  {label: Financial system, expr: "pub_s + 100 * (nz(lel_s) + (l2_s - l3_s) / 100 * dep_s * (1 - nz(lefi))) / act_s"}
 
+  - id: bank_holdings_treasury
+    topic: banks
+    wide: true
+    kind: contributions
+    measure: flow
+    title: "Who Holds the Banks' Claims on the Treasury and Provinces"
+    short_title: "Holders: Treasury"
+    description: >-
+      Each bank's share of the financial system's government securities and loans to the non-financial public sector (national, provincial and municipal). Monthly, since June 1996.
+    source: bcra_entities
+    source_label: BCRA (Información de Entidades Financieras, monthly data on each institution)
+    frequency: M
+    units: "% of the banks' total"
+    ranges: [10Y, 25Y, Max]
+    note: >-
+      From each institution's balance sheet: government securities (including the Treasury's LEFI) and loans to the non-financial public sector, at book value. The eight banks named are the largest holders today; banks that merged or closed are in All others for their whole history. The chart of accounts does not separate national from provincial claims.
+    contributions:
+      precomputed: true
+      hide_total: true
+      style: area
+      units: "%"
+      groups:
+        - {key: nacion, label: Banco Nación, add: [nacion], color: copper}
+        - {key: provincia, label: Banco Provincia, add: [provincia], color: sky}
+        - {key: galicia, label: Galicia, add: [galicia], color: sage}
+        - {key: santander, label: Santander, add: [santander], color: lavender}
+        - {key: bbva, label: BBVA, add: [bbva], color: gold}
+        - {key: macro, label: Macro, add: [macro], color: rose}
+        - {key: credicoop, label: Credicoop, add: [credicoop], color: teal}
+        - {key: icbc, label: ICBC, add: [icbc], color: slate}
+        - {key: other, label: All others, add: [other], color: neutral}
+    variants:
+      nacion: {label: Banco Nación, id: "bcraef:hold_treasury_nacion"}
+      provincia: {label: Banco Provincia, id: "bcraef:hold_treasury_provincia"}
+      galicia: {label: Galicia, id: "bcraef:hold_treasury_galicia"}
+      santander: {label: Santander, id: "bcraef:hold_treasury_santander"}
+      bbva: {label: BBVA, id: "bcraef:hold_treasury_bbva"}
+      macro: {label: Macro, id: "bcraef:hold_treasury_macro"}
+      credicoop: {label: Credicoop, id: "bcraef:hold_treasury_credicoop"}
+      icbc: {label: ICBC, id: "bcraef:hold_treasury_icbc"}
+      other: {label: All others, id: "bcraef:hold_treasury_other"}
+    default: {variant: nacion, transform: level, range: Max}
+
+  - id: bank_holdings_bcra
+    topic: banks
+    wide: true
+    kind: contributions
+    measure: flow
+    title: "Who Holds the Banks' Claims on the BCRA"
+    short_title: "Holders: BCRA"
+    description: >-
+      Each bank's share of the financial system's holdings of BCRA notes (LEBAC, LELIQ, NOTALIQ and others) and repos with the BCRA. Monthly, since June 1996.
+    source: bcra_entities
+    source_label: BCRA (Información de Entidades Financieras, monthly data on each institution)
+    frequency: M
+    units: "% of the banks' total"
+    ranges: [10Y, 25Y, Max]
+    note: >-
+      From each institution's balance sheet: BCRA securities and repos with the BCRA. Since the central bank stopped issuing notes and taking repos in 2024 the total is small, so recent shares move a lot.
+    contributions:
+      precomputed: true
+      hide_total: true
+      style: area
+      units: "%"
+      groups:
+        - {key: nacion, label: Banco Nación, add: [nacion], color: copper}
+        - {key: provincia, label: Banco Provincia, add: [provincia], color: sky}
+        - {key: galicia, label: Galicia, add: [galicia], color: sage}
+        - {key: santander, label: Santander, add: [santander], color: lavender}
+        - {key: bbva, label: BBVA, add: [bbva], color: gold}
+        - {key: macro, label: Macro, add: [macro], color: rose}
+        - {key: credicoop, label: Credicoop, add: [credicoop], color: teal}
+        - {key: icbc, label: ICBC, add: [icbc], color: slate}
+        - {key: other, label: All others, add: [other], color: neutral}
+    variants:
+      nacion: {label: Banco Nación, id: "bcraef:hold_bcra_nacion"}
+      provincia: {label: Banco Provincia, id: "bcraef:hold_bcra_provincia"}
+      galicia: {label: Galicia, id: "bcraef:hold_bcra_galicia"}
+      santander: {label: Santander, id: "bcraef:hold_bcra_santander"}
+      bbva: {label: BBVA, id: "bcraef:hold_bcra_bbva"}
+      macro: {label: Macro, id: "bcraef:hold_bcra_macro"}
+      credicoop: {label: Credicoop, id: "bcraef:hold_bcra_credicoop"}
+      icbc: {label: ICBC, id: "bcraef:hold_bcra_icbc"}
+      other: {label: All others, id: "bcraef:hold_bcra_other"}
+    default: {variant: nacion, transform: level, range: Max}
+
+  - id: bank_sovereign_capital
+    topic: banks
+    kind: variants
+    overlay: true
+    measure: rate
+    title: Exposure to the State Relative to Capital
+    short_title: Exposure / capital
+    description: >-
+      Banks' claims on the Treasury, the rest of the public sector and the
+      BCRA as a percentage of their net equity, by group. At 300%, a 10%
+      loss on those claims would cost 30% of capital. Monthly, since December
+      2009.
+    source: derived
+    source_label: BCRA (Informe sobre Bancos, statistical annex)
+    frequency: M
+    units: "% of net equity"
+    transforms: [level, yoy]
+    ranges: [5Y, 10Y, Max]
+    note: >-
+      Claims on the state as in the exposure chart (Treasury and other
+      public sector, BCRA notes in own portfolio, net repos with the BCRA),
+      in pesos, over net equity. Book values; regulation gives most of these
+      claims low risk weights, so capital ratios do not reflect them.
+    default: {variant: public, transform: level, range: Max}
+    derive:
+      method: formula
+      anchor: eq_s
+      start: "2009-12-01"
+      vars:
+        lefi: lefi_period
+        pub_s: "bcrabk:ind|system|4_credito_al_sector_publico"
+        l2_s: "bcrabk:ind|system|2_liquidez_con_pases_lefi"
+        l3_s: "bcrabk:ind|system|3_liquidez"
+        lel_s: "bcrabk:bal|system|titulos_publicos/tenencia_por_cartera_propia"
+        act_s: "bcrabk:bal|system|activo"
+        dep_s: "bcrabk:bal|system|depositos"
+        eq_s: "bcrabk:bal|system|patrimonio_neto"
+        pub_p: "bcrabk:ind|private|4_credito_al_sector_publico"
+        l2_p: "bcrabk:ind|private|2_liquidez_con_pases_lefi"
+        l3_p: "bcrabk:ind|private|3_liquidez"
+        lel_p: "bcrabk:bal|private|titulos_publicos/tenencia_por_cartera_propia"
+        act_p: "bcrabk:bal|private|activo"
+        dep_p: "bcrabk:bal|private|depositos"
+        eq_p: "bcrabk:bal|private|patrimonio_neto"
+        pub_g: "bcrabk:ind|public|4_credito_al_sector_publico"
+        l2_g: "bcrabk:ind|public|2_liquidez_con_pases_lefi"
+        l3_g: "bcrabk:ind|public|3_liquidez"
+        lel_g: "bcrabk:bal|public|titulos_publicos/tenencia_por_cartera_propia"
+        act_g: "bcrabk:bal|public|activo"
+        dep_g: "bcrabk:bal|public|depositos"
+        eq_g: "bcrabk:bal|public|patrimonio_neto"
+      variants:
+        public: {label: Public banks, expr: "100 * (pub_g / 100 * act_g + nz(lel_g) + (l2_g - l3_g) / 100 * dep_g * (1 - nz(lefi))) / eq_g"}
+        private: {label: Private banks, expr: "100 * (pub_p / 100 * act_p + nz(lel_p) + (l2_p - l3_p) / 100 * dep_p * (1 - nz(lefi))) / eq_p"}
+        system: {label: Financial system, expr: "100 * (pub_s / 100 * act_s + nz(lel_s) + (l2_s - l3_s) / 100 * dep_s * (1 - nz(lefi))) / eq_s"}
+
   - id: bank_liquidity
     topic: banks
     wide: true
@@ -1764,6 +1956,85 @@ indicators:
       public:  {label: Public banks,     id: "bcrabk:ind|public|9b_roe_acumulado_anual_considera_ajuste_por_inflacion"}
     default: {variant: system, transform: level}
 
+  - id: bank_profits
+    topic: banks
+    wide: true
+    kind: contributions
+    measure: flow
+    title: Where Bank Profits Come From
+    short_title: Profit sources
+    description: >-
+      The financial system's results by source, as a percentage of assets,
+      averaged over the last twelve months: interest, inflation-indexed
+      adjustments, securities and repos, fees, credit losses, costs, and the
+      loss of value of peso positions to inflation. Monthly, since December
+      2020.
+    source: derived
+    source_label: BCRA (Informe sobre Bancos, statistical annex)
+    frequency: M
+    units: "% of assets, annualized"
+    ranges: [5Y, Max]
+    note: >-
+      The BCRA's monthly annualized results as a percentage of netted assets,
+      in constant currency (IAS 29), averaged over twelve months. Net
+      interest: interest income minus interest expense. CER adjustments:
+      indexation of inflation-linked loans and bonds. Securities and repos:
+      results on securities (mostly government paper) and premiums on repos
+      (mostly with the BCRA). Inflation: the monetary result, the loss on net
+      peso positions. Costs: administrative expenses and taxes other than
+      income tax. Other: other financial results, miscellaneous and income
+      tax. With inflation above 200% (2023-24), nominal interest and gains
+      on securities were very large and mostly offset by the inflation loss;
+      the total result is what is left.
+    contributions:
+      precomputed: true
+      total: total
+      total_label: Total result
+      style: bars
+      units: "% of assets"
+      groups:
+        - {key: interest,   label: Net interest,           add: [interest],   color: copper}
+        - {key: cer,        label: CER adjustments,        add: [cer],        color: sky}
+        - {key: securities, label: Securities and repos,   add: [securities], color: sage}
+        - {key: fx,         label: Exchange-rate gains,    add: [fx],         color: lavender}
+        - {key: fees,       label: Net fees,               add: [fees],       color: gold}
+        - {key: losses,     label: Credit losses,          add: [losses],     color: rose}
+        - {key: costs,      label: Costs,                  add: [costs],      color: slate}
+        - {key: inflation,  label: Inflation (monetary result), add: [inflation], color: teal}
+        - {key: other,      label: Other,                  add: [other],      color: neutral}
+    default: {variant: total, transform: level, range: Max}
+    derive:
+      method: formula
+      anchor: tot
+      start: "2020-12-01"
+      vars:
+        ii: "bcrabk:res|system|ingresos_por_intereses_2"
+        ie: "bcrabk:res|system|egresos_por_intereses_2"
+        cer: "bcrabk:res|system|ajustes_cer_y_cvs_2"
+        fx: "bcrabk:res|system|diferencias_de_cotizacion_2"
+        sec: "bcrabk:res|system|resultado_por_titulos_valores_2"
+        rep: "bcrabk:res|system|primas_por_pases_2"
+        ofin: "bcrabk:res|system|otros_resultados_financieros_2"
+        fees: "bcrabk:res|system|resultado_por_servicios_2"
+        loss: "bcrabk:res|system|cargos_por_incobrabilidad_2"
+        adm: "bcrabk:res|system|gastos_de_administracion_2"
+        tax: "bcrabk:res|system|cargas_impositivas_2"
+        div: "bcrabk:res|system|diversos_2"
+        mon: "bcrabk:res|system|resultado_monetario_2"
+        inc: "bcrabk:res|system|impuesto_a_las_ganancias_2"
+        tot: "bcrabk:res|system|resultado_total_2"
+      variants:
+        total:      {label: Total result,         expr: "avg12(tot)"}
+        interest:   {label: Net interest,         expr: "avg12(ii + ie)"}
+        cer:        {label: CER adjustments,      expr: "avg12(cer)"}
+        securities: {label: Securities and repos, expr: "avg12(sec + rep)"}
+        fx:         {label: Exchange-rate gains,  expr: "avg12(fx)"}
+        fees:       {label: Net fees,             expr: "avg12(fees)"}
+        losses:     {label: Credit losses,        expr: "avg12(loss)"}
+        costs:      {label: Costs,                expr: "avg12(adm + tax)"}
+        inflation:  {label: Inflation (monetary result), expr: "avg12(mon)"}
+        other:      {label: Other,                expr: "avg12(ofin + div + inc)"}
+
   - id: bank_concentration
     topic: banks
     kind: variants
@@ -1801,8 +2072,9 @@ indicators:
     title: Concentration Index and Number of Institutions
     short_title: HHI
     description: >-
-      Herfindahl-Hirschman index of assets, deposits and loans (sum of
-      squared market shares, 0 to 10,000). Monthly, since June 1996.
+      Herfindahl-Hirschman index of assets, deposits and loans, and of the
+      banks' claims on the Treasury and on the BCRA (sum of squared shares,
+      0 to 10,000). Monthly, since June 1996.
     source: bcra_entities
     source_label: BCRA (Información de Entidades Financieras, monthly data on each institution)
     frequency: M
@@ -1818,6 +2090,8 @@ indicators:
       assets:   {label: Assets,   id: "bcraef:hhi_assets"}
       deposits: {label: Deposits, id: "bcraef:hhi_deposits"}
       loans:    {label: Loans,    id: "bcraef:hhi_loans"}
+      treasury: {label: "Claims on the Treasury and provinces", id: "bcraef:hhi_treasury"}
+      bcra:     {label: Claims on the BCRA, id: "bcraef:hhi_bcra"}
     default: {variant: assets, transform: level, range: Max}
 
   - id: bank_top10
@@ -1922,6 +2196,96 @@ indicators:
         gdp: 4.4_OGP_2004_T_17
       variants:
         depth: {label: Private credit / GDP, expr: "100 * sum4(loans) / sum4(gdp)"}
+
+  - id: bank_credit_mix
+    topic: banks
+    wide: true
+    kind: contributions
+    measure: flow
+    title: What Banks Lend For
+    short_title: Credit by type
+    description: >-
+      Financing to the private sector by type, as a share of the total, in
+      pesos and dollars. Monthly, since January 2010. For growth in real
+      terms of peso loans by type, see Private Peso Loans on the Money page.
+    source: derived
+    source_label: BCRA (Informe sobre Bancos, statistical annex)
+    frequency: M
+    units: "% of private financing"
+    ranges: [5Y, 10Y, Max]
+    note: >-
+      Loans and other financing to the non-financial private sector, by
+      type, as classified in the BCRA's debtor data; dollar financing valued
+      in pesos (most export finance is in dollars).
+    contributions:
+      precomputed: true
+      hide_total: true
+      style: area
+      units: "%"
+      groups:
+        - {key: cards, label: "Credit cards", add: [cards], color: copper}
+        - {key: personal, label: "Personal loans", add: [personal], color: sky}
+        - {key: documents, label: "Promissory notes", add: [documents], color: sage}
+        - {key: overdrafts, label: "Overdrafts", add: [overdrafts], color: lavender}
+        - {key: mortgages, label: "Mortgage-backed", add: [mortgages], color: gold}
+        - {key: pledge, label: "Pledge-backed (cars)", add: [pledge], color: rose}
+        - {key: exports, label: "Export finance", add: [exports], color: teal}
+        - {key: other, label: "Other", add: [other], color: neutral}
+    default: {variant: cards, transform: level, range: Max}
+    derive:
+      method: formula
+      anchor: tot
+      vars:
+        tot: "bcrabk:npl_lines|system|1_total_sector_privado/saldo_total_de_financiaciones/cartera_total"
+        cards: "bcrabk:npl_lines|system|1_total_sector_privado/saldo_total_de_financiaciones/tarjetas_de_credito"
+        personal: "bcrabk:npl_lines|system|1_total_sector_privado/saldo_total_de_financiaciones/personales"
+        documents: "bcrabk:npl_lines|system|1_total_sector_privado/saldo_total_de_financiaciones/documentos"
+        overdrafts: "bcrabk:npl_lines|system|1_total_sector_privado/saldo_total_de_financiaciones/adelantos"
+        mortgages: "bcrabk:npl_lines|system|1_total_sector_privado/saldo_total_de_financiaciones/con_garantia_hipotecaria"
+        pledge: "bcrabk:npl_lines|system|1_total_sector_privado/saldo_total_de_financiaciones/con_garantia_prendaria"
+        exports: "bcrabk:npl_lines|system|1_total_sector_privado/saldo_total_de_financiaciones/prefinanciacion_y_financiacion_de_exportaciones"
+        other: "bcrabk:npl_lines|system|1_total_sector_privado/saldo_total_de_financiaciones/otros"
+      variants:
+        cards: {label: "Credit cards", expr: "100 * cards / tot"}
+        personal: {label: "Personal loans", expr: "100 * personal / tot"}
+        documents: {label: "Promissory notes", expr: "100 * documents / tot"}
+        overdrafts: {label: "Overdrafts", expr: "100 * overdrafts / tot"}
+        mortgages: {label: "Mortgage-backed", expr: "100 * mortgages / tot"}
+        pledge: {label: "Pledge-backed (cars)", expr: "100 * pledge / tot"}
+        exports: {label: "Export finance", expr: "100 * exports / tot"}
+        other: {label: "Other", expr: "100 * other / tot"}
+
+  - id: bank_uva
+    topic: banks
+    kind: variants
+    overlay: true
+    measure: rate
+    title: Inflation-Indexed (UVA) Lending
+    short_title: UVA lending
+    description: >-
+      Loans in UVA (units indexed to the CPI) as a share of financing to the
+      private sector and to households. Monthly, since January 2018.
+    source: derived
+    source_label: BCRA (Informe sobre Bancos, statistical annex)
+    frequency: M
+    units: "% of financing"
+    transforms: [level, yoy]
+    ranges: [5Y, Max]
+    note: >-
+      UVA loans are mostly mortgages and personal loans whose principal is
+      adjusted by inflation (CER).
+    default: {variant: households, transform: level, range: Max}
+    derive:
+      method: formula
+      anchor: uva
+      vars:
+        uva: "bcrabk:npl_lines|system|1_1_sector_privado_en_uva/saldo_total_de_financiaciones/cartera_total"
+        tot: "bcrabk:npl_lines|system|1_total_sector_privado/saldo_total_de_financiaciones/cartera_total"
+        huva: "bcrabk:npl_lines|system|2_1_familias_en_uva/saldo_total_de_financiaciones/cartera_total"
+        htot: "bcrabk:npl_lines|system|2_familias_total/saldo_total_de_financiaciones/cartera_total"
+      variants:
+        households: {label: Households,     expr: "100 * huva / htot"}
+        total:      {label: Private sector, expr: "100 * uva / tot"}
 
   - id: bank_spread
     topic: banks

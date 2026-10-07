@@ -120,6 +120,11 @@ def parse(content: bytes) -> dict:
                     continue
                 continue
             dates = {i: _as_date(c) for i, c in enumerate(cells) if i > 0 and _as_date(c) is not None}
+            # Yearly columns ("A diciembre", or year-to-date sums) only where no monthly data exist.
+            monthly_years = {d.year for i, d in dates.items() if not isinstance(cells[i], (int, float, str))}
+            if monthly_years:
+                first = min(monthly_years)
+                dates = {i: d for i, d in dates.items() if not isinstance(cells[i], (int, float, str)) or d.year < first}
             if len(dates) > 5:
                 cols, parent = dates, None
                 if skey == "npl_lines" and group is None:

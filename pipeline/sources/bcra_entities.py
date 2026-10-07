@@ -205,6 +205,40 @@ def composition(arc: dict, months: list[str]) -> dict:
     return t
 
 
+# Banks named in the holdings charts (the largest holders of Treasury paper
+# today); everyone else is "other".
+HOLDERS = {"00011": "nacion", "00014": "provincia", "00007": "galicia", "00072": "santander", "00017": "bbva",
+           "00285": "macro", "00191": "credicoop", "00015": "icbc"}
+
+
+def holdings(arc: dict) -> pd.DataFrame:
+    """Each named bank's share of the banks' claims on the Treasury and provinces
+    (government securities and loans to the non-financial public sector) and on
+    the BCRA (its notes and repos), monthly; plus the HHI of each."""
+    df = arc["bal"]
+    df = df[(df.date >= START) & df.acct.str[0].isin(["1"])].copy()
+    cats = {a: _category(a, arc["desc"]) for a in df.acct.unique()}
+    df["cat"] = df.acct.map(cats)
+    rows = []
+    for base, keep in (("treasury", ("gov_sec", "loans_public")), ("bcra", ("bcra_sec",))):
+        s = df[df.cat.isin(keep)].groupby(["date", "ent"]).v.sum()
+        for d, g in s.groupby(level=0):
+            g = g.droplevel(0).clip(lower=0)
+            tot = g.sum()
+            if tot <= 0:
+                continue
+            sh = g / tot * 100
+            stamp = pd.Timestamp(int(d[:4]), int(d[4:6]), 1)
+            named = 0.0
+            for ent, key in HOLDERS.items():
+                v = float(sh.get(ent, 0.0))
+                named += v
+                rows.append((stamp, f"bcraef:hold_{base}_{key}", v))
+            rows.append((stamp, f"bcraef:hold_{base}_other", 100 - named))
+            rows.append((stamp, f"bcraef:hhi_{base}", float((sh ** 2).sum())))
+    return pd.DataFrame(rows, columns=["date", "series_id", "value"])
+
+
 def top10_tables(arc: dict) -> dict:
     dates = sorted(arc["bal"].date.unique())
     latest = dates[-1]
@@ -255,7 +289,7 @@ def fetch(ids, content: bytes | None = None) -> FetchResult:
         if content is None:
             content, _ = download()
         LAST = load_archive(content)
-        data = concentration(LAST)
+        data = pd.concat([concentration(LAST), holdings(LAST)], ignore_index=True)
     except Exception as exc:
         return FetchResult(data=pd.DataFrame(columns=["date", "series_id", "value"]),
                            errors={sid: f"entity archive: {exc}" for sid in ids})

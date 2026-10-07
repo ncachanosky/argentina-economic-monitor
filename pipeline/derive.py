@@ -39,7 +39,8 @@ formula   Arithmetic on stored series: `vars` maps short names to series ids;
           results <= 0 (e.g. an implied exchange rate when net reserves are
           negative); `max: <expr>` blanks results above that bound. A var may name another derived indicator's series as
           "@indicator:variant" (taken at month end for monthly indicators).
-          Also: sum4(x), the sum of the last four periods; `start` drops
+          Also: sum4(x), the sum of the last four periods; avg12(x), the
+          average of the last twelve; `start` drops
           earlier dates; in a quarterly indicator, monthly inputs are taken
           at the last month of each quarter.
 
@@ -304,7 +305,8 @@ def formula(ind, frames: dict[str, pd.Series]) -> tuple[pd.DataFrame, dict]:
     env = {k: frames[v].reindex(idx) for k, v in names.items()}
     env["nz"] = lambda x: x.fillna(0)
     env["sum4"] = lambda x: x.rolling(4).sum()          # last four quarters (or periods)
-    funcs = {"nz", "sum4"}
+    env["avg12"] = lambda x: x.rolling(12).mean()       # average of the last twelve periods
+    funcs = {"nz", "sum4", "avg12"}
     allowed = (ast.Expression, ast.BinOp, ast.UnaryOp, ast.Add, ast.Sub, ast.Mult, ast.Div, ast.USub,
                ast.Name, ast.Load, ast.Constant, ast.Call)
     out = {}
