@@ -209,7 +209,68 @@ BAL_NOTES = [
     "Securities received in reverse repos: book value, all counterparties; from January 2018 they are no longer on the balance sheet (IFRS).",
     "Deposits by sector exclude accrued interest, CER adjustments and IFRS adjustments, so they do not add up to total deposits.",
     "Since January 2020 banks report in constant currency (IAS 29), restated to each month's prices.",
+    "Lines in italics are computed here: the difference between a line and the sub-lines the BCRA publishes for it (for government securities, everything other than BCRA notes, mostly Treasury securities).",
 ]
+
+RESIDUAL_LABELS = {
+    "Government securities": ("Treasury and other government securities", "first"),
+    "Deposits": ("Accrued interest and adjustments", "last"),
+    "Private sector": ("Other deposits", "last"),
+}
+
+
+def add_residuals(rows: list[dict]) -> list[dict]:
+    """Where a line's published sub-lines do not add up to it, add the difference
+    as a computed sub-line (e.g. Treasury securities = government securities
+    minus BCRA notes, the only sub-line the BCRA publishes)."""
+    out = []
+    for i, r in enumerate(rows):
+        out.append(r)
+        if r["kind"] == "total" or r["values"] is None:
+            continue
+        kids, j = [], i + 1
+        while j < len(rows) and rows[j]["level"] > r["level"] and rows[j]["side"] == r["side"]:
+            if rows[j]["level"] == r["level"] + 1:
+                kids.append(rows[j])
+            j += 1
+        if not kids:
+            continue
+        res = []
+        for t, v in enumerate(r["values"]):
+            if v is None:
+                res.append(None)
+                continue
+            res.append(v - sum((k["values"][t] or 0) for k in kids))
+        if not any(x is not None and abs(x) > max(1.0, 0.005 * abs(v or 0)) for x, v in zip(res, r["values"])):
+            continue
+        label, where = RESIDUAL_LABELS.get(r["label"], ("Other, not itemized", "last"))
+        row = {"side": r["side"], "level": r["level"] + 1, "kind": "computed", "label": label,
+               "values": [round(x, 3) if x is not None else None for x in res]}
+        r["_residual"] = (row, where)
+    # Place the computed lines first or last among their parent's sub-lines.
+    final = []
+    for i, r in enumerate(out):
+        final.append(r)
+        if "_residual" not in r:
+            continue
+        row, where = r.pop("_residual")
+        if where == "first":
+            final.append(row)
+        else:
+            r["_pending"] = row
+    result, stack = [], []
+    for r in final:
+        while stack and r["level"] <= stack[-1]["level"]:
+            result.append(stack.pop()["_pending"])
+        if "_pending" in r:
+            stack.append(r)
+        result.append(r)
+    while stack:
+        result.append(stack.pop()["_pending"])
+    for r in result:
+        r.pop("_pending", None)
+    return result
+
 
 def balance_tables(parsed: dict) -> dict:
     """{group: {year: {year, dates, fx, rows, notes}}} in the layout the balance-sheet card reads.
@@ -238,6 +299,7 @@ def balance_tables(parsed: dict) -> dict:
             level = 2 if slug(k) in LEVEL2 else it["level"]
             rows.append({"side": side, "level": level, "kind": kind, "label": label,
                          "values": [it["values"].get(d) for d in dates]})
+        rows = add_residuals(rows)
         # Totals at the bottom of each side, like the BCRA table.
         a = [r for r in rows if r["side"] == "A"]
         l = [r for r in rows if r["side"] == "L"]

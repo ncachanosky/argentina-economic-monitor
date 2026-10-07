@@ -1037,7 +1037,7 @@
           const cr = ct ? cmap.get(ks[j]) : null;
           const b = cr && cr.values ? conv(cr.values[ci], cfx, ctot) : null;
           const mark = valLabel && r.label.toLowerCase().startsWith(valLabel) ? " †" : "";
-          const cls = r.kind === "total" ? "total" : r.kind === "less" ? "less" : r.level === 0 ? "main" : "";
+          const cls = r.kind === "total" ? "total" : r.kind === "less" ? "less" : r.kind === "computed" ? "computed" : r.level === 0 ? "main" : "";
           const cells = [h("td", { class: "pres", style: `padding-left:${10 + r.level * 16}px` }, niceLabel(r.label) + mark),
             h("td", {}, r.kind === "less" || r.kind === "header" ? "" : fmt(a))];
           if (ct) cells.push(h("td", {}, r.kind === "less" || r.kind === "header" ? "" : fmt(b)), h("td", {}, r.kind === "less" || a === null || b === null ? "" : fmtChg(a - b)));
@@ -1091,7 +1091,7 @@
     const tableEl = h("div", { class: "table-scroll top10" });
     const hint = h("p", { class: "hint" });
     const pct = (v) => (v === null || v === undefined ? "–" : (v < 0 ? "−" : "") + Math.abs(v).toFixed(1));
-    const SUMMARY = [["public_total", "Public sector (Treasury, provinces, BCRA notes)"], ["loans_private", "Loans to the private sector"],
+    const SUMMARY = [["public_total", "Public sector (Treasury, provinces, BCRA notes and repos)"], ["loans_private", "Loans to the private sector"],
       ["liquid", "Cash and BCRA current accounts"], ["fx_share_dep", "Dollar share of deposits"], ["loans_to_dep", "Loans / deposits"], ["equity", "Net equity"]];
     let view = null;
 

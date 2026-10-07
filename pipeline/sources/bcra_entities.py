@@ -40,16 +40,19 @@ DEPOSITS_ARS = ("311", "312", "318")
 DEPOSITS_FX = ("315", "316", "319")
 BCRA_WORDS = re.compile(r"BCRA|B\.C\.R\.A|LEBAC|LELIQ|NOBAC|NOTALIQ|LEDIV|LETRAS DE LIQUIDEZ|NOTAS DE LIQUIDEZ")
 PRIVATE_WORDS = re.compile(r"PRIVAD")
+# Repos with the BCRA (chart of accounts, Com. "A" plan de cuentas): principal and accrued interest,
+# in pesos and in foreign currency, on Treasury securities and on BCRA monetary instruments.
+BCRA_REPO = {"141143", "141144", "141222", "145106", "145129", "145222"}
 
 ASSET_ROWS = [
     ("liquid", "Cash and BCRA current accounts"),
     ("gov_sec", "Government securities (Treasury, provinces; incl. LEFI)"),
-    ("bcra_sec", "BCRA notes (LEBAC, LELIQ, NOTALIQ, ...)"),
+    ("bcra_sec", "BCRA notes and repos with the BCRA"),
     ("priv_sec", "Private securities"),
     ("loans_private", "Loans to the private sector"),
     ("loans_public", "Loans to the public sector"),
     ("loans_other", "Other loans (financial sector, non-residents)"),
-    ("other_fin", "Other financial claims (incl. repos)"),
+    ("other_fin", "Other financial claims"),
     ("other_assets", "Other assets"),
 ]
 FUNDING_ROWS = [
@@ -160,7 +163,7 @@ def _category(acct: str, desc: dict) -> str:
             return "loans_private"
         return "loans_other"
     if a.startswith("14"):
-        return "other_fin"
+        return "bcra_sec" if a in BCRA_REPO else "other_fin"
     return "other_assets"
 
 

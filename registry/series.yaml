@@ -1843,9 +1843,9 @@ indicators:
     note: >-
       Unconsolidated balance sheets as each institution reports them to the
       BCRA, grouped by the BCRA's chart of accounts. Government securities
-      include the Treasury's LEFI; BCRA notes are securities issued by the
-      central bank; repos with the BCRA (large in 2019-2024) are in other
-      financial claims. Shares of total assets; deposits and equity are on
+      include the Treasury's LEFI; BCRA notes and repos are the central
+      bank's securities (LEBAC, LELIQ, NOTALIQ and others) plus repos with
+      the BCRA (large in 2019-2024). Shares of total assets; deposits and equity are on
       the funding side. Descriptive only: a bank's balance-sheet mix reflects
       its business model, not its soundness.
 
