@@ -1238,6 +1238,7 @@ indicators:
 
   - id: bcra_assets
     topic: money
+    hidden: true        # history charts off for now; the weekly balance table replaces them
     kind: contributions
     measure: flow
     title: "BCRA Balance Sheet: Assets"
@@ -1284,6 +1285,7 @@ indicators:
 
   - id: bcra_liabilities
     topic: money
+    hidden: true        # history charts off for now; the weekly balance table replaces them
     kind: contributions
     measure: flow
     title: "BCRA Balance Sheet: Liabilities"

@@ -972,10 +972,14 @@
     const dateOpts = (y) => ind.years[y].slice().reverse().map((d) => [d, fmtDay(d)]);
     const ySel = sel(years.slice().reverse().map((y) => [y, y]), state.year, "Year", (y) => { state.year = y; state.date = ind.years[y].slice(-1)[0]; dSel.replaceChildren(...dateOpts(y).map(([v, t]) => h("option", { value: v }, t))); dSel.value = state.date; render(); });
     const dSel = sel(dateOpts(state.year), state.date, "Weekly balance", (d) => { state.date = d; render(); });
-    const cySel = sel([["", "None"], ...years.slice().reverse().map((y) => [y, y])], "", "Compare with: year", (y) => {
+    const setCompare = (y) => {
       state.cyear = y; state.cdate = y ? ind.years[y].slice(-1)[0] : "";
-      cdSel.replaceChildren(...(y ? dateOpts(y) : []).map(([v, t]) => h("option", { value: v }, t))); cdSel.value = state.cdate; cdSel.hidden = !y; render();
-    });
+      cySel.value = y;
+      cdSel.replaceChildren(...(y ? dateOpts(y) : []).map(([v, t]) => h("option", { value: v }, t))); cdSel.value = state.cdate;
+      cdSel.hidden = !y; clearBtn.hidden = !y; render();
+    };
+    const cySel = sel([["", "No comparison"], ...years.slice().reverse().map((y) => [y, y])], "", "Compare with: year", (y) => setCompare(y));
+    const clearBtn = h("button", { class: "btn", type: "button", hidden: true, title: "Show only the selected balance", onclick: () => setCompare("") }, "✕ Remove comparison");
     const cdSel = sel([], "", "Compare with: weekly balance", (d) => { state.cdate = d; render(); });
     cdSel.hidden = true;
     const uSeg = segmented([["ars", "Pesos"], ["usd", "US dollars"], ["pct", "% of assets"]], state.units, (k) => { state.units = k; uSeg.update(k); render(); }, "Units");
@@ -1058,7 +1062,7 @@
     const onCSV = () => { if (view) downloadBlob(toCSV(view.header, view.rows), `bcra_balance_${state.date}${state.cdate ? "_vs_" + state.cdate : ""}_${state.units}.csv`, "text/csv"); };
     appendAll(card,
       h("div", { class: "controls" }, h("label", { class: "base-pick" }, h("span", {}, "Balance:"), ySel, dSel),
-        h("label", { class: "base-pick" }, h("span", {}, "Compare with:"), cySel, cdSel), h("span", { class: "spacer" }), uSeg),
+        h("label", { class: "base-pick" }, h("span", {}, "Compare with:"), cySel, cdSel), clearBtn, h("span", { class: "spacer" }), uSeg),
       guide, unitsNote, grid, notesEl,
       h("div", { class: "card-foot" },
         h("span", {}, "Source: ", h("a", { href: "https://www.bcra.gob.ar/en/weekly-summary-balances-of-assets-and-liabilities/", target: "_blank", rel: "noopener" }, ind.source_label),
