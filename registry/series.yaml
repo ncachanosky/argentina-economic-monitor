@@ -2648,6 +2648,7 @@ indicators:
         - {key: cash,        label: Paid (in the budget),   add: [cash],        color: slate}
         - {key: capitalized, label: Capitalized interest (estimate), add: [capitalized], color: copper}
     yearly: {how: december}
+    method_links: [{anchor: capitalized-interest, label: "How capitalized interest is estimated"}]
     default: {variant: cash, transform: level, range: Max}
     derive:
       method: formula
@@ -2689,6 +2690,7 @@ indicators:
     note: >-
       An estimate, not an official measure: see the note on Interest on the
       Debt, Paid and Capitalized for what it includes and its biases.
+    method_links: [{anchor: capitalized-interest, label: "How capitalized interest is estimated"}]
     default: {variant: official, transform: level, range: Max}
     derive:
       method: formula
@@ -2726,6 +2728,7 @@ indicators:
       balance only together with that erosion, so it is shown apart from
       interest. Covers gross debt, including bonds held by the BCRA, the
       pension fund (FGS) and Banco Nación.
+    method_links: [{anchor: cer-adjustment, label: "How the CER adjustment is calculated"}]
     default: {variant: cer, transform: level, range: Max}
     derive:
       method: formula

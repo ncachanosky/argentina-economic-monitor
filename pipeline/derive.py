@@ -375,7 +375,18 @@ def formula(ind, frames: dict[str, pd.Series]) -> tuple[pd.DataFrame, dict]:
     df = df.replace([np.inf, -np.inf], np.nan)
     if spec.get("start"):
         df = df[df.index >= pd.Timestamp(str(spec["start"]))]
-    return df.dropna(how="all").sort_index(), {}
+    df = df.dropna(how="all").sort_index()
+    info = {}
+    import re
+    m = next((re.search(r"gdp12\(\s*(\w+)", v["expr"]) for v in spec["variants"].values() if "gdp12(" in v["expr"]), None)
+    if m and m.group(1) in names:
+        # Last month the national accounts cover; later months use GDP extended with the CPI.
+        q = frames[names[m.group(1)]].dropna()
+        if len(q) and len(df):
+            through = q.index.max() + pd.DateOffset(months=2)
+            info["gdp_through"] = through.strftime("%Y-%m-%d")
+            info["gdp_estimated"] = bool(df.index.max() > through)
+    return df, info
 
 
 # ---------- net international reserves ----------

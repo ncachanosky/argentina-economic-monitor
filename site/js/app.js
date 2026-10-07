@@ -574,6 +574,22 @@
     ? `*${partial.year}: ${fmtShortMonth(partial.first).split(" ")[0]}–${fmtShortMonth(partial.last)}, year to date.`
     : `*${partial.year}: twelve months to ${fmtShortMonth(partial.last)}.`);
 
+  // Where GDP comes from in ratios to GDP, and links to the methodology.
+  function methodLine(ind) {
+    const d = ind.derived || {};
+    const links = [...(d.gdp_through ? [{ anchor: "gdp-ratios", label: "How ratios to GDP are calculated" }] : []), ...(ind.method_links || [])];
+    if (!d.gdp_through && !links.length) return null;
+    const parts = [];
+    if (d.gdp_through) {
+      const next = addMonths(d.gdp_through, 1);
+      parts.push(d.gdp_estimated
+        ? `GDP: INDEC through ${fmtShortMonth(d.gdp_through)}; from ${fmtShortMonth(next)} to ${fmtShortMonth(ind.last_obs)}, estimated by extending it with the CPI until INDEC publishes the quarter. `
+        : `GDP: INDEC through ${fmtShortMonth(d.gdp_through)}. `);
+    }
+    links.forEach((l, i) => { if (i) parts.push(" · "); parts.push(h("a", { href: `${ROOT}methodology/#${l.anchor}` }, l.label)); });
+    return h("p", { class: "hint method-line" }, ...parts);
+  }
+
   // ---------- card: one series with variants ----------
   function variantsCard(ind, wide) {
     const variantKeys = Object.keys(ind.variants);
@@ -1017,7 +1033,7 @@
       // A short fixed window (view_start) has no use for rebasing or presidencies.
       ind.view_start ? null : h("div", { class: "controls" }, realSeg, baseWrap, presBtn, epBtn),
       ind.caveat ? h("p", { class: "caveat" }, ind.caveat) : null,
-      trackerLine(), summaryEl, hint, bandKey, epKey, chartEl, statsEl);
+      trackerLine(), summaryEl, hint, methodLine(ind), bandKey, epKey, chartEl, statsEl);
     drawSummary();
     table = tableView([], [], false, ind.frequency);
     appendAll(card, breakdownTable(ind), table, annualTable(ind), weightsTable(ind), ind.note ? h("p", { class: "chips-note" }, ind.note) : null, footer(ind, onPNG, onCSV));
@@ -1786,7 +1802,7 @@
     appendAll(card, 
       h("p", { class: "hint" }, C.hide_total ? `${fP(C.dates[latestI])}: ${parts}` : `${fP(C.dates[latestI])}: ${C.total.label} ${fmtNum(C.total.values[latestI], PC ? pp : pct)}${yoyWord} — ${parts}`),
       h("div", { class: "controls" }, ySeg, h("span", { class: "spacer" }), rSeg),
-      hintEl, barEl,
+      hintEl, methodLine(ind), barEl,
       lineKeys.length ? h("p", { class: "hint", style: "margin-top:14px" }, `${C.lines_title || "Components, year-over-year change"}. `,
         h("button", { class: "btn", type: "button", onclick: onLinePNG, style: "padding:1px 8px;font-size:12px" }, "PNG")) : null,
       lineKeys.length ? chipsEl : null, lineKeys.length ? lineEl : null);

@@ -71,6 +71,7 @@ class Indicator:
     plain_level: bool = False          # levels only: no rebasing or presidency view (e.g. series that go negative)
     yearly: dict | None = None         # monthly cards: a yearly view {how: december|sum, variants: [...]} (see app.js)
     ref_line: float | None = None      # variants card: a dashed horizontal reference line (e.g. 100)
+    method_links: list | None = None   # [{anchor, label}]: links to sections of the methodology page
 
     def input_ids(self) -> list[str]:
         """Source series this indicator reads (its variants, or a derivation's inputs)."""
@@ -309,6 +310,7 @@ def load(path: Path = REGISTRY_PATH, releases_path: Path = RELEASES_PATH) -> Reg
                 plain_level=bool(item.get("plain_level", False)),
                 yearly=item.get("yearly"),
                 ref_line=item.get("ref_line"),
+                method_links=item.get("method_links"),
                 view_start=str(item["view_start"]) + ("-01" if len(str(item["view_start"])) == 7 else "") if item.get("view_start") else None,
             )
         )

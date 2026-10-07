@@ -276,6 +276,7 @@ def export(out: Path) -> None:
             "plain_level": ind.plain_level,
             "yearly": ind.yearly,
             "ref_line": ind.ref_line,
+            "method_links": ind.method_links,
             "source_label": ind.source_label,
             "default": ind.default,
             "headline": ind.headline,
