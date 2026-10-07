@@ -13,7 +13,7 @@
   const PAGE = (document.body && document.body.dataset.page) || "home";
   const DATA = ROOT + "data/";
   const MAX_PANEL_SERIES = 4;              // fixed palette has four distinguishable slots
-  const SERIES_VARS = ["--series-1", "--series-2", "--series-3", "--series-4"];
+  const SERIES_VARS = ["--series-1", "--series-2", "--series-3", "--series-4", "--series-5", "--series-6", "--series-7", "--series-8"];
   const EXPORT = { width: 1200, height: 800 }; // EO figure standard
 
   // Transformations by measure. Indices change in percent; rates (e.g. capacity
@@ -227,7 +227,7 @@
   // Render the current view as a branded 1200x800 PNG (always light theme).
   async function exportPNG(ind, traces, subtitle, pct, filename, extras = {}) {
     const light = { ink: "#36454F", ink2: "#5A6872", ink3: "#85909A", grid: "#ECE9E3", rule: "#E3E0D9" };
-    const lightSeries = ["#B87333", "#5B9BD5", "#87A96B", "#8E7AB5"];
+    const lightSeries = ["#B87333", "#5B9BD5", "#87A96B", "#8E7AB5", "#C9A227", "#C96B7E", "#3E9C9A", "#6C7A89"];
     const font = '"Calibri", "Carlito", "Segoe UI", Arial, sans-serif';
     const data = traces.map((t, i) => {
       const c = { ...t };
@@ -611,7 +611,7 @@
     };
     const card = cardFrame(ind, !!wide);
     const Y = ind.yearly;
-    const ySeg = Y ? segmented([["monthly", "Monthly"], ["yearly", "Yearly"]], "monthly", (k) => { state.yearly = k === "yearly"; ySeg.update(k); draw(); }, "Frequency") : null;
+    const ySeg = Y ? segmented([["monthly", ind.frequency === "D" ? "Daily" : "Monthly"], ["yearly", "Yearly"]], "monthly", (k) => { state.yearly = k === "yearly"; ySeg.update(k); draw(); }, "Frequency") : null;
     const chartEl = h("div", { class: "chart" + (wide ? " tall-ish" : ""), role: "img", "aria-label": `${ind.title} chart` });
     const hint = h("p", { class: "hint" });
     const statsEl = h("div", { class: "term-stats", hidden: true });
@@ -788,7 +788,8 @@
         keys.forEach((k, slot) => {
           const s = k === state.variant ? main : series(k);
           // Overlays keep empty months in range so a gap in one series shows as a gap.
-          const ii = ind.overlay ? ind.dates.map((d, i) => i).filter((i) => (!start || ind.dates[i] >= start) && (!x.length || ind.dates[i] <= x[x.length - 1])) : idx;
+          // (Daily overlays drop each series' empty days, since sources keep different calendars.)
+          const ii = ind.overlay ? ind.dates.map((d, i) => i).filter((i) => (!start || ind.dates[i] >= start) && (!x.length || ind.dates[i] <= x[x.length - 1]) && (ind.frequency !== "D" || s.y[i] !== null)) : idx;
           const xx = ii.map((i) => ind.dates[i]), yy = ii.map((i) => s.y[i]);
           const color = cssVar(SERIES_VARS[slot]);
           const hover = `%{x|${DF}}: <b>%{y:${yFmt()}}${sfx}</b><extra>${s.v.label}</extra>`;
@@ -1510,7 +1511,7 @@
       const shown = actual.map((v) => (cap && Math.abs(v) > cap ? Math.sign(v) * cap : v));
       const clipped = actual.map((v) => !!cap && Math.abs(v) > cap);
       const muted = forExport ? "#C9CED3" : (isDark() ? "#4A5761" : "#C9CED3");
-      const lightSeries = ["#B87333", "#5B9BD5", "#87A96B", "#8E7AB5"];
+      const lightSeries = ["#B87333", "#5B9BD5", "#87A96B", "#8E7AB5", "#C9A227", "#C96B7E", "#3E9C9A", "#6C7A89"];
       const colors = order.map((k) => (slots.has(k) ? (forExport ? lightSeries[slots.get(k)] : cssVar(SERIES_VARS[slots.get(k)])) : muted));
       const inkColor = forExport ? "#36454F" : cssVar("--ink");
       const trace = {

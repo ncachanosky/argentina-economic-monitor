@@ -3359,9 +3359,9 @@ indicators:
     default: {variant: official, transform: level, range: 5Y}
     derive:
       method: formula
-      vars: {off: "bcra:5", mep: "dolar:mep", ccl: "dolar:ccl", blue: "dolar:blue", card: "dolar:tarjeta", cry: "dolar:cripto"}
+      vars: {ofx: "bcra:5", mep: "dolar:mep", ccl: "dolar:ccl", blue: "dolar:blue", card: "dolar:tarjeta", cry: "dolar:cripto"}
       variants:
-        official: {label: Official (wholesale), expr: "off"}
+        official: {label: Official (wholesale), expr: "ofx"}
         mep:      {label: MEP,                  expr: "mep"}
         ccl:      {label: CCL,                  expr: "ccl"}
         blue:     {label: Blue (informal),      expr: "blue"}
@@ -3398,11 +3398,11 @@ indicators:
     default: {variant: ccl, transform: level, range: 10Y}
     derive:
       method: formula
-      vars: {off: "bcra:5", mep: "dolar:mep", ccl: "dolar:ccl", blue: "dolar:blue"}
+      vars: {ofx: "bcra:5", mep: "dolar:mep", ccl: "dolar:ccl", blue: "dolar:blue"}
       variants:
-        ccl:  {label: CCL,             expr: "100 * (ccl / off - 1)"}
-        mep:  {label: MEP,             expr: "100 * (mep / off - 1)"}
-        blue: {label: Blue (informal), expr: "100 * (blue / off - 1)"}
+        ccl:  {label: CCL,             expr: "100 * (ccl / ofx - 1)"}
+        mep:  {label: MEP,             expr: "100 * (mep / ofx - 1)"}
+        blue: {label: Blue (informal), expr: "100 * (blue / ofx - 1)"}
 
   - id: fx_carry
     topic: fx
@@ -3438,9 +3438,9 @@ indicators:
       method: formula
       anchor: dep
       start: "2003-12-01"
-      vars: {dep: "bcra:12", off: "bcra:5", mep: "dolar:mep"}
+      vars: {dep: "bcra:12", ofx: "bcra:5", mep: "dolar:mep"}
       variants:
-        official: {label: Official rate, expr: "cum12(100 * ((1 + lag(dep, 1) / 100 * 30 / 365) * lag(off, 1) / off - 1))"}
+        official: {label: Official rate, expr: "cum12(100 * ((1 + lag(dep, 1) / 100 * 30 / 365) * lag(ofx, 1) / ofx - 1))"}
         mep:      {label: MEP rate,      expr: "cum12(100 * ((1 + lag(dep, 1) / 100 * 30 / 365) * lag(mep, 1) / mep - 1))"}
 
   - id: fx_devaluation
