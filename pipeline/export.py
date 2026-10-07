@@ -173,21 +173,28 @@ def export_table(ind, out: Path, status: dict) -> dict | None:
     import shutil
     from .update import TABLES_DIR
     src = TABLES_DIR / ind.table["source"]
-    if not (src / "index.json").exists():
+    main = src / ind.table.get("file", "index.json")
+    if not main.exists():
         print(f"skip {ind.id}: no table yet")
         return None
     dst = out / "tables" / ind.table["source"]
     dst.mkdir(parents=True, exist_ok=True)
-    for f in src.glob("*.json"):
-        shutil.copyfile(f, dst / f.name)
-    index = json.loads((src / "index.json").read_text(encoding="utf-8"))
-    last = max(d for ds in index["years"].values() for d in ds)
+    for f in src.rglob("*.json"):
+        target = dst / f.relative_to(src)
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(f, target)
+    index = json.loads(main.read_text(encoding="utf-8"))
+    if "years" in index:
+        last = max(d for ds in index["years"].values() for d in ds)
+    else:
+        last = index.get("latest")
     st = status.get(ind.table.get("status_id", ""), {})
     payload = {
         "id": ind.id, "topic": ind.topic, "kind": ind.kind, "title": ind.title, "short_title": ind.short_title,
         "description": ind.description, "note": ind.note, "source_label": ind.source_label, "wide": True,
         "frequency": ind.frequency, "units": ind.units, "table": {**ind.table, "path": f"tables/{ind.table['source']}/"},
-        "years": index["years"], "status": st.get("status", "ok"), "last_obs": last,
+        "years": index.get("years"), "groups": index.get("groups"), "group_labels": index.get("group_labels"),
+        "status": st.get("status", "ok"), "last_obs": last,
         "last_checked": st.get("last_checked"), "last_changed": st.get("last_changed"),
     }
     (out / f"{ind.id}.json").write_text(json.dumps(payload, separators=(",", ":")), encoding="utf-8")
@@ -205,7 +212,7 @@ def export(out: Path) -> None:
     for ind in reg.indicators:
         if ind.hidden:
             continue
-        if ind.kind == "balance_sheet":
+        if ind.kind in registry.TABLE_KINDS:
             entry = export_table(ind, out, status)
             if entry:
                 manifest_inds.append(entry)

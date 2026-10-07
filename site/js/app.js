@@ -956,20 +956,24 @@
   function balanceCard(ind) {
     const T = ind.table;
     const years = Object.keys(ind.years).sort();
+    const groups = ind.groups ? Object.keys(ind.groups) : null;
     const cache = new Map();
+    const fD = (d) => (T.monthly ? fmtShortMonth(d) : fmtDay(d));
     const load = (y) => {
-      if (!cache.has(y)) cache.set(y, getJSON(`${DATA}${T.path}${y}.json`));
-      return cache.get(y);
+      const key = `${state.group || ""}/${y}`;
+      if (!cache.has(key)) cache.set(key, getJSON(`${DATA}${T.path}${state.group ? state.group + "/" : ""}${y}.json`));
+      return cache.get(key);
     };
     const lastYear = years[years.length - 1];
-    const state = { year: lastYear, date: ind.years[lastYear].slice(-1)[0], cyear: "", cdate: "", units: "ars" };
+    const state = { year: lastYear, date: ind.years[lastYear].slice(-1)[0], cyear: "", cdate: "", units: "ars", group: groups ? groups[0] : null };
     const card = cardFrame(ind, true);
 
     const sel = (opts, value, label, onChange) => {
       const el = h("select", { class: "select", "aria-label": label }, opts.map(([v, t]) => h("option", { value: v }, t)));
       el.value = value; el.addEventListener("change", () => onChange(el.value)); return el;
     };
-    const dateOpts = (y) => ind.years[y].slice().reverse().map((d) => [d, fmtDay(d)]);
+    const dateOpts = (y) => ind.years[y].slice().reverse().map((d) => [d, fD(d)]);
+    const gSel = groups ? sel(groups.map((g) => [g, (ind.group_labels || {})[g] || g]), state.group, "Group", (g) => { state.group = g; render(); }) : null;
     const ySel = sel(years.slice().reverse().map((y) => [y, y]), state.year, "Year", (y) => { state.year = y; state.date = ind.years[y].slice(-1)[0]; dSel.replaceChildren(...dateOpts(y).map(([v, t]) => h("option", { value: v }, t))); dSel.value = state.date; render(); });
     const dSel = sel(dateOpts(state.year), state.date, "Weekly balance", (d) => { state.date = d; render(); });
     const setCompare = (y) => {
@@ -982,7 +986,8 @@
     const clearBtn = h("button", { class: "btn", type: "button", hidden: true, title: "Show only the selected balance", onclick: () => setCompare("") }, "✕ Remove comparison");
     const cdSel = sel([], "", "Compare with: weekly balance", (d) => { state.cdate = d; render(); });
     cdSel.hidden = true;
-    const uSeg = segmented([["ars", "Pesos"], ["usd", "US dollars"], ["pct", "% of assets"]], state.units, (k) => { state.units = k; uSeg.update(k); render(); }, "Units");
+    const unitOpts = [["ars", "Pesos"], ["usd", "US dollars"], ["pct", "% of assets"]].filter(([k]) => !T.units || T.units.includes(k));
+    const uSeg = segmented(unitOpts, state.units, (k) => { state.units = k; uSeg.update(k); render(); }, "Units");
 
     const guide = h("details", { class: "bs-guide", open: true }, h("summary", {}, "How to read this balance sheet"),
       h("ul", {}, (T.guide || []).map((g) => { const li = h("li"); li.innerHTML = g; return li; })));
@@ -1024,8 +1029,8 @@
       const valLabel = (T.valuation_label || "").toLowerCase();
       const csv = [];
       const side = (code, title) => {
-        const head = [h("th", {}, title), h("th", {}, fmtDay(state.date))];
-        if (ct) head.push(h("th", {}, fmtDay(state.cdate)), h("th", {}, "Change"));
+        const head = [h("th", {}, title), h("th", {}, fD(state.date))];
+        if (ct) head.push(h("th", {}, fD(state.cdate)), h("th", {}, "Change"));
         const body = t.rows.map((r, j) => {
           if (r.side !== code) return null;
           const a = r.values ? conv(r.values[i], fx, tot) : null;
@@ -1044,32 +1049,86 @@
       };
       grid.replaceChildren(side("A", "Assets"), side("L", "Liabilities and net equity"));
       const unitText = state.units === "usd" ? "Millions of US dollars, at each balance's exchange rate"
-        : state.units === "pct" ? "Percent of total assets on each date" : "Billions of pesos of each date";
-      const rateText = [fx ? `${fmtDay(state.date)}: ${fx.toLocaleString("en-US", { maximumFractionDigits: 2 })} pesos per dollar` : null,
-        ct && cfx ? `${fmtDay(state.cdate)}: ${cfx.toLocaleString("en-US", { maximumFractionDigits: 2 })}` : null].filter(Boolean).join("; ");
+        : state.units === "pct" ? "Percent of total assets on each date" : `Billions of pesos of each ${T.monthly ? "month" : "date"}`;
+      const rateText = [fx ? `${fD(state.date)}: ${fx.toLocaleString("en-US", { maximumFractionDigits: 2 })} pesos per dollar` : null,
+        ct && cfx ? `${fD(state.cdate)}: ${cfx.toLocaleString("en-US", { maximumFractionDigits: 2 })}` : null].filter(Boolean).join("; ");
       unitsNote.textContent = `${unitText}.${rateText ? " Exchange rate " + rateText + "." : ""}${ct ? " Lines are matched by name; a line renamed or regrouped between the two dates shows no change." : ""}`;
       const vn = [valuationAt(state.date), ct ? valuationAt(state.cdate) : null];
       const notes = [];
-      if (vn[0]) notes.push(h("p", { class: "chips-note" }, h("b", {}, `† On ${fmtDay(state.date)}: `), vn[0].text));
-      if (vn[1] && vn[1] !== vn[0]) notes.push(h("p", { class: "chips-note" }, h("b", {}, `† On ${fmtDay(state.cdate)}: `), vn[1].text));
+      if (vn[0]) notes.push(h("p", { class: "chips-note" }, h("b", {}, `† On ${fD(state.date)}: `), vn[0].text));
+      if (vn[1] && vn[1] !== vn[0]) notes.push(h("p", { class: "chips-note" }, h("b", {}, `† On ${fD(state.cdate)}: `), vn[1].text));
       const bcraNotes = [...new Set([...(t.notes || []), ...(ct && ct !== t ? ct.notes || [] : [])])];
       if (bcraNotes.length) notes.push(h("details", { class: "table-view" }, h("summary", {}, "BCRA's notes to these balances"),
         bcraNotes.map((n) => h("p", { class: "chips-note" }, n))));
       notesEl.replaceChildren(...notes);
-      view = { header: ["side", "line", `${state.date} (${unitText})`, ...(ct ? [state.cdate, "change"] : [])], rows: csv };
+      view = { header: ["side", "line", `${state.group ? state.group + " " : ""}${state.date} (${unitText})`, ...(ct ? [state.cdate, "change"] : [])], rows: csv };
     }
 
-    const onCSV = () => { if (view) downloadBlob(toCSV(view.header, view.rows), `bcra_balance_${state.date}${state.cdate ? "_vs_" + state.cdate : ""}_${state.units}.csv`, "text/csv"); };
+    const onCSV = () => { if (view) downloadBlob(toCSV(view.header, view.rows), `${ind.id}_${state.group ? state.group + "_" : ""}${state.date}${state.cdate ? "_vs_" + state.cdate : ""}_${state.units}.csv`, "text/csv"); };
     appendAll(card,
-      h("div", { class: "controls" }, h("label", { class: "base-pick" }, h("span", {}, "Balance:"), ySel, dSel),
+      h("div", { class: "controls" }, gSel ? h("label", { class: "base-pick" }, h("span", {}, "Group:"), gSel) : null,
+        h("label", { class: "base-pick" }, h("span", {}, "Balance:"), ySel, dSel),
         h("label", { class: "base-pick" }, h("span", {}, "Compare with:"), cySel, cdSel), clearBtn, h("span", { class: "spacer" }), uSeg),
       guide, unitsNote, grid, notesEl,
       h("div", { class: "card-foot" },
-        h("span", {}, "Source: ", h("a", { href: "https://www.bcra.gob.ar/en/weekly-summary-balances-of-assets-and-liabilities/", target: "_blank", rel: "noopener" }, ind.source_label),
-          ` · Latest: ${fmtDay(ind.last_obs)}`),
+        h("span", {}, "Source: ", T.source_url ? h("a", { href: T.source_url, target: "_blank", rel: "noopener" }, ind.source_label) : ind.source_label,
+          ` · Latest: ${fD(ind.last_obs)}`),
         h("div", { class: "actions" },
           h("button", { class: "btn", type: "button", onclick: onCSV, title: "Download the balance sheet in this view as CSV" }, "CSV"))));
     card.draw = () => render().catch((e) => { console.error(e); grid.replaceChildren(h("div", { class: "error-box" }, "The balance sheet could not be loaded.")); });
+    return card;
+  }
+
+  // ---------- card: the ten largest institutions and their balance-sheet mix ----------
+  function top10Card(ind) {
+    const T = ind.table;
+    const card = cardFrame(ind, true);
+    let data = null;
+    const state = { date: null, side: "assets" };
+    const dSel = h("select", { class: "select", "aria-label": "Date" });
+    dSel.addEventListener("change", () => { state.date = dSel.value; render(); });
+    const sSeg = segmented([["assets", "Assets"], ["funding", "Funding"], ["summary", "Summary"]], state.side, (k) => { state.side = k; sSeg.update(k); render(); }, "View");
+    const tableEl = h("div", { class: "table-scroll top10" });
+    const hint = h("p", { class: "hint" });
+    const pct = (v) => (v === null || v === undefined ? "–" : (v < 0 ? "−" : "") + Math.abs(v).toFixed(1));
+    const SUMMARY = [["public_total", "Public sector (Treasury, provinces, BCRA notes)"], ["loans_private", "Loans to the private sector"],
+      ["liquid", "Cash and BCRA current accounts"], ["fx_share_dep", "Dollar share of deposits"], ["loans_to_dep", "Loans / deposits"], ["equity", "Net equity"]];
+    let view = null;
+
+    function render() {
+      const t = data.tables[state.date];
+      const cols = state.side === "summary" ? SUMMARY : data.rows[state.side];
+      // Shade each cell relative to its column's range, so differences stand out.
+      const all = [...t.banks, ...t.benchmarks];
+      const range = Object.fromEntries(cols.map(([k]) => { const v = all.map((r) => r[k]).filter((x) => x !== null && x !== undefined); return [k, [Math.min(...v), Math.max(...v)]]; }));
+      const shade = (k, v) => { const [a, b] = range[k]; if (v === null || v === undefined || b <= a) return null; const f = (v - a) / (b - a); return `background: color-mix(in srgb, var(--accent) ${Math.round(f * 28)}%, transparent)`; };
+      const head = h("tr", {}, h("th", {}, "#"), h("th", {}, "Institution"), h("th", {}, "Share of system assets"), cols.map(([, l]) => h("th", {}, l)));
+      const body = t.banks.map((b) => h("tr", {}, h("td", {}, String(b.rank)),
+        h("td", { class: "pres" }, b.name, b.group ? h("span", { class: "at" }, ` ${b.group}`) : null),
+        h("td", {}, pct(b.assets_share)), cols.map(([k]) => h("td", { style: shade(k, b[k]) }, pct(b[k])))));
+      const bench = t.benchmarks.map((b, i) => h("tr", { class: i === 0 ? "bench first" : "bench" }, h("td", {}, ""), h("td", { class: "pres" }, h("b", {}, b.name)), h("td", {}, ""),
+        cols.map(([k]) => h("td", { style: shade(k, b[k]) }, pct(b[k])))));
+      tableEl.replaceChildren(h("table", { class: "data top" }, h("thead", {}, head), h("tbody", {}, body, bench)));
+      const what = state.side === "assets" ? "Percent of each institution's total assets." : state.side === "funding" ? "Percent of each institution's total assets (liabilities plus net equity)." : "Percent of assets, except the dollar share (percent of deposits) and loans / deposits.";
+      hint.textContent = `${what} ${t.n} institutions in the system. Shading: higher values within each column are darker.`;
+      view = { header: ["rank", "institution", "share_of_system_assets", ...cols.map(([k]) => k)],
+        rows: [...t.banks.map((b) => [b.rank, b.name, b.assets_share, ...cols.map(([k]) => b[k] ?? "")]), ...t.benchmarks.map((b) => ["", b.name, "", ...cols.map(([k]) => b[k] ?? "")])] };
+    }
+    const onCSV = () => { if (view) downloadBlob(toCSV(view.header, view.rows), `${ind.id}_${state.date}_${state.side}.csv`, "text/csv"); };
+    appendAll(card, h("div", { class: "controls" }, h("label", { class: "base-pick" }, h("span", {}, "Date:"), dSel), h("span", { class: "spacer" }), sSeg),
+      hint, tableEl, ind.note ? h("p", { class: "chips-note" }, ind.note) : null,
+      h("div", { class: "card-foot" },
+        h("span", {}, "Source: ", T.source_url ? h("a", { href: T.source_url, target: "_blank", rel: "noopener" }, ind.source_label) : ind.source_label, ` · Latest: ${fmtShortMonth(ind.last_obs)}`),
+        h("div", { class: "actions" }, h("button", { class: "btn", type: "button", onclick: onCSV, title: "Download this table as CSV" }, "CSV"))));
+    card.draw = async () => {
+      if (!data) {
+        try { data = await getJSON(`${DATA}${T.path}${T.file}`); } catch (e) { console.error(e); tableEl.replaceChildren(h("div", { class: "error-box" }, "The table could not be loaded.")); return; }
+        const ds = data.dates.slice().reverse();
+        dSel.replaceChildren(...ds.map((d) => h("option", { value: d }, d === data.latest ? `${fmtShortMonth(d)} (latest)` : (d.slice(5, 7) === "12" ? `Dec ${d.slice(0, 4)}` : fmtShortMonth(d)))));
+        state.date = data.latest; dSel.value = state.date;
+      }
+      render();
+    };
     return card;
   }
 
@@ -1547,6 +1606,7 @@
       ind.kind === "panel" ? panelCard(ind)
         : ind.kind === "contributions" ? contributionsCard(ind)
         : ind.kind === "balance_sheet" ? balanceCard(ind)
+        : ind.kind === "top10" ? top10Card(ind)
         : variantsCard(ind, !!ind.wide)));
     topicsEl2.replaceChildren(h("section", { class: "topic", id: `topic-${topic.id}` }, cards));
     $("#tiles").replaceChildren(...inds.filter((i) => i.headline).map((i) => tile(i)).filter(Boolean));

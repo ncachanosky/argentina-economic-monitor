@@ -457,3 +457,28 @@ def test_weekly_balance_header_dates_are_repaired():
     assert w._text_date("31/12/2019 (**)") == T("2019-12-31")
     assert w._text_date("01/15/2002") == T("2002-01-15")
     assert w._text_date("01/07/2002") == T("2002-01-07")
+
+
+def test_entity_accounts_and_concentration():
+    from pipeline.sources import bcra_entities as e
+    desc = {"121056": "LETRAS DE LIQUIDEZ DEL BCRA - MEDIC", "121049": "TÍTULOS PRIVADOS - TÍTULOS DE DEUDA",
+            "121016": "TÍTULOS PÚBLICOS - MEDICIÓN A COSTO"}
+    assert e._category("121056", desc) == "bcra_sec"
+    assert e._category("121049", desc) == "priv_sec"
+    assert e._category("121016", desc) == "gov_sec"
+    assert e._category("131715", desc) == "loans_private" and e._category("131109", desc) == "loans_public"
+    assert e._category("315700", desc) == "dep_fx" and e._category("311700", desc) == "dep_ars"
+    bal = pd.DataFrame({"ent": ["A", "B", "A", "B"], "date": ["202601"] * 4, "acct": ["111001", "111001", "311700", "311700"],
+                        "v": [75.0, 25.0, -60.0, -40.0]})
+    c = e.concentration({"bal": bal}).set_index("series_id").value
+    assert c["bcraef:hhi_assets"] == pytest.approx(75 ** 2 + 25 ** 2)
+    assert c["bcraef:top10_deposits"] == pytest.approx(100) and c["bcraef:n_assets"] == 2
+
+
+def test_bank_annex_helpers():
+    from pipeline.sources import bcra_banks as b
+    assert b.slug("Disponibilidades1") == "disponibilidades"
+    assert b.slug("4.- Crédito al sector público") == "4_credito_al_sector_publico"
+    assert b._as_date(2004) == pd.Timestamp("2004-12-01")
+    import datetime as dt
+    assert b._as_date(dt.datetime(2026, 7, 1)) == pd.Timestamp("2026-07-01")

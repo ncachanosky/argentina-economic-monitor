@@ -39,6 +39,9 @@ formula   Arithmetic on stored series: `vars` maps short names to series ids;
           results <= 0 (e.g. an implied exchange rate when net reserves are
           negative); `max: <expr>` blanks results above that bound. A var may name another derived indicator's series as
           "@indicator:variant" (taken at month end for monthly indicators).
+          Also: sum4(x), the sum of the last four periods; `start` drops
+          earlier dates; in a quarterly indicator, monthly inputs are taken
+          at the last month of each quarter.
 
 net_reserves  Gross reserves minus foreign-currency liabilities, under
           several conventions, weekly; see NET_CONVENTIONS below.
@@ -289,15 +292,26 @@ def formula(ind, frames: dict[str, pd.Series]) -> tuple[pd.DataFrame, dict]:
     spec = ind.derive
     names = spec["vars"]
     idx = pd.DatetimeIndex(sorted(set().union(*[frames[i].index for i in names.values()])))
+    if ind.frequency == "Q":
+        # Monthly inputs enter a quarterly formula at their quarter's last month.
+        def q(sr):
+            sr = sr.dropna()
+            if len(sr) > 2 and sr.index.to_series().diff().dt.days.median() < 40:
+                sr = sr.resample("QS").last()
+            return sr
+        frames = {**frames, **{v: q(frames[v]) for v in names.values()}}
+        idx = pd.DatetimeIndex(sorted(set().union(*[frames[i].index for i in names.values()])))
     env = {k: frames[v].reindex(idx) for k, v in names.items()}
     env["nz"] = lambda x: x.fillna(0)
+    env["sum4"] = lambda x: x.rolling(4).sum()          # last four quarters (or periods)
+    funcs = {"nz", "sum4"}
     allowed = (ast.Expression, ast.BinOp, ast.UnaryOp, ast.Add, ast.Sub, ast.Mult, ast.Div, ast.USub,
                ast.Name, ast.Load, ast.Constant, ast.Call)
     out = {}
     for k, v in spec["variants"].items():
         tree = ast.parse(v["expr"], mode="eval")
         for node in ast.walk(tree):
-            if not isinstance(node, allowed) or (isinstance(node, ast.Call) and getattr(node.func, "id", None) != "nz"):
+            if not isinstance(node, allowed) or (isinstance(node, ast.Call) and getattr(node.func, "id", None) not in funcs):
                 raise ValueError(f"{ind.id}.{k}: unsupported expression {v['expr']!r}")
             if isinstance(node, ast.Name) and node.id not in env:
                 raise ValueError(f"{ind.id}.{k}: unknown name {node.id!r}")
@@ -316,6 +330,8 @@ def formula(ind, frames: dict[str, pd.Series]) -> tuple[pd.DataFrame, dict]:
     if anchor is not None:
         df = df[anchor.notna()]
     df = df.replace([np.inf, -np.inf], np.nan)
+    if spec.get("start"):
+        df = df[df.index >= pd.Timestamp(str(spec["start"]))]
     return df.dropna(how="all").sort_index(), {}
 
 

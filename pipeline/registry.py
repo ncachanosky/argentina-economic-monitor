@@ -10,7 +10,8 @@ ROOT = Path(__file__).resolve().parents[1]
 REGISTRY_PATH = ROOT / "registry" / "series.yaml"
 RELEASES_PATH = ROOT / "registry" / "releases.yaml"
 
-KINDS = {"variants", "panel", "contributions", "balance_sheet"}
+KINDS = {"variants", "panel", "contributions", "balance_sheet", "top10"}
+TABLE_KINDS = {"balance_sheet", "top10"}   # cards that read a full table (data/tables/<source>), no series
 DERIVE_METHODS = {"splice", "reweight", "ratio", "tracker", "monthly", "flows", "expectations", "formula", "net_reserves"}
 RANGE_KEYS = {"2Y", "5Y", "10Y", "25Y", "50Y", "Max"}
 TRANSFORMS = {"level", "yoy", "mom", "ytd", "acc", "share"}
@@ -217,17 +218,17 @@ def load(path: Path = REGISTRY_PATH, releases_path: Path = RELEASES_PATH) -> Reg
             if not v.get("id") or not v.get("label"):
                 raise RegistryError(f"{where}: variant '{key}' needs id and label")
             variants[key] = Variant(key=key, label=v["label"], source_id=str(v["id"]))
-        if item["kind"] == "balance_sheet":
+        if item["kind"] in TABLE_KINDS:
             # A full table written by a source adapter (data/tables/<source>), no series.
             if not (item.get("table") or {}).get("source"):
-                raise RegistryError(f"{where}: a balance_sheet needs table.source")
+                raise RegistryError(f"{where}: a {item['kind']} card needs table.source")
         elif not variants:
             raise RegistryError(f"{where}: no variants")
 
         default = item.get("default") or {}
         dvar = default.get("variant")
         dvars = dvar if isinstance(dvar, list) else [dvar]
-        if item["kind"] != "balance_sheet" and any(d not in variants for d in dvars):
+        if item["kind"] not in TABLE_KINDS and any(d not in variants for d in dvars):
             raise RegistryError(f"{where}: default variant {dvar!r} not defined")
         if default.get("transform", "level") not in TRANSFORMS:
             raise RegistryError(f"{where}: unknown default transform")

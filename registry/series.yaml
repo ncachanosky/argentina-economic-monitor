@@ -120,6 +120,59 @@ inputs:
   - {id: bcra_fx_repos, source: manual, frequency: D, measure: flow, static: true, allow_gaps: true, label: "BCRA repos with foreign banks (USD m)"}
   - {id: "bcra_fx_repos#short_usd_m", source: manual, frequency: D, measure: flow, static: true, allow_gaps: true, label: "BCRA repos with foreign banks, original maturity up to one year (USD m)"}
   - {id: imf_purchases, source: manual, frequency: D, measure: flow, static: true, allow_gaps: true, label: "IMF purchases and repurchases since April 2025 (USD m)"}
+  # Banks: statistical annex of the BCRA's Informe sobre Bancos (monthly from
+  # Dec 2009, Decembers before), ids bcrabk:<sheet>|<group>|<line>.
+  - {id: lefi_period, source: manual, frequency: M, measure: flow, static: true, allow_gaps: true, label: "Months when banks' BCRA-repo liquidity was held as LEFI (Treasury bills)"}
+  - {id: "bcrabk:ind|system|4_credito_al_sector_publico", source: bcra_banks, frequency: M, measure: flow, allow_gaps: true, label: "Banks (system): credit to the public sector, % of assets"}
+  - {id: "bcrabk:ind|system|1_liquidez_amplia", source: bcra_banks, frequency: M, measure: flow, allow_gaps: true, label: "Banks (system): broad liquidity, % of deposits"}
+  - {id: "bcrabk:ind|system|2_liquidez_con_pases_lefi", source: bcra_banks, frequency: M, measure: flow, allow_gaps: true, label: "Banks (system): liquidity incl. BCRA repos/LEFI, % of deposits"}
+  - {id: "bcrabk:ind|system|3_liquidez", source: bcra_banks, frequency: M, measure: flow, allow_gaps: true, label: "Banks (system): liquidity (cash and BCRA accounts), % of deposits"}
+  - {id: "bcrabk:ind|system|11a_integracion_de_capital", source: bcra_banks, frequency: M, measure: flow, allow_gaps: true, label: "Banks (system): regulatory capital, % of risk-weighted assets"}
+  - {id: "bcrabk:ind|system|9b_roe_acumulado_anual_considera_ajuste_por_inflacion", source: bcra_banks, frequency: M, measure: flow, allow_gaps: true, label: "Banks (system): ROE, inflation-adjusted, %"}
+  - {id: "bcrabk:bal|system|titulos_publicos/tenencia_por_cartera_propia", source: bcra_banks, frequency: M, measure: flow, allow_gaps: true, label: "Banks (system): BCRA notes held in own portfolio, millions of pesos"}
+  - {id: "bcrabk:bal|system|activo", source: bcra_banks, frequency: M, measure: flow, allow_gaps: true, label: "Banks (system): total assets, millions of pesos"}
+  - {id: "bcrabk:bal|system|depositos", source: bcra_banks, frequency: M, measure: flow, allow_gaps: true, label: "Banks (system): deposits, millions of pesos"}
+  - {id: "bcrabk:ind|private|4_credito_al_sector_publico", source: bcra_banks, frequency: M, measure: flow, allow_gaps: true, label: "Banks (private banks): credit to the public sector, % of assets"}
+  - {id: "bcrabk:ind|private|1_liquidez_amplia", source: bcra_banks, frequency: M, measure: flow, allow_gaps: true, label: "Banks (private banks): broad liquidity, % of deposits"}
+  - {id: "bcrabk:ind|private|2_liquidez_con_pases_lefi", source: bcra_banks, frequency: M, measure: flow, allow_gaps: true, label: "Banks (private banks): liquidity incl. BCRA repos/LEFI, % of deposits"}
+  - {id: "bcrabk:ind|private|3_liquidez", source: bcra_banks, frequency: M, measure: flow, allow_gaps: true, label: "Banks (private banks): liquidity (cash and BCRA accounts), % of deposits"}
+  - {id: "bcrabk:ind|private|11a_integracion_de_capital", source: bcra_banks, frequency: M, measure: flow, allow_gaps: true, label: "Banks (private banks): regulatory capital, % of risk-weighted assets"}
+  - {id: "bcrabk:ind|private|9b_roe_acumulado_anual_considera_ajuste_por_inflacion", source: bcra_banks, frequency: M, measure: flow, allow_gaps: true, label: "Banks (private banks): ROE, inflation-adjusted, %"}
+  - {id: "bcrabk:bal|private|titulos_publicos/tenencia_por_cartera_propia", source: bcra_banks, frequency: M, measure: flow, allow_gaps: true, label: "Banks (private banks): BCRA notes held in own portfolio, millions of pesos"}
+  - {id: "bcrabk:bal|private|activo", source: bcra_banks, frequency: M, measure: flow, allow_gaps: true, label: "Banks (private banks): total assets, millions of pesos"}
+  - {id: "bcrabk:bal|private|depositos", source: bcra_banks, frequency: M, measure: flow, allow_gaps: true, label: "Banks (private banks): deposits, millions of pesos"}
+  - {id: "bcrabk:ind|public|4_credito_al_sector_publico", source: bcra_banks, frequency: M, measure: flow, allow_gaps: true, label: "Banks (public banks): credit to the public sector, % of assets"}
+  - {id: "bcrabk:ind|public|1_liquidez_amplia", source: bcra_banks, frequency: M, measure: flow, allow_gaps: true, label: "Banks (public banks): broad liquidity, % of deposits"}
+  - {id: "bcrabk:ind|public|2_liquidez_con_pases_lefi", source: bcra_banks, frequency: M, measure: flow, allow_gaps: true, label: "Banks (public banks): liquidity incl. BCRA repos/LEFI, % of deposits"}
+  - {id: "bcrabk:ind|public|3_liquidez", source: bcra_banks, frequency: M, measure: flow, allow_gaps: true, label: "Banks (public banks): liquidity (cash and BCRA accounts), % of deposits"}
+  - {id: "bcrabk:ind|public|11a_integracion_de_capital", source: bcra_banks, frequency: M, measure: flow, allow_gaps: true, label: "Banks (public banks): regulatory capital, % of risk-weighted assets"}
+  - {id: "bcrabk:ind|public|9b_roe_acumulado_anual_considera_ajuste_por_inflacion", source: bcra_banks, frequency: M, measure: flow, allow_gaps: true, label: "Banks (public banks): ROE, inflation-adjusted, %"}
+  - {id: "bcrabk:bal|public|titulos_publicos/tenencia_por_cartera_propia", source: bcra_banks, frequency: M, measure: flow, allow_gaps: true, label: "Banks (public banks): BCRA notes held in own portfolio, millions of pesos"}
+  - {id: "bcrabk:bal|public|activo", source: bcra_banks, frequency: M, measure: flow, allow_gaps: true, label: "Banks (public banks): total assets, millions of pesos"}
+  - {id: "bcrabk:bal|public|depositos", source: bcra_banks, frequency: M, measure: flow, allow_gaps: true, label: "Banks (public banks): deposits, millions of pesos"}
+  - {id: "bcrabk:ind|system|6_irregularidad_de_cartera_privada", source: bcra_banks, frequency: M, measure: flow, allow_gaps: true, label: "Banks (system): non-performing private loans, %"}
+  - {id: "bcrabk:npl_lines|system|1_total_sector_privado/ratio_de_irregularidad/cartera_irregular_total", source: bcra_banks, frequency: M, measure: flow, allow_gaps: true, label: "Banks (system): non-performing loans, private sector, %"}
+  - {id: "bcrabk:npl_lines|system|2_familias_total/ratio_de_irregularidad/cartera_irregular_total", source: bcra_banks, frequency: M, measure: flow, allow_gaps: true, label: "Banks (system): non-performing loans, households, %"}
+  - {id: "bcrabk:npl_lines|system|3_empresas_total/ratio_de_irregularidad/cartera_irregular_total", source: bcra_banks, frequency: M, measure: flow, allow_gaps: true, label: "Banks (system): non-performing loans, firms, %"}
+  - {id: "bcrabk:bal|system|disponibilidades", source: bcra_banks, frequency: M, measure: flow, allow_gaps: true, label: "Banks (system): cash and BCRA accounts, millions of pesos"}
+  - {id: "bcrabk:bal|system|prestamos", source: bcra_banks, frequency: M, measure: flow, allow_gaps: true, label: "Banks (system): loans, millions of pesos"}
+  - {id: "bcrabk:bal|system|prestamos/sector_privado", source: bcra_banks, frequency: M, measure: flow, allow_gaps: true, label: "Banks (system): loans to the private sector, millions of pesos"}
+  - {id: "bcrabk:bal_ars|system|disponibilidades", source: bcra_banks, frequency: M, measure: flow, allow_gaps: true, label: "Banks (system): cash and BCRA accounts in pesos only, millions of pesos"}
+  - {id: "bcrabk:bal_ars|system|depositos", source: bcra_banks, frequency: M, measure: flow, allow_gaps: true, label: "Banks (system): deposits in pesos only, millions of pesos"}
+  - {id: "bcrabk:bal_ars|system|prestamos", source: bcra_banks, frequency: M, measure: flow, allow_gaps: true, label: "Banks (system): loans in pesos only, millions of pesos"}
+  # Banks: concentration from the BCRA's monthly data on each institution (since Nov 1994).
+  - {id: "bcraef:hhi_assets", source: bcra_entities, frequency: M, measure: flow, allow_gaps: true, stale_days: 150, label: "Banks: hhi of assets"}
+  - {id: "bcraef:hhi_deposits", source: bcra_entities, frequency: M, measure: flow, allow_gaps: true, stale_days: 150, label: "Banks: hhi of deposits"}
+  - {id: "bcraef:hhi_loans", source: bcra_entities, frequency: M, measure: flow, allow_gaps: true, stale_days: 150, label: "Banks: hhi of loans"}
+  - {id: "bcraef:top5_assets", source: bcra_entities, frequency: M, measure: flow, allow_gaps: true, stale_days: 150, label: "Banks: top5 of assets"}
+  - {id: "bcraef:top5_deposits", source: bcra_entities, frequency: M, measure: flow, allow_gaps: true, stale_days: 150, label: "Banks: top5 of deposits"}
+  - {id: "bcraef:top5_loans", source: bcra_entities, frequency: M, measure: flow, allow_gaps: true, stale_days: 150, label: "Banks: top5 of loans"}
+  - {id: "bcraef:top10_assets", source: bcra_entities, frequency: M, measure: flow, allow_gaps: true, stale_days: 150, label: "Banks: top10 of assets"}
+  - {id: "bcraef:top10_deposits", source: bcra_entities, frequency: M, measure: flow, allow_gaps: true, stale_days: 150, label: "Banks: top10 of deposits"}
+  - {id: "bcraef:top10_loans", source: bcra_entities, frequency: M, measure: flow, allow_gaps: true, stale_days: 150, label: "Banks: top10 of loans"}
+  - {id: "bcraef:n_assets", source: bcra_entities, frequency: M, measure: flow, allow_gaps: true, stale_days: 150, label: "Banks: n of assets"}
+  - {id: "bcraef:n_deposits", source: bcra_entities, frequency: M, measure: flow, allow_gaps: true, stale_days: 150, label: "Banks: n of deposits"}
+  - {id: "bcraef:n_loans", source: bcra_entities, frequency: M, measure: flow, allow_gaps: true, stale_days: 150, label: "Banks: n of loans"}
   - {id: "bcra:29",  source: bcra, frequency: M, measure: flow, allow_gaps: true, label: "REM: median expected inflation, next 12 months"}
   - {id: 4.4_DGI_2004_T_19, source: datos_gob, frequency: Q, measure: index,
      label: "INDEC gross fixed capital formation, current prices"}
@@ -185,12 +238,23 @@ topics:
       region), inflation since 1943 corrected for the 2007-2015 INDEC
       intervention, and wholesale prices.
   - id: money
-    slug: money-banking
-    title: Money & Banking
+    slug: money-central-bank
+    old_slugs: [money-banking]
+    title: Money & Central Bank
     description: >-
       Base money and what creates it, monetary aggregates, deposits and loans,
-      interest rates, the official exchange rate and reserves. From the
-      central bank (BCRA). Peso amounts can be shown in real terms.
+      interest rates, the official exchange rate, reserves and the central
+      bank's balance sheet. From the BCRA. Peso amounts can be shown in real
+      terms.
+
+  - id: banks
+    slug: banks
+    title: Banks
+    description: >-
+      The financial system: exposure to the public sector, liquidity and
+      reserve requirements, dollar deposits, loan quality, capital and
+      profitability, concentration and the largest banks. From the BCRA's
+      banking report and its monthly data on each institution.
 
 indicators:
   - id: emae
@@ -1348,6 +1412,7 @@ indicators:
     table:
       source: bcra_weekly
       status_id: "bcrawk:gross"
+      source_url: https://www.bcra.gob.ar/en/weekly-summary-balances-of-assets-and-liabilities/
       guide:
         - >-
           <b>Both sides add up.</b> Assets equal liabilities plus net equity.
@@ -1428,3 +1493,464 @@ indicators:
         total:    {label: Credit to the government, expr: "100 * (nz(gov_ars) + nz(gov_usd)) / (absorb + base)"}
         advances: {label: Temporary advances,       expr: "100 * nz(adv) / (absorb + base)"}
         other:    {label: Securities and other,     expr: "100 * (nz(gov_ars) - nz(adv) + nz(gov_usd)) / (absorb + base)"}
+
+  # ---------------- Banks ----------------
+  - id: bank_public_exposure
+    topic: banks
+    wide: true
+    kind: variants
+    overlay: true
+    measure: rate
+    emphasis: total
+    title: Banks' Exposure to the Public Sector
+    short_title: Public-sector exposure
+    description: >-
+      Claims of the financial system on the public sector as a share of its
+      assets: on the Treasury and the rest of the non-financial public sector
+      (securities, loans), and on the central bank (its notes and repos).
+      Monthly, since December 2009.
+    source: derived
+    source_label: BCRA (Informe sobre Bancos, statistical annex)
+    frequency: M
+    units: "% of assets"
+    transforms: [level, yoy]
+    ranges: [5Y, 10Y, Max]
+    note: >-
+      Treasury and other public sector: the BCRA's indicator "credit to the
+      public sector" (government securities, including the Treasury's LEFI,
+      loans to the public sector, and other claims), excluding BCRA paper.
+      BCRA: notes held in banks' own portfolio (LEBAC, NOBAC, LELIQ) plus net repos with the BCRA,
+      measured as the difference between the BCRA's liquidity ratios with and
+      without repos, times deposits. From July 2024 to June 2025 that
+      difference was the Treasury's LEFI (already in the first line), so it
+      is not counted as BCRA exposure in those months.
+    default: {variant: total, transform: level, range: Max}
+    derive:
+      method: formula
+      anchor: pub
+      start: "2009-12-01"
+      vars:
+        pub: "bcrabk:ind|system|4_credito_al_sector_publico"
+        l2: "bcrabk:ind|system|2_liquidez_con_pases_lefi"
+        l3: "bcrabk:ind|system|3_liquidez"
+        lel: "bcrabk:bal|system|titulos_publicos/tenencia_por_cartera_propia"
+        act: "bcrabk:bal|system|activo"
+        dep: "bcrabk:bal|system|depositos"
+        lefi: lefi_period
+      variants:
+        total:    {label: Total public sector,              expr: "pub + 100 * (nz(lel) + (l2 - l3) / 100 * dep * (1 - nz(lefi))) / act"}
+        treasury: {label: Treasury and other public sector, expr: "pub"}
+        bcra:     {label: Central bank (BCRA),              expr: "100 * (nz(lel) + (l2 - l3) / 100 * dep * (1 - nz(lefi))) / act"}
+
+  - id: bank_public_exposure_groups
+    topic: banks
+    kind: variants
+    overlay: true
+    measure: rate
+    title: Public-Sector Exposure by Bank Group
+    short_title: Exposure by group
+    description: >-
+      Claims on the Treasury, the rest of the public sector and the BCRA, as
+      a share of assets: public banks, private banks and the whole system.
+      Monthly, since December 2009.
+    source: derived
+    source_label: BCRA (Informe sobre Bancos, statistical annex)
+    frequency: M
+    units: "% of assets"
+    transforms: [level, yoy]
+    ranges: [5Y, 10Y, Max]
+    note: Same definition as the total in the chart of the system's exposure.
+    default: {variant: public, transform: level, range: Max}
+    derive:
+      method: formula
+      anchor: pub_s
+      start: "2009-12-01"
+      vars:
+        lefi: lefi_period
+        pub_s: "bcrabk:ind|system|4_credito_al_sector_publico"
+        l2_s: "bcrabk:ind|system|2_liquidez_con_pases_lefi"
+        l3_s: "bcrabk:ind|system|3_liquidez"
+        lel_s: "bcrabk:bal|system|titulos_publicos/tenencia_por_cartera_propia"
+        act_s: "bcrabk:bal|system|activo"
+        dep_s: "bcrabk:bal|system|depositos"
+        pub_p: "bcrabk:ind|private|4_credito_al_sector_publico"
+        l2_p: "bcrabk:ind|private|2_liquidez_con_pases_lefi"
+        l3_p: "bcrabk:ind|private|3_liquidez"
+        lel_p: "bcrabk:bal|private|titulos_publicos/tenencia_por_cartera_propia"
+        act_p: "bcrabk:bal|private|activo"
+        dep_p: "bcrabk:bal|private|depositos"
+        pub_g: "bcrabk:ind|public|4_credito_al_sector_publico"
+        l2_g: "bcrabk:ind|public|2_liquidez_con_pases_lefi"
+        l3_g: "bcrabk:ind|public|3_liquidez"
+        lel_g: "bcrabk:bal|public|titulos_publicos/tenencia_por_cartera_propia"
+        act_g: "bcrabk:bal|public|activo"
+        dep_g: "bcrabk:bal|public|depositos"
+      variants:
+        public:  {label: Public banks,  expr: "pub_g + 100 * (nz(lel_g) + (l2_g - l3_g) / 100 * dep_g * (1 - nz(lefi))) / act_g"}
+        private: {label: Private banks, expr: "pub_p + 100 * (nz(lel_p) + (l2_p - l3_p) / 100 * dep_p * (1 - nz(lefi))) / act_p"}
+        system:  {label: Financial system, expr: "pub_s + 100 * (nz(lel_s) + (l2_s - l3_s) / 100 * dep_s * (1 - nz(lefi))) / act_s"}
+
+  - id: bank_liquidity
+    topic: banks
+    wide: true
+    kind: contributions
+    measure: flow
+    title: "Bank Liquidity: What Backs Deposits"
+    short_title: Liquidity
+    description: >-
+      Banks' liquid assets as a share of their deposits, by type: cash and
+      accounts at the BCRA; repos with the BCRA (and, July 2024 to June 2025,
+      the Treasury's LEFI); BCRA notes; and Treasury bonds that banks use to
+      meet reserve requirements instead of cash. Monthly, since December 2009.
+    source: derived
+    source_label: BCRA (Informe sobre Bancos, statistical annex)
+    frequency: M
+    units: "% of deposits"
+    ranges: [5Y, 10Y, Max]
+    note: >-
+      The BCRA's three liquidity ratios nest: liquidity (cash and current
+      accounts at the BCRA), liquidity with repos and LEFI, and broad
+      liquidity, which adds BCRA notes and Treasury bonds counted toward
+      reserve requirements. Treasury bonds for reserve requirements are broad
+      liquidity minus liquidity with repos and LEFI, minus BCRA notes held in
+      banks' own portfolio (from the balance sheet). Before 2018 the
+      difference is zero: the BCRA's data show no Treasury bonds counted
+      toward reserve requirements. Reserve requirements on peso deposits can be
+      met in part with Treasury bonds bought at primary auctions; all
+      currencies together, as the BCRA reports the ratios.
+    contributions:
+      precomputed: true
+      hide_total: true
+      style: area
+      units: "%"
+      groups:
+        - {key: cash,  label: Cash and BCRA current accounts,          add: [cash],  color: copper}
+        - {key: repo,  label: "BCRA repos (LEFI Jul 2024 - Jun 2025)",  add: [repo],  color: sky}
+        - {key: notes, label: BCRA notes,                               add: [notes], color: lavender}
+        - {key: bonds, label: Treasury bonds for reserve requirements,  add: [bonds], color: sage}
+    default: {variant: cash, transform: level, range: Max}
+    derive:
+      method: formula
+      anchor: l1
+      start: "2009-12-01"
+      vars:
+        l1: "bcrabk:ind|system|1_liquidez_amplia"
+        l2: "bcrabk:ind|system|2_liquidez_con_pases_lefi"
+        l3: "bcrabk:ind|system|3_liquidez"
+        lel: "bcrabk:bal|system|titulos_publicos/tenencia_por_cartera_propia"
+        dep: "bcrabk:bal|system|depositos"
+      variants:
+        cash:  {label: Cash and BCRA current accounts, expr: "l3"}
+        repo:  {label: BCRA repos and LEFI,            expr: "l2 - l3"}
+        notes: {label: BCRA notes,                     expr: "100 * nz(lel) / dep"}
+        bonds: {label: Treasury bonds for reserve requirements, expr: "l1 - l2 - 100 * nz(lel) / dep"}
+
+  - id: bank_dollars
+    topic: banks
+    kind: variants
+    overlay: true
+    measure: rate
+    title: Where Dollar Deposits Go
+    short_title: Dollar deposits
+    description: >-
+      Banks' dollars held as cash or at the BCRA, and dollar loans, as a
+      share of dollar deposits. Monthly, since December 2012.
+    source: derived
+    source_label: BCRA (Informe sobre Bancos, statistical annex)
+    frequency: M
+    units: "% of dollar deposits"
+    transforms: [level, yoy]
+    ranges: [5Y, 10Y, Max]
+    note: >-
+      Foreign-currency items are total minus peso-only balance-sheet lines.
+      Dollars held at the BCRA (bank reserve requirements) are part of the
+      BCRA's gross reserves; see Net International Reserves.
+    default: {variant: cash, transform: level, range: Max}
+    derive:
+      method: formula
+      anchor: dep
+      start: "2012-12-01"
+      vars:
+        disp: "bcrabk:bal|system|disponibilidades"
+        disp_ars: "bcrabk:bal_ars|system|disponibilidades"
+        dep: "bcrabk:bal|system|depositos"
+        dep_ars: "bcrabk:bal_ars|system|depositos"
+        loans: "bcrabk:bal|system|prestamos"
+        loans_ars: "bcrabk:bal_ars|system|prestamos"
+      variants:
+        cash:  {label: "Cash and BCRA accounts, % of dollar deposits", expr: "100 * (disp - disp_ars) / (dep - dep_ars)"}
+        loans: {label: "Dollar loans, % of dollar deposits",            expr: "100 * (loans - loans_ars) / (dep - dep_ars)"}
+
+  - id: bank_npl
+    topic: banks
+    kind: variants
+    overlay: true
+    measure: rate
+    title: Non-Performing Loans
+    short_title: Non-performing loans
+    description: >-
+      Loans to the private sector in arrears of more than 90 days or
+      otherwise irregular, as a share of loans: households, firms and total.
+      Monthly, since January 2010.
+    source: bcra_banks
+    source_label: BCRA (Informe sobre Bancos, statistical annex)
+    frequency: M
+    validate_as: flow
+    units: "% of loans"
+    transforms: [level, yoy]
+    ranges: [5Y, 10Y, Max]
+    note: >-
+      Irregular portfolio: debtors classified in situations 3 to 6 of the
+      BCRA's debtor classification. Households: loans to individuals except
+      for commercial purposes; firms: loans to companies and commercial loans
+      to individuals.
+    variants:
+      households: {label: Households, id: "bcrabk:npl_lines|system|2_familias_total/ratio_de_irregularidad/cartera_irregular_total"}
+      firms:      {label: Firms,      id: "bcrabk:npl_lines|system|3_empresas_total/ratio_de_irregularidad/cartera_irregular_total"}
+      total:      {label: Private sector, id: "bcrabk:npl_lines|system|1_total_sector_privado/ratio_de_irregularidad/cartera_irregular_total"}
+    default: {variant: households, transform: level, range: Max}
+
+  - id: bank_capital
+    topic: banks
+    kind: variants
+    overlay: true
+    measure: rate
+    title: Bank Capital
+    short_title: Capital
+    description: >-
+      Regulatory capital as a share of risk-weighted assets (credit, market
+      and operational risk), by bank group. Monthly, since February 2013.
+    source: bcra_banks
+    source_label: BCRA (Informe sobre Bancos, statistical annex)
+    frequency: M
+    validate_as: flow
+    units: "% of risk-weighted assets"
+    transforms: [level, yoy]
+    ranges: [5Y, 10Y, Max]
+    note: >-
+      Basel III minimum: 8% (plus buffers). Sovereign exposures carry low
+      risk weights, so banks heavy in government paper show high ratios.
+    variants:
+      system:  {label: Financial system, id: "bcrabk:ind|system|11a_integracion_de_capital"}
+      private: {label: Private banks,    id: "bcrabk:ind|private|11a_integracion_de_capital"}
+      public:  {label: Public banks,     id: "bcrabk:ind|public|11a_integracion_de_capital"}
+    default: {variant: system, transform: level, range: Max}
+
+  - id: bank_roe
+    topic: banks
+    kind: variants
+    overlay: true
+    measure: rate
+    title: Bank Profitability
+    short_title: Profitability
+    description: >-
+      Return on equity, inflation-adjusted, accumulated over the year and
+      annualized, by bank group. Monthly, since January 2020.
+    source: bcra_banks
+    source_label: BCRA (Informe sobre Bancos, statistical annex)
+    frequency: M
+    validate_as: flow
+    units: "% of equity, annualized"
+    transforms: [level]
+    ranges: [5Y, Max]
+    view_start: "2020-01"
+    note: >-
+      Since January 2020 banks report in constant currency (IAS 29), so
+      results are net of the loss of value of their peso positions.
+      Year-to-date figures restart each January.
+    variants:
+      system:  {label: Financial system, id: "bcrabk:ind|system|9b_roe_acumulado_anual_considera_ajuste_por_inflacion"}
+      private: {label: Private banks,    id: "bcrabk:ind|private|9b_roe_acumulado_anual_considera_ajuste_por_inflacion"}
+      public:  {label: Public banks,     id: "bcrabk:ind|public|9b_roe_acumulado_anual_considera_ajuste_por_inflacion"}
+    default: {variant: system, transform: level}
+
+  - id: bank_concentration
+    topic: banks
+    kind: variants
+    overlay: true
+    measure: rate
+    title: Concentration of the Financial System
+    short_title: Concentration
+    description: >-
+      Combined share of the ten largest institutions in the system's assets,
+      deposits and loans. Monthly, since June 1996.
+    source: bcra_entities
+    source_label: BCRA (Información de Entidades Financieras, monthly data on each institution)
+    frequency: M
+    validate_as: flow
+    units: "% of the system"
+    plain_level: true
+    transforms: [level]
+    ranges: [10Y, 25Y, Max]
+    note: >-
+      Ten largest by each measure, from each institution's balance sheet
+      (unconsolidated). The Herfindahl-Hirschman index (sum of squared
+      shares, 0 to 10,000) is in the next chart. Number of institutions:
+      149 in June 1996, 73 in 2026. Before June 1996 the BCRA's archive
+      omits the public banks, so the series start then.
+    variants:
+      assets:   {label: Assets,   id: "bcraef:top10_assets"}
+      deposits: {label: Deposits, id: "bcraef:top10_deposits"}
+      loans:    {label: Loans,    id: "bcraef:top10_loans"}
+    default: {variant: assets, transform: level, range: Max}
+
+  - id: bank_concentration_hhi
+    topic: banks
+    kind: variants
+    overlay: true
+    title: Concentration Index and Number of Institutions
+    short_title: HHI
+    description: >-
+      Herfindahl-Hirschman index of assets, deposits and loans (sum of
+      squared market shares, 0 to 10,000). Monthly, since June 1996.
+    source: bcra_entities
+    source_label: BCRA (Información de Entidades Financieras, monthly data on each institution)
+    frequency: M
+    validate_as: flow
+    plain_level: true
+    units: "HHI, 0 to 10,000"
+    transforms: [level]
+    ranges: [10Y, 25Y, Max]
+    note: >-
+      Below 1,500: unconcentrated; 1,500-2,500: moderately concentrated;
+      above 2,500: highly concentrated (US merger guidelines, 2010).
+    variants:
+      assets:   {label: Assets,   id: "bcraef:hhi_assets"}
+      deposits: {label: Deposits, id: "bcraef:hhi_deposits"}
+      loans:    {label: Loans,    id: "bcraef:hhi_loans"}
+    default: {variant: assets, transform: level, range: Max}
+
+  - id: bank_top10
+    topic: banks
+    kind: top10
+    wide: true
+    title: The Ten Largest Institutions
+    short_title: Ten largest
+    description: >-
+      The ten largest institutions by assets and how their balance sheets are
+      composed, next to the ten together, the whole system, and public and
+      private banks. Latest month, or any December since 1996.
+    source: table
+    source_label: BCRA (Información de Entidades Financieras, monthly data on each institution)
+    frequency: M
+    units: "% of each institution's assets"
+    default: {}
+    table:
+      source: bcra_entities
+      file: top10.json
+      status_id: "bcraef:top10_assets"
+      source_url: https://www.bcra.gob.ar/en/information-on-financial-institutions/
+    note: >-
+      Unconsolidated balance sheets as each institution reports them to the
+      BCRA, grouped by the BCRA's chart of accounts. Government securities
+      include the Treasury's LEFI; BCRA notes are securities issued by the
+      central bank; repos with the BCRA (large in 2019-2024) are in other
+      financial claims. Shares of total assets; deposits and equity are on
+      the funding side. Descriptive only: a bank's balance-sheet mix reflects
+      its business model, not its soundness.
+
+  - id: bank_balance_sheet
+    topic: banks
+    kind: balance_sheet
+    wide: true
+    title: Balance Sheet of the Financial System
+    short_title: System balance sheet
+    description: >-
+      The financial system's balance sheet in the BCRA's standardized
+      presentation, for the whole system or a group of banks: assets on the
+      left, liabilities and net equity on the right. Monthly since December
+      2009 (Decembers before).
+    source: table
+    source_label: BCRA (Informe sobre Bancos, statistical annex)
+    frequency: M
+    units: Millions of pesos
+    default: {}
+    table:
+      source: bcra_banks
+      status_id: "bcrabk:bal|system|activo"
+      source_url: https://www.bcra.gob.ar/informe-sobre-bancos/
+      monthly: true
+      units: [ars, pct]
+      guide:
+        - >-
+          <b>Assets and their funding.</b> Assets on the left; on the right,
+          what funds them: deposits, other liabilities and net equity. Main
+          lines in bold, their breakdown indented.
+        - >-
+          <b>Government paper.</b> Government securities include the
+          Treasury's bills and bonds (and LEFI in 2024-25) and, as a sub-line,
+          the BCRA's notes (LEBAC, NOBAC, LELIQ). Repos with the BCRA are in
+          other claims from financial intermediation.
+        - >-
+          <b>Deposits.</b> Public- and private-sector deposits; private ones
+          by type (current accounts, savings accounts, time deposits). Amounts
+          include dollar deposits valued in pesos.
+        - >-
+          <b>Comparing dates.</b> Pesos of each date; for long comparisons use
+          shares of total assets. Since 2020 banks report in constant
+          currency, and since 2018 under international accounting standards.
+
+  - id: bank_credit_depth
+    topic: banks
+    kind: variants
+    measure: rate
+    title: Private Credit as a Share of GDP
+    short_title: Credit / GDP
+    description: >-
+      Banks' loans to the private sector over nominal GDP, both averaged over
+      the last four quarters. Quarterly, since 2010.
+    source: derived
+    source_label: BCRA (Informe sobre Bancos, statistical annex); INDEC
+    frequency: Q
+    units: "% of GDP"
+    transforms: [level, yoy]
+    ranges: [5Y, 10Y, Max]
+    note: >-
+      Loans in pesos and dollars (dollar loans valued in pesos), gross of
+      provisions: average of the last four quarter-end stocks. GDP at current
+      prices: average of the last four quarters (INDEC publishes quarterly
+      GDP at annual rates). Averaging the stock keeps high inflation from
+      inflating the ratio: an end-of-period stock over a year's output would
+      overstate it.
+    default: {variant: depth, transform: level, range: Max}
+    derive:
+      method: formula
+      anchor: loans
+      start: "2010-10-01"
+      vars:
+        loans: "bcrabk:bal|system|prestamos/sector_privado"
+        gdp: 4.4_OGP_2004_T_17
+      variants:
+        depth: {label: Private credit / GDP, expr: "100 * sum4(loans) / sum4(gdp)"}
+
+  - id: bank_spread
+    topic: banks
+    kind: variants
+    overlay: true
+    measure: rate
+    validate_as: flow
+    title: Interest Rate Spreads
+    short_title: Spreads
+    description: >-
+      Lending rates minus the 30-day time-deposit rate, in percentage points:
+      personal loans and overdrafts. Daily.
+    source: derived
+    source_label: BCRA
+    frequency: D
+    units: Percentage points
+    transforms: [level]
+    ranges: [2Y, 5Y, 10Y, Max]
+    note: >-
+      Annual nominal rates as the BCRA reports them. The spread on personal
+      loans includes the credit risk of unsecured consumer lending.
+    default: {variant: personal, transform: level, range: 5Y}
+    derive:
+      method: formula
+      anchor: dep
+      vars:
+        dep: "bcra:12"
+        personal: "bcra:14"
+        overdraft: "bcra:13"
+      variants:
+        personal:  {label: Personal loans minus deposits, expr: "personal - dep"}
+        overdraft: {label: Overdrafts minus deposits,     expr: "overdraft - dep"}

@@ -264,3 +264,9 @@ table.data.bs tr.total td { font-weight: 700; border-top: 2px solid var(--ink-3)
 table.data.bs tr.less td { font-style: italic; color: var(--ink-3); }
 .bs-notes { margin-top: 8px; }
 @media (max-width: 600px) { table.data.bs td:first-child { min-width: 9em; } }
+table.data.top td:nth-child(2) { white-space: normal; min-width: 14em; text-align: left; }
+table.data.top th { white-space: normal; vertical-align: bottom; min-width: 6em; }
+table.data.top tr.bench td { font-weight: 600; }
+table.data.top tr.bench.first td { border-top: 2px solid var(--ink-3); }
+table.data.top .at { color: var(--ink-3); font-size: 12px; }
+.top10 { max-height: none; }
