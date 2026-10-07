@@ -49,6 +49,22 @@ def get_adapter(name: str):
         from . import finanzas
 
         return finanzas
+    if name == "dolar":
+        from . import dolar
+
+        return dolar
+    if name == "bcra_cambiario":
+        from . import bcra_cambiario
+
+        return bcra_cambiario
+    if name == "rem":
+        from . import rem
+
+        return rem
+    if name == "ustreasury":
+        from . import ustreasury
+
+        return ustreasury
     if name == "manual":
         from . import manual
 

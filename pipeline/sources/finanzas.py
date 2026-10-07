@@ -612,6 +612,34 @@ def add_real_yields(placements: list[dict], cer: pd.Series) -> None:
             p["real"] = round((g ** (365 / days) - 1) * 100, 2)
 
 
+def breakevens(placements: list[dict], window: int = 45) -> list[tuple[str, float]]:
+    """Devaluation implied by an auction: on one settlement date, a fixed-rate peso letter and a
+    zero-coupon dollar-linked one maturing within `window` days of each other. Annual breakeven
+    depreciation = (1 + TEA of the peso letter) / (1 + dollar yield of the linked one) - 1, %."""
+    by_date: dict[str, list[dict]] = {}
+    for p in placements:
+        by_date.setdefault(p["settle"], []).append(p)
+    out = []
+    for d, ps in sorted(by_date.items()):
+        fixed = [p for p in ps if p["kind"] == "fixed" and p.get("tea") is not None and p.get("maturity")]
+        for q in ps:
+            c = (q.get("coupon") or "").lower()
+            if q["kind"] != "dlinked" or not q.get("price") or not q.get("maturity") or "cero" not in c:
+                continue
+            days = (dt.date.fromisoformat(q["maturity"]) - dt.date.fromisoformat(d)).days
+            if days < 20:
+                continue
+            m = dt.date.fromisoformat(q["maturity"])
+            near = sorted(fixed, key=lambda p: abs((dt.date.fromisoformat(p["maturity"]) - m).days))
+            if not near or abs((dt.date.fromisoformat(near[0]["maturity"]) - m).days) > window:
+                continue
+            y_usd = (1000 / q["price"]) ** (365 / days) - 1
+            be = ((1 + near[0]["tea"] / 100) / (1 + y_usd) - 1) * 100
+            if -50 < be < 500:
+                out.append((d, be))
+    return out
+
+
 def placement_series(placements: list[dict]) -> dict[str, dict]:
     """Monthly cash value placed by kind (pesos kinds: millions of pesos; dollar kinds: millions of
     US$, plus "<kind>_ars" for the part the files report in pesos),
@@ -641,6 +669,15 @@ def placement_series(placements: list[dict]) -> dict[str, dict]:
         den = cap.ve.groupby(cap.date).sum().reindex(allm, fill_value=0.0).rolling(6, min_periods=1).sum()
         r = (num / den.where(den > 0)).dropna()
         out["fin:col|tem_fixed"] = {d: float(v) for d, v in r.items()}
+    # Average yield (TEA, %) of the month's capitalizing fixed-rate placements, weighted by cash.
+    capm = df[df.coupon.str.contains("capitalizable", case=False, na=False) & (df.kind == "fixed") & df.tea.notna()]
+    if not capm.empty:
+        t = (capm.tea * capm.ve).groupby(capm.date).sum() / capm.ve.groupby(capm.date).sum()
+        out["fin:col|tea_fixed_m"] = {d: float(v) for d, v in t.items()}
+    b = breakevens(placements)
+    if b:
+        bs = pd.Series({pd.Timestamp(k[:7] + "-01"): v for k, v in b}).groupby(level=0).mean()
+        out["fin:col|breakeven"] = {d: float(v) for d, v in bs.items()}
     peso = df[df.kind.isin(PESO_KINDS) & df.life.notna()]
     w = peso.groupby("date").apply(lambda g: (g.life * g.ve).sum() / g.ve.sum(), include_groups=False)
     out["fin:col|life"] = {d: float(v) for d, v in w.items()}

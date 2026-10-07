@@ -561,10 +561,12 @@
     const ys = [...by.keys()].sort();
     ys.forEach((y, n) => {
       const ms = by.get(y), last = ms[ms.length - 1];
-      const complete = how === "sum" ? ms.length === 12 : last[0] === 12;
+      const nMonths = new Set(ms.map((m) => m[0])).size;
+      const complete = how === "sum" ? nMonths === 12 : last[0] === 12;
       if (!complete && n < ys.length - 1) return;           // incomplete early years are skipped
       if (!complete && how === "sum" && n === 0) return;
-      const v = how === "sum" ? ms.reduce((a, m) => a + m[1], 0) : (ms.find((m) => m[0] === 12) || last)[1];
+      const dec = ms.filter((m) => m[0] === 12);
+      const v = how === "sum" ? ms.reduce((a, m) => a + m[1], 0) : (dec.length ? dec[dec.length - 1] : last)[1];
       years.push(complete ? y : `${y}*`); vals.push(v);
       if (!complete) partial = { year: y, first: ms[0][2], last: last[2] };
     });

@@ -542,3 +542,21 @@ def test_finanzas_presentations_follow_their_workbook():
     p = f.find_presentations(html)
     assert [d.isoformat() for d, _ in p] == ["2026-06-30", "2026-03-31"]
     assert p[0][1].endswith("2do_trim_26.pdf")
+
+
+def test_market_rate_sources_are_cross_checked():
+    from pipeline.sources import dolar
+    h = dolar.history([{"fecha": "2026-10-06", "venta": 1540}, {"fecha": "2026-10-07", "venta": 1550}])
+    assert dolar.combine(h, {"venta": 1555, "fechaActualizacion": "2026-10-07T18:58:00Z"})[1] is None
+    assert "disagree" in dolar.combine(h, {"venta": 1700, "fechaActualizacion": "2026-10-07T18:58:00Z"})[1]
+    s, err = dolar.combine(h, {"venta": 1560, "fechaActualizacion": "2026-10-08T12:00:00Z"})
+    assert err is None and s.index.max() == pd.Timestamp("2026-10-08")
+
+
+def test_auction_breakeven_devaluation():
+    from pipeline.sources import finanzas as f
+    pl = [{"settle": "2026-08-31", "kind": "fixed", "tea": 30.0, "maturity": "2027-01-29", "coupon": "capitalizable 2,25", "price": 1000},
+          {"settle": "2026-08-31", "kind": "dlinked", "maturity": "2027-01-29", "coupon": "Cero cupón", "price": 990}]
+    (d, be), = f.breakevens(pl)
+    y = (1000 / 990) ** (365 / 151) - 1
+    assert d == "2026-08-31" and be == pytest.approx((1.30 / (1 + y) - 1) * 100)

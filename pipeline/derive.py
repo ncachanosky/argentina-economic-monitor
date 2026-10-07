@@ -25,7 +25,8 @@ tracker   Quarterly averages of a monthly activity index (EMAE), next to
 
 monthly   Monthly series from daily ones: per variant, the daily sum of
           `sum_of` ids (days missing any of them are dropped), then the
-          month's average (`how: mean`, default) or last value (`how: last`).
+          month's average (`how: mean`, default), last value (`how: last`)
+          or total (`how: sum`, for daily flows).
 
 flows     Monthly sources of a stock, in percentage points of the stock at
           the end of the previous month: per variant, the month's sum of the
@@ -41,7 +42,8 @@ formula   Arithmetic on stored series: `vars` maps short names to series ids;
           "@indicator:variant" (taken at month end for monthly indicators).
           Also: sum4(x) and sum12(x), sums of the last four or twelve
           periods; avg12(x), the average of the last twelve; lag(x, k), the
-          value k periods earlier; gdp12(gdp, cpi), nominal GDP of the last
+          value k periods earlier; cum12(x), twelve periods of a % return
+          compounded; gdp12(gdp, cpi), nominal GDP of the last
           twelve months at a monthly frequency (see gdp12); `start` drops
           earlier dates; in a quarterly indicator, monthly inputs are taken
           at the last month of each quarter, and in a monthly one daily
@@ -250,7 +252,8 @@ def monthly(ind, frames: dict[str, pd.Series]) -> tuple[pd.DataFrame, dict]:
     for k, v in ind.derive["variants"].items():
         d = _daily_sum(frames, v["sum_of"])
         g = d.resample("MS")
-        out[ind.variants[k].source_id] = g.last() if v.get("how") == "last" else g.mean()
+        how = v.get("how", "mean")
+        out[ind.variants[k].source_id] = g.last() if how == "last" else g.sum(min_count=1) if how == "sum" else g.mean()
     df = pd.DataFrame(out).sort_index()
     # The current month is partial: keep it once it has 10 business days of
     # data (an average of a few days is mostly noise), and say so.
@@ -347,7 +350,8 @@ def formula(ind, frames: dict[str, pd.Series]) -> tuple[pd.DataFrame, dict]:
     env["avg12"] = lambda x: x.rolling(12).mean()       # average of the last twelve periods
     env["lag"] = lambda x, k=1: x.shift(int(k))         # value k periods earlier
     env["gdp12"] = lambda gdp, cpi: gdp12(gdp, cpi)     # nominal GDP of the last twelve months, monthly
-    funcs = {"nz", "sum4", "sum12", "avg12", "lag", "gdp12"}
+    env["cum12"] = lambda x: ((1 + x / 100).rolling(12).apply(np.prod, raw=True) - 1) * 100   # compounded % over 12 periods
+    funcs = {"nz", "sum4", "sum12", "avg12", "lag", "gdp12", "cum12"}
     allowed = (ast.Expression, ast.BinOp, ast.UnaryOp, ast.Add, ast.Sub, ast.Mult, ast.Div, ast.USub,
                ast.Name, ast.Load, ast.Constant, ast.Call)
     out = {}

@@ -243,6 +243,31 @@ inputs:
   - {id: 452.2_TRANSPORTERTE_0_T_10_32, source: datos_gob, frequency: M, measure: flow, label: "Fiscal: economic subsidies, transport"}
   - {id: 452.2_OTRAS_FUNCNES_0_T_15_25, source: datos_gob, frequency: M, measure: flow, label: "Fiscal: economic subsidies, other"}
   - {id: "bcra:30", source: bcra, frequency: D, measure: index, label: "CER (index of the inflation adjustment, base 2 Feb 2002 = 1)"}
+  - {id: "bcrabc:current", source: bcra_cambiario, frequency: M, measure: flow, stale_days: 120, label: "Balance cambiario: current"}
+  - {id: "bcrabc:goods", source: bcra_cambiario, frequency: M, measure: flow, stale_days: 120, label: "Balance cambiario: goods"}
+  - {id: "bcrabc:services", source: bcra_cambiario, frequency: M, measure: flow, stale_days: 120, label: "Balance cambiario: services"}
+  - {id: "bcrabc:primary", source: bcra_cambiario, frequency: M, measure: flow, stale_days: 120, label: "Balance cambiario: primary"}
+  - {id: "bcrabc:secondary", source: bcra_cambiario, frequency: M, measure: flow, stale_days: 120, label: "Balance cambiario: secondary"}
+  - {id: "bcrabc:capital", source: bcra_cambiario, frequency: M, measure: flow, stale_days: 120, label: "Balance cambiario: capital"}
+  - {id: "bcrabc:financial", source: bcra_cambiario, frequency: M, measure: flow, stale_days: 120, label: "Balance cambiario: financial"}
+  - {id: "bcrabc:fdi", source: bcra_cambiario, frequency: M, measure: flow, stale_days: 120, label: "Balance cambiario: fdi"}
+  - {id: "bcrabc:portfolio", source: bcra_cambiario, frequency: M, measure: flow, stale_days: 120, label: "Balance cambiario: portfolio"}
+  - {id: "bcrabc:loans", source: bcra_cambiario, frequency: M, measure: flow, stale_days: 120, label: "Balance cambiario: loans"}
+  - {id: "bcrabc:imf", source: bcra_cambiario, frequency: M, measure: flow, stale_days: 120, label: "Balance cambiario: imf"}
+  - {id: "bcrabc:ifis", source: bcra_cambiario, frequency: M, measure: flow, stale_days: 120, label: "Balance cambiario: ifis"}
+  - {id: "bcrabc:cash_purchases", source: bcra_cambiario, frequency: M, measure: flow, stale_days: 120, label: "Balance cambiario: cash_purchases"}
+  - {id: "bcrabc:reserves", source: bcra_cambiario, frequency: M, measure: flow, stale_days: 120, label: "Balance cambiario: reserves"}
+  - {id: "bcra:78", source: bcra, frequency: D, measure: flow, allow_gaps: true, label: "Change in international reserves from BCRA purchases of foreign currency (USD m)"}
+  # Market exchange rates (unofficial: ArgentinaDatos and DolarAPI, compiled from the financial press), pesos per US dollar, selling.
+  - {id: "dolar:blue", source: dolar, frequency: D, measure: index, allow_gaps: true, stale_days: 7, label: "Informal (blue) dollar"}
+  - {id: "dolar:mep", source: dolar, frequency: D, measure: index, allow_gaps: true, stale_days: 7, label: "MEP dollar (bond trades, local)"}
+  - {id: "dolar:ccl", source: dolar, frequency: D, measure: index, allow_gaps: true, stale_days: 7, label: "CCL dollar (bond trades, abroad)"}
+  - {id: "dolar:tarjeta", source: dolar, frequency: D, measure: index, allow_gaps: true, stale_days: 7, label: "Card (tarjeta) dollar"}
+  - {id: "dolar:cripto", source: dolar, frequency: D, measure: index, allow_gaps: true, stale_days: 7, label: "Crypto dollar (stablecoins)"}
+  - {id: "rem:fx12", source: rem, frequency: M, measure: index, allow_gaps: true, label: "REM: median expected official exchange rate, twelve months ahead"}
+  - {id: "ust:52w", source: ustreasury, frequency: D, measure: flow, allow_gaps: true, label: "US Treasury 52-week bill, coupon-equivalent yield, %"}
+  - {id: "fin:col|tea_fixed_m", source: finanzas, frequency: M, measure: flow, allow_gaps: true, label: "Average yield (TEA, %) of the month's fixed-rate capitalizing placements"}
+  - {id: "fin:col|breakeven", source: finanzas, frequency: M, measure: flow, allow_gaps: true, label: "Breakeven devaluation implied by auctions (fixed-rate vs dollar-linked), annual %"}
   # Finance Secretariat, central administration gross debt (monthly bulletin), millions of US dollars.
   - {id: "fin:a3|pesos_other", source: finanzas, frequency: M, measure: index, label: "Debt in pesos, not CER-linked"}
   - {id: "fin:a3|pesos_cer", source: finanzas, frequency: M, measure: index, label: "Debt in pesos, CER-linked"}
@@ -363,6 +388,15 @@ topics:
       interest rates, the official exchange rate, reserves and the central
       bank's balance sheet. From the BCRA. Peso amounts can be shown in real
       terms.
+
+  - id: fx
+    slug: exchange-rate
+    title: Exchange Rate
+    description: >-
+      Official and market exchange rates and the gaps between them, the
+      dollar return of the peso carry trade, market and survey estimates of
+      devaluation, the BCRA's purchases of foreign currency, and the
+      foreign-exchange market's flows (balance cambiario).
 
   - id: banks
     slug: banks
@@ -1322,7 +1356,7 @@ indicators:
     default: {variant: rate, transform: level, range: 10Y}
 
   - id: fx_official
-    topic: money
+    topic: fx
     wide: true
     kind: variants
     overlay: true
@@ -3285,3 +3319,263 @@ indicators:
       zero-coupon CER-linked letters and bonds: the effective annual yield
       over inflation implied by the issue price and the CER from issue to
       settlement. Recent months are preliminary.
+
+
+  # ---------------- Exchange rate ----------------
+
+  - id: fx_market_rates
+    topic: fx
+    wide: true
+    kind: variants
+    overlay: true
+    log_level: true
+    title: Official and Market Exchange Rates
+    short_title: Market rates
+    description: >-
+      Pesos per US dollar: the official wholesale rate, the MEP and CCL
+      rates implied by bond trades, the informal ("blue") rate, the card
+      rate and the crypto dollar. Daily, selling prices.
+    source: derived
+    source_label: BCRA (official); ArgentinaDatos and DolarAPI (market rates, unofficial)
+    frequency: D
+    units: Pesos per US dollar
+    transforms: [level, yoy]
+    ranges: [2Y, 5Y, 10Y, Max]
+    caveat: >-
+      Market rates other than the official one are unofficial: they are
+      compiled from quotes in the financial press by two community data
+      projects (ArgentinaDatos and DolarAPI), checked against each other on
+      each update. Treat single days with care.
+    note: >-
+      MEP (mercado electrónico de pagos): pesos per dollar implied by buying
+      a bond in pesos and selling it for dollars in Argentina; CCL (contado
+      con liquidación): the same with dollars delivered abroad. Blue: the
+      informal street market. Card (tarjeta): the official retail rate plus
+      the taxes on card purchases abroad. Crypto: dollar stablecoins bought
+      with pesos. Gaps between them were large while exchange controls
+      (cepo) were in force (September 2011 - December 2015 and September
+      2019 - April 2025).
+    method_links: [{anchor: fx-market, label: "About market exchange rates"}]
+    default: {variant: official, transform: level, range: 5Y}
+    derive:
+      method: formula
+      vars: {off: "bcra:5", mep: "dolar:mep", ccl: "dolar:ccl", blue: "dolar:blue", card: "dolar:tarjeta", cry: "dolar:cripto"}
+      variants:
+        official: {label: Official (wholesale), expr: "off"}
+        mep:      {label: MEP,                  expr: "mep"}
+        ccl:      {label: CCL,                  expr: "ccl"}
+        blue:     {label: Blue (informal),      expr: "blue"}
+        card:     {label: Card (tarjeta),       expr: "card"}
+        crypto:   {label: Crypto,               expr: "cry"}
+
+  - id: fx_gaps
+    topic: fx
+    wide: true
+    kind: variants
+    overlay: true
+    measure: rate
+    validate_as: flow
+    plain_level: true
+    title: Gaps Over the Official Rate
+    short_title: Exchange-rate gaps
+    description: >-
+      How much more pesos the MEP, CCL and informal dollars cost than the
+      official wholesale rate, percent. Daily.
+    source: derived
+    source_label: BCRA; ArgentinaDatos and DolarAPI (unofficial)
+    frequency: D
+    units: "% over the official rate"
+    transforms: [level]
+    ranges: [2Y, 5Y, 10Y, Max]
+    yearly: {how: december}
+    ref_line: 0
+    note: >-
+      Each rate over the official wholesale rate (Communication A 3500) of
+      the same day, minus one. The gap measures how binding exchange controls
+      are and how far the market expects the official rate to move. Market
+      rates are unofficial (see Official and Market Exchange Rates). Yearly
+      view: the last day of each year.
+    default: {variant: ccl, transform: level, range: 10Y}
+    derive:
+      method: formula
+      vars: {off: "bcra:5", mep: "dolar:mep", ccl: "dolar:ccl", blue: "dolar:blue"}
+      variants:
+        ccl:  {label: CCL,             expr: "100 * (ccl / off - 1)"}
+        mep:  {label: MEP,             expr: "100 * (mep / off - 1)"}
+        blue: {label: Blue (informal), expr: "100 * (blue / off - 1)"}
+
+  - id: fx_carry
+    topic: fx
+    kind: variants
+    overlay: true
+    measure: rate
+    validate_as: flow
+    plain_level: true
+    title: Carry Trade Return in Dollars
+    short_title: Carry trade
+    description: >-
+      What a dollar earned by being converted to pesos, held in 30-day time
+      deposits rolled over each month, and converted back: the return over
+      the last twelve months, in dollars, percent. Monthly.
+    source: derived
+    source_label: BCRA; ArgentinaDatos and DolarAPI (MEP, unofficial)
+    frequency: M
+    units: "% in dollars, last 12 months"
+    transforms: [level]
+    ranges: [5Y, 10Y, Max]
+    yearly: {how: december}
+    ref_line: 0
+    note: >-
+      Each month: the 30-day time-deposit rate at the end of the previous
+      month (annual nominal rate, accrued for 30 days) times the change in
+      the exchange rate over the month (end of month to end of month),
+      compounded over twelve months. Official: in and out at the wholesale
+      rate, which most savers could not do under exchange controls. MEP: in
+      and out at the MEP rate, a route open to individuals. Before taxes and
+      fees. Positive: pesos paid more than the depreciation.
+    default: {variant: official, transform: level, range: Max}
+    derive:
+      method: formula
+      anchor: dep
+      start: "2003-12-01"
+      vars: {dep: "bcra:12", off: "bcra:5", mep: "dolar:mep"}
+      variants:
+        official: {label: Official rate, expr: "cum12(100 * ((1 + lag(dep, 1) / 100 * 30 / 365) * lag(off, 1) / off - 1))"}
+        mep:      {label: MEP rate,      expr: "cum12(100 * ((1 + lag(dep, 1) / 100 * 30 / 365) * lag(mep, 1) / mep - 1))"}
+
+  - id: fx_devaluation
+    topic: fx
+    wide: true
+    kind: variants
+    overlay: true
+    measure: rate
+    validate_as: flow
+    plain_level: true
+    title: Expected and Actual Devaluation
+    short_title: Expected devaluation
+    description: >-
+      Three estimates of the depreciation of the official rate expected over
+      the next twelve months, against what then happened: the BCRA's survey
+      of analysts, the devaluation priced in Treasury auctions, and interest
+      parity. Annual %, monthly.
+    source: derived
+    source_label: BCRA (REM, exchange rate); Secretaría de Finanzas (placements); US Treasury
+    frequency: M
+    units: "% over 12 months"
+    transforms: [level]
+    ranges: [5Y, Max]
+    note: >-
+      Survey: the median expected official rate twelve months ahead in the
+      BCRA's market expectations survey (REM) over the month's average
+      official rate. Auctions: on days the Treasury sells a fixed-rate peso
+      letter and a dollar-linked one of similar maturity, the devaluation
+      that makes both pay the same, annualized (month's average). Interest
+      parity: the month's average yield on fixed-rate Treasury letters (TEA)
+      over the US Treasury 52-week bill yield; it includes any risk premium,
+      so it overstates expected devaluation when holding pesos is risky.
+      Actual: the change in the official rate over the following twelve
+      months, known only a year later.
+    method_links: [{anchor: fx-devaluation, label: "How devaluation expectations are measured"}]
+    default: {variant: survey, transform: level, range: 5Y}
+    derive:
+      method: formula
+      vars: {rem: "rem:fx12", offa: "@fx_official:wholesale:avg", be: "fin:col|breakeven", tea: "fin:col|tea_fixed_m", ust: "ust:52w"}
+      variants:
+        survey:   {label: Survey (REM),          expr: "100 * (rem / offa - 1)"}
+        auctions: {label: Auctions (breakeven),  expr: "be"}
+        parity:   {label: Interest parity,       expr: "100 * ((1 + tea / 100) / (1 + ust / 100) - 1)"}
+        actual:   {label: "Actual, next 12 months", expr: "100 * (lag(offa, -12) / offa - 1)"}
+
+  - id: fx_bcra_purchases
+    topic: fx
+    wide: true
+    kind: contributions
+    measure: flow
+    title: BCRA Purchases of Foreign Currency
+    short_title: BCRA purchases
+    description: >-
+      The central bank's net purchases of foreign currency in the market,
+      millions of US dollars, by month. Daily data summed.
+    source: derived
+    source_label: BCRA
+    frequency: M
+    units: Millions of US dollars
+    ranges: [2Y, 5Y, 10Y, Max]
+    note: >-
+      The change in international reserves from the BCRA's purchases and
+      sales of foreign currency (net purchases from the private sector and
+      others; negative: net sales). Not included: the Treasury's own
+      purchases in the market (block trades), published only as
+      announcements, and the BCRA's positions in dollar futures. The current
+      month is partial.
+    contributions:
+      precomputed: true
+      hide_total: true
+      units: "US$ m"
+      suffix: " m"
+      groups:
+        - {key: purchases, label: Net purchases, add: [purchases], color: sky}
+    yearly: {how: sum}
+    default: {variant: purchases, transform: level, range: 5Y}
+    derive:
+      method: monthly
+      variants:
+        purchases: {label: Net purchases, sum_of: ["bcra:78"], how: sum}
+
+  - id: fx_balance_cambiario
+    topic: fx
+    wide: true
+    kind: contributions
+    measure: flow
+    title: Foreign-Exchange Market Flows (Balance Cambiario)
+    short_title: Balance cambiario
+    description: >-
+      What moved through the foreign-exchange market each month, and the
+      change in reserves it left: trade, services, income, purchases of
+      dollars for holding by individuals and firms, official lenders and
+      other financial flows. Millions of US dollars, since 2003.
+    source: derived
+    source_label: BCRA (Informe de Evolución del Mercado de Cambios y Balance Cambiario)
+    frequency: M
+    units: Millions of US dollars
+    ranges: [2Y, 5Y, 10Y, Max]
+    note: >-
+      Cash flows through the foreign-exchange market (when dollars change
+      hands, not when goods ship), as the BCRA records them. Goods: export
+      receipts minus import payments. Income: interest, profits, dividends
+      and transfers. Dollars for holding: net purchases of banknotes and
+      foreign currency "with no specific purpose" (formation of external
+      assets by individuals and firms; negative: net purchases). Official
+      lenders: the IMF and other international and bilateral lenders. Other:
+      the rest of the capital and financial accounts (direct and portfolio
+      investment, loans and debt, government and other operations). The bars
+      add up to the change in reserves from these transactions (the line).
+    method_links: [{anchor: balance-cambiario, label: "About the balance cambiario"}]
+    contributions:
+      precomputed: true
+      total: reserves
+      total_label: Change in reserves from transactions
+      units: "US$ m"
+      suffix: " m"
+      groups:
+        - {key: goods,    label: Goods,                add: [goods],    color: copper}
+        - {key: services, label: Services,             add: [services], color: sky}
+        - {key: income,   label: Income,               add: [income],   color: lavender}
+        - {key: holding,  label: Dollars for holding,  add: [holding],  color: rose}
+        - {key: official, label: Official lenders,     add: [official], color: sage}
+        - {key: other,    label: Other,                add: [other],    color: neutral}
+    yearly: {how: sum}
+    default: {variant: goods, transform: level, range: 5Y}
+    derive:
+      method: formula
+      anchor: res
+      vars: {goods: "bcrabc:goods", serv: "bcrabc:services", prim: "bcrabc:primary", sec: "bcrabc:secondary", cap: "bcrabc:capital",
+             fin: "bcrabc:financial", hold: "bcrabc:cash_purchases", imf: "bcrabc:imf", ifis: "bcrabc:ifis", res: "bcrabc:reserves"}
+      variants:
+        goods:    {label: Goods,               expr: "goods"}
+        services: {label: Services,            expr: "serv"}
+        income:   {label: Income,              expr: "prim + sec"}
+        holding:  {label: Dollars for holding, expr: "hold"}
+        official: {label: Official lenders,    expr: "nz(imf) + nz(ifis)"}
+        other:    {label: Other,               expr: "cap + fin - hold - nz(imf) - nz(ifis)"}
+        reserves: {label: Change in reserves,  expr: "res"}
