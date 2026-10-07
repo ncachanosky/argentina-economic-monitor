@@ -37,6 +37,14 @@ def get_adapter(name: str):
         from . import bcra_fx
 
         return bcra_fx
+    if name == "bcra_banks":
+        from . import bcra_banks
+
+        return bcra_banks
+    if name == "bcra_entities":
+        from . import bcra_entities
+
+        return bcra_entities
     if name == "manual":
         from . import manual
 

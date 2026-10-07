@@ -482,3 +482,10 @@ def test_bank_annex_helpers():
     assert b._as_date(2004) == pd.Timestamp("2004-12-01")
     import datetime as dt
     assert b._as_date(dt.datetime(2026, 7, 1)) == pd.Timestamp("2026-07-01")
+
+
+def test_every_registry_source_has_an_adapter():
+    from pipeline.sources import get_adapter
+    reg = registry.load()
+    for source, _ in reg.series_by_source():
+        assert get_adapter(source) is not None
