@@ -213,10 +213,10 @@ def parse_monthly(content: bytes) -> dict[str, dict]:
 
     # A.1 stock of capitalizing peso securities (all LECAP and BONCAP lines, short and long term)
     _, it = monthly_block(_rows(wb["A.1"]))
-    for key, lab in [("lecap", "LECAP"), ("boncap", "BONCAP")]:
+    for key, lab in [("lecap", "LECAP"), ("boncap", "BONCAP"), ("advances", "ADELANTOS TRANSITORIOS BCRA")]:
         tot: dict = {}
         for i, l, vals in it:
-            if _norm(l) == _norm(lab):
+            if _norm(l) == _norm(lab) or (key == "advances" and _norm(l).startswith(_norm(lab))):
                 for d, v in vals.items():
                     tot[d] = tot.get(d, 0.0) + v
         out[f"fin:a1|{key}"] = tot
@@ -380,6 +380,52 @@ def schedule_table(q: dict, monthly: dict | None) -> dict:
     }
 
 
+# ---------- quarterly presentations: debt by holder ----------
+
+HOLDERS = [("public", "agencias del sector publico"), ("private", "sector privado"), ("total", "total deuda publica bruta")]
+HOLDERS_FROM_STORE_MIN = 8          # with this much history stored, only the latest presentations are read
+
+
+def find_presentations(html: str) -> list[tuple[dt.date, str]]:
+    """(report date, presentation PDF) pairs: on the landing page each quarter lists its
+    workbook and then its presentation, whose file names do not carry a usable date."""
+    out, last = [], None
+    for href in re.findall(r'href="([^"]+)"', html):
+        url = href if href.startswith("http") else BASE + href
+        name = url.rsplit("/", 1)[-1].lower()
+        if re.search(r"deuda_publica_[^/]*\.xlsx$", name):
+            last = _file_date(url)
+        elif name.endswith(".pdf") and "presentaci" in name and last:
+            if all(u != url for _, u in out):
+                out.append((last, url))
+            last = None
+    return out
+
+
+def parse_holders(content: bytes) -> dict[str, float]:
+    """Debt by holder at the report's date (US$ millions): the table "Deuda Bruta de la
+    Administración Central por acreedor", second date column."""
+    import pdfplumber
+    with pdfplumber.open(io.BytesIO(content)) as pdf:
+        for page in pdf.pages:
+            text = page.extract_text() or ""
+            if "Agencias del Sector" not in text or "Sector Privado" not in text:
+                continue
+            out = {}
+            for line in text.splitlines():
+                n = _norm(line)
+                for key, lab in HOLDERS:
+                    if n.startswith(lab) and key not in out:
+                        nums = [t for t in re.findall(r"[\d.,()%-]+", line) if re.search(r"\d", t)]
+                        amounts = [t for t in nums if "%" not in t]
+                        if len(amounts) >= 2:
+                            v = amounts[1].strip("()").replace(".", "")
+                            out[key] = float(v)
+            if {"public", "private", "total"} <= set(out):
+                return out
+    raise ValueError("holder table not found")
+
+
 # ---------- placements ----------
 
 KINDS = [
@@ -509,6 +555,30 @@ def parse_placements(content: bytes, year: int) -> list[dict]:
     return [p for p in out if p["settle"][:4] == str(year)] or out
 
 
+def add_real_yields(placements: list[dict], cer: pd.Series) -> None:
+    """Real yield (effective annual, %) implied by the issue price of zero-coupon CER-linked
+    letters and bonds: the price per 1,000 of face value is the face value adjusted by the CER
+    from issue to settlement, discounted at the real yield to maturity. The CER is taken ten
+    business days before each date (about fourteen calendar days), as the bonds' terms do."""
+    if cer is None or cer.empty:
+        return
+    cer = cer.dropna().sort_index()
+    at = lambda d: cer.asof(pd.Timestamp(d) - pd.Timedelta(days=14))
+    for p in placements:
+        c = (p.get("coupon") or "").lower()
+        if p["kind"] != "cer" or not ("cero" in c or "tasa cero" in p["name"].lower() or "lecer" in p["name"].lower()):
+            continue
+        if not (p.get("issue") and p.get("maturity") and p.get("price")):
+            continue
+        days = (dt.date.fromisoformat(p["maturity"]) - dt.date.fromisoformat(p["settle"])).days
+        ci, cs = at(p["issue"]), at(p["settle"])
+        if days <= 0 or not ci or not cs or pd.isna(ci) or pd.isna(cs):
+            continue
+        g = 1000 * cs / ci / p["price"]
+        if 0.3 < g < 3:
+            p["real"] = round((g ** (365 / days) - 1) * 100, 2)
+
+
 def placement_series(placements: list[dict]) -> dict[str, dict]:
     """Monthly cash value placed by kind (pesos kinds: millions of pesos; dollar kinds: millions of
     US$, plus "<kind>_ars" for the part the files report in pesos),
@@ -584,12 +654,49 @@ def collect() -> dict:
         pl = []
         for y, u in files.items():
             pl += parse_placements(_get(u), y)
+        try:
+            from .. import store
+            add_real_yields(pl, store.as_of("bcra:30"))
+        except Exception:
+            pass
         parsed["placements"] = pl
         parsed["placements_urls"] = files
         parsed["series"].update(placement_series(pl))
     except Exception as exc:
         parsed["errors"]["placements"] = f"placements: {exc}"
+    try:
+        parsed["series"].update(collect_holders())
+    except Exception as exc:
+        parsed["errors"]["holders"] = f"debt by holder: {exc}"
     return parsed
+
+
+def collect_holders() -> dict[str, dict]:
+    """Debt by holder at each quarter end, from the quarterly presentations. Stored history is
+    kept, and only the latest presentations are read once it is long enough."""
+    from .. import store
+    pres = find_presentations(_get(QUARTERLY_PAGE).decode("utf-8", "ignore"))
+    if not pres:
+        raise RuntimeError("no presentations found")
+    out = {f"fin:hold|{k}": {} for k, _ in HOLDERS}
+    for k, _ in HOLDERS:
+        old = store.as_of(f"fin:hold|{k}")
+        out[f"fin:hold|{k}"].update({d: float(v) for d, v in old.items()})
+    have = len(out["fin:hold|total"])
+    todo = sorted(pres, reverse=True)[: (3 if have >= HOLDERS_FROM_STORE_MIN else len(pres))]
+    errors = []
+    for d, url in todo:
+        try:
+            h = parse_holders(_get(url))
+        except Exception as exc:
+            errors.append(f"{d}: {exc}")
+            continue
+        m = pd.Timestamp(d.year, d.month, 1)
+        for k, _ in HOLDERS:
+            out[f"fin:hold|{k}"][m] = h[k]
+    if not out["fin:hold|total"]:
+        raise RuntimeError("; ".join(errors) or "no holder tables")
+    return out
 
 
 def to_long(series: dict[str, dict]) -> pd.DataFrame:
@@ -608,7 +715,7 @@ def fetch(ids, parsed: dict | None = None) -> FetchResult:
     for sid in ids:
         if sid not in have:
             block = sid.split(":", 1)[1].split("|", 1)[0]
-            part = "placements" if block == "col" else "monthly"
+            part = "placements" if block == "col" else "holders" if block == "hold" else "monthly"
             errors[sid] = errs.get(part, "not in the Finance Secretariat files")
     data = data[data.series_id.isin(set(ids))].sort_values(["series_id", "date"])
     meta = {sid: {"units": None, "time_index_end": g.date.max().strftime("%Y-%m-%d")} for sid, g in data.groupby("series_id")}

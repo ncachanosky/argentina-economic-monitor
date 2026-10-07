@@ -1354,25 +1354,25 @@
     async function render() {
       const t = await load(state.year);
       const rows = t.auctions[state.date] || [];
-      const head = h("tr", {}, ["Instrument", "Type", "Maturity", "Face value", "Cash value", "Price / 1,000", "Life, yrs", "TEM %", "TEA %"].map((x) => h("th", {}, x)));
+      const head = h("tr", {}, ["Instrument", "Type", "Maturity", "Face value", "Cash value", "Price / 1,000", "Life, yrs", "TEM %", "TEA %", "Real yield %"].map((x) => h("th", {}, x)));
       const body = rows.map((r) => h("tr", {},
         h("td", { class: "pres", title: r.coupon || "" }, r.name),
         h("td", {}, h("span", { class: "sw", style: `background:${groupColor(KCOL[r.kind])}` }), " ", (index.kinds || {})[r.kind] || r.kind),
         h("td", {}, r.maturity ? fmtDay(r.maturity) : "–"),
         h("td", {}, n0(r.vn)), h("td", {}, n0(r.ve)), h("td", {}, n1(r.price)), h("td", {}, n1(r.life, 2)),
-        h("td", {}, n1(r.tem, 2)), h("td", {}, n1(r.tea, 1))));
+        h("td", {}, n1(r.tem, 2)), h("td", {}, n1(r.tea, 1)), h("td", {}, n1(r.real, 1))));
       const ars = rows.filter((r) => r.currency === "ARS").reduce((a, r) => a + (r.ve || 0), 0);
       const usd = rows.filter((r) => r.currency === "USD").reduce((a, r) => a + (r.ve || 0), 0);
       tableEl.replaceChildren(h("table", { class: "data plc" }, h("thead", {}, head), h("tbody", {}, body)));
       hint.textContent = `${fmtDay(state.date)}: ${rows.length} placement${rows.length === 1 ? "" : "s"}; cash raised ${n0(ars)} million pesos` +
         (usd ? ` and US$ ${n0(usd)} million (dollar and dollar-linked)` : "") + ". Amounts in millions of the instrument's currency; hover an instrument for its terms.";
-      view = { header: ["settlement", "instrument", "type", "issue", "maturity", "terms", "currency", "face_value", "cash_value", "price_per_1000", "life_years", "tem_pct", "tea_pct"],
-        rows: rows.map((r) => [state.date, r.name, r.kind, r.issue, r.maturity, r.coupon, r.currency, r.vn, r.ve, r.price, r.life, r.tem, r.tea]) };
+      view = { header: ["settlement", "instrument", "type", "issue", "maturity", "terms", "currency", "face_value", "cash_value", "price_per_1000", "life_years", "tem_pct", "tea_pct", "real_yield_pct"],
+        rows: rows.map((r) => [state.date, r.name, r.kind, r.issue, r.maturity, r.coupon, r.currency, r.vn, r.ve, r.price, r.life, r.tem, r.tea, r.real]) };
     }
     const onCSV = async () => {
       // The whole year, not just the date shown.
       const t = await load(state.year);
-      const rows = Object.entries(t.auctions).flatMap(([d, rs]) => rs.map((r) => [d, r.name, r.kind, r.issue, r.maturity, r.coupon, r.currency, r.vn, r.ve, r.price, r.life, r.tem, r.tea]));
+      const rows = Object.entries(t.auctions).flatMap(([d, rs]) => rs.map((r) => [d, r.name, r.kind, r.issue, r.maturity, r.coupon, r.currency, r.vn, r.ve, r.price, r.life, r.tem, r.tea, r.real]));
       downloadBlob(toCSV(view.header, rows), `${ind.id}_${state.year}.csv`, "text/csv");
     };
     appendAll(card, h("div", { class: "controls" }, h("label", { class: "base-pick" }, h("span", {}, "Year:"), ySel),

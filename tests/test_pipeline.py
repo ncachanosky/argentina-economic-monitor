@@ -531,3 +531,14 @@ def test_gdp12_and_formula_helpers():
     assert g["2022-12-01"] == pytest.approx(1200.0) and g["2024-06-01"] == pytest.approx(1200.0)
     assert pd.isna(g["2022-06-01"])                       # fewer than four quarters
     assert g["2025-03-01"] > 1200.0                      # extended with the CPI after the last quarter
+
+
+def test_finanzas_presentations_follow_their_workbook():
+    from pipeline.sources import finanzas as f
+    html = ('<a href="https://x/sites/default/files/deuda_publica_30-06-2026_0.xlsx"></a>'
+            '<a href="https://x/sites/default/files/presentacion_grafica_2do_trim_26.pdf"></a>'
+            '<a href="https://x/sites/default/files/deuda_publica_31-03-2026.xlsx"></a>'
+            '<a href="https://x/sites/default/files/presentacion_grafica_it_26_c.pdf"></a>')
+    p = f.find_presentations(html)
+    assert [d.isoformat() for d, _ in p] == ["2026-06-30", "2026-03-31"]
+    assert p[0][1].endswith("2do_trim_26.pdf")

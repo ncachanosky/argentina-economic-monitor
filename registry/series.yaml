@@ -254,6 +254,21 @@ inputs:
   - {id: "fin:a2|total", source: finanzas, frequency: M, measure: index, label: "Gross debt (incl. eligible debt pending restructuring)"}
   - {id: "fin:a1|lecap", source: finanzas, frequency: M, measure: flow, label: "Stock of LECAP (capitalizing letters)"}
   - {id: "fin:a1|boncap", source: finanzas, frequency: M, measure: flow, label: "Stock of BONCAP (capitalizing bonds)"}
+  - {id: "fin:a1|advances", source: finanzas, frequency: M, measure: flow, label: "BCRA temporary advances to the Treasury (stock)"}
+  - {id: "fin:hold|public", source: finanzas, frequency: M, measure: flow, allow_gaps: true, stale_days: 200, label: "Gross debt held by public-sector agencies (quarter ends, US$ m)"}
+  - {id: "fin:hold|private", source: finanzas, frequency: M, measure: flow, allow_gaps: true, stale_days: 200, label: "Gross debt held by the private sector (quarter ends, US$ m)"}
+  - {id: "fin:hold|total", source: finanzas, frequency: M, measure: flow, allow_gaps: true, stale_days: 200, label: "Gross debt, total incl. eligible pending restructuring (quarter ends, US$ m)"}
+  # IMIG revenue by tax (national share, cash basis), millions of current pesos.
+  - {id: 452.2_IVA_NETO_RROS_0_T_19_67, source: datos_gob, frequency: M, measure: flow, label: "Revenue: VAT, net of refunds"}
+  - {id: 452.2_GANANCIASIAS_0_T_9_51, source: datos_gob, frequency: M, measure: flow, label: "Revenue: income tax"}
+  - {id: 452.2_APORTES_COIAL_0_T_39_29, source: datos_gob, frequency: M, measure: flow, label: "Revenue: social security contributions"}
+  - {id: 452.2_DERECHOS_EION_0_T_20_42, source: datos_gob, frequency: M, measure: flow, label: "Revenue: export duties"}
+  - {id: 452.2_DERECHOS_IION_0_T_20_60, source: datos_gob, frequency: M, measure: flow, label: "Revenue: import duties"}
+  - {id: 452.2_DEBITOS_CRTOS_0_T_16_22, source: datos_gob, frequency: M, measure: flow, label: "Revenue: tax on bank debits and credits"}
+  - {id: 452.2_COMBUSTIBLLES_0_T_12_97, source: datos_gob, frequency: M, measure: flow, label: "Revenue: fuel taxes"}
+  - {id: 452.2_IMPUESTOS_NOS_0_T_18_87, source: datos_gob, frequency: M, measure: flow, label: "Revenue: excise taxes (impuestos internos)"}
+  - {id: 452.2_BIENES_PERLES_0_T_17_26, source: datos_gob, frequency: M, measure: flow, label: "Revenue: personal assets tax"}
+  - {id: 452.2_RESTO_TRIBIOS_0_T_17_0, source: datos_gob, frequency: M, measure: flow, label: "Revenue: other taxes (incl. PAIS tax)"}
   - {id: "fin:col|tem_fixed", source: finanzas, frequency: M, measure: flow, allow_gaps: true, label: "Average implied yield (TEM, %) of capitalizing fixed-rate placements, last six months"}
   - {id: "fin:a4|peso_mkt_issued", source: finanzas, frequency: M, measure: flow, label: "Peso marketable securities issued"}
   - {id: "fin:a4|peso_mkt_amortized", source: finanzas, frequency: M, measure: flow, label: "Peso marketable securities amortized"}
@@ -2560,6 +2575,82 @@ indicators:
         capital_12m:   {label: Capital (12 months),   expr: "100 * (sum12((cap - pcap) / cpi) - lag(sum12((cap - pcap) / cpi), 12)) / lag(sum12((tot) / cpi), 12)"}
         other_12m:     {label: Other (12 months),     expr: "100 * (sum12((tot - pen - prv - wag - pcur - cap) / cpi) - lag(sum12((tot - pen - prv - wag - pcur - cap) / cpi), 12)) / lag(sum12((tot) / cpi), 12)"}
 
+  - id: fiscal_revenue_contrib
+    topic: fiscal
+    wide: true
+    kind: contributions
+    measure: flow
+    title: What Drives Revenue
+    short_title: Revenue by tax
+    description: >-
+      Change in real total revenue from the same month a year earlier, and
+      the contribution of each tax, in percentage points. Monthly.
+    source: derived
+    source_label: Secretaría de Hacienda (IMIG), via datos.gob.ar; INDEC
+    frequency: M
+    units: Percentage points
+    ranges: [2Y, 5Y, Max]
+    note: >-
+      National non-financial public sector, cash basis: the national share of
+      each tax, after automatic transfers to the provinces. Each item
+      deflated by the CPI (national, INDEC); contribution of an item: its
+      real change over total revenue a year earlier, so the bars add up to
+      the change in total. Other taxes: import duties, fuel, excise, personal
+      assets and the rest, including the PAIS tax on foreign-currency
+      purchases (December 2019 - December 2024). Non-tax and capital revenue
+      is the residual of total revenue: property income (including BCRA
+      profit transfers and the pension fund's income), fees and capital
+      revenue.
+    contributions:
+      precomputed: true
+      total: total
+      total_label: Real total revenue, y/y %
+      units: pp
+      groups:
+        - {key: vat, label: "VAT", add: [vat], color: copper}
+        - {key: income, label: "Income tax", add: [income], color: sky}
+        - {key: social, label: "Social security contributions", add: [social], color: sage}
+        - {key: export, label: "Export duties", add: [export], color: gold}
+        - {key: debits, label: "Tax on bank debits and credits", add: [debits], color: lavender}
+        - {key: other_tax, label: "Other taxes (incl. import duties, fuel, PAIS)", add: [other_tax], color: rose}
+        - {key: nontax, label: "Non-tax and capital revenue", add: [nontax], color: neutral}
+    yearly: {how: december, suffix: _12m, total_label: "Real total revenue, change vs. previous year, %"}
+    default: {variant: total, transform: level, range: 5Y}
+    derive:
+      method: formula
+      anchor: tot
+      start: "2017-12-01"
+      vars:
+        tot: 379.9_ING_ANTES_017__26_83
+        vat: 452.2_IVA_NETO_RROS_0_T_19_67
+        inc: 452.2_GANANCIASIAS_0_T_9_51
+        ss: 452.2_APORTES_COIAL_0_T_39_29
+        exd: 452.2_DERECHOS_EION_0_T_20_42
+        imd: 452.2_DERECHOS_IION_0_T_20_60
+        deb: 452.2_DEBITOS_CRTOS_0_T_16_22
+        fuel: 452.2_COMBUSTIBLLES_0_T_12_97
+        exc: 452.2_IMPUESTOS_NOS_0_T_18_87
+        pa: 452.2_BIENES_PERLES_0_T_17_26
+        oth: 452.2_RESTO_TRIBIOS_0_T_17_0
+        cpi: 148.3_INIVELNAL_DICI_M_26
+      variants:
+        total: {label: Total, expr: "100 * (tot * lag(cpi, 12) / cpi - lag(tot, 12)) / lag(tot, 12)"}
+        vat: {label: "VAT", expr: "100 * ((vat) * lag(cpi, 12) / cpi - lag((vat), 12)) / lag(tot, 12)"}
+        income: {label: "Income tax", expr: "100 * ((inc) * lag(cpi, 12) / cpi - lag((inc), 12)) / lag(tot, 12)"}
+        social: {label: "Social security contributions", expr: "100 * ((ss) * lag(cpi, 12) / cpi - lag((ss), 12)) / lag(tot, 12)"}
+        export: {label: "Export duties", expr: "100 * ((exd) * lag(cpi, 12) / cpi - lag((exd), 12)) / lag(tot, 12)"}
+        debits: {label: "Tax on bank debits and credits", expr: "100 * ((deb) * lag(cpi, 12) / cpi - lag((deb), 12)) / lag(tot, 12)"}
+        other_tax: {label: "Other taxes (incl. import duties, fuel, PAIS)", expr: "100 * ((imd + fuel + exc + pa + oth) * lag(cpi, 12) / cpi - lag((imd + fuel + exc + pa + oth), 12)) / lag(tot, 12)"}
+        nontax: {label: "Non-tax and capital revenue", expr: "100 * ((tot - vat - inc - ss - exd - deb - imd - fuel - exc - pa - oth) * lag(cpi, 12) / cpi - lag((tot - vat - inc - ss - exd - deb - imd - fuel - exc - pa - oth), 12)) / lag(tot, 12)"}
+        total_12m: {label: "Total (12 months)", expr: "100 * (sum12((tot) / cpi) / lag(sum12((tot) / cpi), 12) - 1)"}
+        vat_12m: {label: "VAT (12 months)", expr: "100 * (sum12((vat) / cpi) - lag(sum12((vat) / cpi), 12)) / lag(sum12((tot) / cpi), 12)"}
+        income_12m: {label: "Income tax (12 months)", expr: "100 * (sum12((inc) / cpi) - lag(sum12((inc) / cpi), 12)) / lag(sum12((tot) / cpi), 12)"}
+        social_12m: {label: "Social security contributions (12 months)", expr: "100 * (sum12((ss) / cpi) - lag(sum12((ss) / cpi), 12)) / lag(sum12((tot) / cpi), 12)"}
+        export_12m: {label: "Export duties (12 months)", expr: "100 * (sum12((exd) / cpi) - lag(sum12((exd) / cpi), 12)) / lag(sum12((tot) / cpi), 12)"}
+        debits_12m: {label: "Tax on bank debits and credits (12 months)", expr: "100 * (sum12((deb) / cpi) - lag(sum12((deb) / cpi), 12)) / lag(sum12((tot) / cpi), 12)"}
+        other_tax_12m: {label: "Other taxes (incl. import duties, fuel, PAIS) (12 months)", expr: "100 * (sum12((imd + fuel + exc + pa + oth) / cpi) - lag(sum12((imd + fuel + exc + pa + oth) / cpi), 12)) / lag(sum12((tot) / cpi), 12)"}
+        nontax_12m: {label: "Non-tax and capital revenue (12 months)", expr: "100 * (sum12((tot - vat - inc - ss - exd - deb - imd - fuel - exc - pa - oth) / cpi) - lag(sum12((tot - vat - inc - ss - exd - deb - imd - fuel - exc - pa - oth) / cpi), 12)) / lag(sum12((tot) / cpi), 12)"}
+
   - id: fiscal_subsidies
     topic: fiscal
     kind: contributions
@@ -2660,6 +2751,8 @@ indicators:
         cap: "fin:a1|lecap"
         bcap: "fin:a1|boncap"
         tem: "fin:col|tem_fixed"
+        po: "fin:a3|pesos_other"
+        adv: "fin:a1|advances"
         cerstock: "fin:a3|pesos_cer"
         fx: "bcra:5"
         cer: "bcra:30"
@@ -2675,12 +2768,13 @@ indicators:
     overlay: true
     measure: rate
     validate_as: flow
-    title: Financial Balance Adjusted for Capitalized Interest
+    title: "Financial Balance: Cash, Accrual and Operational"
     short_title: Adjusted balance
     description: >-
-      The official financial balance, and the balance if capitalized interest
-      were recorded as interest when it accrues. Share of GDP, last twelve
-      months.
+      The official financial balance (cash); the balance if capitalized
+      interest were recorded when it accrues; and the operational balance,
+      which also credits the government with the erosion of its fixed-rate
+      peso debt by inflation. Share of GDP, last twelve months.
     source: derived
     source_label: Secretaría de Hacienda (IMIG); Secretaría de Finanzas; BCRA; INDEC
     frequency: M
@@ -2688,9 +2782,17 @@ indicators:
     transforms: [level]
     ranges: [5Y, Max]
     note: >-
-      An estimate, not an official measure: see the note on Interest on the
-      Debt, Paid and Capitalized for what it includes and its biases.
-    method_links: [{anchor: capitalized-interest, label: "How capitalized interest is estimated"}]
+      Estimates, not official measures. Accrual: the official balance minus
+      capitalized interest (see Interest on the Debt, Paid and Capitalized).
+      Operational: the accrual balance plus the inflation component of
+      interest on peso debt that is not indexed (each month's CPI inflation
+      times the stock at the end of the previous month, excluding the BCRA's
+      temporary advances); the CER adjustment of indexed debt is left out of
+      both, as compensation for inflation. In high inflation the operational
+      balance can show a surplus while the cash balance shows a deficit: the
+      difference is the inflation tax paid by holders of peso debt, not
+      fiscal effort.
+    method_links: [{anchor: capitalized-interest, label: "How capitalized interest is estimated"}, {anchor: operational-balance, label: "The operational balance"}]
     default: {variant: official, transform: level, range: Max}
     derive:
       method: formula
@@ -2700,6 +2802,7 @@ indicators:
       variants:
         official: {label: Official (cash),                expr: "100 * sum12(fin) / gdp12(gdp, cpi)"}
         adjusted: {label: Minus capitalized interest,     expr: "100 * (sum12(fin) - sum12(lag((nz(cap) + nz(bcap)) * fx, 1) * nz(tem) / 100)) / gdp12(gdp, cpi)"}
+        operational: {label: "Operational (inflation-corrected)", expr: "100 * (sum12(fin) - sum12(lag((nz(cap) + nz(bcap)) * fx, 1) * nz(tem) / 100) + sum12(lag((po - nz(adv)) * fx, 1) * (cpi / lag(cpi, 1) - 1))) / gdp12(gdp, cpi)"}
 
   - id: fiscal_cer_adjustment
     topic: fiscal
@@ -2790,6 +2893,151 @@ indicators:
         usd:         {label: US dollars,           expr: "usd / 1000"}
         sdr:         {label: SDR,                  expr: "sdr / 1000"}
         other:       {label: Other currencies,     expr: "(nz(eur) + nz(jpy) + nz(oth)) / 1000"}
+
+  - id: debt_gdp
+    topic: fiscal
+    wide: true
+    kind: contributions
+    measure: flow
+    title: Gross Debt as a Share of GDP
+    short_title: Debt / GDP
+    description: >-
+      Gross debt of the central administration in normal payment status, by
+      currency, as a share of GDP: the stock at the end of each month, at
+      that month's exchange rate, over GDP of the last twelve months.
+      Monthly, since January 2019.
+    source: derived
+    source_label: Secretaría de Finanzas (monthly debt bulletin); BCRA; INDEC
+    frequency: M
+    units: "% of GDP"
+    ranges: [5Y, Max]
+    note: >-
+      Debt valued at the wholesale exchange rate of the last day of the
+      month (the Finance Secretariat's own convention, "TC fin del
+      período"), so a devaluation raises the ratio at once while GDP adjusts
+      over the following year (early 2024). Gross debt includes debt held by
+      the BCRA, the pension fund (FGS) and other public agencies; see Who
+      Holds the Debt. Excludes debt not presented to the 2005, 2010 and 2020
+      exchanges.
+    method_links: [{anchor: debt-gdp, label: "How debt / GDP is calculated"}]
+    contributions:
+      precomputed: true
+      total_label: Gross debt
+      units: "% of GDP"
+      suffix: "% GDP"
+      groups:
+        - {key: pesos_other, label: "Pesos, not indexed", add: [pesos_other], color: copper}
+        - {key: pesos_cer,   label: "Pesos, CER-linked",  add: [pesos_cer],   color: gold}
+        - {key: fx,          label: Foreign currency,     add: [fx],          color: sky}
+    yearly: {how: december}
+    default: {variant: fx, transform: level, range: Max}
+    derive:
+      method: formula
+      anchor: usd
+      vars: &debtgdp
+        po: "fin:a3|pesos_other"
+        pc: "fin:a3|pesos_cer"
+        usd: "fin:a3|usd"
+        eur: "fin:a3|eur"
+        jpy: "fin:a3|jpy"
+        sdr: "fin:a3|sdr"
+        oth: "fin:a3|other"
+        pub: "fin:hold|public"
+        prv: "fin:hold|private"
+        tot: "fin:hold|total"
+        fx: "bcra:5"
+        gdp: 4.4_OGP_2004_T_17
+        cpi: 148.3_INIVELNAL_DICI_M_26
+      variants:
+        pesos_other: {label: "Pesos, not indexed", expr: "100 * po * fx / gdp12(gdp, cpi)"}
+        pesos_cer:   {label: "Pesos, CER-linked",  expr: "100 * pc * fx / gdp12(gdp, cpi)"}
+        fx:          {label: Foreign currency,     expr: "100 * (usd + nz(eur) + nz(jpy) + nz(sdr) + nz(oth)) * fx / gdp12(gdp, cpi)"}
+
+  - id: debt_holders
+    topic: fiscal
+    wide: true
+    kind: contributions
+    measure: flow
+    title: Who Holds the Debt
+    short_title: Debt by holder
+    description: >-
+      Gross debt by holder as a share of GDP, at the end of each quarter:
+      public-sector agencies (the BCRA, the pension fund and others), the
+      private sector, and multilateral and bilateral lenders. Since 2019.
+    source: derived
+    source_label: Secretaría de Finanzas (quarterly debt presentation); BCRA; INDEC
+    frequency: M
+    units: "% of GDP"
+    ranges: [5Y, Max]
+    note: >-
+      Public-sector agencies: securities, loans and advances held by
+      national public bodies (the BCRA's non-transferable letters and
+      advances, the pension fund's bonds, Banco Nación and others). Private
+      sector: as the Finance Secretariat computes it, the rest after
+      public agencies and multilateral and bilateral lenders. Multilateral
+      and bilateral: the IMF, IDB, World Bank, CAF and others and the Paris
+      Club, plus about US$2.4 billion of debt eligible for but not presented
+      to the restructurings. Only the private and multilateral parts are
+      owed outside the state. Quarter ends; valued at the exchange rate of
+      the quarter's last day.
+    method_links: [{anchor: debt-gdp, label: "How debt / GDP is calculated"}]
+    contributions:
+      precomputed: true
+      total_label: Gross debt
+      units: "% of GDP"
+      suffix: "% GDP"
+      groups:
+        - {key: public,  label: Public-sector agencies,          add: [public],  color: slate}
+        - {key: private, label: Private sector,                  add: [private], color: copper}
+        - {key: multi,   label: Multilateral and bilateral,      add: [multi],   color: sage}
+    yearly: {how: december}
+    default: {variant: private, transform: level, range: Max}
+    derive:
+      method: formula
+      anchor: tot
+      vars: *debtgdp
+      variants:
+        public:  {label: Public-sector agencies,     expr: "100 * pub * fx / gdp12(gdp, cpi)"}
+        private: {label: Private sector,             expr: "100 * prv * fx / gdp12(gdp, cpi)"}
+        multi:   {label: Multilateral and bilateral, expr: "100 * (tot - pub - prv) * fx / gdp12(gdp, cpi)"}
+
+  - id: treasury_deposits
+    topic: fiscal
+    kind: variants
+    overlay: true
+    measure: flow
+    plain_level: true
+    title: Treasury Deposits at the BCRA
+    short_title: Treasury deposits
+    description: >-
+      Deposits of the Treasury and other official accounts at the central
+      bank, in pesos and in foreign currency (valued in pesos), at the end
+      of each month. The cash the Treasury draws on when it pays maturities
+      without rolling them over. Can be shown in pesos of the latest month.
+    source: derived
+    source_label: BCRA (balance sheet, monthly)
+    frequency: M
+    units: Millions of pesos
+    transforms: [level]
+    ranges: [2Y, 5Y, 10Y, Max]
+    deflate_with: {indicator: cpi_long, variant: corrected, label: CPI}
+    yearly: {how: december}
+    note: >-
+      Official deposits in the BCRA's balance sheet (the Treasury's accounts
+      and those of other national public bodies); foreign currency: the
+      Treasury's deposits in dollars, at the balance sheet's exchange rate;
+      pesos: the rest. End of month. Compare with peso maturities in Debt
+      Maturities and with the rollover ratio.
+    default: {variant: pesos, transform: level, range: 5Y}
+    derive:
+      method: formula
+      anchor: tot
+      vars:
+        tot: "bcrabal:105"
+        fxd: "bcrabal:107"
+      variants:
+        pesos: {label: In pesos,            expr: "(tot - nz(fxd)) / 1000"}
+        fx:    {label: In foreign currency, expr: "nz(fxd) / 1000"}
 
   - id: debt_schedule
     topic: fiscal
@@ -3011,8 +3259,9 @@ indicators:
     short_title: Auction results
     description: >-
       Every bond and letter placed on each settlement date: instrument, type,
-      amounts, issue price and, for fixed-rate letters and bonds, the yield
-      implied by the price. Since January 2021.
+      amounts, issue price and the yield implied by the price (nominal for
+      fixed-rate letters and bonds, real for CER-linked ones). Since January
+      2021.
     source: table
     source_label: Secretaría de Finanzas (colocaciones de deuda)
     frequency: D
@@ -3031,5 +3280,7 @@ indicators:
       fixed-rate instruments (LECAP, BONCAP) and discount letters: the
       payoff at maturity (face value capitalized at the instrument's monthly
       rate, actual days / 30) over the issue price, as an effective monthly
-      rate (TEM) and an effective annual rate (TEA). Recent months are
-      preliminary.
+      rate (TEM) and an effective annual rate (TEA). Real yield, for
+      zero-coupon CER-linked letters and bonds: the effective annual yield
+      over inflation implied by the issue price and the CER from issue to
+      settlement. Recent months are preliminary.
