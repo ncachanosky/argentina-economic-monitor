@@ -39,10 +39,13 @@ formula   Arithmetic on stored series: `vars` maps short names to series ids;
           results <= 0 (e.g. an implied exchange rate when net reserves are
           negative); `max: <expr>` blanks results above that bound. A var may name another derived indicator's series as
           "@indicator:variant" (taken at month end for monthly indicators).
-          Also: sum4(x), the sum of the last four periods; avg12(x), the
-          average of the last twelve; `start` drops
+          Also: sum4(x) and sum12(x), sums of the last four or twelve
+          periods; avg12(x), the average of the last twelve; lag(x, k), the
+          value k periods earlier; gdp12(gdp, cpi), nominal GDP of the last
+          twelve months at a monthly frequency (see gdp12); `start` drops
           earlier dates; in a quarterly indicator, monthly inputs are taken
-          at the last month of each quarter.
+          at the last month of each quarter, and in a monthly one daily
+          inputs at the last day of each month.
 
 net_reserves  Gross reserves minus foreign-currency liabilities, under
           several conventions, weekly; see NET_CONVENTIONS below.
@@ -288,6 +291,32 @@ def expectations(ind, frames: dict[str, pd.Series]) -> tuple[pd.DataFrame, dict]
     return df.dropna(how="all").sort_index(), {}
 
 
+def gdp12(gdp: pd.Series, cpi: pd.Series) -> pd.Series:
+    """Nominal GDP of the twelve months ending in each month, on the index of `gdp`.
+
+    Quarterly GDP (at quarter-start dates, at annual rates as INDEC publishes
+    it) averaged over four quarters is the GDP of the twelve months ending in
+    the quarter's last month; between
+    quarter ends it is interpolated log-linearly, and after the last quarter
+    published it is carried forward with the CPI (twelve-month average), so
+    ratios to GDP for the latest months do not wait for the national accounts.
+    """
+    idx = gdp.index
+    q = gdp.dropna()
+    q = q[q.index.month.isin([1, 4, 7, 10])]
+    s4 = q.rolling(4).mean().dropna()                    # INDEC publishes quarters at annual rates
+    s4.index = s4.index + pd.DateOffset(months=2)        # quarter's last month
+    months = pd.date_range(s4.index.min(), idx.max(), freq="MS")
+    out = np.exp(np.log(s4).reindex(months).interpolate(limit_area="inside"))
+    last = s4.index.max()
+    c = cpi.dropna()
+    c = c.reindex(pd.date_range(c.index.min(), c.index.max(), freq="MS")).rolling(12).mean()
+    if last in c.index and pd.notna(c.get(last)):
+        ahead = months[months > last]
+        out.loc[ahead] = s4[last] * (c.reindex(ahead) / c[last]).values
+    return out.reindex(idx)
+
+
 def formula(ind, frames: dict[str, pd.Series]) -> tuple[pd.DataFrame, dict]:
     import ast
     spec = ind.derive
@@ -302,11 +331,23 @@ def formula(ind, frames: dict[str, pd.Series]) -> tuple[pd.DataFrame, dict]:
             return sr
         frames = {**frames, **{v: q(frames[v]) for v in names.values()}}
         idx = pd.DatetimeIndex(sorted(set().union(*[frames[i].index for i in names.values()])))
+    elif ind.frequency == "M":
+        # Daily inputs enter a monthly formula at their month's last value.
+        def m(sr):
+            sr = sr.dropna()
+            if len(sr) > 2 and sr.index.to_series().diff().dt.days.median() < 20:
+                sr = sr.resample("MS").last()
+            return sr
+        frames = {**frames, **{v: m(frames[v]) for v in names.values()}}
+        idx = pd.DatetimeIndex(sorted(set().union(*[frames[i].index for i in names.values()])))
     env = {k: frames[v].reindex(idx) for k, v in names.items()}
     env["nz"] = lambda x: x.fillna(0)
     env["sum4"] = lambda x: x.rolling(4).sum()          # last four quarters (or periods)
+    env["sum12"] = lambda x: x.rolling(12).sum()        # last twelve months (or periods)
     env["avg12"] = lambda x: x.rolling(12).mean()       # average of the last twelve periods
-    funcs = {"nz", "sum4", "avg12"}
+    env["lag"] = lambda x, k=1: x.shift(int(k))         # value k periods earlier
+    env["gdp12"] = lambda gdp, cpi: gdp12(gdp, cpi)     # nominal GDP of the last twelve months, monthly
+    funcs = {"nz", "sum4", "sum12", "avg12", "lag", "gdp12"}
     allowed = (ast.Expression, ast.BinOp, ast.UnaryOp, ast.Add, ast.Sub, ast.Mult, ast.Div, ast.USub,
                ast.Name, ast.Load, ast.Constant, ast.Call)
     out = {}
@@ -451,12 +492,14 @@ def net_reserves(ind, frames: dict[str, pd.Series]) -> tuple[pd.DataFrame, dict]
 
 
 def _resolve(ref: str, reg, freq: str) -> pd.Series:
-    """'@indicator:variant' -> that derived series, at month ends for monthly targets."""
-    ind_id, var = ref[1:].split(":", 1)
+    """'@indicator:variant' -> that indicator's series (derived or fetched), at month ends for
+    monthly targets; '@indicator:variant:avg' takes the month's average instead."""
+    ind_id, var, *how = ref[1:].split(":")
     other = next(x for x in reg.indicators if x.id == ind_id)
-    s = compute(other, reg)[0][other.variants[var].source_id].dropna()
+    sid = other.variants[var].source_id
+    s = (compute(other, reg)[0][sid] if other.derive else store.as_of(sid)).dropna()
     if freq == "M":
-        s = s.resample("MS").last()
+        s = s.resample("MS").mean() if how == ["avg"] else s.resample("MS").last()
     return s
 
 

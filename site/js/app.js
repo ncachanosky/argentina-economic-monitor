@@ -261,6 +261,7 @@
     };
     if (extras.uniformtext) layout.uniformtext = extras.uniformtext;
     if (extras.barmode) layout.barmode = extras.barmode;
+    if (extras.xcategory) layout.xaxis.type = "category";
     if (data[0] && data[0].orientation === "h") { layout.xaxis.ticksuffix = (extras.xsuffix !== undefined ? extras.xsuffix : specOf(pct).suffix); if (extras.xrange) layout.xaxis.range = extras.xrange; layout.yaxis.ticksuffix = ""; layout.margin.l = 260; }
     const url = await Plotly.toImage({ data, layout }, { format: "png", width: EXPORT.width, height: EXPORT.height });
     const a = h("a", { href: url, download: filename });
@@ -1132,6 +1133,170 @@
     return card;
   }
 
+  // ---------- card: debt maturity profile (Finance Secretariat, quarterly) ----------
+  function scheduleCard(ind) {
+    const T = ind.table;
+    const card = cardFrame(ind, true);
+    let data = null;
+    const state = { view: "monthly", part: "total" };
+    const vSeg = segmented([["monthly", "Next 18 months"], ["annual", "By year"]], state.view, (k) => { state.view = k; vSeg.update(k); draw(); }, "View");
+    const pSeg = segmented([["total", "Capital + interest"], ["capital", "Capital"], ["interest", "Interest"]], state.part, (k) => { state.part = k; pSeg.update(k); draw(); }, "Payments");
+    const chartEl = h("div", { class: "chart tall-ish", role: "img", "aria-label": "Debt maturities by type of debt" });
+    const hint = h("p", { class: "hint" });
+    const sumEl = h("div", { class: "table-scroll" });
+    const fmt = (v) => (v === null || v === undefined ? "–" : Math.round(v).toLocaleString("en-US"));
+    const LAST_YEAR = 2040;
+    let view = null;
+
+    // Columns for the current view: labels and, per group, the values of the chosen part.
+    function columns() {
+      const P = data[state.view];
+      const val = (k, j) => (state.part === "capital" ? P.capital[k][j] : state.part === "interest" ? P.interest[k][j] : P.capital[k][j] + P.interest[k][j]);
+      if (state.view === "monthly") {
+        const labels = P.dates.map((d) => fmtShortMonth(d));
+        return { labels, keys: P.dates, cols: data.groups.map((g) => ({ ...g, values: P.dates.map((_, j) => val(g.key, j)) })) };
+      }
+      // Years after LAST_YEAR (and the 2055-2089 block) together.
+      const idx = P.years.map((y, j) => j);
+      const keep = idx.filter((j) => /^\d{4}$/.test(P.years[j]) && Number(P.years[j]) <= LAST_YEAR);
+      const rest = idx.filter((j) => !keep.includes(j));
+      const first = data.as_of ? Number(data.as_of.slice(5, 7)) : 12;
+      const labels = keep.map((j) => (j === 0 && first < 12 ? `${P.years[j]} (rest)` : P.years[j])).concat(rest.length ? [`${LAST_YEAR + 1}+`] : []);
+      return { labels, keys: labels, cols: data.groups.map((g) => ({ ...g,
+        values: keep.map((j) => val(g.key, j)).concat(rest.length ? [rest.reduce((a, j) => a + val(g.key, j), 0)] : []) })) };
+    }
+
+    function traces() {
+      const { labels, keys, cols } = columns();
+      const paidMonths = state.view === "monthly" ? keys.map((d) => data.paid[d] !== undefined) : keys.map(() => false);
+      const tr = cols.map((g) => ({
+        type: "bar", name: g.label, x: labels, y: g.values,
+        marker: { color: groupColor(g.color), opacity: paidMonths.map((p) => (p ? 0.4 : 1)), line: { width: 0 } },
+        _lightColors: labels.map(() => GROUP_LIGHT[g.color] || "#B0B7BD"),
+        hovertemplate: `${g.label}: <b>%{y:,.0f}</b><extra></extra>`,
+      }));
+      if (state.view === "monthly" && state.part === "total" && paidMonths.some(Boolean)) {
+        const ink = cssVar("--ink");
+        tr.push({ type: "scatter", mode: "markers", name: "Actually paid (all debt)", x: labels.filter((_, j) => paidMonths[j]),
+          y: keys.filter((_, j) => paidMonths[j]).map((d) => data.paid[d]),
+          marker: { color: ink, size: 9, symbol: "diamond", line: { color: cssVar("--surface"), width: 1 } }, _light: "#36454F",
+          hovertemplate: `Actually paid: <b>%{y:,.0f}</b><extra></extra>` });
+      }
+      return tr;
+    }
+
+    function draw() {
+      if (!data) return;
+      const { labels, cols } = columns();
+      const legend = { orientation: "h", x: 0, y: 1.02, yanchor: "bottom", font: { color: cssVar("--ink") } };
+      Plotly.react(chartEl, traces(), baseLayout({
+        xaxis: { type: "category" }, yaxis: { tickformat: ",.0f" },
+        extra: { barmode: "stack", bargap: 0.25, showlegend: true, legend, margin: { l: 64, r: 16, t: 60, b: 48 } },
+      }), PLOT_CONFIG);
+      // Next twelve months not yet elapsed: totals by group, and what needs dollars.
+      const M = data.monthly;
+      const ahead = M.dates.map((d, j) => j).filter((j) => data.paid[M.dates[j]] === undefined).slice(0, 12);
+      const tot = (k, part) => ahead.reduce((a, j) => a + (part === "capital" ? M.capital[k][j] : part === "interest" ? M.interest[k][j] : M.capital[k][j] + M.interest[k][j]), 0);
+      const rows = data.groups.map((g) => [g.label, tot(g.key, "capital"), tot(g.key, "interest"), tot(g.key, "total")]);
+      const sum = (c) => rows.reduce((a, r) => a + r[c], 0);
+      const fxNeed = ["fx_bonds", "imf", "ifis"].reduce((a, k) => a + tot(k, "total"), 0);
+      const span = ahead.length ? `${fmtShortMonth(M.dates[ahead[0]])} - ${fmtShortMonth(M.dates[ahead[ahead.length - 1]])}` : "";
+      sumEl.replaceChildren(h("table", { class: "data sched" },
+        h("thead", {}, h("tr", {}, h("th", {}, `Next ${ahead.length} months (${span}), US$ m`), h("th", {}, "Capital"), h("th", {}, "Interest"), h("th", {}, "Total"))),
+        h("tbody", {}, rows.map((r) => h("tr", {}, h("td", { class: "pres" }, r[0]), h("td", {}, fmt(r[1])), h("td", {}, fmt(r[2])), h("td", {}, fmt(r[3])))),
+          h("tr", { class: "total" }, h("td", { class: "pres" }, h("b", {}, "Total")), h("td", {}, fmt(sum(1))), h("td", {}, fmt(sum(2))), h("td", {}, h("b", {}, fmt(sum(3))))))));
+      hint.textContent = `As of ${fmtDay(data.as_of)}, millions of US dollars at that date's exchange rates. ` +
+        `Next ${ahead.length} months: ${fmt(sum(3))} in all, of which ${fmt(fxNeed)} in foreign-currency bonds, the IMF and other multilaterals.` +
+        (state.view === "monthly" && Object.keys(data.paid).length ? " Faded bars: months already past; the diamond is what was actually paid." : "");
+      view = { header: [state.view === "monthly" ? "month" : "year", ...cols.map((g) => g.label), "total"],
+        rows: labels.map((l, j) => [state.view === "monthly" ? M.dates[j] : l, ...cols.map((g) => +g.values[j].toFixed(1)), +cols.reduce((a, g) => a + g.values[j], 0).toFixed(1)]) };
+    }
+    const partWord = () => (state.part === "total" ? "Capital and interest" : state.part === "capital" ? "Capital" : "Interest");
+    const onPNG = () => exportPNG(ind, traces(), `${partWord()} due, millions of US dollars, as of ${fmtDay(data.as_of)}`, { suffix: "", signed: false },
+      `${ind.id}_${state.view}_${state.part}.png`, { barmode: "stack", xcategory: true });
+    const onCSV = () => { if (view) downloadBlob(toCSV(view.header, view.rows), `${ind.id}_${state.view}_${state.part}.csv`, "text/csv"); };
+    appendAll(card, h("div", { class: "controls" }, vSeg, h("span", { class: "spacer" }), pSeg), hint, chartEl, sumEl,
+      ind.note ? h("p", { class: "chips-note" }, ind.note) : null,
+      h("div", { class: "card-foot" },
+        h("span", {}, "Source: ", T.source_url ? h("a", { href: T.source_url, target: "_blank", rel: "noopener" }, ind.source_label) : ind.source_label,
+          ` · Report as of: ${ind.last_obs ? fmtDay(ind.last_obs) : "–"}`),
+        h("div", { class: "actions" },
+          h("button", { class: "btn", type: "button", onclick: onPNG, title: "Download this chart as a 1200×800 PNG" }, "PNG"),
+          h("button", { class: "btn", type: "button", onclick: onCSV, title: "Download this view as CSV" }, "CSV"))));
+    card.draw = async () => {
+      if (!data) {
+        try { data = await getJSON(`${DATA}${T.path}${T.file}`); } catch (e) { console.error(e); chartEl.replaceChildren(h("div", { class: "error-box" }, "The maturity profile could not be loaded.")); return; }
+      }
+      draw();
+    };
+    return card;
+  }
+
+  // ---------- card: Treasury placements, auction by auction ----------
+  function placementsCard(ind) {
+    const T = ind.table;
+    const card = cardFrame(ind, true);
+    let index = null;
+    const cache = new Map();
+    const load = (y) => { if (!cache.has(y)) cache.set(y, getJSON(`${DATA}${T.path}placements/${y}.json`)); return cache.get(y); };
+    const state = { year: null, date: null };
+    const ySel = h("select", { class: "select", "aria-label": "Year" });
+    const dSel = h("select", { class: "select", "aria-label": "Settlement date" });
+    ySel.addEventListener("change", () => { state.year = ySel.value; fillDates(); state.date = index.years[state.year].slice(-1)[0]; dSel.value = state.date; render(); });
+    dSel.addEventListener("change", () => { state.date = dSel.value; render(); });
+    const tableEl = h("div", { class: "table-scroll" });
+    const hint = h("p", { class: "hint" });
+    const n0 = (v) => (v === null || v === undefined ? "–" : Math.round(v).toLocaleString("en-US"));
+    const n1 = (v, d = 1) => (v === null || v === undefined ? "–" : v.toLocaleString("en-US", { minimumFractionDigits: d, maximumFractionDigits: d }));
+    const KCOL = { fixed: "copper", cer: "gold", floating: "sage", dual: "lavender", dlinked: "teal", usd: "sky" };
+    let view = null;
+    function fillDates() {
+      dSel.replaceChildren(...index.years[state.year].slice().reverse().map((d) => h("option", { value: d }, fmtDay(d))));
+    }
+    async function render() {
+      const t = await load(state.year);
+      const rows = t.auctions[state.date] || [];
+      const head = h("tr", {}, ["Instrument", "Type", "Maturity", "Face value", "Cash value", "Price / 1,000", "Life, yrs", "TEM %", "TEA %"].map((x) => h("th", {}, x)));
+      const body = rows.map((r) => h("tr", {},
+        h("td", { class: "pres", title: r.coupon || "" }, r.name),
+        h("td", {}, h("span", { class: "sw", style: `background:${groupColor(KCOL[r.kind])}` }), " ", (index.kinds || {})[r.kind] || r.kind),
+        h("td", {}, r.maturity ? fmtDay(r.maturity) : "–"),
+        h("td", {}, n0(r.vn)), h("td", {}, n0(r.ve)), h("td", {}, n1(r.price)), h("td", {}, n1(r.life, 2)),
+        h("td", {}, n1(r.tem, 2)), h("td", {}, n1(r.tea, 1))));
+      const ars = rows.filter((r) => r.currency === "ARS").reduce((a, r) => a + (r.ve || 0), 0);
+      const usd = rows.filter((r) => r.currency === "USD").reduce((a, r) => a + (r.ve || 0), 0);
+      tableEl.replaceChildren(h("table", { class: "data plc" }, h("thead", {}, head), h("tbody", {}, body)));
+      hint.textContent = `${fmtDay(state.date)}: ${rows.length} placement${rows.length === 1 ? "" : "s"}; cash raised ${n0(ars)} million pesos` +
+        (usd ? ` and US$ ${n0(usd)} million (dollar and dollar-linked)` : "") + ". Amounts in millions of the instrument's currency; hover an instrument for its terms.";
+      view = { header: ["settlement", "instrument", "type", "issue", "maturity", "terms", "currency", "face_value", "cash_value", "price_per_1000", "life_years", "tem_pct", "tea_pct"],
+        rows: rows.map((r) => [state.date, r.name, r.kind, r.issue, r.maturity, r.coupon, r.currency, r.vn, r.ve, r.price, r.life, r.tem, r.tea]) };
+    }
+    const onCSV = async () => {
+      // The whole year, not just the date shown.
+      const t = await load(state.year);
+      const rows = Object.entries(t.auctions).flatMap(([d, rs]) => rs.map((r) => [d, r.name, r.kind, r.issue, r.maturity, r.coupon, r.currency, r.vn, r.ve, r.price, r.life, r.tem, r.tea]));
+      downloadBlob(toCSV(view.header, rows), `${ind.id}_${state.year}.csv`, "text/csv");
+    };
+    appendAll(card, h("div", { class: "controls" }, h("label", { class: "base-pick" }, h("span", {}, "Year:"), ySel),
+      h("label", { class: "base-pick" }, h("span", {}, "Settlement date:"), dSel)), hint, tableEl,
+      ind.note ? h("p", { class: "chips-note" }, ind.note) : null,
+      h("div", { class: "card-foot" },
+        h("span", {}, "Source: ", T.source_url ? h("a", { href: T.source_url, target: "_blank", rel: "noopener" }, ind.source_label) : ind.source_label,
+          ` · Latest: ${ind.last_obs ? fmtDay(ind.last_obs) : "–"}`),
+        h("div", { class: "actions" }, h("button", { class: "btn", type: "button", onclick: onCSV, title: "Download the year's placements as CSV" }, "CSV (year)"))));
+    card.draw = async () => {
+      if (!index) {
+        try { index = await getJSON(`${DATA}${T.path}${T.file}`); } catch (e) { console.error(e); tableEl.replaceChildren(h("div", { class: "error-box" }, "The placements could not be loaded.")); return; }
+        const ys = Object.keys(index.years).sort();
+        ySel.replaceChildren(...ys.slice().reverse().map((y) => h("option", { value: y }, y)));
+        state.year = ys[ys.length - 1]; ySel.value = state.year; fillDates();
+        state.date = index.latest; dSel.value = state.date;
+      }
+      render();
+    };
+    return card;
+  }
+
   // ---------- card: panel of components (EMAE by sector, UCII by block) ----------
   // Breaks the bar axis when one value dwarfs the rest (e.g. fishing +424%),
   // so the others stay readable. Returns the axis cap, or null if no break.
@@ -1386,7 +1551,10 @@
     const DF = ind.frequency === "Q" ? "Q%q %Y" : "%b %Y";
     const fP = (iso) => fmtPeriod(iso, ind.frequency);
     // Shares (units "%") read as percent of the total; contributions as pp.
-    const pp = C.units === "%" ? { suffix: "%", signed: false } : { suffix: " pp", signed: true };
+    // Units: "%" (shares), "pp" (contributions), or a custom suffix (e.g. "% GDP", " m").
+    const pp = C.suffix ? { suffix: C.suffix.startsWith("%") || C.suffix.startsWith(" ") ? C.suffix : " " + C.suffix, signed: false }
+      : C.units === "%" ? { suffix: "%", signed: false } : { suffix: " pp", signed: true };
+    const sfx = pp.suffix;
     const pct = INDEX_TRANSFORMS.yoy;
     const gdpLabel = C.total.label;
     // Precomputed contributions (e.g. sources of base money): no component lines,
@@ -1422,19 +1590,19 @@
           type: "scatter", mode: "lines", name: g.label, x, y: idx.map((i) => g.values[i]),
           stackgroup: median(g.values) < 0 ? "neg" : "pos", line: { width: 0.6, color: groupColor(g.color) },
           fillcolor: groupColor(g.color), _light: GROUP_LIGHT[g.color] || "#B0B7BD",
-          hovertemplate: `${g.label}: <b>%{y:,.1f}${C.units === "%" ? "%" : " pp"}</b><extra></extra>`,
+          hovertemplate: `${g.label}: <b>%{y:,.1f}${sfx}</b><extra></extra>`,
         }));
       }
       const tr = C.groups.map((g) => ({
         type: "bar", name: g.label, x, y: idx.map((i) => g.values[i]),
         marker: { color: groupColor(g.color), line: { width: 0 } }, _lightColors: idx.map(() => GROUP_LIGHT[g.color] || "#B0B7BD"),
-        hovertemplate: `${g.label}: <b>%{y:,.1f}${C.units === "%" ? "%" : " pp"}</b><extra></extra>`,
+        hovertemplate: `${g.label}: <b>%{y:,.1f}${sfx}</b><extra></extra>`,
       }));
       const ink = cssVar("--ink");
       if (!C.hide_total) tr.push({
         type: "scatter", mode: "markers+lines", name: PC ? C.total.label : `${C.total.label} growth`, x, y: idx.map((i) => C.total.values[i]),
         line: { color: ink, width: 1 }, marker: { color: ink, size: 7, symbol: "diamond", line: { color: cssVar("--surface"), width: 1 } },
-        _light: "#36454F", hovertemplate: `<b>${C.total.label}: %{y:,.1f}%</b><extra></extra>`,
+        _light: "#36454F", hovertemplate: `<b>${C.total.label}: %{y:,.1f}${PC ? sfx : "%"}</b><extra></extra>`,
       });
       return tr;
     }
@@ -1474,8 +1642,8 @@
       if (lineKeys.length) Plotly.react(lineEl, lt, baseLayout({ pct, xaxis: { hoverformat: DF }, extra: { showlegend: true, legend, margin: { l: 52, r: 16, t: 30, b: 36 } } }), PLOT_CONFIG);
       const idx = visible();
       table && table.refresh(idx.map((i) => C.dates[i]), [
-        { label: `${C.total.label} (${PC ? "%" : "y/y %"})`, values: idx.map((i) => C.total.values[i]) },
-        ...C.groups.map((g) => ({ label: `${g.label} (pp)`, values: idx.map((i) => g.values[i]) })),
+        ...(C.hide_total ? [] : [{ label: `${C.total.label} (${PC ? sfx.trim() : "y/y %"})`, values: idx.map((i) => C.total.values[i]) }]),
+        ...C.groups.map((g) => ({ label: `${g.label} (${sfx.trim()})`, values: idx.map((i) => g.values[i]) })),
       ], pp);
     }
 
@@ -1493,7 +1661,7 @@
     // Latest-quarter summary line.
     const parts = C.groups.map((g) => `${g.label} ${fmtNum(g.values[latestI], pp)}`).join(" · ");
     appendAll(card, 
-      h("p", { class: "hint" }, C.hide_total ? `${fP(C.dates[latestI])}: ${parts}` : `${fP(C.dates[latestI])}: ${C.total.label} ${fmtNum(C.total.values[latestI], pct)}${yoyWord} — ${parts}`),
+      h("p", { class: "hint" }, C.hide_total ? `${fP(C.dates[latestI])}: ${parts}` : `${fP(C.dates[latestI])}: ${C.total.label} ${fmtNum(C.total.values[latestI], PC ? pp : pct)}${yoyWord} — ${parts}`),
       h("div", { class: "controls" }, h("span", { class: "spacer" }), rSeg),
       barEl,
       lineKeys.length ? h("p", { class: "hint", style: "margin-top:14px" }, `${C.lines_title || "Components, year-over-year change"}. `,
@@ -1609,6 +1777,8 @@
         : ind.kind === "contributions" ? contributionsCard(ind)
         : ind.kind === "balance_sheet" ? balanceCard(ind)
         : ind.kind === "top10" ? top10Card(ind)
+        : ind.kind === "schedule" ? scheduleCard(ind)
+        : ind.kind === "placements" ? placementsCard(ind)
         : variantsCard(ind, !!ind.wide)));
     topicsEl2.replaceChildren(h("section", { class: "topic", id: `topic-${topic.id}` }, cards));
     $("#tiles").replaceChildren(...inds.filter((i) => i.headline).map((i) => tile(i)).filter(Boolean));

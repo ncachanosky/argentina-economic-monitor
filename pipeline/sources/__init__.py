@@ -45,6 +45,10 @@ def get_adapter(name: str):
         from . import bcra_entities
 
         return bcra_entities
+    if name == "finanzas":
+        from . import finanzas
+
+        return finanzas
     if name == "manual":
         from . import manual
 

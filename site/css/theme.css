@@ -275,3 +275,10 @@ table.data.top tr.bench.first td { border-top: 2px solid var(--ink-3); }
 table.data.top .at { color: var(--ink-3); font-size: 12px; }
 .top10 { max-height: none; }
 table.data.bs tr.computed td { font-style: italic; }
+
+/* Fiscal: placements table type swatch */
+table.data .sw { display: inline-block; width: 10px; height: 10px; border-radius: 3px; vertical-align: middle; }
+table.data.plc { font-size: 13px; }
+table.data.plc th { white-space: normal; vertical-align: bottom; }
+table.data.plc td:nth-child(2) { text-align: left; }
+table.data.sched tr.total td { font-weight: 700; border-top: 2px solid var(--ink-3); }

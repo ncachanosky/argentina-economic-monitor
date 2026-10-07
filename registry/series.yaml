@@ -226,6 +226,58 @@ inputs:
   - {id: "bcra:29",  source: bcra, frequency: M, measure: flow, allow_gaps: true, label: "REM: median expected inflation, next 12 months"}
   - {id: 4.4_DGI_2004_T_19, source: datos_gob, frequency: Q, measure: index,
      label: "INDEC gross fixed capital formation, current prices"}
+  # National non-financial public sector, cash basis (Secretaría de Hacienda, IMIG), millions of current pesos.
+  - {id: 379.9_ING_ANTES_017__26_83, source: datos_gob, frequency: M, measure: flow, label: "Fiscal: total revenue"}
+  - {id: 379.9_ING_CORR_I017__29_10, source: datos_gob, frequency: M, measure: flow, label: "Fiscal: tax revenue"}
+  - {id: 379.9_GTOS_PRIMA017__37_33, source: datos_gob, frequency: M, measure: flow, label: "Fiscal: primary spending"}
+  - {id: 379.9_GTOS_CORR_017__35_92, source: datos_gob, frequency: M, measure: flow, label: "Fiscal: social security benefits"}
+  - {id: 379.9_GTOS_CORR_017__49_26, source: datos_gob, frequency: M, measure: flow, label: "Fiscal: wages"}
+  - {id: 379.9_GTOS_CORR_017_3_0_M_50_79, source: datos_gob, frequency: M, measure: flow, label: "Fiscal: current transfers to the private sector"}
+  - {id: 379.9_GTOS_CORR_017_5_0_M_51_42, source: datos_gob, frequency: M, measure: flow, label: "Fiscal: current transfers to provinces"}
+  - {id: 379.9_GTOS_CAP_T017__50_91, source: datos_gob, frequency: M, measure: flow, label: "Fiscal: capital transfers to provinces"}
+  - {id: 379.9_GTOS_CAP_2017__13_60, source: datos_gob, frequency: M, measure: flow, label: "Fiscal: capital spending"}
+  - {id: 379.9_GTOS_CORR_017__40_84, source: datos_gob, frequency: M, measure: flow, label: "Fiscal: net interest"}
+  - {id: 379.9_SUPERAVIT_017__23_94, source: datos_gob, frequency: M, measure: flow, label: "Fiscal: primary balance"}
+  - {id: 379.9_RESULTADO_017__18_38, source: datos_gob, frequency: M, measure: flow, label: "Fiscal: financial balance"}
+  - {id: 452.2_ENERGIAGIA_0_T_7_56, source: datos_gob, frequency: M, measure: flow, label: "Fiscal: economic subsidies, energy"}
+  - {id: 452.2_TRANSPORTERTE_0_T_10_32, source: datos_gob, frequency: M, measure: flow, label: "Fiscal: economic subsidies, transport"}
+  - {id: 452.2_OTRAS_FUNCNES_0_T_15_25, source: datos_gob, frequency: M, measure: flow, label: "Fiscal: economic subsidies, other"}
+  - {id: "bcra:30", source: bcra, frequency: D, measure: index, label: "CER (index of the inflation adjustment, base 2 Feb 2002 = 1)"}
+  # Finance Secretariat, central administration gross debt (monthly bulletin), millions of US dollars.
+  - {id: "fin:a3|pesos_other", source: finanzas, frequency: M, measure: index, label: "Debt in pesos, not CER-linked"}
+  - {id: "fin:a3|pesos_cer", source: finanzas, frequency: M, measure: index, label: "Debt in pesos, CER-linked"}
+  - {id: "fin:a3|usd", source: finanzas, frequency: M, measure: index, label: "Debt in US dollars"}
+  - {id: "fin:a3|eur", source: finanzas, frequency: M, measure: flow, label: "Debt in euros"}
+  - {id: "fin:a3|jpy", source: finanzas, frequency: M, measure: flow, label: "Debt in yen"}
+  - {id: "fin:a3|sdr", source: finanzas, frequency: M, measure: flow, label: "Debt in SDR"}
+  - {id: "fin:a3|other", source: finanzas, frequency: M, measure: flow, label: "Debt in other currencies"}
+  - {id: "fin:a2|total", source: finanzas, frequency: M, measure: index, label: "Gross debt (incl. eligible debt pending restructuring)"}
+  - {id: "fin:a1|lecap", source: finanzas, frequency: M, measure: flow, label: "Stock of LECAP (capitalizing letters)"}
+  - {id: "fin:a1|boncap", source: finanzas, frequency: M, measure: flow, label: "Stock of BONCAP (capitalizing bonds)"}
+  - {id: "fin:col|tem_fixed", source: finanzas, frequency: M, measure: flow, allow_gaps: true, label: "Average implied yield (TEM, %) of capitalizing fixed-rate placements, last six months"}
+  - {id: "fin:a4|peso_mkt_issued", source: finanzas, frequency: M, measure: flow, label: "Peso marketable securities issued"}
+  - {id: "fin:a4|peso_mkt_amortized", source: finanzas, frequency: M, measure: flow, label: "Peso marketable securities amortized"}
+  - {id: "fin:a5|fx_capital", source: finanzas, frequency: M, measure: flow, label: "Paid in foreign currency: capital"}
+  - {id: "fin:a5|fx_interest", source: finanzas, frequency: M, measure: flow, label: "Paid in foreign currency: interest"}
+  - {id: "fin:a5|imf_capital", source: finanzas, frequency: M, measure: flow, label: "Paid to the IMF: capital"}
+  - {id: "fin:a5|imf_interest", source: finanzas, frequency: M, measure: flow, label: "Paid to the IMF: interest"}
+  - {id: "fin:a5|idb_capital", source: finanzas, frequency: M, measure: flow, label: "Paid to the IDB: capital"}
+  - {id: "fin:a5|idb_interest", source: finanzas, frequency: M, measure: flow, label: "Paid to the IDB: interest"}
+  - {id: "fin:a5|wb_capital", source: finanzas, frequency: M, measure: flow, label: "Paid to the World Bank (IBRD): capital"}
+  - {id: "fin:a5|wb_interest", source: finanzas, frequency: M, measure: flow, label: "Paid to the World Bank (IBRD): interest"}
+  - {id: "fin:a5|caf_capital", source: finanzas, frequency: M, measure: flow, label: "Paid to CAF: capital"}
+  - {id: "fin:a5|caf_interest", source: finanzas, frequency: M, measure: flow, label: "Paid to CAF: interest"}
+  - {id: "fin:a5|total", source: finanzas, frequency: M, measure: flow, label: "Debt service paid, total"}
+  # Placements of Treasury bonds and letters (colocaciones), monthly cash value: pesos kinds in millions of pesos, dollar kinds in millions of US$.
+  - {id: "fin:col|fixed", source: finanzas, frequency: M, measure: flow, allow_gaps: true, label: "Placements: fixed-rate pesos"}
+  - {id: "fin:col|cer", source: finanzas, frequency: M, measure: flow, allow_gaps: true, label: "Placements: CER-linked"}
+  - {id: "fin:col|floating", source: finanzas, frequency: M, measure: flow, allow_gaps: true, label: "Placements: floating rate"}
+  - {id: "fin:col|dual", source: finanzas, frequency: M, measure: flow, allow_gaps: true, label: "Placements: dual"}
+  - {id: "fin:col|dlinked", source: finanzas, frequency: M, measure: flow, allow_gaps: true, label: "Placements: dollar-linked (US$ m)"}
+  - {id: "fin:col|usd", source: finanzas, frequency: M, measure: flow, allow_gaps: true, label: "Placements: hard dollar (US$ m)"}
+  - {id: "fin:col|dlinked_ars", source: finanzas, frequency: M, measure: flow, allow_gaps: true, label: "Placements: dollar-linked, reported in pesos"}
+  - {id: "fin:col|usd_ars", source: finanzas, frequency: M, measure: flow, allow_gaps: true, label: "Placements: hard dollar, reported in pesos"}
+  - {id: "fin:col|life", source: finanzas, frequency: M, measure: flow, allow_gaps: true, label: "Placements: average life of peso placements, years"}
 
 party_colors:
   peronism: {label: "Peronism (PJ / FpV / FdT)", light: "#4A9FDB", dark: "#6CB4E8"}
@@ -305,6 +357,15 @@ topics:
       reserve requirements, dollar deposits, loan quality, capital and
       profitability, concentration and the largest banks. From the BCRA's
       banking report and its monthly data on each institution.
+
+  - id: fiscal
+    slug: fiscal
+    title: Fiscal & Debt
+    description: >-
+      The national government's accounts and its debt: the primary and
+      financial balance, revenue and spending, interest paid and interest
+      capitalized outside the budget, the debt stock, the maturity profile,
+      payments, and Treasury placements and auctions.
 
 indicators:
   - id: emae
@@ -2318,3 +2379,607 @@ indicators:
       variants:
         personal:  {label: Personal loans minus deposits, expr: "personal - dep"}
         overdraft: {label: Overdrafts minus deposits,     expr: "overdraft - dep"}
+
+  # ---------------- Fiscal & Debt ----------------
+  # Fiscal flows: national non-financial public sector, cash basis (IMIG,
+  # Secretaría de Hacienda). Ratios to GDP: the last twelve months over the
+  # nominal GDP of the same twelve months (gdp12 in pipeline/derive.py).
+
+  - id: fiscal_balance
+    topic: fiscal
+    wide: true
+    kind: variants
+    overlay: true
+    measure: rate
+    validate_as: flow
+    title: Primary and Financial Balance
+    short_title: Fiscal balance
+    description: >-
+      The national non-financial public sector's balance before interest
+      (primary) and after interest (financial), cash basis, as a share of GDP:
+      the last twelve months. Monthly, since December 2015.
+    source: derived
+    source_label: Secretaría de Hacienda (IMIG), via datos.gob.ar; INDEC
+    frequency: M
+    units: "% of GDP, last 12 months"
+    transforms: [level]
+    ranges: [5Y, 10Y, Max]
+    note: >-
+      Sum of the last twelve months of each balance over nominal GDP of the
+      same twelve months: quarterly GDP interpolated to months, and carried
+      forward with the CPI for months the national accounts have not yet
+      covered. Cash basis: interest that is capitalized rather than paid is
+      not in the financial balance (see Interest on the Debt, Paid and
+      Capitalized). Revenue includes BCRA profit transfers and, in some
+      years, income from asset sales and debt operations.
+    default: {variant: financial, transform: level, range: Max}
+    headline: {variant: financial, transform: level}
+    derive:
+      method: formula
+      anchor: prim
+      vars: &fiscal_gdp
+        prim: 379.9_SUPERAVIT_017__23_94
+        fin: 379.9_RESULTADO_017__18_38
+        rev: 379.9_ING_ANTES_017__26_83
+        tax: 379.9_ING_CORR_I017__29_10
+        spend: 379.9_GTOS_PRIMA017__37_33
+        intr: 379.9_GTOS_CORR_017__40_84
+        gdp: 4.4_OGP_2004_T_17
+        cpi: 148.3_INIVELNAL_DICI_M_26
+      variants:
+        primary:   {label: Primary balance,   expr: "100 * sum12(prim) / gdp12(gdp, cpi)"}
+        financial: {label: Financial balance, expr: "100 * sum12(fin) / gdp12(gdp, cpi)"}
+
+  - id: fiscal_balance_monthly
+    topic: fiscal
+    kind: variants
+    overlay: true
+    measure: flow
+    title: Monthly Primary and Financial Balance
+    short_title: Monthly balance
+    description: >-
+      The monthly primary and financial balance of the national
+      non-financial public sector, cash basis. Can be shown in pesos of the
+      latest month.
+    source: datos_gob
+    source_label: Secretaría de Hacienda (IMIG), via datos.gob.ar
+    frequency: M
+    units: Millions of pesos
+    transforms: [level]
+    ranges: [2Y, 5Y, 10Y, Max]
+    deflate_with: {indicator: cpi_long, variant: corrected, label: CPI}
+    note: >-
+      Seasonal: June and December carry the half-yearly bonus (aguinaldo) on
+      wages and pensions, and some months concentrate tax payments (income
+      tax and personal assets in May-June). Compare a month with the same
+      month a year earlier, or use the twelve-month ratios to GDP.
+    variants:
+      primary:   {label: Primary balance,   id: 379.9_SUPERAVIT_017__23_94}
+      financial: {label: Financial balance, id: 379.9_RESULTADO_017__18_38}
+    default: {variant: primary, transform: level, range: 5Y}
+
+  - id: fiscal_revenue_spending
+    topic: fiscal
+    kind: variants
+    overlay: true
+    measure: rate
+    validate_as: flow
+    title: Revenue and Spending
+    short_title: Revenue and spending
+    description: >-
+      Total revenue, tax revenue, primary spending and total spending
+      (primary plus interest), as a share of GDP: the last twelve months.
+    source: derived
+    source_label: Secretaría de Hacienda (IMIG), via datos.gob.ar; INDEC
+    frequency: M
+    units: "% of GDP, last 12 months"
+    transforms: [level]
+    ranges: [5Y, 10Y, Max]
+    note: >-
+      National non-financial public sector, cash basis. Tax revenue is the
+      national share, after automatic transfers to the provinces
+      (coparticipación).
+    default: {variant: spending, transform: level, range: Max}
+    derive:
+      method: formula
+      anchor: rev
+      vars: *fiscal_gdp
+      variants:
+        revenue:  {label: Total revenue,    expr: "100 * sum12(rev) / gdp12(gdp, cpi)"}
+        tax:      {label: Tax revenue,      expr: "100 * sum12(tax) / gdp12(gdp, cpi)"}
+        spending: {label: Primary spending, expr: "100 * sum12(spend) / gdp12(gdp, cpi)"}
+        total:    {label: Total spending,   expr: "100 * (sum12(spend) + sum12(intr)) / gdp12(gdp, cpi)"}
+
+  - id: fiscal_spending_contrib
+    topic: fiscal
+    wide: true
+    kind: contributions
+    measure: flow
+    title: What Drives Primary Spending
+    short_title: Spending by item
+    description: >-
+      Change in real primary spending from the same month a year earlier, and
+      the contribution of each item, in percentage points. Monthly.
+    source: derived
+    source_label: Secretaría de Hacienda (IMIG), via datos.gob.ar; INDEC
+    frequency: M
+    units: Percentage points
+    ranges: [2Y, 5Y, Max]
+    note: >-
+      Each item deflated by the CPI (national, INDEC). Contribution of an
+      item: its real change over total primary spending a year earlier, so
+      the bars add up to the change in total. Provinces: current and capital
+      transfers. Capital spending excludes capital transfers to provinces.
+      Other: goods and services, transfers to universities and public
+      companies, and the rest.
+    contributions:
+      precomputed: true
+      total: total
+      total_label: Real primary spending, y/y %
+      units: pp
+      groups:
+        - {key: pensions,  label: Pensions and social security, add: [pensions],  color: copper}
+        - {key: private,   label: Transfers to households and firms, add: [private], color: sky}
+        - {key: wages,     label: Wages,                        add: [wages],     color: sage}
+        - {key: provinces, label: Transfers to provinces,       add: [provinces], color: lavender}
+        - {key: capital,   label: Capital spending,             add: [capital],   color: gold}
+        - {key: other,     label: Other,                        add: [other],     color: neutral}
+    default: {variant: total, transform: level, range: 5Y}
+    derive:
+      method: formula
+      anchor: tot
+      start: "2018-01-01"
+      vars:
+        tot: 379.9_GTOS_PRIMA017__37_33
+        pen: 379.9_GTOS_CORR_017__35_92
+        wag: 379.9_GTOS_CORR_017__49_26
+        prv: 379.9_GTOS_CORR_017_3_0_M_50_79
+        pcur: 379.9_GTOS_CORR_017_5_0_M_51_42
+        pcap: 379.9_GTOS_CAP_T017__50_91
+        cap: 379.9_GTOS_CAP_2017__13_60
+        cpi: 148.3_INIVELNAL_DICI_M_26
+      variants:
+        total:     {label: Total,      expr: "100 * (tot * lag(cpi, 12) / cpi - lag(tot, 12)) / lag(tot, 12)"}
+        pensions:  {label: Pensions,   expr: "100 * (pen * lag(cpi, 12) / cpi - lag(pen, 12)) / lag(tot, 12)"}
+        private:   {label: Transfers to households and firms, expr: "100 * (prv * lag(cpi, 12) / cpi - lag(prv, 12)) / lag(tot, 12)"}
+        wages:     {label: Wages,      expr: "100 * (wag * lag(cpi, 12) / cpi - lag(wag, 12)) / lag(tot, 12)"}
+        provinces: {label: Provinces,  expr: "100 * ((pcur + pcap) * lag(cpi, 12) / cpi - (lag(pcur, 12) + lag(pcap, 12))) / lag(tot, 12)"}
+        capital:   {label: Capital,    expr: "100 * ((cap - pcap) * lag(cpi, 12) / cpi - (lag(cap, 12) - lag(pcap, 12))) / lag(tot, 12)"}
+        other:     {label: Other,      expr: "100 * ((tot - pen - prv - wag - pcur - cap) * lag(cpi, 12) / cpi - (lag(tot, 12) - lag(pen, 12) - lag(prv, 12) - lag(wag, 12) - lag(pcur, 12) - lag(cap, 12))) / lag(tot, 12)"}
+
+  - id: fiscal_subsidies
+    topic: fiscal
+    kind: contributions
+    measure: flow
+    title: Economic Subsidies
+    short_title: Subsidies
+    description: >-
+      Subsidies to energy, transport and other sectors, as a share of GDP:
+      the last twelve months.
+    source: derived
+    source_label: Secretaría de Hacienda, via datos.gob.ar; INDEC
+    frequency: M
+    units: "% of GDP, last 12 months"
+    ranges: [5Y, 10Y, Max]
+    note: >-
+      Economic subsidies: current transfers to energy companies and funds
+      (CAMMESA, ENARSA and others), to public and private transport, and to
+      other sectors. Cash basis. Social transfers are not included.
+    contributions:
+      precomputed: true
+      total_label: Total subsidies
+      units: "% of GDP"
+      suffix: "% GDP"
+      groups:
+        - {key: energy,    label: Energy,    add: [energy],    color: gold}
+        - {key: transport, label: Transport, add: [transport], color: sky}
+        - {key: other,     label: Other,     add: [other],     color: neutral}
+    default: {variant: energy, transform: level, range: Max}
+    derive:
+      method: formula
+      anchor: en
+      vars:
+        en: 452.2_ENERGIAGIA_0_T_7_56
+        tr: 452.2_TRANSPORTERTE_0_T_10_32
+        ot: 452.2_OTRAS_FUNCNES_0_T_15_25
+        gdp: 4.4_OGP_2004_T_17
+        cpi: 148.3_INIVELNAL_DICI_M_26
+      variants:
+        energy:    {label: Energy,    expr: "100 * sum12(en) / gdp12(gdp, cpi)"}
+        transport: {label: Transport, expr: "100 * sum12(tr) / gdp12(gdp, cpi)"}
+        other:     {label: Other,     expr: "100 * sum12(nz(ot)) / gdp12(gdp, cpi)"}
+
+  - id: fiscal_interest
+    topic: fiscal
+    wide: true
+    kind: contributions
+    measure: flow
+    title: Interest on the Debt, Paid and Capitalized
+    short_title: Interest, paid and capitalized
+    description: >-
+      Interest the budget records (paid in cash, net of interest between
+      public agencies) and the interest it does not: interest capitalized
+      into the principal of peso letters and bonds, and the CER adjustment of
+      inflation-linked debt. As a share of GDP, last twelve months. Since
+      December 2021.
+    source: derived
+    source_label: Secretaría de Hacienda (IMIG); Secretaría de Finanzas (monthly debt bulletin); BCRA; INDEC
+    frequency: M
+    units: "% of GDP, last 12 months"
+    ranges: [5Y, Max]
+    note: >-
+      The budget is on a cash basis. A capitalizing letter (LECAP, BONCAP)
+      pays its accrued interest at maturity together with the principal, and
+      that payment is recorded as amortization, below the line, so it never
+      appears as interest. Capitalized interest, estimated: the stock of
+      LECAP and BONCAP at the end of the previous month (monthly debt
+      bulletin), in pesos, times the average monthly yield (TEM) at which
+      fixed-rate LECAP and BONCAP were placed in the last six months
+      (implied by their issue prices, weighted by cash raised). The
+      Finance Secretariat's own "capitalization" line is not used: it also
+      books the interest already accrued on securities sold in reopenings,
+      which the buyer paid for in cash (large in 2025, with the end of the
+      LEFI). CER adjustment: the CER-linked stock at the end of the previous
+      month, in pesos, times the month's change in the CER. The CER
+      adjustment compensates for inflation, but so does part of the nominal
+      rate on a peso letter, so leaving it out would treat the two kinds of
+      debt differently. Biases: it covers gross debt, including securities
+      held by the BCRA, the pension fund (FGS) and Banco Nación, which
+      overstates what is owed outside the public sector; TAMAR-linked
+      BONCAP are taken at the fixed-rate average; and the interest on the
+      LEFI (July 2024 - July 2025) and on letters sold at a discount is
+      left out, which understates it.
+    contributions:
+      precomputed: true
+      total_label: Accrual-adjusted interest
+      units: "% of GDP"
+      suffix: "% GDP"
+      groups:
+        - {key: cash,        label: Paid (in the budget),   add: [cash],        color: slate}
+        - {key: capitalized, label: Capitalized interest,   add: [capitalized], color: copper}
+        - {key: cer,         label: CER adjustment,         add: [cer],         color: gold}
+    default: {variant: cash, transform: level, range: Max}
+    derive:
+      method: formula
+      anchor: cerstock
+      start: "2021-12-01"
+      vars: &interest
+        intr: 379.9_GTOS_CORR_017__40_84
+        fin: 379.9_RESULTADO_017__18_38
+        cap: "fin:a1|lecap"
+        bcap: "fin:a1|boncap"
+        tem: "fin:col|tem_fixed"
+        cerstock: "fin:a3|pesos_cer"
+        fx: "bcra:5"
+        cer: "bcra:30"
+        gdp: 4.4_OGP_2004_T_17
+        cpi: 148.3_INIVELNAL_DICI_M_26
+      variants:
+        cash:        {label: Paid,           expr: "100 * sum12(intr) / gdp12(gdp, cpi)"}
+        capitalized: {label: Capitalized,    expr: "100 * sum12(lag((nz(cap) + nz(bcap)) * fx, 1) * nz(tem) / 100) / gdp12(gdp, cpi)"}
+        cer:         {label: CER adjustment, expr: "100 * sum12(lag(cerstock * fx, 1) * (cer / lag(cer, 1) - 1)) / gdp12(gdp, cpi)"}
+
+  - id: fiscal_balance_adjusted
+    topic: fiscal
+    kind: variants
+    overlay: true
+    measure: rate
+    validate_as: flow
+    title: Financial Balance Adjusted for Capitalized Interest
+    short_title: Adjusted balance
+    description: >-
+      The official financial balance, and the balance if capitalized interest
+      (and the CER adjustment) were recorded as interest when they accrue.
+      Share of GDP, last twelve months.
+    source: derived
+    source_label: Secretaría de Hacienda (IMIG); Secretaría de Finanzas; BCRA; INDEC
+    frequency: M
+    units: "% of GDP, last 12 months"
+    transforms: [level]
+    ranges: [5Y, Max]
+    note: >-
+      An estimate, not an official measure: see the note on Interest on the
+      Debt, Paid and Capitalized for what it includes and its two biases.
+    default: {variant: official, transform: level, range: Max}
+    derive:
+      method: formula
+      anchor: cerstock
+      start: "2021-12-01"
+      vars: *interest
+      variants:
+        official: {label: Official (cash),                expr: "100 * sum12(fin) / gdp12(gdp, cpi)"}
+        adjusted: {label: Minus capitalized interest,     expr: "100 * (sum12(fin) - sum12(lag((nz(cap) + nz(bcap)) * fx, 1) * nz(tem) / 100)) / gdp12(gdp, cpi)"}
+        full:     {label: Minus capitalized and CER,      expr: "100 * (sum12(fin) - sum12(lag((nz(cap) + nz(bcap)) * fx, 1) * nz(tem) / 100) - sum12(lag(cerstock * fx, 1) * (cer / lag(cer, 1) - 1))) / gdp12(gdp, cpi)"}
+
+  - id: debt_stock
+    topic: fiscal
+    wide: true
+    kind: contributions
+    measure: flow
+    title: Gross Debt by Currency
+    short_title: Debt by currency
+    description: >-
+      Gross debt of the central administration in normal payment status, by
+      currency, billions of US dollars at each month's exchange rates.
+      Monthly, since January 2019.
+    source: derived
+    source_label: Secretaría de Finanzas (monthly debt bulletin)
+    frequency: M
+    units: Billions of US dollars
+    ranges: [5Y, Max]
+    note: >-
+      Includes debt held by the BCRA, the pension fund (FGS) and other public
+      agencies (non-transferable letters, temporary advances). Peso debt in
+      dollars moves with the exchange rate: a devaluation lowers it. SDR debt
+      is mostly with the IMF. Excludes debt not presented to the 2005, 2010
+      and 2020 exchanges.
+    contributions:
+      precomputed: true
+      hide_total: true
+      style: area
+      units: "US$ bn"
+      suffix: " bn"
+      groups:
+        - {key: pesos_other, label: "Pesos, not indexed", add: [pesos_other], color: copper}
+        - {key: pesos_cer,   label: "Pesos, CER-linked",  add: [pesos_cer],   color: gold}
+        - {key: usd,         label: US dollars,           add: [usd],         color: sky}
+        - {key: sdr,         label: SDR (mostly IMF),     add: [sdr],         color: rose}
+        - {key: other,       label: Euros and other,      add: [other],       color: neutral}
+    default: {variant: usd, transform: level, range: Max}
+    derive:
+      method: formula
+      anchor: usd
+      vars:
+        po: "fin:a3|pesos_other"
+        pc: "fin:a3|pesos_cer"
+        usd: "fin:a3|usd"
+        eur: "fin:a3|eur"
+        jpy: "fin:a3|jpy"
+        sdr: "fin:a3|sdr"
+        oth: "fin:a3|other"
+      variants:
+        pesos_other: {label: "Pesos, not indexed", expr: "po / 1000"}
+        pesos_cer:   {label: "Pesos, CER-linked",  expr: "pc / 1000"}
+        usd:         {label: US dollars,           expr: "usd / 1000"}
+        sdr:         {label: SDR,                  expr: "sdr / 1000"}
+        other:       {label: Other currencies,     expr: "(nz(eur) + nz(jpy) + nz(oth)) / 1000"}
+
+  - id: debt_schedule
+    topic: fiscal
+    kind: schedule
+    wide: true
+    title: Debt Maturities
+    short_title: Maturities
+    description: >-
+      Capital and interest falling due in each of the next eighteen months
+      and each year ahead, by type of debt, millions of US dollars. From the
+      Finance Secretariat's latest quarterly report.
+    source: table
+    source_label: Secretaría de Finanzas (quarterly debt report)
+    frequency: Q
+    units: Millions of US dollars
+    default: {}
+    table:
+      source: finanzas
+      file: schedule.json
+      status_id: "fin:a5|total"
+      source_url: https://www.argentina.gob.ar/economia/finanzas/datos-trimestrales-de-la-deuda
+    note: >-
+      Debt in normal payment status at the report's date, valued at that
+      date's exchange rates, with peso debt converted to dollars (a later
+      depreciation shrinks it). Capitalizing peso letters (LECAP, BONCAP) pay
+      their interest with the principal, so it shows as capital. Most peso
+      maturities are rolled over at auctions, and the BCRA's advances and
+      non-transferable letters are owed within the public sector; foreign-
+      currency bonds and the IMF are the payments that need dollars.
+      Projected interest on floating-rate and CER-linked debt uses the rates
+      and index of the report's date. Debt issued after that date (new
+      short-term letters, above all) is not in the profile, so what is
+      actually paid in the first months usually exceeds it; months already
+      past show what was paid (all debt, monthly bulletin).
+
+  - id: debt_service_fx
+    topic: fiscal
+    wide: true
+    kind: contributions
+    measure: flow
+    title: Debt Payments in Foreign Currency
+    short_title: FX debt payments
+    description: >-
+      Capital and interest the central administration paid in foreign
+      currency each month: bonds and other debt, the IMF, and other
+      multilaterals (IDB, World Bank, CAF). Millions of US dollars, since
+      January 2019.
+    source: derived
+    source_label: Secretaría de Finanzas (monthly debt bulletin)
+    frequency: M
+    units: Millions of US dollars
+    ranges: [2Y, 5Y, Max]
+    note: >-
+      Payments as recorded, including those to public agencies (interest on
+      the BCRA's non-transferable letters). The big months are January and
+      July, when the Globales and Bonares issued in the 2020 restructuring
+      pay. Most of the May 2025 spike is the Treasury's redemption of
+      non-transferable letters held by the BCRA. Other multilaterals: the IDB, the World Bank (IBRD) and CAF;
+      smaller lenders are in "Bonds and other".
+    contributions:
+      precomputed: true
+      total_label: Total paid in foreign currency
+      units: "US$ m"
+      suffix: " m"
+      groups:
+        - {key: bonds_cap, label: "Bonds and other: capital",  add: [bonds_cap], color: sky}
+        - {key: bonds_int, label: "Bonds and other: interest", add: [bonds_int], color: lavender}
+        - {key: imf,       label: IMF,                         add: [imf],       color: rose}
+        - {key: ifis,      label: Other multilaterals,         add: [ifis],      color: sage}
+    default: {variant: bonds_cap, transform: level, range: 5Y}
+    derive:
+      method: formula
+      anchor: fc
+      vars:
+        fc: "fin:a5|fx_capital"
+        fi: "fin:a5|fx_interest"
+        ic: "fin:a5|imf_capital"
+        ii: "fin:a5|imf_interest"
+        bc: "fin:a5|idb_capital"
+        bi: "fin:a5|idb_interest"
+        wc: "fin:a5|wb_capital"
+        wi: "fin:a5|wb_interest"
+        cc: "fin:a5|caf_capital"
+        ci: "fin:a5|caf_interest"
+      variants:
+        bonds_cap: {label: "Bonds and other: capital",  expr: "fc - nz(ic) - nz(bc) - nz(wc) - nz(cc)"}
+        bonds_int: {label: "Bonds and other: interest", expr: "fi - nz(ii) - nz(bi) - nz(wi) - nz(ci)"}
+        imf:       {label: IMF,                         expr: "nz(ic) + nz(ii)"}
+        ifis:      {label: Other multilaterals,         expr: "nz(bc) + nz(bi) + nz(wc) + nz(wi) + nz(cc) + nz(ci)"}
+
+  - id: debt_rollover
+    topic: fiscal
+    kind: variants
+    measure: rate
+    validate_as: flow
+    title: Rollover of Peso Debt
+    short_title: Rollover
+    description: >-
+      Peso marketable securities issued over those falling due, percent:
+      above 100, the Treasury raised net financing in pesos; below 100, it
+      paid down peso debt with its own cash. Monthly, since January 2019.
+    source: derived
+    source_label: Secretaría de Finanzas (monthly debt bulletin)
+    frequency: M
+    units: "% of maturities"
+    transforms: [level]
+    plain_level: true
+    ranges: [2Y, 5Y, Max]
+    note: >-
+      Issuance and amortization of peso-denominated bonds and letters (LECAP,
+      BONCAP, BONCER, LECER, BONTE, duals and others), valued in dollars on
+      the day of each operation. Excludes letters placed with public agencies,
+      the LEFI (a BCRA liquidity operation, July 2024 - July 2025) and dollar
+      and dollar-linked instruments. Swaps count on both sides, pulling the
+      ratio toward 100. Amortizations include the capitalized interest paid
+      at maturity. Peso debt bought by public agencies counts as issuance.
+    default: {variant: m3, transform: level, range: 5Y}
+    derive:
+      method: formula
+      anchor: amo
+      vars:
+        iss: "fin:a4|peso_mkt_issued"
+        amo: "fin:a4|peso_mkt_amortized"
+      variants:
+        monthly: {label: Monthly,                expr: "100 * iss / amo", max: "1000 + 0 * amo"}
+        m3:      {label: Last three months,      expr: "100 * (iss + lag(iss, 1) + lag(iss, 2)) / (amo + lag(amo, 1) + lag(amo, 2))"}
+
+  - id: placements_mix
+    topic: fiscal
+    wide: true
+    kind: contributions
+    measure: flow
+    title: What the Treasury Places
+    short_title: Placements by type
+    description: >-
+      Cash raised each month in Treasury bonds and letters, by type of
+      instrument, as a share of the month's total. Since January 2021.
+    source: derived
+    source_label: Secretaría de Finanzas (colocaciones de deuda)
+    frequency: M
+    units: "% of cash raised"
+    ranges: [2Y, 5Y, Max]
+    note: >-
+      Market placements of bonds and letters (auctions and their second
+      rounds, and direct placements), at their cash value; dollar and
+      dollar-linked placements converted at the month's average wholesale
+      rate. Excludes letters placed with public agencies, swaps and
+      conversions. Dual: bonds that pay the better of two adjustments (CER
+      or the official exchange rate in 2022-2023; a fixed rate or TAMAR
+      since 2025).
+    contributions:
+      precomputed: true
+      hide_total: true
+      style: area
+      units: "%"
+      groups:
+        - {key: fixed,    label: Fixed-rate pesos,              add: [fixed],    color: copper}
+        - {key: cer,      label: CER-linked,                    add: [cer],      color: gold}
+        - {key: floating, label: "Floating (TAMAR, BADLAR)",    add: [floating], color: sage}
+        - {key: dual,     label: Dual,                          add: [dual],     color: lavender}
+        - {key: dlinked,  label: Dollar-linked (paid in pesos), add: [dlinked],  color: teal}
+        - {key: usd,      label: Hard dollar,                   add: [usd],      color: sky}
+    default: {variant: fixed, transform: level, range: Max}
+    derive:
+      method: formula
+      anchor: fx_
+      vars:
+        fx_: "fin:col|fixed"
+        cr: "fin:col|cer"
+        fl: "fin:col|floating"
+        du: "fin:col|dual"
+        dl: "fin:col|dlinked"
+        hd: "fin:col|usd"
+        dla: "fin:col|dlinked_ars"
+        hda: "fin:col|usd_ars"
+        fxa: "@fx_official:wholesale:avg"
+      variants:
+        fixed:    {label: Fixed-rate pesos, expr: "100 * nz(fx_) / (nz(fx_) + nz(cr) + nz(fl) + nz(du) + (nz(dl) + nz(hd)) * fxa + nz(dla) + nz(hda))"}
+        cer:      {label: CER-linked,       expr: "100 * nz(cr) / (nz(fx_) + nz(cr) + nz(fl) + nz(du) + (nz(dl) + nz(hd)) * fxa + nz(dla) + nz(hda))"}
+        floating: {label: Floating,         expr: "100 * nz(fl) / (nz(fx_) + nz(cr) + nz(fl) + nz(du) + (nz(dl) + nz(hd)) * fxa + nz(dla) + nz(hda))"}
+        dual:     {label: Dual,             expr: "100 * nz(du) / (nz(fx_) + nz(cr) + nz(fl) + nz(du) + (nz(dl) + nz(hd)) * fxa + nz(dla) + nz(hda))"}
+        dlinked:  {label: Dollar-linked,    expr: "100 * (nz(dl) * fxa + nz(dla)) / (nz(fx_) + nz(cr) + nz(fl) + nz(du) + (nz(dl) + nz(hd)) * fxa + nz(dla) + nz(hda))"}
+        usd:      {label: Hard dollar,      expr: "100 * (nz(hd) * fxa + nz(hda)) / (nz(fx_) + nz(cr) + nz(fl) + nz(du) + (nz(dl) + nz(hd)) * fxa + nz(dla) + nz(hda))"}
+
+  - id: placements_life
+    topic: fiscal
+    kind: variants
+    measure: flow
+    title: Average Life of New Peso Placements
+    short_title: Life of placements
+    description: >-
+      Average life of the peso bonds and letters placed each month, in
+      years, weighted by cash raised. A longer life spreads out future
+      maturities. Since January 2021.
+    source: finanzas
+    source_label: Secretaría de Finanzas (colocaciones de deuda)
+    frequency: M
+    units: Years
+    transforms: [level]
+    plain_level: true
+    ranges: [2Y, 5Y, Max]
+    note: >-
+      Peso instruments (fixed-rate, CER-linked, floating and dual); average
+      life as the Finance Secretariat reports it for amortizing bonds, time
+      to maturity for bullet bonds and letters. One long bond placed in a
+      month can move the average a lot.
+    variants:
+      life: {label: Average life, id: "fin:col|life"}
+    default: {variant: life, transform: level, range: Max}
+
+  - id: treasury_placements
+    topic: fiscal
+    kind: placements
+    wide: true
+    title: Treasury Auctions and Placements
+    short_title: Auction results
+    description: >-
+      Every bond and letter placed on each settlement date: instrument, type,
+      amounts, issue price and, for fixed-rate letters and bonds, the yield
+      implied by the price. Since January 2021.
+    source: table
+    source_label: Secretaría de Finanzas (colocaciones de deuda)
+    frequency: D
+    units: Millions of pesos (US$ for dollar instruments)
+    default: {}
+    table:
+      source: finanzas
+      file: placements/index.json
+      status_id: "fin:col|fixed"
+      source_url: https://www.argentina.gob.ar/economia/finanzas/deudapublica/colocacionesdedeuda
+    note: >-
+      One settlement date usually is one auction (with its second round a
+      day later). The file lists what was placed, not what was offered or
+      what fell due, so it does not give each auction's rollover; see Rollover
+      of Peso Debt for the monthly ratio. Implied yield for capitalizing
+      fixed-rate instruments (LECAP, BONCAP) and discount letters: the
+      payoff at maturity (face value capitalized at the instrument's monthly
+      rate, actual days / 30) over the issue price, as an effective monthly
+      rate (TEM) and an effective annual rate (TEA). Recent months are
+      preliminary.

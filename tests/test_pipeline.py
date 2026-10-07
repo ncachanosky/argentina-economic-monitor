@@ -489,3 +489,45 @@ def test_every_registry_source_has_an_adapter():
     reg = registry.load()
     for source, _ in reg.series_by_source():
         assert get_adapter(source) is not None
+
+
+def test_finanzas_helpers():
+    import datetime as dt
+    from pipeline.sources import finanzas as f
+    # file names and links
+    assert f._file_date("https://x/sites/default/files/colocaciones_31-08-26_preliminar.xlsx") == dt.date(2026, 8, 31)
+    assert f._file_date("coloc_31_12_2020_.xlsx") == dt.date(2020, 12, 31)
+    html = '<a href="/sites/default/files/colocaciones_31-07-26_1.xlsx"></a><a href="https://www.argentina.gob.ar/sites/default/files/colocaciones_31-08-26_preliminar.xlsx"></a><a href="/sites/default/files/coloc_31_12_2020_.xlsx"></a><a href="/sites/default/files/colocaciones_31-12-2025_0.xlsx"></a>'
+    files = f.find_placements(html)
+    assert list(files) == [2025, 2026] and files[2026].endswith("31-08-26_preliminar.xlsx")
+    assert f._period("ago-26 (*)") == pd.Timestamp("2026-08-01")
+    # instruments
+    assert f.classify("LECAP/$/30-11-2026", "Tasa efectiva mensual capitalizable 2,30", "MONEDA NACIONAL", "ARP") == "fixed"
+    assert f.classify("BONCER/$/TASA CERO/30-06-2027", "Cero cupón", "MONEDA NACIONAL", "UCP") == "cer"
+    assert f.classify("BONCAP/$/TAMAR+6,5%/26-02-2027", "", "MONEDA NACIONAL", "ARP") == "floating"
+    assert f.classify("BONCAP DUAL/$/15-12-2026", "", "MONEDA NACIONAL", "ARP") == "dual"
+    assert f.classify("LETRA/U$S/0,4%/31-10-23", "", "MONEDA EXTRANJERA", "DLK", "Integra al vencimiento al tipo de cambio") == "dlinked"
+    assert f.classify("BONAR/U$S/29-10-2027", "", "MONEDA EXTRANJERA", "USD") == "usd"
+    assert f.peso_market("LECAP - $") and f.peso_market("BONCER/$/0%+CER/30-06-2027")
+    assert not f.peso_market("LETRA FGS - $") and not f.peso_market("LEFI/$/TPM/17-07-2025") and not f.peso_market("BONAR/U$S/6%/29-10-2027")
+    # cash value units of dollar placements
+    assert f.dollar_unit("DLK", 4108.9, 43.8, 2021) == "ARS"
+    assert f.dollar_unit("DLK", 421452.6, 421452.6, 2024) == "ARS"
+    assert f.dollar_unit("USD", 126.8, 128.0, 2026) == "USD"
+    # implied yield: a letter placed at par on its issue date yields its own TEM
+    d0, d1 = dt.date(2026, 1, 30), dt.date(2026, 3, 16)
+    tem, tea = f.implied_yield("fixed", "Tasa efectiva mensual capitalizable 2,99", d0, d1, d0, 1000.0)
+    assert tem == pytest.approx(2.99, abs=0.01) and tea > tem * 12
+    assert f.implied_yield("cer", "Cero cupón", d0, d1, d0, 1000.0) == (None, None)
+
+
+def test_gdp12_and_formula_helpers():
+    from pipeline import derive
+    # Quarterly GDP at annual rates, constant 1200: the twelve-month GDP is 1200.
+    q = pd.Series(1200.0, index=pd.date_range("2022-01-01", "2024-10-01", freq="QS"))
+    idx = pd.date_range("2022-01-01", "2025-03-01", freq="MS")
+    cpi = pd.Series(range(1, len(idx) + 1), index=idx, dtype=float)
+    g = derive.gdp12(q.reindex(idx), cpi)
+    assert g["2022-12-01"] == pytest.approx(1200.0) and g["2024-06-01"] == pytest.approx(1200.0)
+    assert pd.isna(g["2022-06-01"])                       # fewer than four quarters
+    assert g["2025-03-01"] > 1200.0                      # extended with the CPI after the last quarter
