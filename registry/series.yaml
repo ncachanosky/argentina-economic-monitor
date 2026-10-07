@@ -2446,6 +2446,7 @@ indicators:
     frequency: M
     units: Millions of pesos
     transforms: [level]
+    plain_level: true
     ranges: [2Y, 5Y, 10Y, Max]
     deflate_with: {indicator: cpi_long, variant: corrected, label: CPI}
     note: >-
@@ -2599,9 +2600,8 @@ indicators:
     description: >-
       Interest the budget records (paid in cash, net of interest between
       public agencies) and the interest it does not: interest capitalized
-      into the principal of peso letters and bonds, and the CER adjustment of
-      inflation-linked debt. As a share of GDP, last twelve months. Since
-      December 2021.
+      into the principal of peso letters and bonds (LECAP, BONCAP). As a
+      share of GDP, last twelve months. Since December 2021.
     source: derived
     source_label: Secretaría de Hacienda (IMIG); Secretaría de Finanzas (monthly debt bulletin); BCRA; INDEC
     frequency: M
@@ -2619,11 +2619,8 @@ indicators:
       Finance Secretariat's own "capitalization" line is not used: it also
       books the interest already accrued on securities sold in reopenings,
       which the buyer paid for in cash (large in 2025, with the end of the
-      LEFI). CER adjustment: the CER-linked stock at the end of the previous
-      month, in pesos, times the month's change in the CER. The CER
-      adjustment compensates for inflation, but so does part of the nominal
-      rate on a peso letter, so leaving it out would treat the two kinds of
-      debt differently. Biases: it covers gross debt, including securities
+      LEFI). See Inflation Adjustment of CER-Linked Debt for the indexed debt.
+      Biases: it covers gross debt, including securities
       held by the BCRA, the pension fund (FGS) and Banco Nación, which
       overstates what is owed outside the public sector; TAMAR-linked
       BONCAP are taken at the fixed-rate average; and the interest on the
@@ -2636,8 +2633,7 @@ indicators:
       suffix: "% GDP"
       groups:
         - {key: cash,        label: Paid (in the budget),   add: [cash],        color: slate}
-        - {key: capitalized, label: Capitalized interest,   add: [capitalized], color: copper}
-        - {key: cer,         label: CER adjustment,         add: [cer],         color: gold}
+        - {key: capitalized, label: Capitalized interest (estimate), add: [capitalized], color: copper}
     default: {variant: cash, transform: level, range: Max}
     derive:
       method: formula
@@ -2657,7 +2653,6 @@ indicators:
       variants:
         cash:        {label: Paid,           expr: "100 * sum12(intr) / gdp12(gdp, cpi)"}
         capitalized: {label: Capitalized,    expr: "100 * sum12(lag((nz(cap) + nz(bcap)) * fx, 1) * nz(tem) / 100) / gdp12(gdp, cpi)"}
-        cer:         {label: CER adjustment, expr: "100 * sum12(lag(cerstock * fx, 1) * (cer / lag(cer, 1) - 1)) / gdp12(gdp, cpi)"}
 
   - id: fiscal_balance_adjusted
     topic: fiscal
@@ -2669,8 +2664,8 @@ indicators:
     short_title: Adjusted balance
     description: >-
       The official financial balance, and the balance if capitalized interest
-      (and the CER adjustment) were recorded as interest when they accrue.
-      Share of GDP, last twelve months.
+      were recorded as interest when it accrues. Share of GDP, last twelve
+      months.
     source: derived
     source_label: Secretaría de Hacienda (IMIG); Secretaría de Finanzas; BCRA; INDEC
     frequency: M
@@ -2679,7 +2674,7 @@ indicators:
     ranges: [5Y, Max]
     note: >-
       An estimate, not an official measure: see the note on Interest on the
-      Debt, Paid and Capitalized for what it includes and its two biases.
+      Debt, Paid and Capitalized for what it includes and its biases.
     default: {variant: official, transform: level, range: Max}
     derive:
       method: formula
@@ -2689,7 +2684,42 @@ indicators:
       variants:
         official: {label: Official (cash),                expr: "100 * sum12(fin) / gdp12(gdp, cpi)"}
         adjusted: {label: Minus capitalized interest,     expr: "100 * (sum12(fin) - sum12(lag((nz(cap) + nz(bcap)) * fx, 1) * nz(tem) / 100)) / gdp12(gdp, cpi)"}
-        full:     {label: Minus capitalized and CER,      expr: "100 * (sum12(fin) - sum12(lag((nz(cap) + nz(bcap)) * fx, 1) * nz(tem) / 100) - sum12(lag(cerstock * fx, 1) * (cer / lag(cer, 1) - 1))) / gdp12(gdp, cpi)"}
+
+  - id: fiscal_cer_adjustment
+    topic: fiscal
+    kind: variants
+    measure: rate
+    validate_as: flow
+    plain_level: true
+    title: Inflation Adjustment of CER-Linked Debt
+    short_title: CER adjustment
+    description: >-
+      The increase in the principal of inflation-indexed (CER) peso debt from
+      the CER adjustment, which is paid at maturity and never recorded as
+      interest. Share of GDP, last twelve months. Since December 2019.
+    source: derived
+    source_label: Secretaría de Finanzas (monthly debt bulletin); BCRA; INDEC
+    frequency: M
+    units: "% of GDP, last 12 months"
+    transforms: [level]
+    ranges: [5Y, Max]
+    note: >-
+      The CER-linked stock at the end of the previous month, in pesos, times
+      the month's change in the CER. Mostly compensation for inflation, not a
+      real cost: with inflation above 200% (2023-24) it was well over 10% of
+      GDP, while inflation eroded the real value of fixed-rate peso debt by
+      a comparable order. It belongs in an inflation-corrected (operational)
+      balance only together with that erosion, so it is shown apart from
+      interest. Covers gross debt, including bonds held by the BCRA, the
+      pension fund (FGS) and Banco Nación.
+    default: {variant: cer, transform: level, range: Max}
+    derive:
+      method: formula
+      anchor: cerstock
+      start: "2019-12-01"
+      vars: *interest
+      variants:
+        cer: {label: CER adjustment, expr: "100 * sum12(lag(cerstock * fx, 1) * (cer / lag(cer, 1) - 1)) / gdp12(gdp, cpi)"}
 
   - id: debt_stock
     topic: fiscal
