@@ -47,7 +47,16 @@ def contributions(ind, raw: pd.DataFrame) -> dict:
         groups = [{"key": g["key"], "label": g["label"], "color": g.get("color"),
                    "values": _clean(raw[sid[g["add"][0]]].reindex(valid).tolist())} for g in spec["groups"]]
         tot = raw[sid[spec["total"]]] if spec.get("total") else raw[[sid[g["add"][0]] for g in spec["groups"]]].sum(axis=1)
-        return {"dates": [d.strftime("%Y-%m-%d") for d in valid],
+        yearly = None
+        if ind.yearly:
+            # Yearly view: the same groups, or their twelve-month versions (variant key + suffix).
+            sfx = ind.yearly.get("suffix", "")
+            yv = raw[[sid[g["add"][0] + sfx] for g in spec["groups"]] + ([sid[spec["total"] + sfx]] if spec.get("total") else [])].dropna(how="all")
+            ytot = raw[sid[spec["total"] + sfx]] if spec.get("total") else raw[[sid[g["add"][0] + sfx] for g in spec["groups"]]].sum(axis=1)
+            yearly = {"how": ind.yearly.get("how", "december"), "dates": [d.strftime("%Y-%m-%d") for d in yv.index],
+                      "groups": [_clean(raw[sid[g["add"][0] + sfx]].reindex(yv.index).tolist()) for g in spec["groups"]],
+                      "total": _clean(ytot.reindex(yv.index).tolist()), "total_label": ind.yearly.get("total_label")}
+        return {"dates": [d.strftime("%Y-%m-%d") for d in valid], "yearly": yearly,
                 "total": {"label": spec.get("total_label", "Total"), "values": _clean(tot.reindex(valid).tolist())},
                 "groups": groups, "lines": {}, "default_lines": [], "lines_title": spec.get("lines_title"),
                 "units": spec.get("units", "pp"), "suffix": spec.get("suffix"), "precomputed": True,
@@ -265,6 +274,8 @@ def export(out: Path) -> None:
             "note": ind.note,
             "caveat": ind.caveat,
             "plain_level": ind.plain_level,
+            "yearly": ind.yearly,
+            "ref_line": ind.ref_line,
             "source_label": ind.source_label,
             "default": ind.default,
             "headline": ind.headline,

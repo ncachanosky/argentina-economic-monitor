@@ -71,6 +71,7 @@
   // Period label: "Jul 2026" for monthly data, "Q3 2026" for quarterly.
   const fmtDay = (iso) => new Date(iso + "T00:00:00Z").toLocaleDateString("en-US", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" });
   const fmtPeriod = (iso, freq) => {
+    if (freq === "Y") return iso;
     if (freq === "D") return fmtDay(iso);
     if (freq !== "Q") return fmtShortMonth(iso);
     const [y, m] = iso.split("-").map(Number);
@@ -415,11 +416,11 @@
         tbody.append(h("tr", {}, h("td", {}, fmtPeriod(dates[i], freq)), ...cols.map((c) => h("td", {}, fmtNum(c.values[i], pct)))));
       }
       details.append(h("div", { class: "table-scroll" }, h("table", { class: "data" },
-        h("thead", {}, h("tr", {}, h("th", {}, freq === "Q" ? "Quarter" : "Month"), ...cols.map((c) => h("th", {}, c.label)))), tbody)));
+        h("thead", {}, h("tr", {}, h("th", {}, freq === "Q" ? "Quarter" : freq === "Y" ? "Year" : "Month"), ...cols.map((c) => h("th", {}, c.label)))), tbody)));
       details.dataset.filled = "1";
     };
     details.addEventListener("toggle", fill);
-    details.refresh = (d, c, p) => { dates = d; cols = c; pct = p; details.querySelector(".table-scroll")?.remove(); delete details.dataset.filled; if (details.open) fill(); };
+    details.refresh = (d, c, p, f) => { dates = d; cols = c; pct = p; if (f) freq = f; details.querySelector(".table-scroll")?.remove(); delete details.dataset.filled; if (details.open) fill(); };
     return details;
   }
 
@@ -548,6 +549,31 @@
   const partialNote = (ind) => (ind.derived && ind.derived.partial_month
     ? `${fmtMonth(ind.derived.partial_month.slice(0, 7) + "-01")} is partial: data through ${fmtDay(ind.derived.partial_month)}.` : "");
 
+  // ---------- yearly view of monthly data ----------
+  // how = "december": the December value of each year (for twelve-month sums and
+  // ratios, the calendar year); "sum": the sum of the year's months. The year in
+  // progress takes its latest month (december) or the months so far (sum), and
+  // is labelled with an asterisk.
+  function yearlyAgg(dates, values, how) {
+    const by = new Map();
+    dates.forEach((d, i) => { const v = values[i]; if (v === null || v === undefined) return; const y = d.slice(0, 4); if (!by.has(y)) by.set(y, []); by.get(y).push([Number(d.slice(5, 7)), v, d]); });
+    const years = [], vals = []; let partial = null;
+    const ys = [...by.keys()].sort();
+    ys.forEach((y, n) => {
+      const ms = by.get(y), last = ms[ms.length - 1];
+      const complete = how === "sum" ? ms.length === 12 : last[0] === 12;
+      if (!complete && n < ys.length - 1) return;           // incomplete early years are skipped
+      if (!complete && how === "sum" && n === 0) return;
+      const v = how === "sum" ? ms.reduce((a, m) => a + m[1], 0) : (ms.find((m) => m[0] === 12) || last)[1];
+      years.push(complete ? y : `${y}*`); vals.push(v);
+      if (!complete) partial = { year: y, first: ms[0][2], last: last[2] };
+    });
+    return { years, values: vals, partial };
+  }
+  const yearlyNote = (how, partial) => (!partial ? "" : how === "sum"
+    ? `*${partial.year}: ${fmtShortMonth(partial.first).split(" ")[0]}–${fmtShortMonth(partial.last)}, year to date.`
+    : `*${partial.year}: twelve months to ${fmtShortMonth(partial.last)}.`);
+
   // ---------- card: one series with variants ----------
   function variantsCard(ind, wide) {
     const variantKeys = Object.keys(ind.variants);
@@ -563,8 +589,11 @@
       customBase: ind.default.base || null,               // "YYYY-MM-01"
       byPres: false,
       episodes: false,            // mark dated shocks (registry `episodes`)
+      yearly: false,              // yearly view (registry `yearly`)
     };
     const card = cardFrame(ind, !!wide);
+    const Y = ind.yearly;
+    const ySeg = Y ? segmented([["monthly", "Monthly"], ["yearly", "Yearly"]], "monthly", (k) => { state.yearly = k === "yearly"; ySeg.update(k); draw(); }, "Frequency") : null;
     const chartEl = h("div", { class: "chart" + (wide ? " tall-ish" : ""), role: "img", "aria-label": `${ind.title} chart` });
     const hint = h("p", { class: "hint" });
     const statsEl = h("div", { class: "term-stats", hidden: true });
@@ -811,6 +840,9 @@
       if (main.rebased && state.transform === "level") {
         shapes.push({ type: "line", xref: "paper", yref: "y", x0: 0, x1: 1, y0: 100, y1: 100, line: { color: cssVar("--ink-2"), width: 1, _light: "#5A6872" } });
       }
+      if (ind.ref_line !== null && ind.ref_line !== undefined && state.transform === "level") {
+        shapes.push({ type: "line", xref: "paper", yref: "y", x0: 0, x1: 1, y0: ind.ref_line, y1: ind.ref_line, line: { color: cssVar("--ink-2"), width: 1.2, dash: "dash", _light: "#5A6872" } });
+      }
       // Quarter tracker: the quarter in progress is drawn lighter.
       const tk = ind.derived && ind.derived.tracker;
       if (tk && !tk.complete) traces.forEach((tr) => {
@@ -827,6 +859,41 @@
         });
       }
       return { traces, shapes: [...bs.shapes, ...shapes], annotations: [...bs.annotations, ...annotations], main, t, x, y };
+    }
+
+    // Yearly view: grouped bars of each variant's yearly value.
+    function buildYearly() {
+      const t = T.level || Object.values(T)[0];
+      const keys = Y.variants || (ind.overlay ? [state.variant, ...variantKeys.filter((k) => k !== state.variant)] : [state.variant]);
+      const start = viewStart(ind, state.range);
+      let partial = null, labels = null;
+      const traces = keys.map((k, slot) => {
+        const v = ind.variants[k];
+        const a = yearlyAgg(ind.dates, v.values, Y.how);
+        const ii = a.years.map((y, i) => i).filter((i) => !start || `${a.years[i].slice(0, 4)}-12-31` >= start);
+        partial = partial || a.partial; labels = labels || ii.map((i) => a.years[i]);
+        return { type: "bar", name: v.label, x: ii.map((i) => a.years[i]), y: ii.map((i) => a.values[i]), _slot: slot,
+          marker: { color: cssVar(SERIES_VARS[slot % SERIES_VARS.length]) },
+          hovertemplate: `%{x}: <b>%{y:,.1f}${t.suffix}</b><extra>${v.label}</extra>` };
+      });
+      const shapes = ind.ref_line !== null && ind.ref_line !== undefined
+        ? [{ type: "line", xref: "paper", yref: "y", x0: 0, x1: 1, y0: ind.ref_line, y1: ind.ref_line, line: { color: cssVar("--ink-2"), width: 1.2, dash: "dash", _light: "#5A6872" } }] : [];
+      return { traces, shapes, t, keys, labels: labels || [], partial };
+    }
+
+    function drawYearly() {
+      const { traces, shapes, t, keys, labels, partial } = buildYearly();
+      const msgs = [Y.how === "sum" ? "Calendar-year totals." : "Calendar years: the December value of the twelve-month series."];
+      if (partial) msgs.push(yearlyNote(Y.how, partial));
+      if (ind._real) msgs.push(`Real terms: pesos of ${fmtMonth(ind.deflator.latest)}.`);
+      hint.textContent = msgs.join(" ");
+      statsEl.hidden = true;
+      Plotly.react(chartEl, traces, baseLayout({
+        pct: t, xaxis: { type: "category" },
+        extra: { bargap: 0.25, barmode: "group", shapes, showlegend: traces.length > 1,
+          legend: { orientation: "h", x: 0, y: 1.02, yanchor: "bottom", font: { color: cssVar("--ink") } }, margin: { l: 52, r: 16, t: 10, b: 36 } },
+      }), PLOT_CONFIG);
+      table && table.refresh(labels, traces.map((tr) => ({ label: tr.name, values: labels.map((l) => { const j = tr.x.indexOf(l); return j < 0 ? null : tr.y[j]; }) })), t, "Y");
     }
 
     function drawStats(main, t) {
@@ -874,6 +941,12 @@
       if (epKey) epKey.hidden = !state.episodes;
       baseSel.disabled = state.transform !== "level";
       customIn.disabled = state.transform !== "level";
+      if (state.yearly) {
+        const hide = (el, on) => { if (el) el.style.display = on ? "none" : ""; };
+        hide(tSeg, true); hide(presBtn, true); hide(baseWrap, true); hide(vSeg, !!Y.variants);
+        drawYearly(); return;
+      }
+      for (const el of [tSeg, presBtn, baseWrap, vSeg]) if (el) el.style.display = "";
 
       const { traces, shapes, annotations, main, t, x, y } = build();
       const msgs = [];
@@ -905,17 +978,26 @@
         const s = k === state.variant ? main : series(k);
         return { label: `${s.v.label}${suffix}`, values: x.map((d) => s.y[ind.dates.indexOf(d)]) };
       });
-      table && table.refresh(x, cols, t);
+      table && table.refresh(x, cols, t, ind.frequency);
     }
 
     const overlayKeys = () => (ind.overlay && !state.byPres ? [state.variant, ...variantKeys.filter((k) => k !== state.variant)] : [state.variant]);
     const subtitle = (main, t) => `${overlayKeys().map((k) => ind.variants[k].label).join(" vs. ")} · ${t.change ? t.short : main.units}`;
     const fileTag = () => `${ind.id}_${state.variant}_${state.transform}${baseMonth() ? "_base" + baseMonth().slice(0, 7) : ""}${state.byPres ? "_presidencies" : ""}`;
     const onPNG = () => {
+      if (state.yearly) {
+        const yb = buildYearly();
+        return exportPNG(ind, yb.traces, `${yb.traces.map((tr) => tr.name).join(" vs. ")} · yearly${yb.partial ? " · " + yearlyNote(Y.how, yb.partial) : ""}`, yb.t, `${ind.id}_yearly.png`, { shapes: yb.shapes, barmode: "group", xcategory: true });
+      }
       const { traces, shapes, annotations, main, t } = build();
       exportPNG(ind, traces, subtitle(main, t), t, `${fileTag()}.png`, { shapes, annotations, ylog: isLog(), barmode: state.transform === "share" ? "stack" : "group" });
     };
     const onCSV = () => {
+      if (state.yearly) {
+        const yb = buildYearly();
+        const rows = yb.labels.map((l) => [l, ...yb.traces.map((tr) => { const j = tr.x.indexOf(l); return j < 0 ? "" : +tr.y[j].toPrecision(8); })]);
+        return downloadBlob(toCSV(["year", ...yb.traces.map((tr) => `${ind.short_title} — ${tr.name} — ${unitsOf(ind)}`)], rows), `${ind.id}_yearly.csv`, "text/csv");
+      }
       const { main, t, x, y } = build();
       const ks = overlayKeys();
       const ys = ks.map((k) => (k === state.variant ? main.y : series(k).y));
@@ -931,7 +1013,7 @@
     };
 
     appendAll(card, 
-      h("div", { class: "controls" }, vSeg, tSeg, h("span", { class: "spacer" }), ind.view_start ? null : rSeg),
+      h("div", { class: "controls" }, ySeg, vSeg, tSeg, h("span", { class: "spacer" }), ind.view_start ? null : rSeg),
       // A short fixed window (view_start) has no use for rebasing or presidencies.
       ind.view_start ? null : h("div", { class: "controls" }, realSeg, baseWrap, presBtn, epBtn),
       ind.caveat ? h("p", { class: "caveat" }, ind.caveat) : null,
@@ -1574,7 +1656,31 @@
     const lineEl = h("div", { class: "chart", role: "img", "aria-label": "Components, year-over-year change" });
     const chipsEl = h("div", { class: "chips", role: "group", "aria-label": "Components to compare" });
     const rSeg = segmented(rangeKeys(ind).map((k) => [k, k]), state.range, (k) => { state.range = k; drawAll(); }, "Time range");
+    const CY = C.yearly;
+    const ySeg = CY ? segmented([["monthly", "Monthly"], ["yearly", "Yearly"]], "monthly", (k) => { state.yearly = k === "yearly"; ySeg.update(k); drawAll(); }, "Frequency") : null;
+    const hintEl = h("p", { class: "hint" });
     let table;
+
+    // Yearly view: each group's yearly value (December of the twelve-month series).
+    function yearlyTraces() {
+      const start = startDate(ind.last_obs, RANGES[state.range]);
+      const agg = (vals) => yearlyAgg(CY.dates, vals, CY.how);
+      const tot = agg(CY.total);
+      const keep = tot.years.map((y, i) => i).filter((i) => !start || `${tot.years[i].slice(0, 4)}-12-31` >= start);
+      const x = keep.map((i) => tot.years[i]);
+      const pick = (a) => x.map((l) => { const j = a.years.indexOf(l); return j < 0 ? null : a.values[j]; });
+      const tr = C.groups.map((g, n) => ({
+        type: "bar", name: g.label, x, y: pick(agg(CY.groups[n])),
+        marker: { color: groupColor(g.color), line: { width: 0 } }, _lightColors: x.map(() => GROUP_LIGHT[g.color] || "#B0B7BD"),
+        hovertemplate: `${g.label}: <b>%{y:,.1f}${sfx}</b><extra></extra>`,
+      }));
+      const ink = cssVar("--ink");
+      const tl = CY.total_label || C.total.label;
+      if (!C.hide_total) tr.push({ type: "scatter", mode: "markers+lines", name: tl, x, y: keep.map((i) => tot.values[i]),
+        line: { color: ink, width: 1 }, marker: { color: ink, size: 8, symbol: "diamond", line: { color: cssVar("--surface"), width: 1 } }, _light: "#36454F",
+        hovertemplate: `<b>${tl}: %{y:,.1f}${PC && !CY.total_label ? sfx : "%"}</b><extra></extra>` });
+      return { tr, x, partial: tot.partial };
+    }
 
     const visible = () => {
       const start = startDate(ind.last_obs, RANGES[state.range]);
@@ -1628,6 +1734,18 @@
     function drawAll() {
       rSeg.update(state.range);
       const legend = { orientation: "h", x: 0, y: 1.02, yanchor: "bottom", font: { color: cssVar("--ink") } };
+      if (state.yearly) {
+        const { tr, x, partial } = yearlyTraces();
+        hintEl.textContent = `Calendar years${CY.how === "sum" ? ": totals" : ""}. ${yearlyNote(CY.how, partial)}`;
+        hintEl.hidden = false;
+        Plotly.react(barEl, tr, baseLayout({
+          pct: pp, xaxis: { type: "category" },
+          extra: { barmode: C.style === "area" ? "stack" : "relative", bargap: 0.25, showlegend: true, legend, margin: { l: 56, r: 16, t: 40, b: 36 } },
+        }), PLOT_CONFIG);
+        table && table.refresh(x, tr.map((t) => ({ label: `${t.name} (${t.type === "bar" ? sfx.trim() : "%"})`, values: t.y })), pp, "Y");
+        return;
+      }
+      hintEl.hidden = true;
       Plotly.react(barEl, barTraces(), baseLayout({
         pct: pp, xaxis: { hoverformat: DF },
         extra: { barmode: "relative", bargap: 0.25, showlegend: true, legend, margin: { l: 56, r: 16, t: 40, b: 36 } },
@@ -1644,14 +1762,19 @@
       table && table.refresh(idx.map((i) => C.dates[i]), [
         ...(C.hide_total ? [] : [{ label: `${C.total.label} (${PC ? sfx.trim() : "y/y %"})`, values: idx.map((i) => C.total.values[i]) }]),
         ...C.groups.map((g) => ({ label: `${g.label} (${sfx.trim()})`, values: idx.map((i) => g.values[i]) })),
-      ], pp);
+      ], pp, ind.frequency);
     }
 
     const latestI = C.dates.length - 1;
-    const onPNG = () => exportPNG(ind, barTraces(), `${PC ? ind.units : `Contributions to year-over-year ${C.total.label} growth, percentage points`} · latest: ${fP(C.dates[latestI])}`,
+    const onPNG = () => state.yearly ? (() => { const yt = yearlyTraces(); return exportPNG(ind, yt.tr, `${ind.units} · yearly${yt.partial ? " · " + yearlyNote(CY.how, yt.partial) : ""}`, pp, `${ind.id}_yearly.png`, { barmode: C.style === "area" ? "stack" : "relative", xcategory: true }); })()
+      : exportPNG(ind, barTraces(), `${PC ? ind.units : `Contributions to year-over-year ${C.total.label} growth, percentage points`} · latest: ${fP(C.dates[latestI])}`,
       pp, `${ind.id}_contributions.png`, { barmode: "relative" });
     const onLinePNG = () => exportPNG({ ...ind, title: C.lines_title || "Components, year-over-year change" }, lineTraces(), `Percent change vs. same ${ind.frequency === "Q" ? "quarter" : "month"} a year earlier · constant 2004 prices`, pct, `${ind.id}_lines_yoy.png`);
     const onCSV = () => {
+      if (state.yearly) {
+        const yt = yearlyTraces();
+        return downloadBlob(toCSV(["year", ...yt.tr.map((t) => t.name)], yt.x.map((l, i) => [l, ...yt.tr.map((t) => (t.y[i] === null ? "" : +t.y[i].toFixed(4)))])), `${ind.id}_yearly.csv`, "text/csv");
+      }
       const header = ["date", `${C.total.label} y/y %`, ...C.groups.map((g) => `${g.label} contribution (pp)`), ...lineKeys.map((k) => `${C.lines[k].label} y/y %`)];
       const rows = C.dates.map((d, i) => [d, C.total.values[i], ...C.groups.map((g) => g.values[i]), ...lineKeys.map((k) => C.lines[k].values[i])]
         .map((v, j) => (j === 0 || v === null ? v : +v.toFixed(4))));
@@ -1662,8 +1785,8 @@
     const parts = C.groups.map((g) => `${g.label} ${fmtNum(g.values[latestI], pp)}`).join(" · ");
     appendAll(card, 
       h("p", { class: "hint" }, C.hide_total ? `${fP(C.dates[latestI])}: ${parts}` : `${fP(C.dates[latestI])}: ${C.total.label} ${fmtNum(C.total.values[latestI], PC ? pp : pct)}${yoyWord} — ${parts}`),
-      h("div", { class: "controls" }, h("span", { class: "spacer" }), rSeg),
-      barEl,
+      h("div", { class: "controls" }, ySeg, h("span", { class: "spacer" }), rSeg),
+      hintEl, barEl,
       lineKeys.length ? h("p", { class: "hint", style: "margin-top:14px" }, `${C.lines_title || "Components, year-over-year change"}. `,
         h("button", { class: "btn", type: "button", onclick: onLinePNG, style: "padding:1px 8px;font-size:12px" }, "PNG")) : null,
       lineKeys.length ? chipsEl : null, lineKeys.length ? lineEl : null);

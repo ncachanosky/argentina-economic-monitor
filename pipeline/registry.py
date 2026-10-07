@@ -69,6 +69,8 @@ class Indicator:
     caveat: str | None = None          # highlighted warning shown above the chart
     table: dict | None = None          # balance_sheet cards: {source, status_id, guide, valuation_notes}
     plain_level: bool = False          # levels only: no rebasing or presidency view (e.g. series that go negative)
+    yearly: dict | None = None         # monthly cards: a yearly view {how: december|sum, variants: [...]} (see app.js)
+    ref_line: float | None = None      # variants card: a dashed horizontal reference line (e.g. 100)
 
     def input_ids(self) -> list[str]:
         """Source series this indicator reads (its variants, or a derivation's inputs)."""
@@ -305,6 +307,8 @@ def load(path: Path = REGISTRY_PATH, releases_path: Path = RELEASES_PATH) -> Reg
                 caveat=" ".join(str(item["caveat"]).split()) if item.get("caveat") else None,
                 table=item.get("table"),
                 plain_level=bool(item.get("plain_level", False)),
+                yearly=item.get("yearly"),
+                ref_line=item.get("ref_line"),
                 view_start=str(item["view_start"]) + ("-01" if len(str(item["view_start"])) == 7 else "") if item.get("view_start") else None,
             )
         )

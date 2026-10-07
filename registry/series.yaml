@@ -2412,6 +2412,7 @@ indicators:
       not in the financial balance (see Interest on the Debt, Paid and
       Capitalized). Revenue includes BCRA profit transfers and, in some
       years, income from asset sales and debt operations.
+    yearly: {how: december}
     default: {variant: financial, transform: level, range: Max}
     headline: {variant: financial, transform: level}
     derive:
@@ -2457,6 +2458,7 @@ indicators:
     variants:
       primary:   {label: Primary balance,   id: 379.9_SUPERAVIT_017__23_94}
       financial: {label: Financial balance, id: 379.9_RESULTADO_017__18_38}
+    yearly: {how: sum}
     default: {variant: primary, transform: level, range: 5Y}
 
   - id: fiscal_revenue_spending
@@ -2480,6 +2482,7 @@ indicators:
       National non-financial public sector, cash basis. Tax revenue is the
       national share, after automatic transfers to the provinces
       (coparticipación).
+    yearly: {how: december}
     default: {variant: spending, transform: level, range: Max}
     derive:
       method: formula
@@ -2525,11 +2528,12 @@ indicators:
         - {key: provinces, label: Transfers to provinces,       add: [provinces], color: lavender}
         - {key: capital,   label: Capital spending,             add: [capital],   color: gold}
         - {key: other,     label: Other,                        add: [other],     color: neutral}
+    yearly: {how: december, suffix: _12m, total_label: "Real primary spending, change vs. previous year, %"}
     default: {variant: total, transform: level, range: 5Y}
     derive:
       method: formula
       anchor: tot
-      start: "2018-01-01"
+      start: "2017-12-01"
       vars:
         tot: 379.9_GTOS_PRIMA017__37_33
         pen: 379.9_GTOS_CORR_017__35_92
@@ -2547,6 +2551,14 @@ indicators:
         provinces: {label: Provinces,  expr: "100 * ((pcur + pcap) * lag(cpi, 12) / cpi - (lag(pcur, 12) + lag(pcap, 12))) / lag(tot, 12)"}
         capital:   {label: Capital,    expr: "100 * ((cap - pcap) * lag(cpi, 12) / cpi - (lag(cap, 12) - lag(pcap, 12))) / lag(tot, 12)"}
         other:     {label: Other,      expr: "100 * ((tot - pen - prv - wag - pcur - cap) * lag(cpi, 12) / cpi - (lag(tot, 12) - lag(pen, 12) - lag(prv, 12) - lag(wag, 12) - lag(pcur, 12) - lag(cap, 12))) / lag(tot, 12)"}
+        # Twelve-month versions (real sums of the last twelve months vs. the twelve before), for the yearly view.
+        total_12m:     {label: Total (12 months),     expr: "100 * (sum12((tot) / cpi) / lag(sum12((tot) / cpi), 12) - 1)"}
+        pensions_12m:  {label: Pensions (12 months),  expr: "100 * (sum12((pen) / cpi) - lag(sum12((pen) / cpi), 12)) / lag(sum12((tot) / cpi), 12)"}
+        private_12m:   {label: Households and firms (12 months), expr: "100 * (sum12((prv) / cpi) - lag(sum12((prv) / cpi), 12)) / lag(sum12((tot) / cpi), 12)"}
+        wages_12m:     {label: Wages (12 months),     expr: "100 * (sum12((wag) / cpi) - lag(sum12((wag) / cpi), 12)) / lag(sum12((tot) / cpi), 12)"}
+        provinces_12m: {label: Provinces (12 months), expr: "100 * (sum12((pcur + pcap) / cpi) - lag(sum12((pcur + pcap) / cpi), 12)) / lag(sum12((tot) / cpi), 12)"}
+        capital_12m:   {label: Capital (12 months),   expr: "100 * (sum12((cap - pcap) / cpi) - lag(sum12((cap - pcap) / cpi), 12)) / lag(sum12((tot) / cpi), 12)"}
+        other_12m:     {label: Other (12 months),     expr: "100 * (sum12((tot - pen - prv - wag - pcur - cap) / cpi) - lag(sum12((tot - pen - prv - wag - pcur - cap) / cpi), 12)) / lag(sum12((tot) / cpi), 12)"}
 
   - id: fiscal_subsidies
     topic: fiscal
@@ -2575,6 +2587,7 @@ indicators:
         - {key: energy,    label: Energy,    add: [energy],    color: gold}
         - {key: transport, label: Transport, add: [transport], color: sky}
         - {key: other,     label: Other,     add: [other],     color: neutral}
+    yearly: {how: december}
     default: {variant: energy, transform: level, range: Max}
     derive:
       method: formula
@@ -2634,6 +2647,7 @@ indicators:
       groups:
         - {key: cash,        label: Paid (in the budget),   add: [cash],        color: slate}
         - {key: capitalized, label: Capitalized interest (estimate), add: [capitalized], color: copper}
+    yearly: {how: december}
     default: {variant: cash, transform: level, range: Max}
     derive:
       method: formula
@@ -2889,6 +2903,8 @@ indicators:
       and dollar-linked instruments. Swaps count on both sides, pulling the
       ratio toward 100. Amortizations include the capitalized interest paid
       at maturity. Peso debt bought by public agencies counts as issuance.
+    yearly: {how: december, variants: [y12]}
+    ref_line: 100
     default: {variant: m3, transform: level, range: 5Y}
     derive:
       method: formula
@@ -2897,8 +2913,9 @@ indicators:
         iss: "fin:a4|peso_mkt_issued"
         amo: "fin:a4|peso_mkt_amortized"
       variants:
-        monthly: {label: Monthly,                expr: "100 * iss / amo", max: "1000 + 0 * amo"}
+        monthly: {label: Single month,           expr: "100 * iss / amo", max: "1000 + 0 * amo"}
         m3:      {label: Last three months,      expr: "100 * (iss + lag(iss, 1) + lag(iss, 2)) / (amo + lag(amo, 1) + lag(amo, 2))"}
+        y12:     {label: Last twelve months,     expr: "100 * sum12(iss) / sum12(amo)"}
 
   - id: placements_mix
     topic: fiscal
