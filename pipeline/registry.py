@@ -140,6 +140,9 @@ class Registry:
                                            "stale_days": inp.get("stale_days")})
             if m["measure"] == "flow":
                 m["measure"] = inp.get("measure", "index")
+            # An input entry's tolerances also apply when an indicator shows the same series.
+            m["allow_gaps"] = bool(m.get("allow_gaps")) or bool(inp.get("allow_gaps"))
+            m["stale_days"] = m.get("stale_days") or inp.get("stale_days")
         return out
 
     def next_release(self, ind: "Indicator", last_obs: str) -> dict | None:
