@@ -942,6 +942,133 @@
     return card;
   }
 
+  // ---------- card: BCRA balance sheet (one weekly balance, optionally compared with another) ----------
+  const ACRONYMS = ["BCRA", "IMF", "SDR", "SDRS", "USD", "LEBAC", "NOBAC", "LELIQ", "NOTALIQ", "A.L.A.D.I", "I.F.M.", "BIS", "BOPREAL", "Argentine", "Argentina", "Treasury"];
+  function niceLabel(s) {
+    const letters = s.replace(/[^A-Za-z]/g, "");
+    if (!letters || letters.replace(/[^A-Z]/g, "").length / letters.length < 0.8) return s;
+    const low = s.toLowerCase();
+    let out = low.charAt(0).toUpperCase() + low.slice(1);
+    for (const a of ACRONYMS) out = out.replace(new RegExp(`\\b${a.replace(/\./g, "\\.")}`, "gi"), a);
+    return out;
+  }
+
+  function balanceCard(ind) {
+    const T = ind.table;
+    const years = Object.keys(ind.years).sort();
+    const cache = new Map();
+    const load = (y) => {
+      if (!cache.has(y)) cache.set(y, getJSON(`${DATA}${T.path}${y}.json`));
+      return cache.get(y);
+    };
+    const lastYear = years[years.length - 1];
+    const state = { year: lastYear, date: ind.years[lastYear].slice(-1)[0], cyear: "", cdate: "", units: "ars" };
+    const card = cardFrame(ind, true);
+
+    const sel = (opts, value, label, onChange) => {
+      const el = h("select", { class: "select", "aria-label": label }, opts.map(([v, t]) => h("option", { value: v }, t)));
+      el.value = value; el.addEventListener("change", () => onChange(el.value)); return el;
+    };
+    const dateOpts = (y) => ind.years[y].slice().reverse().map((d) => [d, fmtDay(d)]);
+    const ySel = sel(years.slice().reverse().map((y) => [y, y]), state.year, "Year", (y) => { state.year = y; state.date = ind.years[y].slice(-1)[0]; dSel.replaceChildren(...dateOpts(y).map(([v, t]) => h("option", { value: v }, t))); dSel.value = state.date; render(); });
+    const dSel = sel(dateOpts(state.year), state.date, "Weekly balance", (d) => { state.date = d; render(); });
+    const cySel = sel([["", "None"], ...years.slice().reverse().map((y) => [y, y])], "", "Compare with: year", (y) => {
+      state.cyear = y; state.cdate = y ? ind.years[y].slice(-1)[0] : "";
+      cdSel.replaceChildren(...(y ? dateOpts(y) : []).map(([v, t]) => h("option", { value: v }, t))); cdSel.value = state.cdate; cdSel.hidden = !y; render();
+    });
+    const cdSel = sel([], "", "Compare with: weekly balance", (d) => { state.cdate = d; render(); });
+    cdSel.hidden = true;
+    const uSeg = segmented([["ars", "Pesos"], ["usd", "US dollars"], ["pct", "% of assets"]], state.units, (k) => { state.units = k; uSeg.update(k); render(); }, "Units");
+
+    const guide = h("details", { class: "bs-guide", open: true }, h("summary", {}, "How to read this balance sheet"),
+      h("ul", {}, (T.guide || []).map((g) => { const li = h("li"); li.innerHTML = g; return li; })));
+    const unitsNote = h("p", { class: "hint" });
+    const grid = h("div", { class: "bs-grid" });
+    const notesEl = h("div", { class: "bs-notes" });
+
+    const keyed = (t) => {
+      const seen = new Map();
+      return t.rows.map((r) => { const k = `${r.side}|${r.label.toLowerCase()}`; const n = (seen.get(k) || 0) + 1; seen.set(k, n); return `${k}|${n}`; });
+    };
+    const valuationAt = (d) => (T.valuation_notes || []).find((n) => d >= n.from && (!n.to || d <= n.to));
+    let view = null;   // for CSV
+
+    async function render() {
+      const t = await load(state.year);
+      const ct = state.cyear && state.cdate ? await load(state.cyear) : null;
+      const i = t.dates.indexOf(state.date), ci = ct ? ct.dates.indexOf(state.cdate) : -1;
+      const fx = t.fx ? t.fx[i] : null, cfx = ct && ct.fx ? ct.fx[ci] : null;
+      const totalOf = (tt, j) => {
+        const r = tt.rows.find((x) => x.kind === "total" && /^total assets/i.test(x.label) && x.values[j] !== null)
+          || tt.rows.find((x) => x.kind === "total" && /liabilities \+ net equity/i.test(x.label));
+        return r ? r.values[j] : null;
+      };
+      const tot = totalOf(t, i), ctot = ct ? totalOf(ct, ci) : null;
+      const conv = (v, rate, total) => {
+        if (v === null || v === undefined) return null;
+        if (state.units === "usd") return rate ? v / rate : null;           // millions of pesos / (pesos per dollar) = millions of dollars
+        if (state.units === "pct") return total ? (v / total) * 100 : null;
+        return v / 1000;                                                    // billions of pesos
+      };
+      const fmt = (v) => (v === null ? "–" : (v = +v.toFixed(state.units === "usd" ? 0 : 1), state.units === "pct") ? (v < 0 ? "−" : "") + Math.abs(v).toFixed(1) + "%"
+        : (v < 0 ? "−" : "") + Math.abs(v).toLocaleString("en-US", { maximumFractionDigits: state.units === "usd" ? 0 : 1, minimumFractionDigits: state.units === "usd" ? 0 : 1 }));
+      const fmtChg = (v) => (v === null ? "–" : (v = +v.toFixed(state.units === "usd" ? 0 : 1), v > 0 ? "+" : v < 0 ? "−" : "") + (state.units === "pct" ? Math.abs(v).toFixed(1) + " pp"
+        : Math.abs(v).toLocaleString("en-US", { maximumFractionDigits: state.units === "usd" ? 0 : 1, minimumFractionDigits: state.units === "usd" ? 0 : 1 })));
+      const cmap = new Map();
+      if (ct) { const ks = keyed(ct); ct.rows.forEach((r, j) => cmap.set(ks[j], r)); }
+      const ks = keyed(t);
+      const valLabel = (T.valuation_label || "").toLowerCase();
+      const csv = [];
+      const side = (code, title) => {
+        const head = [h("th", {}, title), h("th", {}, fmtDay(state.date))];
+        if (ct) head.push(h("th", {}, fmtDay(state.cdate)), h("th", {}, "Change"));
+        const body = t.rows.map((r, j) => {
+          if (r.side !== code) return null;
+          const a = r.values ? conv(r.values[i], fx, tot) : null;
+          const cr = ct ? cmap.get(ks[j]) : null;
+          const b = cr && cr.values ? conv(cr.values[ci], cfx, ctot) : null;
+          const mark = valLabel && r.label.toLowerCase().startsWith(valLabel) ? " †" : "";
+          const cls = r.kind === "total" ? "total" : r.kind === "less" ? "less" : r.level === 0 ? "main" : "";
+          const cells = [h("td", { class: "pres", style: `padding-left:${10 + r.level * 16}px` }, niceLabel(r.label) + mark),
+            h("td", {}, r.kind === "less" || r.kind === "header" ? "" : fmt(a))];
+          if (ct) cells.push(h("td", {}, r.kind === "less" || r.kind === "header" ? "" : fmt(b)), h("td", {}, r.kind === "less" || a === null || b === null ? "" : fmtChg(a - b)));
+          csv.push([code === "A" ? "Assets" : "Liabilities and net equity", niceLabel(r.label), a ?? "", ...(ct ? [b ?? "", a !== null && b !== null ? a - b : ""] : [])]);
+          return h("tr", { class: cls }, cells);
+        });
+        return h("div", { class: "bs-side" }, h("div", { class: "table-scroll" },
+          h("table", { class: "data bs" }, h("thead", {}, h("tr", {}, head)), h("tbody", {}, body))));
+      };
+      grid.replaceChildren(side("A", "Assets"), side("L", "Liabilities and net equity"));
+      const unitText = state.units === "usd" ? "Millions of US dollars, at each balance's exchange rate"
+        : state.units === "pct" ? "Percent of total assets on each date" : "Billions of pesos of each date";
+      const rateText = [fx ? `${fmtDay(state.date)}: ${fx.toLocaleString("en-US", { maximumFractionDigits: 2 })} pesos per dollar` : null,
+        ct && cfx ? `${fmtDay(state.cdate)}: ${cfx.toLocaleString("en-US", { maximumFractionDigits: 2 })}` : null].filter(Boolean).join("; ");
+      unitsNote.textContent = `${unitText}.${rateText ? " Exchange rate " + rateText + "." : ""}${ct ? " Lines are matched by name; a line renamed or regrouped between the two dates shows no change." : ""}`;
+      const vn = [valuationAt(state.date), ct ? valuationAt(state.cdate) : null];
+      const notes = [];
+      if (vn[0]) notes.push(h("p", { class: "chips-note" }, h("b", {}, `† On ${fmtDay(state.date)}: `), vn[0].text));
+      if (vn[1] && vn[1] !== vn[0]) notes.push(h("p", { class: "chips-note" }, h("b", {}, `† On ${fmtDay(state.cdate)}: `), vn[1].text));
+      const bcraNotes = [...new Set([...(t.notes || []), ...(ct && ct !== t ? ct.notes || [] : [])])];
+      if (bcraNotes.length) notes.push(h("details", { class: "table-view" }, h("summary", {}, "BCRA's notes to these balances"),
+        bcraNotes.map((n) => h("p", { class: "chips-note" }, n))));
+      notesEl.replaceChildren(...notes);
+      view = { header: ["side", "line", `${state.date} (${unitText})`, ...(ct ? [state.cdate, "change"] : [])], rows: csv };
+    }
+
+    const onCSV = () => { if (view) downloadBlob(toCSV(view.header, view.rows), `bcra_balance_${state.date}${state.cdate ? "_vs_" + state.cdate : ""}_${state.units}.csv`, "text/csv"); };
+    appendAll(card,
+      h("div", { class: "controls" }, h("label", { class: "base-pick" }, h("span", {}, "Balance:"), ySel, dSel),
+        h("label", { class: "base-pick" }, h("span", {}, "Compare with:"), cySel, cdSel), h("span", { class: "spacer" }), uSeg),
+      guide, unitsNote, grid, notesEl,
+      h("div", { class: "card-foot" },
+        h("span", {}, "Source: ", h("a", { href: "https://www.bcra.gob.ar/en/weekly-summary-balances-of-assets-and-liabilities/", target: "_blank", rel: "noopener" }, ind.source_label),
+          ` · Latest: ${fmtDay(ind.last_obs)}`),
+        h("div", { class: "actions" },
+          h("button", { class: "btn", type: "button", onclick: onCSV, title: "Download the balance sheet in this view as CSV" }, "CSV"))));
+    card.draw = () => render().catch((e) => { console.error(e); grid.replaceChildren(h("div", { class: "error-box" }, "The balance sheet could not be loaded.")); });
+    return card;
+  }
+
   // ---------- card: panel of components (EMAE by sector, UCII by block) ----------
   // Breaks the bar axis when one value dwarfs the rest (e.g. fishing +424%),
   // so the others stay readable. Returns the axis cap, or null if no break.
@@ -1415,6 +1542,7 @@
     const cards = h("div", { class: "cards" }, inds.map((ind) =>
       ind.kind === "panel" ? panelCard(ind)
         : ind.kind === "contributions" ? contributionsCard(ind)
+        : ind.kind === "balance_sheet" ? balanceCard(ind)
         : variantsCard(ind, !!ind.wide)));
     topicsEl2.replaceChildren(h("section", { class: "topic", id: `topic-${topic.id}` }, cards));
     $("#tiles").replaceChildren(...inds.filter((i) => i.headline).map((i) => tile(i)).filter(Boolean));

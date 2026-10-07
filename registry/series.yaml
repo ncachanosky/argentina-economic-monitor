@@ -1328,85 +1328,67 @@ indicators:
         bank_usd: {label: Banks' dollar deposits, expr: "100 * nz(bank_usd) / (absorb + base)"}
         other:    {label: Other,                  expr: "100 * (dep - nz(gov_dep) + nz(liq) + nz(misc)) / (absorb + base)"}
 
-  - id: bcra_backing
+  - id: bcra_balance_sheet
     topic: money
+    kind: balance_sheet
     wide: true
-    kind: variants
-    overlay: true
-    measure: rate
-    title: Reserve Backing of the Peso
-    short_title: Reserve backing
+    title: "BCRA Balance Sheet"
+    short_title: Balance sheet
     description: >-
-      Reserves as a percentage of base money, and of base money plus the
-      BCRA's notes: gross reserves since 1940, and net reserves (standard
-      market estimate) since 2003. Above 100%, reserves cover the liabilities
-      at the official exchange rate. Monthly.
-    source: derived
-    source_label: BCRA (Balance del Banco Central, series since 1940; weekly summary balance)
-    frequency: M
-    units: "% of liabilities"
-    transforms: [level, yoy]
-    ranges: [10Y, 25Y, 50Y, Max]
-    note: >-
-      Gross reserves are BCRA's "gold and foreign currency (net)" line, valued
-      at the official exchange rate: essentially gross reserves today, but net
-      of some foreign-currency liabilities in earlier decades (it was negative
-      in 1986-1988). Net reserves are the standard estimate in the Net
-      International Reserves chart, at the month's last weekly balance,
-      converted to pesos at the balance-sheet exchange rate; they are an
-      estimate with no official definition.
-    default: {variant: net_base, transform: level, range: 25Y}
-    derive:
-      method: formula
-      anchor: base
-      vars:
-        <<: *bal
-        net: "@net_reserves:standard"
-      variants:
-        net_base:  {label: Net reserves / base money,                   expr: "100 * net * fx * 1000 / base"}
-        base:      {label: Gross reserves / base money,                 expr: "100 * gold / base"}
-        net_broad: {label: Net reserves / (base money + BCRA notes),    expr: "100 * net * fx * 1000 / (base + nz(notes))"}
-        broad:     {label: Gross reserves / (base money + BCRA notes),  expr: "100 * gold / (base + nz(notes))"}
-
-  - id: bcra_implied_fx
-    topic: money
-    wide: true
-    kind: variants
-    overlay: true
-    log_level: true
-    title: Implied Exchange Rates
-    short_title: Implied exchange rate
-    description: >-
-      The exchange rate at which reserves would cover base money, or base
-      money plus the BCRA's notes, against the official rate: with gross
-      reserves since December 1989, and with net reserves (standard market
-      estimate) since 2003. Monthly.
-    source: derived
-    source_label: BCRA (Balance del Banco Central; weekly summary balance)
-    frequency: M
-    units: Pesos per US dollar
-    transforms: [level, yoy, mom]
-    ranges: [10Y, 25Y, Max]
-    note: >-
-      Implied rate = peso liabilities / reserves in dollars. Gross reserves
-      overstate what is available, so the gross-based rates are a floor. The
-      net-based rate is shown only while net reserves are positive and the
-      implied rate is at most ten times the official one: as net reserves
-      approach zero the implied rate explodes (and with negative net reserves
-      no exchange rate covers the liabilities). Net reserves are an estimate
-      with no official definition.
-    default: {variant: official, transform: level, range: 25Y}
-    derive:
-      method: formula
-      anchor: fx
-      vars:
-        <<: *bal
-        net: "@net_reserves:standard"
-      variants:
-        official: {label: Official rate,                         expr: "fx"}
-        net_base: {label: Implied by base money (net reserves),  expr: "base / (net * 1000)", positive_only: true, max: "10 * fx"}
-        base:     {label: Implied by base money (gross reserves), expr: "fx * base / gold"}
-        broad:    {label: Implied by base money plus BCRA notes (gross reserves), expr: "fx * (base + nz(notes)) / gold"}
+      The central bank's balance sheet as the BCRA publishes it each week:
+      assets on the left, liabilities and net equity on the right. Pick any
+      weekly balance since 2002 and compare it with another.
+    source: table
+    source_label: BCRA (weekly summary balance of assets and liabilities)
+    frequency: D
+    units: Millions of pesos
+    default: {}
+    table:
+      source: bcra_weekly
+      status_id: "bcrawk:gross"
+      guide:
+        - >-
+          <b>Both sides add up.</b> Assets equal liabilities plus net equity.
+          Main lines are in bold; indented lines break them down, and lines
+          under "Less:" are deducted from the line above.
+        - >-
+          <b>Money is a liability.</b> Base money (currency in circulation plus
+          banks' peso current accounts at the BCRA) is on the right-hand side,
+          next to the BCRA's other peso liabilities: its notes (LEBAC, LELIQ)
+          and repos, which pay interest.
+        - >-
+          <b>Not all reserves are the BCRA's.</b> International reserves on the
+          left are gross. Several liabilities on the right are matched by
+          dollars inside them: banks' current accounts in foreign currency
+          (reserve requirements on dollar deposits), repos with foreign banks,
+          obligations with international agencies, and the China swap (in
+          "Other liabilities" since December 2022, before that in the repo
+          lines). See Net International Reserves.
+        - >-
+          <b>Claims on the Treasury.</b> Government securities, the Treasury's
+          non-transferable bills (Letras Intransferibles) and temporary
+          advances are claims on the Treasury, received in exchange for
+          reserves or pesos. What they are worth depends on the Treasury's
+          ability to pay and on how the BCRA values them, which has changed
+          several times (see the note below the table).
+        - >-
+          <b>Net equity is a residual.</b> It moves with the peso value of
+          reserves (a devaluation raises it) and with the valuation of the
+          Treasury's bills, so it says little about the BCRA's economic
+          solvency; it was negative in 2019.
+        - >-
+          <b>Comparing dates.</b> Peso amounts are in pesos of each date. Over
+          long periods compare shares of total assets, or dollars at each
+          balance's exchange rate. Line names and grouping are the BCRA's own
+          for each year and change over time (the reserves block was
+          restated in 2010, the China swap reclassified in December 2022,
+          repos in May 2026); in a comparison, lines are matched by name.
+      valuation_label: Nontransferable
+      valuation_notes:
+        - {from: "2006-01-01", to: "2018-07-15", text: "Letras Intransferibles at technical value: face value plus accrued interest."}
+        - {from: "2018-07-23", to: "2019-12-23", text: "Letras Intransferibles at estimated present value (BCRA Board Resolution 209/18 of 5 July 2018, applied from the 2017 financial statements): cash flows discounted at the yields of comparable Argentine-law bonds. The switch cut their book value from about USD 49 bn to 37 bn; after the August 2019 primaries it fell to about USD 10 bn. During 2019 the BCRA also reported net equity with the bills at technical value."}
+        - {from: "2019-12-31", to: "2024-04-30", text: "Letras Intransferibles back at technical value (Law 27,541, art. 62; Board Resolution 2/2020), justified by the intent to hold them to maturity; the reversal added about $2.1 trillion pesos at the end of 2019."}
+        - {from: "2024-05-07", to: null, text: "Letras Intransferibles at amortized cost, capped at recoverable value (Board Resolution 128/24, recorded in the 2023 financial statements and in the weekly balance from 7 May 2024): their book value fell from about USD 69 bn to 18 bn. In April 2025 the Treasury repurchased bills with a face value of about USD 16.9 bn using IMF funds (Decree 179/25)."}
 
   - id: bcra_government
     topic: money

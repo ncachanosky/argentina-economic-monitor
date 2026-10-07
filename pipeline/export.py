@@ -168,6 +168,33 @@ def deflator_for(ind, reg, dates: pd.DatetimeIndex) -> dict | None:
             "label": spec.get("label", "CPI")}
 
 
+def export_table(ind, out: Path, status: dict) -> dict | None:
+    """Copy a full table (data/tables/<source>/*.json) next to the site data and write the card's payload."""
+    import shutil
+    from .update import TABLES_DIR
+    src = TABLES_DIR / ind.table["source"]
+    if not (src / "index.json").exists():
+        print(f"skip {ind.id}: no table yet")
+        return None
+    dst = out / "tables" / ind.table["source"]
+    dst.mkdir(parents=True, exist_ok=True)
+    for f in src.glob("*.json"):
+        shutil.copyfile(f, dst / f.name)
+    index = json.loads((src / "index.json").read_text(encoding="utf-8"))
+    last = max(d for ds in index["years"].values() for d in ds)
+    st = status.get(ind.table.get("status_id", ""), {})
+    payload = {
+        "id": ind.id, "topic": ind.topic, "kind": ind.kind, "title": ind.title, "short_title": ind.short_title,
+        "description": ind.description, "note": ind.note, "source_label": ind.source_label, "wide": True,
+        "frequency": ind.frequency, "units": ind.units, "table": {**ind.table, "path": f"tables/{ind.table['source']}/"},
+        "years": index["years"], "status": st.get("status", "ok"), "last_obs": last,
+        "last_checked": st.get("last_checked"), "last_changed": st.get("last_changed"),
+    }
+    (out / f"{ind.id}.json").write_text(json.dumps(payload, separators=(",", ":")), encoding="utf-8")
+    return {"id": ind.id, "topic": ind.topic, "kind": ind.kind, "title": ind.title, "short_title": ind.short_title,
+            "status": payload["status"], "last_obs": last, "headline": False}
+
+
 def export(out: Path) -> None:
     reg = registry.load()
     status = json.loads(STATUS_PATH.read_text(encoding="utf-8")) if STATUS_PATH.exists() else {}
@@ -177,6 +204,11 @@ def export(out: Path) -> None:
     manifest_inds = []
     for ind in reg.indicators:
         if ind.hidden:
+            continue
+        if ind.kind == "balance_sheet":
+            entry = export_table(ind, out, status)
+            if entry:
+                manifest_inds.append(entry)
             continue
         ids = [v.source_id for v in ind.variants.values()]
         derived_info = None

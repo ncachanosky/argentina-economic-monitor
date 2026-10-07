@@ -446,3 +446,14 @@ def test_stale_days_override():
     t = pd.Timestamp("2026-10-06")
     assert not validate.is_stale(pd.Timestamp("2026-09-23"), t, "D", stale_days=21)
     assert validate.is_stale(pd.Timestamp("2026-09-23"), t, "D")
+
+
+def test_weekly_balance_header_dates_are_repaired():
+    from pipeline.sources import bcra_weekly as w
+    T = pd.Timestamp
+    # 7th-of-month cells stored day-for-month, and August labeled as July (2003).
+    raw = [T("2003-07-01"), T("2003-01-15"), T("2003-07-07"), T("2003-07-31"), T("2003-07-08"), T("2003-07-15")]
+    assert w._fix_order(raw) == [T("2003-01-07"), T("2003-01-15"), T("2003-07-07"), T("2003-07-31"), T("2003-08-07"), T("2003-08-15")]
+    assert w._text_date("31/12/2019 (**)") == T("2019-12-31")
+    assert w._text_date("01/15/2002") == T("2002-01-15")
+    assert w._text_date("01/07/2002") == T("2002-01-07")

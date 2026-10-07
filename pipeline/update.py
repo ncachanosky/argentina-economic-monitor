@@ -22,6 +22,7 @@ from .registry import ROOT
 from .sources import get_adapter
 
 STATUS_PATH = ROOT / "data" / "status.json"
+TABLES_DIR = ROOT / "data" / "tables"
 
 
 def _load_status() -> dict:
@@ -47,6 +48,11 @@ def run(dry_run: bool = False, strict: bool = False) -> int:
         adapter = get_adapter(source)
         try:
             res = adapter.fetch(ids)
+            # Sources that also feed a full table (the BCRA balance sheet) write it here.
+            if not dry_run and hasattr(adapter, "write_tables"):
+                changed_tables = adapter.write_tables(TABLES_DIR / source)
+                if changed_tables:
+                    lines.append(f"- table `{source}`: {len(changed_tables)} file(s) updated")
         except Exception as exc:  # whole source down
             res = None
             source_error = str(exc)

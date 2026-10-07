@@ -249,3 +249,18 @@ details.table-view { display: none; }
 .breakdown tr.total td { border-top: 2px solid var(--ink-3); }
 .breakdown table.data td:first-child { white-space: normal; min-width: 14em; }
 .breakdown .table-scroll { max-height: none; }
+
+/* BCRA balance sheet table */
+.bs-guide { font-family: var(--font-ui); font-size: 13px; color: var(--ink-2); background: var(--surface-2); border: 1px solid var(--rule); border-radius: 6px; padding: 8px 12px; margin: 8px 0; }
+.bs-guide summary { cursor: pointer; font-weight: 600; color: var(--ink); }
+.bs-guide ul { margin: 6px 0 2px; padding-left: 18px; }
+.bs-guide li { margin: 4px 0; }
+.bs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; align-items: start; }
+@media (max-width: 900px) { .bs-grid { grid-template-columns: 1fr; } }
+.bs-side .table-scroll { max-height: none; }
+table.data.bs td:first-child { white-space: normal; min-width: 13em; }
+table.data.bs tr.main td { font-weight: 600; }
+table.data.bs tr.total td { font-weight: 700; border-top: 2px solid var(--ink-3); }
+table.data.bs tr.less td { font-style: italic; color: var(--ink-3); }
+.bs-notes { margin-top: 8px; }
+@media (max-width: 600px) { table.data.bs td:first-child { min-width: 9em; } }

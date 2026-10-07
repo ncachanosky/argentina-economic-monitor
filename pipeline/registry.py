@@ -10,7 +10,7 @@ ROOT = Path(__file__).resolve().parents[1]
 REGISTRY_PATH = ROOT / "registry" / "series.yaml"
 RELEASES_PATH = ROOT / "registry" / "releases.yaml"
 
-KINDS = {"variants", "panel", "contributions"}
+KINDS = {"variants", "panel", "contributions", "balance_sheet"}
 DERIVE_METHODS = {"splice", "reweight", "ratio", "tracker", "monthly", "flows", "expectations", "formula", "net_reserves"}
 RANGE_KEYS = {"2Y", "5Y", "10Y", "25Y", "50Y", "Max"}
 TRANSFORMS = {"level", "yoy", "mom", "ytd", "acc", "share"}
@@ -66,6 +66,7 @@ class Indicator:
     validate_as: str | None = None     # measure used to check source data, if not `measure` (e.g. rates above 100%)
     deflate_with: dict | None = None   # {indicator, variant}: offer a real-terms view deflated by this price index
     caveat: str | None = None          # highlighted warning shown above the chart
+    table: dict | None = None          # balance_sheet cards: {source, status_id, guide, valuation_notes}
     plain_level: bool = False          # levels only: no rebasing or presidency view (e.g. series that go negative)
 
     def input_ids(self) -> list[str]:
@@ -123,7 +124,7 @@ class Registry:
         """
         out: dict[str, dict] = {}
         for ind in self.indicators:
-            if ind.source == "derived":
+            if ind.source in ("derived", "table"):
                 continue
             vm = ind.validate_as or ind.measure
             for v in ind.variants.values():
@@ -216,13 +217,17 @@ def load(path: Path = REGISTRY_PATH, releases_path: Path = RELEASES_PATH) -> Reg
             if not v.get("id") or not v.get("label"):
                 raise RegistryError(f"{where}: variant '{key}' needs id and label")
             variants[key] = Variant(key=key, label=v["label"], source_id=str(v["id"]))
-        if not variants:
+        if item["kind"] == "balance_sheet":
+            # A full table written by a source adapter (data/tables/<source>), no series.
+            if not (item.get("table") or {}).get("source"):
+                raise RegistryError(f"{where}: a balance_sheet needs table.source")
+        elif not variants:
             raise RegistryError(f"{where}: no variants")
 
         default = item.get("default") or {}
         dvar = default.get("variant")
         dvars = dvar if isinstance(dvar, list) else [dvar]
-        if any(d not in variants for d in dvars):
+        if item["kind"] != "balance_sheet" and any(d not in variants for d in dvars):
             raise RegistryError(f"{where}: default variant {dvar!r} not defined")
         if default.get("transform", "level") not in TRANSFORMS:
             raise RegistryError(f"{where}: unknown default transform")
@@ -294,6 +299,7 @@ def load(path: Path = REGISTRY_PATH, releases_path: Path = RELEASES_PATH) -> Reg
                 validate_as=item.get("validate_as"),
                 deflate_with=item.get("deflate_with"),
                 caveat=" ".join(str(item["caveat"]).split()) if item.get("caveat") else None,
+                table=item.get("table"),
                 plain_level=bool(item.get("plain_level", False)),
                 view_start=str(item["view_start"]) + ("-01" if len(str(item["view_start"])) == 7 else "") if item.get("view_start") else None,
             )
