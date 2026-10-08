@@ -274,6 +274,40 @@ inputs:
   - {id: "ust:52w", source: ustreasury, frequency: D, measure: flow, allow_gaps: true, label: "US Treasury 52-week bill, coupon-equivalent yield, %"}
   - {id: "fin:col|tea_fixed_m", source: finanzas, frequency: M, measure: flow, allow_gaps: true, label: "Average yield (TEA, %) of the month's fixed-rate capitalizing placements"}
   - {id: "fin:col|breakeven", source: finanzas, frequency: M, measure: flow, allow_gaps: true, label: "Breakeven devaluation implied by auctions (fixed-rate vs dollar-linked), annual %"}
+  # International trade (INDEC, Intercambio Comercial Argentino, via datos.gob.ar), millions of US dollars.
+  - {id: 74.3_IET_0_M_16, source: datos_gob, frequency: M, measure: flow, label: "Exports of goods, total (FOB)"}
+  - {id: 74.3_IIT_0_M_25, source: datos_gob, frequency: M, measure: flow, label: "Imports of goods, total (CIF)"}
+  - {id: 74.3_ISC_0_M_19, source: datos_gob, frequency: M, measure: flow, label: "Trade balance"}
+  - {id: 74.3_IEPP_0_M_35, source: datos_gob, frequency: M, measure: flow, label: "Exports: primary products"}
+  - {id: 74.3_IEMOA_0_M_48, source: datos_gob, frequency: M, measure: flow, label: "Exports: manufactures of agricultural origin"}
+  - {id: 74.3_IEMOI_0_M_46, source: datos_gob, frequency: M, measure: flow, label: "Exports: manufactures of industrial origin"}
+  - {id: 74.3_IECE_0_M_35, source: datos_gob, frequency: M, measure: flow, label: "Exports: fuels and energy"}
+  - {id: 74.3_IIBCA_0_M_32, source: datos_gob, frequency: M, measure: flow, label: "Imports: capital goods"}
+  - {id: 74.3_IIBI_0_M_36, source: datos_gob, frequency: M, measure: flow, label: "Imports: intermediate goods"}
+  - {id: 74.3_IICL_0_M_42, source: datos_gob, frequency: M, measure: flow, label: "Imports: fuels and lubricants"}
+  - {id: 74.3_IIPABC_0_M_50, source: datos_gob, frequency: M, measure: flow, label: "Imports: parts and accessories for capital goods"}
+  - {id: 74.3_IIBCO_0_M_32, source: datos_gob, frequency: M, measure: flow, label: "Imports: consumer goods"}
+  - {id: 74.3_IIVAP_0_M_49, source: datos_gob, frequency: M, measure: flow, label: "Imports: passenger vehicles"}
+  - {id: 74.3_IIR_0_M_23, source: datos_gob, frequency: M, measure: flow, label: "Imports: other"}
+  - {id: 77.3_IET_0_A_25, source: datos_gob, frequency: M, measure: flow, label: "Exports by destination: total"}
+  - {id: 77.3_IEB_0_A_24, source: datos_gob, frequency: M, measure: flow, label: "Exports to Brazil"}
+  - {id: 77.3_IETM_0_A_32, source: datos_gob, frequency: M, measure: flow, label: "Exports to Mercosur"}
+  - {id: 77.3_IEC_0_A_23, source: datos_gob, frequency: M, measure: flow, label: "Exports to China"}
+  - {id: 77.3_IEEU_0_A_32, source: datos_gob, frequency: M, measure: flow, label: "Exports to the United States"}
+  # datos.gob.ar labels these two "Resto de UE-28", but they are the EU totals (they match INDEC's 2024 figures: exports 8,239, imports 8,986).
+  - {id: 77.3_IERU_0_A_29_20, source: datos_gob, frequency: M, measure: flow, label: "Exports to the European Union"}
+  - {id: 78.3_IIRU_0_A_23_52, source: datos_gob, frequency: M, measure: flow, label: "Imports from the European Union"}
+  - {id: 78.3_IIT_0_A_25, source: datos_gob, frequency: M, measure: flow, label: "Imports by origin: total"}
+  - {id: 78.3_IIB_0_A_24, source: datos_gob, frequency: M, measure: flow, label: "Imports from Brazil"}
+  - {id: 78.3_IITM_0_A_32, source: datos_gob, frequency: M, measure: flow, label: "Imports from Mercosur"}
+  - {id: 78.3_IIC_0_A_23, source: datos_gob, frequency: M, measure: flow, label: "Imports from China"}
+  - {id: 78.3_IIM_0_A_22_15, source: datos_gob, frequency: M, measure: flow, label: "Imports from the United States"}
+  - {id: 80.2_IIPENG_0_T_45, source: datos_gob, frequency: Q, measure: index, label: "Export price index (2004 = 100)"}
+  - {id: 80.2_IICENG_0_T_47, source: datos_gob, frequency: Q, measure: index, label: "Export quantity index (2004 = 100)"}
+  - {id: 81.2_IIPING_0_T_45, source: datos_gob, frequency: Q, measure: index, label: "Import price index (2004 = 100)"}
+  - {id: 81.2_IICING_0_T_47, source: datos_gob, frequency: Q, measure: index, label: "Import quantity index (2004 = 100)"}
+  - {id: 183.1_COBROS_EXPNES_0_M_27, source: datos_gob, frequency: M, measure: flow, label: "Balance cambiario: export receipts (goods)"}
+  - {id: 183.1_PAGOS_IMPONES_0_M_26, source: datos_gob, frequency: M, measure: flow, label: "Balance cambiario: import payments (goods)"}
   # Finance Secretariat, central administration gross debt (monthly bulletin), millions of US dollars.
   - {id: "fin:a3|pesos_other", source: finanzas, frequency: M, measure: index, label: "Debt in pesos, not CER-linked"}
   - {id: "fin:a3|pesos_cer", source: finanzas, frequency: M, measure: index, label: "Debt in pesos, CER-linked"}
@@ -380,6 +414,17 @@ topics:
     description: >-
       Quarterly GDP at constant 2004 prices, and its growth by expenditure
       component and by industry.
+  - id: trade
+    slug: international-trade
+    group: Activity
+    title: International Trade
+    description: >-
+      Exports and imports of goods: the trade balance since 1910, what
+      Argentina sells and buys, the energy balance, prices against volumes,
+      the terms of trade, trading partners, and goods shipped against the
+      dollars settled in the foreign-exchange market. From INDEC and the
+      BCRA.
+
   - id: prices
     slug: prices
     # Earlier page names, kept as redirects so shared links keep working.
@@ -2455,6 +2500,534 @@ indicators:
       variants:
         personal:  {label: Personal loans minus deposits, expr: "personal - dep"}
         overdraft: {label: Overdrafts minus deposits,     expr: "overdraft - dep"}
+
+  # ---------------- International trade ----------------
+  - id: trade_balance
+    topic: trade
+    wide: true
+    kind: contributions
+    measure: flow
+    title: Exports, Imports and the Trade Balance
+    short_title: Trade balance
+    description: >-
+      Exports and imports of goods each month (imports shown below zero) and
+      the trade balance, millions of US dollars, since 1992.
+    source: derived
+    source_label: INDEC (Intercambio Comercial Argentino), via datos.gob.ar
+    frequency: M
+    units: Millions of US dollars
+    ranges: [2Y, 5Y, 10Y, Max]
+    note: >-
+      Exports FOB, imports CIF (including freight and insurance), as INDEC
+      records them at customs. Trade is very seasonal (the harvest ships in
+      the second quarter), so compare a month with the same month a year
+      earlier, or use the yearly view (calendar-year totals; the current
+      year is partial).
+    contributions:
+      precomputed: true
+      total: balance
+      total_label: Trade balance
+      units: "US$ m"
+      suffix: " m"
+      groups:
+        - {key: exports, label: Exports, add: [exports], color: copper}
+        - {key: imports, label: Imports (negative), add: [imports], color: sky}
+    yearly: {how: sum}
+    default: {variant: exports, transform: level, range: 10Y}
+    derive:
+      method: formula
+      anchor: x
+      vars: {x: 74.3_IET_0_M_16, m: 74.3_IIT_0_M_25, b: 74.3_ISC_0_M_19}
+      variants:
+        exports: {label: Exports,  expr: "x"}
+        imports: {label: Imports,  expr: "-m"}
+        balance: {label: Balance,  expr: "b"}
+
+  - id: trade_long
+    topic: trade
+    wide: true
+    kind: variants
+    overlay: true
+    log_level: true
+    plain_level: true
+    title: Trade since 1910
+    short_title: Trade since 1910
+    description: >-
+      Exports and imports of goods by year since 1910, millions of current
+      US dollars, on a log scale.
+    source: datos_gob
+    source_label: INDEC, via datos.gob.ar
+    frequency: Y
+    units: Millions of US dollars
+    transforms: [level]
+    ranges: [25Y, 50Y, Max]
+    note: >-
+      Current dollars: the long-run rise includes US inflation. On a log
+      scale equal distances are equal percentage changes, so the gap between
+      the lines is the ratio of exports to imports. The last year shown is
+      the last complete one INDEC has added to this series.
+    variants:
+      exports: {label: Exports, id: 74.1_IET_0_A_16}
+      imports: {label: Imports, id: 74.1_IIT_0_A_25}
+    default: {variant: exports, transform: level, range: Max}
+
+  - id: trade_exports_type
+    topic: trade
+    wide: true
+    kind: contributions
+    measure: flow
+    title: What Argentina Exports
+    short_title: Exports by type
+    description: >-
+      Exports of goods by INDEC's four broad types, millions of US dollars,
+      monthly since 1992.
+    source: derived
+    source_label: INDEC (Intercambio Comercial Argentino), via datos.gob.ar
+    frequency: M
+    units: Millions of US dollars
+    ranges: [2Y, 5Y, 10Y, Max]
+    note: >-
+      Primary products: grains, oilseeds, fresh fruit, fish, minerals and
+      the like. Manufactures of agricultural origin (MOA): soybean meal and
+      oil, meat, dairy, wine and other processed farm products. Manufactures
+      of industrial origin (MOI): vehicles, chemicals, metals, machinery,
+      gold and other industrial goods. Fuels and energy: crude oil, gas,
+      fuels and electricity.
+    contributions:
+      precomputed: true
+      total: total
+      total_label: Total exports
+      units: "US$ m"
+      suffix: " m"
+      groups:
+        - {key: pp,  label: Primary products, add: [pp],  color: sage}
+        - {key: moa, label: Agricultural manufactures (MOA), add: [moa], color: gold}
+        - {key: moi, label: Industrial manufactures (MOI), add: [moi], color: sky}
+        - {key: cye, label: Fuels and energy, add: [cye], color: copper}
+    yearly: {how: sum}
+    default: {variant: pp, transform: level, range: 10Y}
+    derive:
+      method: formula
+      anchor: x
+      vars: {x: 74.3_IET_0_M_16, pp: 74.3_IEPP_0_M_35, moa: 74.3_IEMOA_0_M_48, moi: 74.3_IEMOI_0_M_46, cye: 74.3_IECE_0_M_35}
+      variants:
+        pp:    {label: Primary products, expr: "pp"}
+        moa:   {label: MOA,              expr: "moa"}
+        moi:   {label: MOI,              expr: "moi"}
+        cye:   {label: Fuels and energy, expr: "cye"}
+        total: {label: Total,            expr: "x"}
+
+  - id: trade_exports_growth
+    topic: trade
+    wide: true
+    kind: contributions
+    measure: flow
+    title: What Drives Export Growth
+    short_title: Export growth
+    description: >-
+      Change in exports over the last twelve months against the twelve
+      before, and the contribution of each type, in percentage points.
+    source: derived
+    source_label: INDEC (Intercambio Comercial Argentino), via datos.gob.ar
+    frequency: M
+    units: Percentage points
+    ranges: [5Y, 10Y, Max]
+    note: >-
+      Twelve-month sums remove the seasonality of monthly trade. Contribution
+      of a type: the change in its twelve-month exports over total exports
+      in the previous twelve months, so the bars add up to the change in the
+      total. In US dollars, so it mixes prices and volumes (see Prices
+      against Volumes below).
+    contributions:
+      precomputed: true
+      total: total
+      total_label: "Exports, last 12 months, change %"
+      units: pp
+      groups:
+        - {key: pp,  label: Primary products, add: [pp],  color: sage}
+        - {key: moa, label: Agricultural manufactures (MOA), add: [moa], color: gold}
+        - {key: moi, label: Industrial manufactures (MOI), add: [moi], color: sky}
+        - {key: cye, label: Fuels and energy, add: [cye], color: copper}
+    default: {variant: total, transform: level, range: 10Y}
+    derive:
+      method: formula
+      anchor: x
+      vars: {x: 74.3_IET_0_M_16, pp: 74.3_IEPP_0_M_35, moa: 74.3_IEMOA_0_M_48, moi: 74.3_IEMOI_0_M_46, cye: 74.3_IECE_0_M_35}
+      variants:
+        total: {label: Total, expr: "100 * (sum12(x) / lag(sum12(x), 12) - 1)"}
+        pp:    {label: Primary products, expr: "100 * (sum12(pp) - lag(sum12(pp), 12)) / lag(sum12(x), 12)"}
+        moa:   {label: MOA,              expr: "100 * (sum12(moa) - lag(sum12(moa), 12)) / lag(sum12(x), 12)"}
+        moi:   {label: MOI,              expr: "100 * (sum12(moi) - lag(sum12(moi), 12)) / lag(sum12(x), 12)"}
+        cye:   {label: Fuels and energy, expr: "100 * (sum12(cye) - lag(sum12(cye), 12)) / lag(sum12(x), 12)"}
+
+  - id: trade_imports_use
+    topic: trade
+    wide: true
+    kind: contributions
+    measure: flow
+    title: What Argentina Imports
+    short_title: Imports by use
+    description: >-
+      Imports of goods by economic use, millions of US dollars, monthly since
+      1992.
+    source: derived
+    source_label: INDEC (Intercambio Comercial Argentino), via datos.gob.ar
+    frequency: M
+    units: Millions of US dollars
+    ranges: [2Y, 5Y, 10Y, Max]
+    note: >-
+      Capital goods and their parts and accessories move with investment;
+      intermediate goods (inputs for production, the largest group) with
+      activity; fuels with the energy balance and the weather; consumer
+      goods and cars with household demand and with import restrictions.
+    contributions:
+      precomputed: true
+      total: total
+      total_label: Total imports
+      units: "US$ m"
+      suffix: " m"
+      groups:
+        - {key: bk,  label: Capital goods,          add: [bk],  color: copper}
+        - {key: pz,  label: Parts for capital goods, add: [pz], color: gold}
+        - {key: bi,  label: Intermediate goods,     add: [bi],  color: sky}
+        - {key: cl,  label: Fuels and lubricants,   add: [cl],  color: slate}
+        - {key: bc,  label: Consumer goods,         add: [bc],  color: sage}
+        - {key: va,  label: Passenger vehicles,     add: [va],  color: lavender}
+        - {key: re,  label: Other,                  add: [re],  color: neutral}
+    yearly: {how: sum}
+    default: {variant: bk, transform: level, range: 10Y}
+    derive:
+      method: formula
+      anchor: m
+      vars: {m: 74.3_IIT_0_M_25, bk: 74.3_IIBCA_0_M_32, pz: 74.3_IIPABC_0_M_50, bi: 74.3_IIBI_0_M_36, cl: 74.3_IICL_0_M_42, bc: 74.3_IIBCO_0_M_32, va: 74.3_IIVAP_0_M_49, re: 74.3_IIR_0_M_23}
+      variants:
+        bk: {label: Capital goods, expr: "bk"}
+        pz: {label: Parts, expr: "pz"}
+        bi: {label: Intermediate goods, expr: "bi"}
+        cl: {label: Fuels, expr: "cl"}
+        bc: {label: Consumer goods, expr: "bc"}
+        va: {label: Vehicles, expr: "va"}
+        re: {label: Other, expr: "re"}
+        total: {label: Total, expr: "m"}
+
+  - id: trade_imports_growth
+    topic: trade
+    wide: true
+    kind: contributions
+    measure: flow
+    title: What Drives Import Growth
+    short_title: Import growth
+    description: >-
+      Change in imports over the last twelve months against the twelve
+      before, and the contribution of each use, in percentage points.
+    source: derived
+    source_label: INDEC (Intercambio Comercial Argentino), via datos.gob.ar
+    frequency: M
+    units: Percentage points
+    ranges: [5Y, 10Y, Max]
+    note: >-
+      Twelve-month sums, as for exports. Contribution of a use: the change
+      in its twelve-month imports over total imports in the previous twelve
+      months. Capital goods include their parts and accessories here.
+    contributions:
+      precomputed: true
+      total: total
+      total_label: "Imports, last 12 months, change %"
+      units: pp
+      groups:
+        - {key: bk,  label: Capital goods and parts, add: [bk], color: copper}
+        - {key: bi,  label: Intermediate goods,     add: [bi],  color: sky}
+        - {key: cl,  label: Fuels and lubricants,   add: [cl],  color: slate}
+        - {key: bc,  label: Consumer goods and vehicles, add: [bc], color: sage}
+        - {key: re,  label: Other,                  add: [re],  color: neutral}
+    default: {variant: total, transform: level, range: 10Y}
+    derive:
+      method: formula
+      anchor: m
+      vars: {m: 74.3_IIT_0_M_25, bk: 74.3_IIBCA_0_M_32, pz: 74.3_IIPABC_0_M_50, bi: 74.3_IIBI_0_M_36, cl: 74.3_IICL_0_M_42, bc: 74.3_IIBCO_0_M_32, va: 74.3_IIVAP_0_M_49, re: 74.3_IIR_0_M_23}
+      variants:
+        total: {label: Total, expr: "100 * (sum12(m) / lag(sum12(m), 12) - 1)"}
+        bk:    {label: Capital goods and parts, expr: "100 * (sum12(bk + pz) - lag(sum12(bk + pz), 12)) / lag(sum12(m), 12)"}
+        bi:    {label: Intermediate goods, expr: "100 * (sum12(bi) - lag(sum12(bi), 12)) / lag(sum12(m), 12)"}
+        cl:    {label: Fuels, expr: "100 * (sum12(cl) - lag(sum12(cl), 12)) / lag(sum12(m), 12)"}
+        bc:    {label: Consumer goods and vehicles, expr: "100 * (sum12(bc + va) - lag(sum12(bc + va), 12)) / lag(sum12(m), 12)"}
+        re:    {label: Other, expr: "100 * (sum12(re) - lag(sum12(re), 12)) / lag(sum12(m), 12)"}
+
+  - id: trade_energy
+    topic: trade
+    wide: true
+    kind: contributions
+    measure: flow
+    title: Energy Trade Balance
+    short_title: Energy balance
+    description: >-
+      Exports of fuels and energy, imports of fuels and lubricants (below
+      zero) and the balance between them, millions of US dollars, monthly
+      since 1992.
+    source: derived
+    source_label: INDEC (Intercambio Comercial Argentino), via datos.gob.ar
+    frequency: M
+    units: Millions of US dollars
+    ranges: [5Y, 10Y, Max]
+    note: >-
+      Energy imports peak in the southern winter, when gas and fuel demand
+      for heating and power generation outruns local supply; use the yearly
+      view for the trend. INDEC's export and import categories are not an
+      exact match (exports include electricity and some petrochemicals), so
+      the balance is a close approximation.
+    contributions:
+      precomputed: true
+      total: balance
+      total_label: Energy balance
+      units: "US$ m"
+      suffix: " m"
+      groups:
+        - {key: exports, label: Fuel and energy exports, add: [exports], color: copper}
+        - {key: imports, label: Fuel imports (negative), add: [imports], color: slate}
+    yearly: {how: sum}
+    default: {variant: exports, transform: level, range: Max}
+    derive:
+      method: formula
+      anchor: e
+      vars: {e: 74.3_IECE_0_M_35, f: 74.3_IICL_0_M_42}
+      variants:
+        exports: {label: Exports, expr: "e"}
+        imports: {label: Imports, expr: "-f"}
+        balance: {label: Balance, expr: "e - f"}
+
+  - id: trade_prices_exports
+    topic: trade
+    kind: contributions
+    measure: flow
+    title: "Exports: Prices against Volumes"
+    short_title: Export prices and volumes
+    description: >-
+      Change in the dollar value of exports from the same quarter a year
+      earlier, split into prices and quantities, percentage points.
+    source: derived
+    source_label: INDEC (índices de precios y cantidades), via datos.gob.ar
+    frequency: Q
+    units: Percentage points
+    ranges: [5Y, 10Y, Max]
+    note: >-
+      Value = price × quantity, so with p and q the y/y changes in prices
+      and quantities, value grows (1 + p)(1 + q) − 1. The split is
+      symmetric: prices contribute p(2 + q)/2 and quantities q(2 + p)/2,
+      which add up exactly to the change in value.
+    method_links: [{anchor: trade-prices, label: "How value is split into prices and volumes"}]
+    contributions:
+      precomputed: true
+      total: total
+      total_label: "Export value, y/y %"
+      units: pp
+      groups:
+        - {key: price, label: Prices,     add: [price], color: gold}
+        - {key: qty,   label: Quantities, add: [qty],   color: sage}
+    default: {variant: total, transform: level, range: 10Y}
+    derive:
+      method: formula
+      anchor: p
+      vars: {p: 80.2_IIPENG_0_T_45, q: 80.2_IICENG_0_T_47}
+      variants:
+        total: {label: Value, expr: "100 * (p * q / (lag(p, 4) * lag(q, 4)) - 1)"}
+        price: {label: Prices, expr: "100 * (p / lag(p, 4) - 1) * (1 + q / lag(q, 4)) / 2"}
+        qty:   {label: Quantities, expr: "100 * (q / lag(q, 4) - 1) * (1 + p / lag(p, 4)) / 2"}
+
+  - id: trade_prices_imports
+    topic: trade
+    kind: contributions
+    measure: flow
+    title: "Imports: Prices against Volumes"
+    short_title: Import prices and volumes
+    description: >-
+      Change in the dollar value of imports from the same quarter a year
+      earlier, split into prices and quantities, percentage points.
+    source: derived
+    source_label: INDEC (índices de precios y cantidades), via datos.gob.ar
+    frequency: Q
+    units: Percentage points
+    ranges: [5Y, 10Y, Max]
+    note: >-
+      The same split as for exports. Import volumes follow activity and
+      investment closely; import prices follow world prices of fuels,
+      inputs and manufactures.
+    method_links: [{anchor: trade-prices, label: "How value is split into prices and volumes"}]
+    contributions:
+      precomputed: true
+      total: total
+      total_label: "Import value, y/y %"
+      units: pp
+      groups:
+        - {key: price, label: Prices,     add: [price], color: gold}
+        - {key: qty,   label: Quantities, add: [qty],   color: sky}
+    default: {variant: total, transform: level, range: 10Y}
+    derive:
+      method: formula
+      anchor: p
+      vars: {p: 81.2_IIPING_0_T_45, q: 81.2_IICING_0_T_47}
+      variants:
+        total: {label: Value, expr: "100 * (p * q / (lag(p, 4) * lag(q, 4)) - 1)"}
+        price: {label: Prices, expr: "100 * (p / lag(p, 4) - 1) * (1 + q / lag(q, 4)) / 2"}
+        qty:   {label: Quantities, expr: "100 * (q / lag(q, 4) - 1) * (1 + p / lag(p, 4)) / 2"}
+
+  - id: trade_terms
+    topic: trade
+    wide: true
+    kind: variants
+    title: Terms of Trade
+    short_title: Terms of trade
+    description: >-
+      The price of Argentina's exports relative to the price of its imports,
+      and the two price indices, quarterly since 1990 (2004 = 100).
+    source: datos_gob
+    source_label: INDEC, via datos.gob.ar
+    frequency: Q
+    units: Index, 2004 = 100
+    index_base: "2004"
+    transforms: [level, yoy]
+    ranges: [10Y, 25Y, Max]
+    note: >-
+      Terms of trade: the export price index over the import price index,
+      times 100. A rise means a given volume of exports pays for more
+      imports. Prices in US dollars.
+    variants:
+      terms:   {label: Terms of trade,  id: 82.2_ITI_2004_T_27}
+      exports: {label: Export prices,   id: 82.2_IPE_2004_T_26}
+      imports: {label: Import prices,   id: 82.2_IPI_2004_T_26}
+    default: {variant: terms, transform: level, range: Max}
+
+  - id: trade_partners_exports
+    topic: trade
+    wide: true
+    kind: contributions
+    measure: flow
+    title: Where Exports Go
+    short_title: Export destinations
+    description: >-
+      Exports of goods by destination, millions of US dollars, monthly since
+      1990.
+    source: derived
+    source_label: INDEC (exports by country), via datos.gob.ar
+    frequency: M
+    units: Millions of US dollars
+    ranges: [2Y, 5Y, 10Y, Max]
+    note: >-
+      Rest of Mercosur: the bloc's other members as INDEC groups them
+      (Paraguay and Uruguay above all). European Union: the series
+      datos.gob.ar labels "rest of the EU-28", which matches INDEC's
+      published EU totals.
+    contributions:
+      precomputed: true
+      total: total
+      total_label: Total exports
+      units: "US$ m"
+      suffix: " m"
+      groups:
+        - {key: brazil, label: Brazil,           add: [brazil], color: sage}
+        - {key: merco,  label: Rest of Mercosur, add: [merco],  color: teal}
+        - {key: china,  label: China,            add: [china],  color: rose}
+        - {key: us,     label: United States,    add: [us],     color: sky}
+        - {key: eu,     label: European Union,   add: [eu],     color: lavender}
+        - {key: rest,   label: Rest of the world, add: [rest],  color: neutral}
+    yearly: {how: sum}
+    default: {variant: brazil, transform: level, range: 10Y}
+    derive:
+      method: formula
+      anchor: t
+      vars: {t: 77.3_IET_0_A_25, br: 77.3_IEB_0_A_24, me: 77.3_IETM_0_A_32, cn: 77.3_IEC_0_A_23, us: 77.3_IEEU_0_A_32, eu: 77.3_IERU_0_A_29_20}
+      variants:
+        brazil: {label: Brazil, expr: "br"}
+        merco:  {label: Rest of Mercosur, expr: "me - br"}
+        china:  {label: China, expr: "cn"}
+        us:     {label: United States, expr: "us"}
+        eu:     {label: European Union, expr: "eu"}
+        rest:   {label: Rest of the world, expr: "t - me - cn - us - eu"}
+        total:  {label: Total, expr: "t"}
+
+  - id: trade_partners_imports
+    topic: trade
+    wide: true
+    kind: contributions
+    measure: flow
+    title: Where Imports Come From
+    short_title: Import origins
+    description: >-
+      Imports of goods by origin, millions of US dollars, monthly since 1990.
+    source: derived
+    source_label: INDEC (imports by country), via datos.gob.ar
+    frequency: M
+    units: Millions of US dollars
+    ranges: [2Y, 5Y, 10Y, Max]
+    note: >-
+      Imports CIF. Rest of Mercosur and the European Union as for exports.
+    contributions:
+      precomputed: true
+      total: total
+      total_label: Total imports
+      units: "US$ m"
+      suffix: " m"
+      groups:
+        - {key: brazil, label: Brazil,           add: [brazil], color: sage}
+        - {key: merco,  label: Rest of Mercosur, add: [merco],  color: teal}
+        - {key: china,  label: China,            add: [china],  color: rose}
+        - {key: us,     label: United States,    add: [us],     color: sky}
+        - {key: eu,     label: European Union,   add: [eu],     color: lavender}
+        - {key: rest,   label: Rest of the world, add: [rest],  color: neutral}
+    yearly: {how: sum}
+    default: {variant: brazil, transform: level, range: 10Y}
+    derive:
+      method: formula
+      anchor: t
+      vars: {t: 78.3_IIT_0_A_25, br: 78.3_IIB_0_A_24, me: 78.3_IITM_0_A_32, cn: 78.3_IIC_0_A_23, us: 78.3_IIM_0_A_22_15, eu: 78.3_IIRU_0_A_23_52}
+      variants:
+        brazil: {label: Brazil, expr: "br"}
+        merco:  {label: Rest of Mercosur, expr: "me - br"}
+        china:  {label: China, expr: "cn"}
+        us:     {label: United States, expr: "us"}
+        eu:     {label: European Union, expr: "eu"}
+        rest:   {label: Rest of the world, expr: "t - me - cn - us - eu"}
+        total:  {label: Total, expr: "t"}
+
+  - id: trade_settlement
+    topic: trade
+    wide: true
+    kind: variants
+    overlay: true
+    measure: flow
+    plain_level: true
+    title: Goods Shipped against Dollars Settled
+    short_title: Shipped vs. settled
+    description: >-
+      Exports and imports as recorded at customs, against the export
+      receipts and import payments that went through the foreign-exchange
+      market, twelve-month sums, millions of US dollars, since 2004.
+    source: derived
+    source_label: INDEC (customs), via datos.gob.ar; BCRA (balance cambiario)
+    frequency: M
+    units: Millions of US dollars, last 12 months
+    transforms: [level]
+    ranges: [5Y, 10Y, Max]
+    note: >-
+      Customs records goods when they ship; the foreign-exchange market
+      records the dollars when they change hands, which can be months
+      earlier (prefinancing, advance payments) or later (supplier credit,
+      deferred payment). Receipts above shipments mean exporters are
+      settling ahead or bringing in financing; payments below imports mean
+      importers are running up commercial debt abroad, as when access to
+      the market is rationed. Receipts also include prefinancing and other
+      items INDEC does not count as exports.
+    method_links: [{anchor: balance-cambiario, label: "About the balance cambiario"}]
+    default: {variant: x, transform: level, range: 10Y}
+    derive:
+      method: formula
+      anchor: xc
+      start: "2003-12-01"
+      vars: {xc: 74.3_IET_0_M_16, mc: 74.3_IIT_0_M_25, xr: 183.1_COBROS_EXPNES_0_M_27, mp: 183.1_PAGOS_IMPONES_0_M_26}
+      variants:
+        x:  {label: Exports (customs),         expr: "sum12(xc)"}
+        xr: {label: Export receipts (FX market), expr: "sum12(xr)"}
+        m:  {label: Imports (customs),         expr: "sum12(mc)"}
+        mp: {label: Import payments (FX market), expr: "sum12(mp)"}
 
   # ---------------- Fiscal & Debt ----------------
   # Fiscal flows: national non-financial public sector, cash basis (IMIG,

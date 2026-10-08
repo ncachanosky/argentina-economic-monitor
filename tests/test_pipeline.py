@@ -590,3 +590,12 @@ def test_futures_rows_and_curve_table():
     t = a3.curve_table(df, spot=pd.Series([1550.0], index=pd.to_datetime(["2026-10-01"])), hi=hi)
     assert t["latest"] == "2026-10-01" and [c["date"] for c in t["curves"]] == ["2026-10-01", "2026-09-01", "2026-07-01"]
     assert t["spot"]["value"] == 1550.0 and t["band"]["ceiling"]["monthly_pace"] > 0
+
+
+def test_annual_series_validation():
+    idx = pd.to_datetime(["2022-01-01", "2023-01-01", "2024-01-01"])
+    assert validate.check_series(pd.Series([1.0, 2.0, 3.0], index=idx), pd.Series(dtype=float), "Y", "flow").ok
+    gap = pd.Series([1.0, 3.0], index=pd.to_datetime(["2022-01-01", "2024-01-01"]))
+    assert not validate.check_series(gap, pd.Series(dtype=float), "Y", "flow").ok
+    assert not validate.is_stale(pd.Timestamp("2025-01-01"), pd.Timestamp("2026-10-08"), "Y")
+    assert validate.is_stale(pd.Timestamp("2023-01-01"), pd.Timestamp("2026-10-08"), "Y")

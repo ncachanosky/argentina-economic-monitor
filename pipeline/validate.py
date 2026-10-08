@@ -36,6 +36,12 @@ def check_series(new: pd.Series, old: pd.Series, frequency: str = "M", measure: 
         return c
     if new.index.has_duplicates:
         c.errors.append("duplicate dates")
+    if frequency == "Y":
+        if not ((new.index.day == 1) & (new.index.month == 1)).all():
+            c.errors.append("annual dates not on 1 January")
+        missing = sorted(set(range(new.index.min().year, new.index.max().year + 1)) - set(new.index.year))
+        if missing:
+            (c.warnings if allow_gaps else c.errors).append(f"{len(missing)} missing year(s), first {missing[0]}")
     if frequency in ("M", "Q"):
         if not (new.index.day == 1).all():
             c.errors.append("dates not on period start")
@@ -104,4 +110,6 @@ def is_stale(last_obs: pd.Timestamp, today: pd.Timestamp, frequency: str = "M", 
         return months > STALE_MONTHS
     if frequency == "Q":  # quarter start dates; GDP lags ~2.5 months after quarter end
         return months > 9
+    if frequency == "Y":  # 1 January of the year; published during the following year
+        return months > 30
     return False

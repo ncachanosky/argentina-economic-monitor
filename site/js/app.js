@@ -71,7 +71,7 @@
   // Period label: "Jul 2026" for monthly data, "Q3 2026" for quarterly.
   const fmtDay = (iso) => new Date(iso + "T00:00:00Z").toLocaleDateString("en-US", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" });
   const fmtPeriod = (iso, freq) => {
-    if (freq === "Y") return iso;
+    if (freq === "Y") return iso.length > 4 ? iso.slice(0, 4) : iso;
     if (freq === "D") return fmtDay(iso);
     if (freq !== "Q") return fmtShortMonth(iso);
     const [y, m] = iso.split("-").map(Number);
@@ -84,6 +84,8 @@
     return s.signed ? (v > 0 ? "+" : "") + v.toFixed(1) + s.suffix
       : v.toLocaleString("en-US", { maximumFractionDigits: 1, minimumFractionDigits: 1 }) + s.suffix;
   };
+  // Category axis of years: label every k-th year when there are many, unrotated.
+  const yearAxis = (n) => ({ type: "category", tickangle: 0, ...(n > 16 ? { tickmode: "linear", tick0: 0, dtick: Math.ceil(n / 12) } : {}) });
   const monthIndex = (iso) => { const [y, m] = iso.split("-").map(Number); return y * 12 + (m - 1); };
 
   async function getJSON(path) {
@@ -255,7 +257,7 @@
       shapes: (extras.shapes || []).map((sh) => ({ ...sh, ...(sh._lightFill ? { fillcolor: sh._lightFill } : {}), line: { ...(sh.line || {}), color: (sh.line && sh.line._light) || light.ink3 } })),
       annotations: [
         ...(extras.annotations || []).map((a) => ({ ...a, font: { ...(a.font || {}), size: 15, color: light.ink2 } })),
-        { text: `Source: ${ind.source_label}. Latest observation: ${ind.frequency === "Q" ? fmtPeriod(ind.last_obs, "Q") : fmtMonth(ind.last_obs)}.${ind.source_units ? ` Source data in ${ind.source_units}.` : ""}`, xref: "paper", yref: "paper", x: 0, y: -0.13, xanchor: "left", yanchor: "top", showarrow: false, font: { size: 15, color: light.ink3 } },
+        { text: `Source: ${ind.source_label}. Latest observation: ${ind.frequency === "Q" ? fmtPeriod(ind.last_obs, "Q") : ind.frequency === "Y" ? ind.last_obs.slice(0, 4) : fmtMonth(ind.last_obs)}.${ind.source_units ? ` Source data in ${ind.source_units}.` : ""}`, xref: "paper", yref: "paper", x: 0, y: -0.13, xanchor: "left", yanchor: "top", showarrow: false, font: { size: 15, color: light.ink3 } },
         { text: "<b>Argentina Economic Monitor</b> · Economic Order", xref: "paper", yref: "paper", x: 1, y: -0.13, xanchor: "right", yanchor: "top", showarrow: false, font: { size: 15, color: "#B87333" } },
       ],
       bargap: 0.25,
@@ -597,7 +599,7 @@
     const variantKeys = Object.keys(ind.variants);
     const T = tfs(ind);
     const isRate = ind.measure === "rate";
-    const DF = ind.frequency === "Q" ? "Q%q %Y" : ind.frequency === "D" ? "%d %b %Y" : "%b %Y";   // hover date format
+    const DF = ind.frequency === "Q" ? "Q%q %Y" : ind.frequency === "D" ? "%d %b %Y" : ind.frequency === "Y" ? "%Y" : "%b %Y";   // hover date format
     const fP = (iso) => fmtPeriod(iso, ind.frequency);
     const state = {
       variant: ind.default.variant,
@@ -908,7 +910,7 @@
       hint.textContent = msgs.join(" ");
       statsEl.hidden = true;
       Plotly.react(chartEl, traces, baseLayout({
-        pct: t, xaxis: { type: "category" },
+        pct: t, xaxis: yearAxis(labels.length),
         extra: { bargap: 0.25, barmode: "group", shapes, showlegend: traces.length > 1,
           legend: { orientation: "h", x: 0, y: 1.02, yanchor: "bottom", font: { color: cssVar("--ink") } }, margin: { l: 52, r: 16, t: 10, b: 36 } },
       }), PLOT_CONFIG);
@@ -1880,7 +1882,7 @@
         hintEl.textContent = `Calendar years${CY.how === "sum" ? ": totals" : ""}. ${yearlyNote(CY.how, partial)}`;
         hintEl.hidden = false;
         Plotly.react(barEl, tr, baseLayout({
-          pct: pp, xaxis: { type: "category" },
+          pct: pp, xaxis: yearAxis(x.length),
           extra: { barmode: C.style === "area" ? "stack" : "relative", bargap: 0.25, showlegend: true, legend, margin: { l: 56, r: 16, t: 40, b: 36 } },
         }), PLOT_CONFIG);
         table && table.refresh(x, tr.map((t) => ({ label: `${t.name} (${t.type === "bar" ? sfx.trim() : "%"})`, values: t.y })), pp, "Y");

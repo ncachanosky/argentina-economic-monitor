@@ -16,6 +16,7 @@
   <a href="#banks">Banks</a>
   <a href="#fiscal">Fiscal & Debt</a>
   <a href="#fx">Exchange Rate</a>
+  <a href="#trade">International Trade</a>
   <a href="#references">References</a>
 </nav>
 
@@ -179,6 +180,13 @@
 <p><b>BCRA purchases.</b> The BCRA's daily series of the change in international reserves from its purchases and sales of foreign currency, summed by month. Treasury purchases in the market (block trades) and the BCRA's positions in dollar futures are not published as series and are not included.</p>
 <p id="balance-cambiario"><b>Balance cambiario.</b> The BCRA's monthly record of foreign-exchange transactions between authorized entities and their clients, by concept, in millions of US dollars: a cash view of the balance of payments (dollars that change hands in the market in a given month, which can differ from when goods are shipped or services provided). We group it into goods; services; income (interest, profits, dividends and transfers); purchases of banknotes and foreign currency with no specific purpose ("dollars for holding", the formation of external assets of individuals and firms); the IMF and other official lenders; and the rest of the capital and financial accounts. The groups add up to the change in international reserves from these transactions; each run checks that identity and stops if the workbook's layout changes.</p>
 
+<h2 id="trade">International Trade</h2>
+<p><b>Source.</b> INDEC's monthly Intercambio Comercial Argentino (customs records of goods; exports FOB, imports CIF), its exports and imports by country, and its quarterly indices of prices and quantities of exports and imports (2004 = 100), all through datos.gob.ar. The annual series since 1910 is INDEC's historical series of exports and imports in current US dollars. Services are not included.</p>
+<p><b>Seasonality.</b> Monthly trade follows the harvest (soybeans, corn and wheat ship mostly in the second and third quarters) and the winter demand for imported energy, so the charts use twelve-month sums or calendar-year totals for trends. Growth contributions compare the last twelve months with the twelve before: the contribution of a component is the change in its twelve-month sum over the previous twelve-month total, so they add up to the change in the total.</p>
+<p id="trade-prices"><b>Prices against volumes.</b> INDEC's value index equals its price index times its quantity index (divided by 100). With <i>p</i> and <i>q</i> the year-over-year changes in prices and quantities, value grows (1 + <i>p</i>)(1 + <i>q</i>) − 1 = <i>p</i> + <i>q</i> + <i>pq</i>. The interaction term <i>pq</i> is split equally between the two, so prices contribute <i>p</i>(2 + <i>q</i>)/2 and quantities <i>q</i>(2 + <i>p</i>)/2; the split does not depend on which comes first. The terms of trade are INDEC's: the export price index over the import price index, times 100.</p>
+<p><b>Trading partners.</b> Rest of Mercosur is INDEC's Mercosur total minus Brazil; rest of the world is total trade minus Mercosur, China, the United States and the European Union. On datos.gob.ar the series labeled "total EU-28" is far too small to be the bloc's total, and the series labeled "rest of the EU-28" matches INDEC's published EU totals (2024: exports US$8,239 million, imports US$8,986 million), so the site uses the latter.</p>
+<p><b>Goods shipped against dollars settled.</b> Customs exports and imports against the BCRA's records of export receipts and import payments for goods in the foreign-exchange market (balance cambiario), each as twelve-month sums. The two measure different things: customs records when goods cross the border; the foreign-exchange market records when dollars change hands, including prefinancing and advance payments before shipment and deferred payments after it. Their gap is a rough measure of trade credit, which swings with exchange controls and with expectations of devaluation.</p>
+
 <h2 id="references">References</h2>
 <ul class="refs">
   <li>INDEC. <i>Índice de precios al consumidor. Cobertura nacional. Metodología</i> (2019). <a href="https://www.indec.gob.ar/ftp/cuadros/economia/metodologia_ipc_nacional_2019.pdf">PDF</a>; English version (2017): <a href="https://www.indec.gob.ar/ftp/cuadros/economia/metodologia_ingles_ipc_nacional_05_17.pdf">PDF</a>.</li>
@@ -196,6 +204,7 @@
   <li>Secretaría de Hacienda. <i>Información Mensual de Ingresos y Gastos</i> (national non-financial public sector, cash basis).</li>
   <li>BCRA. <i>Informe de Evolución del Mercado de Cambios y Balance Cambiario</i>, statistical annex; <i>Relevamiento de Expectativas de Mercado</i> (REM). <a href="https://www.bcra.gob.ar/informe-de-la-evolucion-del-mercado-de-cambios-y-balance-cambiario/">bcra.gob.ar</a>.</li>
   <li>ArgentinaDatos (<a href="https://argentinadatos.com/">argentinadatos.com</a>) and DolarAPI (<a href="https://dolarapi.com/">dolarapi.com</a>): market exchange-rate quotes (unofficial).</li>
+  <li>INDEC. <i>Intercambio comercial argentino</i> (monthly report) and <i>Índices de precios y cantidades del comercio exterior</i>. <a href="https://www.indec.gob.ar/">indec.gob.ar</a>.</li>
   <li>A3 Mercados. Dollar futures (DLR), daily closing prices, market-data service (unofficial). <a href="https://www.a3mercados.com.ar/">a3mercados.com.ar</a>.</li>
   <li>U.S. Department of the Treasury. Daily Treasury Bill Rates. <a href="https://home.treasury.gov/resource-center/data-chart-center/interest-rates">treasury.gov</a>.</li>
   <li>Datos Argentina. Time-series API. <a href="https://datos.gob.ar/">datos.gob.ar</a>.</li>
