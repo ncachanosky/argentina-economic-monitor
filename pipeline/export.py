@@ -202,6 +202,7 @@ def export_table(ind, out: Path, status: dict) -> dict | None:
         "id": ind.id, "topic": ind.topic, "kind": ind.kind, "title": ind.title, "short_title": ind.short_title,
         "description": ind.description, "note": ind.note, "source_label": ind.source_label, "wide": True,
         "frequency": ind.frequency, "units": ind.units, "table": {**ind.table, "path": f"tables/{ind.table['source']}/"},
+        "method_links": ind.method_links,
         "years": index.get("years"), "groups": index.get("groups"), "group_labels": index.get("group_labels"),
         "status": st.get("status", "ok"), "last_obs": last,
         "last_checked": st.get("last_checked"), "last_changed": st.get("last_changed"),

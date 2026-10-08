@@ -205,6 +205,7 @@ a:hover { color: var(--accent-ink); }
 details.table-view { margin-top: 8px; font-family: var(--font-ui); font-size: 13px; }
 details.table-view summary { cursor: pointer; color: var(--ink-2); }
 .table-scroll { max-height: 280px; overflow: auto; margin-top: 6px; border: 1px solid var(--rule); border-radius: 6px; }
+.table-scroll.flat { max-height: none; }
 table.data { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; }
 table.data th, table.data td { padding: 4px 10px; text-align: right; border-bottom: 1px solid var(--grid); white-space: nowrap; }
 table.data th:first-child, table.data td:first-child { text-align: left; }

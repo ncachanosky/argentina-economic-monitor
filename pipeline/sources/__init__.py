@@ -65,6 +65,10 @@ def get_adapter(name: str):
         from . import ustreasury
 
         return ustreasury
+    if name == "a3":
+        from . import a3
+
+        return a3
     if name == "manual":
         from . import manual
 

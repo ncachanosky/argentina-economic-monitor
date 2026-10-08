@@ -1333,6 +1333,87 @@
     return card;
   }
 
+  // ---------- card: dollar futures curve ----------
+  function curveCard(ind) {
+    const T = ind.table;
+    const card = cardFrame(ind, true);
+    let data = null, view = null;
+    const chartEl = h("div", { class: "chart tall-ish", role: "img", "aria-label": "Dollar futures curve" });
+    const hint = h("p", { class: "hint" });
+    const sumEl = h("div", { class: "table-scroll flat" });
+    const fmt = (v, d = 0) => (v === null || v === undefined || isNaN(v) ? "–" : Number(v).toLocaleString("en-US", { minimumFractionDigits: d, maximumFractionDigits: d }));
+    const pct = (v) => (v === null || v === undefined || isNaN(v) ? "–" : `${v >= 0 ? "" : "−"}${Math.abs(v).toFixed(1)}%`);
+    const NAMES = ["Today", "A month ago", "Three months ago"];
+    const DASH = ["solid", "dash", "dot"];
+
+    function traces() {
+      const ink = cssVar("--ink"), ink3 = cssVar("--ink-3");
+      const tr = data.curves.map((c, i) => ({
+        type: "scatter", mode: "lines+markers", name: `${NAMES[i] || c.date} (${fmtDay(c.date)})`,
+        x: c.contracts.map((k) => k.expiry), y: c.contracts.map((k) => k.settlement),
+        line: { color: cssVar(SERIES_VARS[0]), width: i ? 1.8 : 2.8, dash: DASH[i] }, marker: { size: i ? 4 : 6, color: cssVar(SERIES_VARS[0]) },
+        _slot: 0, opacity: i ? 0.75 : 1,
+        hovertemplate: `${NAMES[i] || c.date}: <b>%{y:,.2f}</b><extra></extra>`,
+      }));
+      const B = data.band || {};
+      [["ceiling", "Band ceiling, projected"]].forEach(([k, label]) => {
+        if (!B[k]) return;
+        tr.push({ type: "scatter", mode: "lines", name: label, x: [B[k].date, ...B[k].projected.map((p) => p.expiry)], y: [B[k].value, ...B[k].projected.map((p) => p.value)],
+          line: { color: ink3, width: 1.5, dash: "dash" }, _light: "#85909A", hovertemplate: `${label}: <b>%{y:,.0f}</b><extra></extra>` });
+      });
+      if (data.spot) tr.push({ type: "scatter", mode: "markers", name: `Official rate (${fmtDay(data.spot.date)})`, x: [data.spot.date], y: [data.spot.value],
+        marker: { color: ink, size: 10, symbol: "diamond", line: { color: cssVar("--surface"), width: 1 } }, _light: "#36454F",
+        hovertemplate: `Official rate: <b>%{y:,.2f}</b><extra></extra>` });
+      return tr;
+    }
+
+    function draw() {
+      if (!data) return;
+      const legend = { orientation: "h", x: 0, y: 1.02, yanchor: "bottom", font: { color: cssVar("--ink") } };
+      Plotly.react(chartEl, traces(), baseLayout({
+        yaxis: { tickformat: ",.0f" }, xaxis: { hoverformat: "%b %Y" },
+        extra: { showlegend: true, legend, hovermode: "closest", margin: { l: 64, r: 16, t: 60, b: 40 } },
+      }), PLOT_CONFIG);
+      const C = data.curves[0], spot = data.spot ? data.spot.value : null, t0 = new Date(C.date);
+      const ceil = {}; ((data.band || {}).ceiling ? data.band.ceiling.projected : []).forEach((p) => { ceil[p.expiry] = p.value; });
+      const rows = C.contracts.map((k) => {
+        const days = (new Date(k.expiry) - t0) / 864e5;
+        const dev = spot ? 100 * (k.settlement / spot - 1) : null;
+        const ann = spot && days > 20 ? 100 * (Math.pow(k.settlement / spot, 365 / days) - 1) : null;
+        return { k, days, dev, ann, room: ceil[k.expiry] ? 100 * (ceil[k.expiry] / k.settlement - 1) : null };
+      });
+      sumEl.replaceChildren(h("table", { class: "data sched" },
+        h("thead", {}, h("tr", {}, h("th", {}, "Contract (expiry)"), h("th", {}, "Price"), h("th", {}, "vs official rate"), h("th", {}, "Annualized"),
+          h("th", {}, "Projected ceiling above price"), h("th", {}, "Open interest, US$ m"))),
+        h("tbody", {}, rows.map((r) => h("tr", {}, h("td", { class: "pres" }, fmtShortMonth(r.k.expiry)), h("td", {}, fmt(r.k.settlement, 2)),
+          h("td", {}, pct(r.dev)), h("td", {}, pct(r.ann)), h("td", {}, pct(r.room)), h("td", {}, fmt(r.k.oi / 1000)))))));
+      const last = rows[rows.length - 1];
+      hint.textContent = `Settlement prices on ${fmtDay(C.date)}` + (spot ? `; official wholesale rate ${fmt(spot, 2)}.` : ".") +
+        (last && last.dev !== null ? ` The longest contract (${fmtShortMonth(last.k.expiry)}) prices a ${pct(last.dev)} rise in the official rate (${pct(last.ann)} a year).` : "") +
+        ((data.band || {}).ceiling ? ` The grey dashed line extends the band's ceiling at the pace of its last three months (${(100 * data.band.ceiling.monthly_pace).toFixed(2)}% a month): an illustration, not an announced path.` : "");
+      view = { header: ["curve_date", "symbol", "expiry", "settlement", "open_interest_contracts"],
+        rows: data.curves.flatMap((c) => c.contracts.map((k) => [c.date, k.symbol, k.expiry, k.settlement, k.oi])) };
+    }
+    const onPNG = () => exportPNG(ind, traces(), `Settlement prices, pesos per US dollar, ${fmtDay(data.curves[0].date)}`, { suffix: "", signed: false },
+      `${ind.id}.png`, {});
+    const onCSV = () => { if (view) downloadBlob(toCSV(view.header, view.rows), `${ind.id}.csv`, "text/csv"); };
+    appendAll(card, hint, chartEl, sumEl,
+      ind.note ? h("p", { class: "chips-note" }, ind.note) : null, methodLine(ind),
+      h("div", { class: "card-foot" },
+        h("span", {}, "Source: ", T.source_url ? h("a", { href: T.source_url, target: "_blank", rel: "noopener" }, ind.source_label) : ind.source_label,
+          ` · Latest: ${ind.last_obs ? fmtDay(ind.last_obs) : "–"}`),
+        h("div", { class: "actions" },
+          h("button", { class: "btn", type: "button", onclick: onPNG, title: "Download this chart as a 1200×800 PNG" }, "PNG"),
+          h("button", { class: "btn", type: "button", onclick: onCSV, title: "Download the curves as CSV" }, "CSV"))));
+    card.draw = async () => {
+      if (!data) {
+        try { data = await getJSON(`${DATA}${T.path}${T.file}`); } catch (e) { console.error(e); chartEl.replaceChildren(h("div", { class: "error-box" }, "The futures curve could not be loaded.")); return; }
+      }
+      draw();
+    };
+    return card;
+  }
+
   // ---------- card: Treasury placements, auction by auction ----------
   function placementsCard(ind) {
     const T = ind.table;
@@ -1921,6 +2002,7 @@
         : ind.kind === "top10" ? top10Card(ind)
         : ind.kind === "schedule" ? scheduleCard(ind)
         : ind.kind === "placements" ? placementsCard(ind)
+        : ind.kind === "curve" ? curveCard(ind)
         : variantsCard(ind, !!ind.wide)));
     topicsEl2.replaceChildren(h("section", { class: "topic", id: `topic-${topic.id}` }, cards));
     $("#tiles").replaceChildren(...inds.filter((i) => i.headline).map((i) => tile(i)).filter(Boolean));

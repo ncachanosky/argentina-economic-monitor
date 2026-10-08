@@ -267,6 +267,10 @@ inputs:
   - {id: "dolar:tarjeta", source: dolar, frequency: D, measure: index, allow_gaps: true, stale_days: 7, label: "Card (tarjeta) dollar"}
   - {id: "dolar:cripto", source: dolar, frequency: D, measure: index, allow_gaps: true, stale_days: 7, label: "Crypto dollar (stablecoins)"}
   - {id: "rem:fx12", source: rem, frequency: M, measure: index, allow_gaps: true, label: "REM: median expected official exchange rate, twelve months ahead"}
+  # Dollar futures (A3 Mercados, formerly MATba-Rofex; the exchange's market-data API, not an official statistic).
+  - {id: "a3:f12", source: a3, frequency: D, measure: index, allow_gaps: true, stale_days: 7, label: "Dollar futures: price twelve months ahead (interpolated), pesos per US dollar"}
+  - {id: "a3:f6", source: a3, frequency: D, measure: index, allow_gaps: true, stale_days: 7, label: "Dollar futures: price six months ahead (interpolated), pesos per US dollar"}
+  - {id: "a3:oi", source: a3, frequency: D, measure: index, allow_gaps: true, stale_days: 7, label: "Dollar futures: open interest, all contracts, millions of US dollars"}
   - {id: "ust:52w", source: ustreasury, frequency: D, measure: flow, allow_gaps: true, label: "US Treasury 52-week bill, coupon-equivalent yield, %"}
   - {id: "fin:col|tea_fixed_m", source: finanzas, frequency: M, measure: flow, allow_gaps: true, label: "Average yield (TEA, %) of the month's fixed-rate capitalizing placements"}
   - {id: "fin:col|breakeven", source: finanzas, frequency: M, measure: flow, allow_gaps: true, label: "Breakeven devaluation implied by auctions (fixed-rate vs dollar-linked), annual %"}
@@ -3500,12 +3504,12 @@ indicators:
     title: Expected and Actual Devaluation
     short_title: Expected devaluation
     description: >-
-      Three estimates of the depreciation of the official rate expected over
+      Four estimates of the depreciation of the official rate expected over
       the next twelve months, against what then happened: the BCRA's survey
-      of analysts, the devaluation priced in Treasury auctions, and interest
-      parity. Annual %, monthly.
+      of analysts, the devaluation priced in Treasury auctions, interest
+      parity and dollar futures. Annual %, monthly.
     source: derived
-    source_label: BCRA (REM, exchange rate); Secretaría de Finanzas (placements); US Treasury
+    source_label: BCRA (REM, exchange rate); Secretaría de Finanzas (placements); US Treasury; A3 Mercados (futures)
     frequency: M
     units: "% over 12 months"
     transforms: [level]
@@ -3519,18 +3523,113 @@ indicators:
       parity: the month's average yield on fixed-rate Treasury letters (TEA)
       over the US Treasury 52-week bill yield; it includes any risk premium,
       so it overstates expected devaluation when holding pesos is risky.
+      Futures: the six-month dollar-futures price over the official rate at
+      the end of the month, annualized (A3 Mercados, from 2020).
       Actual: the change in the official rate over the following twelve
       months, known only a year later.
     method_links: [{anchor: fx-devaluation, label: "How devaluation expectations are measured"}]
     default: {variant: survey, transform: level, range: 5Y}
     derive:
       method: formula
-      vars: {rem: "rem:fx12", offa: "@fx_official:wholesale:avg", be: "fin:col|breakeven", tea: "fin:col|tea_fixed_m", ust: "ust:52w"}
+      vars: {rem: "rem:fx12", offa: "@fx_official:wholesale:avg", ofx: "bcra:5", f6: "a3:f6", be: "fin:col|breakeven", tea: "fin:col|tea_fixed_m", ust: "ust:52w"}
       variants:
         survey:   {label: Survey (REM),          expr: "100 * (rem / offa - 1)"}
         auctions: {label: Auctions (breakeven),  expr: "be"}
         parity:   {label: Interest parity,       expr: "100 * ((1 + tea / 100) / (1 + ust / 100) - 1)"}
+        futures:  {label: Futures (A3),          expr: "100 * ((f6 / ofx) ** (365 / 182) - 1)"}
         actual:   {label: "Actual, next 12 months", expr: "100 * (lag(offa, -12) / offa - 1)"}
+
+  - id: fx_futures_curve
+    topic: fx
+    kind: curve
+    wide: true
+    title: Dollar Futures Curve
+    short_title: Futures curve
+    description: >-
+      The price of the dollar for each future month as traded on the
+      exchange (settlement prices of the DLR contracts), today and one and
+      three months earlier, against today's official rate and the band's
+      ceiling.
+      Pesos per US dollar.
+    source: table
+    source_label: A3 Mercados (market data, not an official statistic)
+    frequency: D
+    units: Pesos per US dollar
+    default: {}
+    table:
+      source: a3
+      file: curve.json
+      status_id: "a3:f6"
+      source_url: https://www.a3mercados.com.ar/
+    note: >-
+      Each contract settles at the BCRA's wholesale rate (Communication A
+      3500) of its expiry month's last business day, in pesos, so its price
+      is the market's expected rate for that date plus a risk premium. The
+      band's ceiling is projected at the pace of its last three months: an
+      illustration, not the BCRA's announced path. The floor, far below, is
+      left out of the chart.
+    method_links: [{anchor: fx-futures, label: "About dollar futures"}]
+
+  - id: fx_futures_implied
+    topic: fx
+    kind: variants
+    overlay: true
+    measure: rate
+    validate_as: flow
+    plain_level: true
+    title: Devaluation Priced in Futures
+    short_title: Futures devaluation
+    description: >-
+      The depreciation of the official rate implied by dollar futures: the
+      futures price six and twelve months ahead over today's official rate,
+      annual %, daily.
+    source: derived
+    source_label: A3 Mercados (market data); BCRA
+    frequency: D
+    units: "% a year"
+    transforms: [level]
+    ranges: [2Y, 5Y, Max]
+    note: >-
+      Each day the curve of settlement prices is interpolated (log-linearly
+      in days to expiry) at 182 and 365 days. Six months: annualized by
+      compounding. Twelve months: only when the longest contract reaches
+      about ten months (rarely before 2025), extrapolating the last stretch.
+      Futures prices include a risk premium, so they are an upper estimate
+      of the expected rate. Compounding six months to a year overstates the
+      annual figure when the market expects a one-off jump (late 2023).
+    method_links: [{anchor: fx-futures, label: "About dollar futures"}]
+    default: {variant: m6, transform: level, range: 2Y}
+    derive:
+      method: formula
+      anchor: ofx
+      vars: {ofx: "bcra:5", f6: "a3:f6", f12: "a3:f12"}
+      start: "2020-01-01"
+      variants:
+        m6:  {label: "6 months, annualized", expr: "100 * ((f6 / ofx) ** (365 / 182) - 1)"}
+        m12: {label: "12 months",            expr: "100 * (f12 / ofx - 1)"}
+
+  - id: fx_futures_oi
+    topic: fx
+    kind: variants
+    title: Dollar Futures Open Interest
+    short_title: Futures open interest
+    description: >-
+      Contracts outstanding across all dollar-futures maturities, millions
+      of US dollars (US$1,000 a contract), daily.
+    source: a3
+    source_label: A3 Mercados (market data, not an official statistic)
+    frequency: D
+    units: Millions of US dollars
+    transforms: [level, yoy]
+    ranges: [2Y, 5Y, Max]
+    note: >-
+      The size of the market's open bets on the peso. The BCRA has at times
+      sold futures itself to hold down expectations (in late 2015 and again
+      in 2025, for instance); its positions are part of this total.
+    method_links: [{anchor: fx-futures, label: "About dollar futures"}]
+    variants:
+      oi: {label: Open interest, id: "a3:oi"}
+    default: {variant: oi, transform: level, range: 2Y}
 
   - id: fx_bcra_purchases
     topic: fx

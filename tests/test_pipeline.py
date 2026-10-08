@@ -560,3 +560,33 @@ def test_auction_breakeven_devaluation():
     (d, be), = f.breakevens(pl)
     y = (1000 / 990) ** (365 / 151) - 1
     assert d == "2026-08-31" and be == pytest.approx((1.30 / (1 + y) - 1) * 100)
+
+
+def test_futures_expiry_and_constant_horizon():
+    import datetime as dt
+    import math
+    from pipeline.sources import a3
+    assert a3.expiry("DLR022028") == dt.date(2028, 2, 29)
+    assert a3.expiry("DLR122026") == dt.date(2026, 12, 31)
+    assert a3.expiry("DLR122026A") is None
+    curve = pd.DataFrame({"days": [100, 200, 320], "settlement": [1600.0, 1700.0, 1820.0]})
+    # Interpolated log-linearly between the 100- and 200-day contracts.
+    assert a3.at_horizon(curve, 182) == pytest.approx(math.exp(math.log(1600) + 0.82 * math.log(1700 / 1600)))
+    # Extrapolated from the last two when the longest covers >= 82% of the horizon ...
+    assert a3.at_horizon(curve, 365) == pytest.approx(math.exp(math.log(1820) + 45 * math.log(1820 / 1700) / 120))
+    # ... and empty when it does not.
+    assert a3.at_horizon(curve[curve.days < 300], 365) is None
+
+
+def test_futures_rows_and_curve_table():
+    from pipeline.sources import a3
+    rows = [{"dateTime": f"2026-{m:02d}-01T00:00:00.000Z", "symbol": s, "settlement": p, "openInterest": 1000, "volume": 10, "impliedRate": 30}
+            for m in (7, 9, 10) for s, p in (("DLR122026", 1600 + m), ("DLR062027", 1800 + m), ("DLR062026", 1500))]
+    df = a3.frame(rows)
+    assert "DLR062026" not in set(df[df.date == "2026-10-01"].symbol)          # expired contracts dropped
+    s = a3.series(df)
+    assert s["oi"].iloc[-1] == pytest.approx(2.0)                             # two contracts x 1,000 x US$1,000
+    hi = pd.Series([1500.0, 1560.0], index=pd.to_datetime(["2026-07-01", "2026-10-01"]))
+    t = a3.curve_table(df, spot=pd.Series([1550.0], index=pd.to_datetime(["2026-10-01"])), hi=hi)
+    assert t["latest"] == "2026-10-01" and [c["date"] for c in t["curves"]] == ["2026-10-01", "2026-09-01", "2026-07-01"]
+    assert t["spot"]["value"] == 1550.0 and t["band"]["ceiling"]["monthly_pace"] > 0

@@ -352,7 +352,7 @@ def formula(ind, frames: dict[str, pd.Series]) -> tuple[pd.DataFrame, dict]:
     env["gdp12"] = lambda gdp, cpi: gdp12(gdp, cpi)     # nominal GDP of the last twelve months, monthly
     env["cum12"] = lambda x: ((1 + x / 100).rolling(12).apply(np.prod, raw=True) - 1) * 100   # compounded % over 12 periods
     funcs = {"nz", "sum4", "sum12", "avg12", "lag", "gdp12", "cum12"}
-    allowed = (ast.Expression, ast.BinOp, ast.UnaryOp, ast.Add, ast.Sub, ast.Mult, ast.Div, ast.USub,
+    allowed = (ast.Expression, ast.BinOp, ast.UnaryOp, ast.Add, ast.Sub, ast.Mult, ast.Div, ast.Pow, ast.USub,
                ast.Name, ast.Load, ast.Constant, ast.Call)
     out = {}
     for k, v in spec["variants"].items():
