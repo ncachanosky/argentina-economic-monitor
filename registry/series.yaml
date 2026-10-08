@@ -1366,18 +1366,29 @@ indicators:
     title: Official Exchange Rate
     short_title: Exchange rate
     description: >-
-      Pesos per US dollar: the wholesale reference rate (Communication A 3500)
-      and the average retail selling rate, daily.
+      Pesos per US dollar: the wholesale reference rate (Communication A 3500),
+      the average retail selling rate and, since 14 April 2025, the floor and
+      ceiling of the exchange-rate band. Daily.
     source: bcra
     source_label: BCRA
     frequency: D
     units: Pesos per US dollar
     transforms: [level, yoy, mom]
     ranges: [2Y, 5Y, 10Y, Max]
+    note: >-
+      Band: the floor and ceiling the BCRA publishes (Régimen de bandas
+      cambiarias). Inside the band the rate floats; at the limits the BCRA
+      buys (floor) or sells (ceiling). The band started at 1,000 and 1,400
+      pesos per dollar; until December 2025 the floor fell and the ceiling
+      rose 1% a month, prorated by day, and since January 2026 the BCRA has
+      widened it each month at a different pace.
+    method_links: [{anchor: fx-band, label: "About the band"}]
     variants:
       wholesale: {label: Wholesale (A 3500), id: "bcra:5"}
       retail:    {label: Retail,             id: "bcra:4"}
-    default: {variant: wholesale, transform: level, start: "2023-01"}
+      ceiling:   {label: Band ceiling,       id: "bcra:1188"}
+      floor:     {label: Band floor,         id: "bcra:1187"}
+    default: {variant: wholesale, transform: level, range: 2Y}
 
   - id: reserves
     topic: money
@@ -3369,43 +3380,6 @@ indicators:
         blue:     {label: Blue (informal),      expr: "blue"}
         card:     {label: Card (tarjeta),       expr: "card"}
         crypto:   {label: Crypto,               expr: "cry"}
-
-  - id: fx_band
-    topic: fx
-    wide: true
-    kind: variants
-    overlay: true
-    plain_level: true
-    title: The Exchange-Rate Band
-    short_title: Band
-    description: >-
-      The official wholesale rate and the band's floor and ceiling, pesos per
-      US dollar, daily since the band started on 14 April 2025. Inside the
-      band the rate floats; at the limits the BCRA buys (floor) or sells
-      (ceiling).
-    source: derived
-    source_label: BCRA (Régimen de bandas cambiarias; Communication A 3500)
-    frequency: D
-    units: Pesos per US dollar
-    transforms: [level]
-    ranges: [2Y, Max]
-    note: >-
-      The BCRA's published limits (it sets them in advance through the end
-      of each month; the chart shows them through today). The band started at 1,000
-      and 1,400 pesos per dollar; until December 2025 the floor fell and the
-      ceiling rose 1% a month, prorated by day, and since January 2026 the
-      BCRA has widened it each month at a different pace. Before the band,
-      see Official Exchange Rate.
-    method_links: [{anchor: fx-band, label: "About the band"}]
-    default: {variant: official, transform: level, range: Max}
-    derive:
-      method: formula
-      vars: {ofx: "bcra:5", lo: "bcra:1187", hi: "bcra:1188"}
-      start: "2025-04-14"
-      variants:
-        official: {label: Official (wholesale), expr: "ofx"}
-        ceiling:  {label: Ceiling,              expr: "hi"}
-        floor:    {label: Floor,                expr: "lo"}
 
   - id: fx_band_room
     topic: fx
