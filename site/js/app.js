@@ -1333,6 +1333,47 @@
     return card;
   }
 
+  // ---------- navbar: a grouped "Dashboards" menu, then Methodology and About ----------
+  function buildNav(nav, manifest, pageHref) {
+    const topics = manifest.topics.filter((t) => manifest.indicators.some((m) => m.topic === t.id));
+    const groups = [];
+    for (const t of topics) {
+      const name = t.group || "Dashboards";
+      let g = groups.find((x) => x.name === name);
+      if (!g) { g = { name, topics: [] }; groups.push(g); }
+      g.topics.push(t);
+    }
+    const current = topics.find((t) => t.id === PAGE);
+    const panel = h("div", { class: "nav-panel", id: "nav-panel", hidden: true },
+      groups.map((g) => h("div", { class: "nav-group" }, h("div", { class: "nav-group-title" }, g.name),
+        g.topics.map((t) => h("a", { href: pageHref(t.id), "aria-current": t.id === PAGE ? "page" : null }, t.title)))));
+    const trigger = h("button", { class: "nav-trigger" + (current ? " is-current" : ""), type: "button", "aria-expanded": "false", "aria-controls": "nav-panel" },
+      current ? current.title : "Dashboards", h("span", { class: "caret", "aria-hidden": "true" }, "▾"));
+    const menu = h("div", { class: "nav-menu" }, trigger, panel);
+    const links = () => [...panel.querySelectorAll("a")];
+    const open = (focusFirst) => {
+      panel.hidden = false; trigger.setAttribute("aria-expanded", "true");
+      if (focusFirst) (links().find((a) => a.getAttribute("aria-current")) || links()[0]).focus();
+    };
+    const close = (refocus) => {
+      if (panel.hidden) return;
+      panel.hidden = true; trigger.setAttribute("aria-expanded", "false");
+      if (refocus) trigger.focus();
+    };
+    trigger.addEventListener("click", () => (panel.hidden ? open(false) : close(false)));
+    trigger.addEventListener("keydown", (e) => { if (e.key === "ArrowDown") { e.preventDefault(); open(true); } });
+    panel.addEventListener("keydown", (e) => {
+      const l = links(), i = l.indexOf(document.activeElement);
+      if (e.key === "ArrowDown" || e.key === "ArrowUp") { e.preventDefault(); l[(i + (e.key === "ArrowDown" ? 1 : l.length - 1)) % l.length].focus(); }
+    });
+    document.addEventListener("keydown", (e) => { if (e.key === "Escape") close(menu.contains(document.activeElement)); });
+    document.addEventListener("click", (e) => { if (!menu.contains(e.target)) close(false); });
+    menu.addEventListener("focusout", (e) => { if (e.relatedTarget && !menu.contains(e.relatedTarget)) close(false); });
+    nav.append(menu,
+      h("a", { href: `${ROOT}methodology/`, "aria-current": PAGE === "methodology" ? "page" : null }, "Methodology"),
+      h("a", { href: `${ROOT}about/`, "aria-current": PAGE === "about" ? "page" : null }, "About"));
+  }
+
   // ---------- card: dollar futures curve ----------
   function curveCard(ind) {
     const T = ind.table;
@@ -1955,12 +1996,7 @@
       if (topicId && slugOf.has(topicId)) { location.replace(pageHref(topicId, m[1] === "ind" ? `ind-${m[2]}` : "")); return; }
     }
 
-    const nav = $("#nav");
-    for (const t of manifest.topics) {
-      if (!manifest.indicators.some((m) => m.topic === t.id)) continue;
-      nav.append(h("a", { href: pageHref(t.id), "aria-current": t.id === PAGE ? "true" : null }, t.title));
-    }
-    nav.append(h("a", { href: `${ROOT}methodology/`, "aria-current": PAGE === "methodology" ? "true" : null }, "Methodology"));
+    buildNav($("#nav"), manifest, pageHref);
 
     // Charts are redrawn on a theme change (set once the page has charts).
     let redraw = () => {};
@@ -1973,7 +2009,7 @@
     window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => { if (!document.documentElement.dataset.theme) redraw(); });
 
     const topicsEl2 = $("#topics");
-    if (PAGE === "methodology") return;   // static page: nothing to load
+    if (PAGE === "methodology" || PAGE === "about") return;   // static pages: nothing to load
     if (PAGE === "home") {
       // Home: latest headline readings and one card per topic; no charts to draw.
       const heads = await Promise.all(manifest.indicators.filter((m) => m.headline)

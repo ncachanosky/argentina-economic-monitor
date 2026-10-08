@@ -361,17 +361,22 @@ episodes:
      label: "Correction of relative prices",
      description: "Pass-through of the December devaluation and the adjustment of regulated prices"}
 
-# Each topic is a page of the site at /<slug>/, in this order in the navbar.
+# Each topic is a page of the site at /<slug>/, listed in this order in the
+# navbar's Dashboards menu, under its `group` (groups in order of first use).
 topics:
   - id: real_sector
-    slug: real-sector
-    title: Real Sector
+    slug: monthly-activity
+    old_slugs: [real-sector]
+    group: Activity
+    title: Monthly Activity
     description: >-
       Monthly economic activity: the activity estimator (EMAE) by sector,
       manufacturing, construction and capacity utilization.
   - id: gdp
-    slug: gdp
-    title: Real GDP
+    slug: national-accounts
+    old_slugs: [gdp]
+    group: Activity
+    title: National Accounts
     description: >-
       Quarterly GDP at constant 2004 prices, and its growth by expenditure
       component and by industry.
@@ -380,6 +385,7 @@ topics:
     # Earlier page names, kept as redirects so shared links keep working.
     old_slugs: [prices-money]
     old_ids: [prices_money]
+    group: Prices & Money
     title: Prices
     description: >-
       Consumer prices (headline, core, regulated, seasonal; by division and
@@ -388,6 +394,7 @@ topics:
   - id: money
     slug: money-central-bank
     old_slugs: [money-banking]
+    group: Prices & Money
     title: Money & Central Bank
     description: >-
       Base money and what creates it, monetary aggregates, deposits and loans,
@@ -397,6 +404,7 @@ topics:
 
   - id: fx
     slug: exchange-rate
+    group: Prices & Money
     title: Exchange Rate
     description: >-
       Official and market exchange rates and the gaps between them, the
@@ -406,6 +414,7 @@ topics:
 
   - id: banks
     slug: banks
+    group: Prices & Money
     title: Banks
     description: >-
       The financial system: exposure to the public sector, liquidity and
@@ -415,6 +424,7 @@ topics:
 
   - id: fiscal
     slug: fiscal
+    group: Public Sector
     title: Fiscal & Debt
     description: >-
       The national government's accounts and its debt: the primary and

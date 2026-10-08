@@ -74,9 +74,17 @@ def build(out: Path, tag: str, with_data: bool = True) -> None:
         desc="How the Argentina Economic Monitor gets, checks and transforms its data.", tag=tag,
         content=(SITE / "methodology.html").read_text(encoding="utf-8")), encoding="utf-8")
     (out / "methodology.html").unlink(missing_ok=True)
+    d = out / "about"
+    d.mkdir(parents=True, exist_ok=True)
+    (d / "index.html").write_text(render(
+        template, page="about", root="../", title=f"About · {site_name}", h1="About",
+        lede="What the Monitor is, who is behind it, and how to cite it or report an error.",
+        desc="About the Argentina Economic Monitor, a project of Economic Order.", tag=tag,
+        content=(SITE / "about.html").read_text(encoding="utf-8")), encoding="utf-8")
+    (out / "about.html").unlink(missing_ok=True)
     if with_data:
         export.export(out / "data")
-    print(f"built {2 + len(reg.topics)} pages in {out}")
+    print(f"built {3 + len(reg.topics)} pages in {out}")
 
 
 def main(argv: list[str] | None = None) -> int:

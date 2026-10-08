@@ -122,5 +122,7 @@ copper to tell apart as a series.
 
 ## Data license
 
-Source data: INDEC and other official agencies via
-[datos.gob.ar](https://datos.gob.ar/), CC BY 4.0.
+Source data: INDEC (via [datos.gob.ar](https://datos.gob.ar/), CC BY 4.0), the
+BCRA, the Ministry of Economy and other official agencies, under their terms.
+Market quotes (informal and bond-market dollars, dollar futures) come from
+market-data services and are marked as unofficial on the site.
