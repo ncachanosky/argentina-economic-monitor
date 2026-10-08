@@ -805,10 +805,10 @@
           const s = k === state.variant ? main : series(k);
           // Overlays keep empty months in range so a gap in one series shows as a gap.
           // (Daily overlays drop each series' empty days, since sources keep different calendars.)
-          const ii = ind.overlay ? ind.dates.map((d, i) => i).filter((i) => (!start || ind.dates[i] >= start) && (!x.length || ind.dates[i] <= x[x.length - 1]) && (ind.frequency !== "D" || s.y[i] !== null)) : idx;
+          const ii = ind.overlay ? ind.dates.map((d, i) => i).filter((i) => (!start || ind.dates[i] >= start) && (!x.length || ind.dates[i] <= x[x.length - 1]) && ((ind.frequency !== "D" && ind.frequency !== "S") || s.y[i] !== null)) : idx;
           let xx = ii.map((i) => ind.dates[i]), yy = ii.map((i) => s.y[i]);
           if (ind.frequency === "D") [xx, yy] = breakGaps(xx, yy);
-          if (ind.frequency === "S") [xx, yy] = breakGaps(xx, yy, 200);
+          if (ind.frequency === "S") [xx, yy] = breakGaps(xx, yy, 400);
           const color = cssVar(SERIES_VARS[slot]);
           const hover = `${ind.frequency === "S" ? "%{customdata}" : `%{x|${DF}}`}: <b>%{y:${yFmt()}}${sfx}</b><extra>${s.v.label}</extra>`;
           const emph = ind.emphasis === k;   // e.g. a total: thick and dark

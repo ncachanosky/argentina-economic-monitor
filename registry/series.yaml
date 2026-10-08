@@ -382,6 +382,8 @@ inputs:
   - {id: 53.1_TIMB_0_0_25, source: datos_gob, frequency: Q, measure: flow, label: "Mixed income, share of GDP at factor cost"}
   - {id: 53.1_EBE_0_0_27, source: datos_gob, frequency: Q, measure: flow, label: "Operating surplus, share of GDP at factor cost"}
   - {id: "indec_poverty", source: manual, frequency: S, measure: flow, allow_gaps: true, label: "INDEC poverty, persons, % (hand-kept from INDEC reports)"}
+  - {id: "poverty_cedlas", source: manual, frequency: S, measure: flow, allow_gaps: true, static: true, label: "CEDLAS comparable poverty, persons, %"}
+  - {id: "poverty_uca", source: manual, frequency: S, measure: flow, allow_gaps: true, static: true, label: "UCA-ODSA poverty, persons, % (annual survey)"}
   - {id: "indec_poverty#households", source: manual, frequency: S, measure: flow, allow_gaps: true, label: "INDEC poverty, households, %"}
   - {id: "indec_poverty#indigence", source: manual, frequency: S, measure: flow, allow_gaps: true, label: "INDEC indigence, persons, %"}
   - {id: "indec_poverty#indigence_households", source: manual, frequency: S, measure: flow, allow_gaps: true, label: "INDEC indigence, households, %"}
@@ -3778,7 +3780,7 @@ indicators:
       and the indigence (extreme poverty) line, urban areas, by semester,
       as published by INDEC since 2003.
     source: manual
-    source_label: INDEC (Incidencia de la pobreza y la indigencia), from its reports
+    source_label: INDEC (Incidencia de la pobreza y la indigencia), from its reports; CEDLAS (UNLP); UCA-ODSA
     frequency: S
     units: "%"
     transforms: [level]
@@ -3795,12 +3797,20 @@ indicators:
       publishing after that semester and, after the 2016 statistical
       emergency, resumed with a new method in H2 2016. The H2 2007 figure was
       never estimated. Figures before and after 2016 are not comparable: the
-      2016 method uses new baskets and adult-equivalence scales.
+      2016 method uses new baskets and adult-equivalence scales. Two
+      alternatives cover the intervention: CEDLAS's comparable series (INDEC's
+      2016 method on the same survey, with baskets repriced by private price
+      indices, to H1 2017; it matches INDEC from H2 2016) and the UCA's
+      Observatorio de la Deuda Social, from its own annual survey (third
+      quarter, shown at mid-year; before 2010 a reconstruction from INDEC's
+      survey), whose level differs from INDEC's even in normal years.
     variants:
       persons:    {label: "Poverty, persons",      id: "indec_poverty"}
       households: {label: "Poverty, households",   id: "indec_poverty#households"}
       indigence:  {label: "Indigence, persons",    id: "indec_poverty#indigence"}
       indig_hh:   {label: "Indigence, households", id: "indec_poverty#indigence_households"}
+      cedlas:     {label: "Poverty, persons: CEDLAS comparable (alternative)", id: "poverty_cedlas"}
+      uca:        {label: "Poverty, persons: UCA-ODSA survey (alternative)",   id: "poverty_uca"}
     default: {variant: persons, transform: level, range: Max}
 
   - id: labor_purchasing
