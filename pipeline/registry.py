@@ -10,7 +10,7 @@ ROOT = Path(__file__).resolve().parents[1]
 REGISTRY_PATH = ROOT / "registry" / "series.yaml"
 RELEASES_PATH = ROOT / "registry" / "releases.yaml"
 
-KINDS = {"variants", "panel", "contributions", "balance_sheet", "top10", "schedule", "placements", "curve", "statement"}
+KINDS = {"variants", "panel", "contributions", "balance_sheet", "top10", "schedule", "placements", "curve", "statement", "rer_calc"}
 TABLE_KINDS = {"balance_sheet", "top10", "schedule", "placements", "curve"}   # cards that read a full table (data/tables/<source>), no series
 DERIVE_METHODS = {"splice", "reweight", "ratio", "tracker", "monthly", "flows", "expectations", "formula", "net_reserves"}
 RANGE_KEYS = {"2Y", "5Y", "10Y", "25Y", "50Y", "Max"}

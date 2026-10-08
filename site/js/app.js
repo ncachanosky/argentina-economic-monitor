@@ -86,6 +86,15 @@
   };
   // Category axis of years: label every k-th year when there are many, unrotated.
   const yearAxis = (n) => ({ type: "category", tickangle: 0, ...(n > 16 ? { tickmode: "linear", tick0: 0, dtick: Math.ceil(n / 12) } : {}) });
+  // Daily lines: a gap of more than a month in the data breaks the line instead of bridging it.
+  function breakGaps(x, y, days = 31) {
+    const X = [], Y = [];
+    x.forEach((d, i) => {
+      if (X.length && Date.parse(d) - Date.parse(X[X.length - 1]) > days * 864e5) { X.push(d); Y.push(null); }
+      X.push(d); Y.push(y[i]);
+    });
+    return [X, Y];
+  }
   const monthIndex = (iso) => { const [y, m] = iso.split("-").map(Number); return y * 12 + (m - 1); };
 
   async function getJSON(path) {
@@ -796,7 +805,8 @@
           // Overlays keep empty months in range so a gap in one series shows as a gap.
           // (Daily overlays drop each series' empty days, since sources keep different calendars.)
           const ii = ind.overlay ? ind.dates.map((d, i) => i).filter((i) => (!start || ind.dates[i] >= start) && (!x.length || ind.dates[i] <= x[x.length - 1]) && (ind.frequency !== "D" || s.y[i] !== null)) : idx;
-          const xx = ii.map((i) => ind.dates[i]), yy = ii.map((i) => s.y[i]);
+          let xx = ii.map((i) => ind.dates[i]), yy = ii.map((i) => s.y[i]);
+          if (ind.frequency === "D") [xx, yy] = breakGaps(xx, yy);
           const color = cssVar(SERIES_VARS[slot]);
           const hover = `%{x|${DF}}: <b>%{y:${yFmt()}}${sfx}</b><extra>${s.v.label}</extra>`;
           const emph = ind.emphasis === k;   // e.g. a total: thick and dark
@@ -1460,6 +1470,91 @@
         h("span", {}, `Source: ${ind.source_label} · Latest: ${qLabel(last)}`),
         h("div", { class: "actions" },
           h("button", { class: "btn", type: "button", onclick: onCSV, title: "Download this view as CSV" }, "CSV"))));
+    card.draw = () => draw();
+    return card;
+  }
+
+  // ---------- card: real exchange rate calculator ----------
+  // The rate that would put the real exchange rate index back at a reference level:
+  // E* = E_today x RER_ref / RER_today (a higher index is a weaker peso).
+  function rerCalcCard(ind) {
+    const card = cardFrame(ind, true);
+    const D = ind.dates, V = (k) => ind.variants[k].values;
+    const weekday = D.map((d) => { const w = new Date(d + "T00:00:00Z").getUTCDay(); return w !== 0 && w !== 6; });
+    const lastIdx = (k) => { const v = V(k); for (let i = v.length - 1; i >= 0; i--) if (v[i] !== null) return i; return -1; };
+    const state = { mode: "m", ref: "avg2003", date: "2015-12-17" };
+    const REFS = [
+      ["avg1997", "Average since 1997"], ["avg2003", "Average since 2003 (after convertibility)"], ["avg2016", "Average since 2016"],
+      ["med2003", "Median since 2003"], ["d20151217", "17 Dec 2015 (exchange-rate unification)"], ["date", "A date of your choice…"],
+    ];
+    const modeSeg = segmented([["m", "Official rate"], ["mkt", "CCL (market) rate"]], state.mode, (k) => { state.mode = k; modeSeg.update(k); draw(); }, "Exchange rate");
+    const refSel = h("select", { "aria-label": "Reference" }, REFS.map(([k, l]) => h("option", { value: k, selected: k === state.ref ? true : null }, l)));
+    const dateIn = h("input", { type: "date", value: state.date, min: D[0], max: D[D.length - 1], "aria-label": "Reference date", hidden: true });
+    refSel.addEventListener("change", () => { state.ref = refSel.value; dateIn.hidden = state.ref !== "date"; draw(); });
+    dateIn.addEventListener("change", () => { if (dateIn.value) { state.date = dateIn.value; draw(); } });
+    const outEl = h("div", { class: "rer-out" });
+    const chartEl = h("div", { class: "chart", role: "img", "aria-label": "Real exchange rate and the reference" });
+    const fmtR = (v, d = 0) => (v === null || v === undefined || isNaN(v) ? "–" : Number(v).toLocaleString("en-US", { minimumFractionDigits: d, maximumFractionDigits: d }));
+    const pct = (v) => (v === null || isNaN(v) ? "–" : `${v > 0 ? "+" : v < 0 ? "−" : ""}${Math.abs(v).toFixed(1)}%`);
+    const sample = (k, from) => V(k).map((v, i) => [D[i], v]).filter(([d, v], i) => v !== null && weekday[i] && d >= from).map(([, v]) => v);
+    const mean = (a) => a.reduce((x, y) => x + y, 0) / a.length;
+    const quant = (a, q) => { const b = [...a].sort((x, y) => x - y); const p = (b.length - 1) * q, lo = Math.floor(p); return b[lo] + (b[Math.min(lo + 1, b.length - 1)] - b[lo]) * (p - lo); };
+    function refValue(k) {
+      const r = state.ref;
+      if (r === "avg1997") return { v: mean(sample(k, "1997-01-01")), label: "average since 1997" };
+      if (r === "avg2003") return { v: mean(sample(k, "2003-01-01")), label: "average since 2003" };
+      if (r === "avg2016") return { v: mean(sample(k, "2016-01-01")), label: "average since 2016" };
+      if (r === "med2003") return { v: quant(sample(k, "2003-01-01"), 0.5), label: "median since 2003" };
+      const day = r === "d20151217" ? "2015-12-17" : state.date;
+      // The last value on or before the chosen day.
+      let j = -1; for (let i = 0; i < D.length && D[i] <= day; i++) if (V(k)[i] !== null) j = i;
+      return j < 0 ? { v: null, label: fmtDay(day) } : { v: V(k)[j], label: fmtDay(D[j]), date: D[j] };
+    }
+    function draw() {
+      const k = state.mode, fxk = k === "m" ? "ofx" : "ccl", fxName = k === "m" ? "official (wholesale) rate" : "CCL rate";
+      const i = lastIdx(k), jf = lastIdx(fxk);
+      const now = V(k)[i], fxNow = V(fxk)[jf];
+      const ref = refValue(k);
+      const s03 = sample(k, "2003-01-01"), p25 = quant(s03, 0.25), p75 = quant(s03, 0.75);
+      const implied = ref.v ? fxNow * ref.v / now : null;
+      const lo = fxNow * p25 / now, hi = fxNow * p75 / now;
+      outEl.replaceChildren(
+        h("div", { class: "rer-grid" },
+          h("div", { class: "rer-tile" }, h("div", { class: "rer-k" }, `Real exchange rate, ${fmtDay(D[i])}`), h("div", { class: "rer-v" }, fmtR(now, 1)),
+            h("div", { class: "rer-s" }, `Reference (${ref.label}): ${fmtR(ref.v, 1)}`)),
+          h("div", { class: "rer-tile" }, h("div", { class: "rer-k" }, "Index against the reference"), h("div", { class: "rer-v" }, ref.v ? pct(100 * (now / ref.v - 1)) : "–"),
+            h("div", { class: "rer-s" }, ref.v ? (now < ref.v ? "below it: the peso is stronger in real terms" : "above it: the peso is weaker in real terms") : "")),
+          h("div", { class: "rer-tile" }, h("div", { class: "rer-k" }, `${k === "m" ? "Official" : "CCL"} rate that restores the reference`), h("div", { class: "rer-v" }, fmtR(implied)),
+            h("div", { class: "rer-s" }, `Actual ${fxName} ${fmtR(fxNow, 2)} on ${fmtDay(D[jf])}${implied ? `: ${pct(100 * (implied / fxNow - 1))} away` : ""}`)),
+          h("div", { class: "rer-tile" }, h("div", { class: "rer-k" }, "Range: middle half of the index since 2003"), h("div", { class: "rer-v" }, `${fmtR(lo)} – ${fmtR(hi)}`),
+            h("div", { class: "rer-s" }, `Index between ${fmtR(p25, 1)} (25th percentile) and ${fmtR(p75, 1)} (75th)`))),
+        h("p", { class: "hint" }, `Today's ${fxName} × reference index / today's index. ${k === "mkt" ? "CCL mode: the index at the CCL rate (the official index before November 2011, when there were no controls), applied to the CCL rate today." : ""}`));
+      // Weekdays with data; a gap of more than a month (no CCL series, Nov 2011 - Dec 2012) breaks the line.
+      const x = [], y = [];
+      D.forEach((d, n) => {
+        if (V(k)[n] === null || !weekday[n]) return;
+        if (x.length && isoMs(d) - isoMs(x[x.length - 1]) > 31 * dayMs) { x.push(d); y.push(null); }
+        x.push(d); y.push(V(k)[n]);
+      });
+      const ink3 = cssVar("--ink-3"), accent = cssVar(SERIES_VARS[0]);
+      const tr = [{ type: "scatter", mode: "lines", name: ind.variants[k].label, x, y, line: { color: accent, width: 1.6 }, _slot: 0,
+        hovertemplate: "%{x|%d %b %Y}: <b>%{y:.1f}</b><extra></extra>" }];
+      if (ref.date) tr.push({ type: "scatter", mode: "markers", name: "Reference date", x: [ref.date], y: [ref.v], marker: { color: cssVar("--ink"), size: 9, symbol: "diamond" }, _light: "#36454F", hovertemplate: `Reference: <b>%{y:.1f}</b><extra></extra>` });
+      const shapes = [
+        { type: "rect", xref: "paper", x0: 0, x1: 1, y0: p25, y1: p75, fillcolor: isDark() ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.05)", line: { width: 0 }, layer: "below", _lightFill: "rgba(0,0,0,0.05)" },
+        ...(ref.v ? [{ type: "line", xref: "paper", x0: 0, x1: 1, y0: ref.v, y1: ref.v, line: { color: ink3, width: 1.5, dash: "dash" } }] : []),
+      ];
+      Plotly.react(chartEl, tr, baseLayout({ yaxis: { tickformat: ".0f" }, extra: { shapes, showlegend: false, hovermode: "closest", margin: { l: 48, r: 16, t: 10, b: 36 } } }), PLOT_CONFIG);
+    }
+    const caveats = h("div", { class: "chips-note rer-caveats" },
+      h("p", {}, h("b", {}, "Read with care. "), "This is relative purchasing-power parity: it assumes the reference was an equilibrium and that nothing fundamental has changed since. Both are strong assumptions. ",
+        "The terms of trade are about 45% above their 2004 level and energy has turned from a deficit into a surplus, changes that support a stronger peso than history suggests; productivity growth relative to partners (the Balassa–Samuelson effect) works the same way. Single dates can be overshoots: the index spiked after the 2002 and December 2023 devaluations, and was at its strongest at the end of convertibility in 2001. The range across reference choices is the honest answer, not any one number."),
+      h("p", {}, "Model-based assessments (the IMF's External Balance Assessment) estimate the real exchange rate consistent with fundamentals and desirable policies. The IMF's May 2026 staff report judges Argentina's external position \"weaker than the level implied by medium-term fundamentals and desirable policies\", a preliminary assessment subject to exceptionally high uncertainty. ",
+        h("a", { href: "https://www.imf.org/en/publications/cr/issues/2026/05/22/argentina-2026-article-iv-consultation-second-review-under-the-extended-arrangement-under-576253", target: "_blank", rel: "noopener" }, "IMF Country Report, May 2026"), "."));
+    appendAll(card, h("div", { class: "controls" }, modeSeg, h("span", { class: "spacer" }), h("label", { class: "inline-select" }, "Reference: ", refSel, dateIn)),
+      outEl, chartEl, h("p", { class: "hint" }, "Shaded: the middle half of the index since 2003 (25th to 75th percentile); dashed: the reference."),
+      caveats, methodLine(ind),
+      h("div", { class: "card-foot" }, h("span", {}, `Source: ${ind.source_label} · Latest: ${fmtDay(ind.last_obs)}`)));
     card.draw = () => draw();
     return card;
   }
@@ -2130,6 +2225,7 @@
         : ind.kind === "placements" ? placementsCard(ind)
         : ind.kind === "curve" ? curveCard(ind)
         : ind.kind === "statement" ? statementCard(ind)
+        : ind.kind === "rer_calc" ? rerCalcCard(ind)
         : variantsCard(ind, !!ind.wide)));
     topicsEl2.replaceChildren(h("section", { class: "topic", id: `topic-${topic.id}` }, cards));
     $("#tiles").replaceChildren(...inds.filter((i) => i.headline).map((i) => tile(i)).filter(Boolean));

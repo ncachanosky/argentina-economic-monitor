@@ -65,6 +65,10 @@ def get_adapter(name: str):
         from . import ustreasury
 
         return ustreasury
+    if name == "itcrm":
+        from . import itcrm
+
+        return itcrm
     if name == "a3":
         from . import a3
 

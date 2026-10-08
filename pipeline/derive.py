@@ -354,8 +354,10 @@ def formula(ind, frames: dict[str, pd.Series]) -> tuple[pd.DataFrame, dict]:
     env["avg12"] = lambda x: x.rolling(12).mean()       # average of the last twelve periods
     env["lag"] = lambda x, k=1: x.shift(int(k))         # value k periods earlier
     env["gdp12"] = lambda gdp, cpi: gdp12(gdp, cpi)     # nominal GDP of the last twelve months, monthly
+    env["fill"] = lambda x, y: x.fillna(y)               # x, and y where x is missing
+    env["upto"] = lambda x, d: x.where(x.index <= pd.Timestamp(str(d)))   # x through date d, empty after
     env["cum12"] = lambda x: ((1 + x / 100).rolling(12).apply(np.prod, raw=True) - 1) * 100   # compounded % over 12 periods
-    funcs = {"nz", "sum4", "sum12", "avg12", "lag", "gdp12", "cum12"}
+    funcs = {"nz", "sum4", "sum12", "avg12", "lag", "gdp12", "cum12", "fill", "upto"}
     allowed = (ast.Expression, ast.BinOp, ast.UnaryOp, ast.Add, ast.Sub, ast.Mult, ast.Div, ast.Pow, ast.USub,
                ast.Name, ast.Load, ast.Constant, ast.Call)
     out = {}

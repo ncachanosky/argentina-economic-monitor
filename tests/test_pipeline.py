@@ -611,3 +611,16 @@ def test_formula_inputs_aggregate_by_vars_how():
     out, _ = derive.formula(ind, {"x": m, "y": m})
     assert out["d:s"].tolist() == [3.0, 3.0, 6.0, 6.0]        # quarterly sums
     assert out["d:l"].tolist() == [1.0, 1.0, 2.0, 2.0]        # last month of the quarter
+
+
+def test_itcrm_workbook_parse():
+    import io
+    from pipeline.sources import itcrm
+    cols = ["Período", "ITCRM ", "ITCRB Brasil", "ITCRB Estados Unidos", "ITCRB China", "ITCRB Zona Euro"]
+    rows = [["Índices con base 17-12-15=100"] + [None] * 5, cols,
+            [pd.Timestamp("2015-12-17"), 100.0, 101.0, 102.0, 103.0, 104.0],
+            [pd.Timestamp("2015-12-18"), 99.0, 100.0, 101.0, 102.0, 103.0], [None] * 6]
+    buf = io.BytesIO()
+    pd.DataFrame(rows).to_excel(buf, header=False, index=False)
+    p = itcrm.parse(buf.getvalue())
+    assert p["m"].tolist() == [100.0, 99.0] and p["us"].iloc[0] == 102.0

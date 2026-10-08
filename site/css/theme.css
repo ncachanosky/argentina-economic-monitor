@@ -226,6 +226,14 @@ table.statement tr.st-bold td { font-weight: 700; color: var(--ink); }
 table.statement tr.rule td { border-top: 1px solid var(--rule); }
 table.statement tr.st-head td { font-family: var(--font-ui); font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-3); padding-top: 12px; }
 table.statement td.st-delta { color: var(--ink-2); }
+.rer-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 10px 0 4px; }
+.rer-tile { border: 1px solid var(--rule); border-radius: 8px; padding: 10px 12px; background: var(--surface); }
+.rer-k { font-family: var(--font-ui); font-size: 12px; color: var(--ink-3); }
+.rer-v { font-family: var(--font-ui); font-size: 26px; font-weight: 700; color: var(--ink); margin: 4px 0; font-variant-numeric: tabular-nums; }
+.rer-s { font-family: var(--font-ui); font-size: 12px; color: var(--ink-2); }
+.rer-caveats p { margin: 6px 0; }
+.inline-select input[type=date] { font: inherit; }
+@media (max-width: 860px) { .rer-grid { grid-template-columns: repeat(2, 1fr); } }
 .inline-select { font-family: var(--font-ui); font-size: 14px; color: var(--ink-2); display: inline-flex; align-items: center; gap: 6px; }
 table.data { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; }
 table.data th, table.data td { padding: 4px 10px; text-align: right; border-bottom: 1px solid var(--grid); white-space: nowrap; }

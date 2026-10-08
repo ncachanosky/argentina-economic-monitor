@@ -266,6 +266,12 @@ inputs:
   - {id: "dolar:ccl", source: dolar, frequency: D, measure: index, allow_gaps: true, stale_days: 7, label: "CCL dollar (bond trades, abroad)"}
   - {id: "dolar:tarjeta", source: dolar, frequency: D, measure: index, allow_gaps: true, stale_days: 7, label: "Card (tarjeta) dollar"}
   - {id: "dolar:cripto", source: dolar, frequency: D, measure: index, allow_gaps: true, stale_days: 7, label: "Crypto dollar (stablecoins)"}
+  # Real exchange rate (BCRA ITCRM workbook), daily since 1997, 17-Dec-2015 = 100; a rise is a real depreciation.
+  - {id: "itcrm:m",  source: itcrm, frequency: D, measure: index, allow_gaps: true, stale_days: 10, label: "Multilateral real exchange rate index (ITCRM)"}
+  - {id: "itcrm:us", source: itcrm, frequency: D, measure: index, allow_gaps: true, stale_days: 10, label: "Bilateral real exchange rate index: United States"}
+  - {id: "itcrm:br", source: itcrm, frequency: D, measure: index, allow_gaps: true, stale_days: 10, label: "Bilateral real exchange rate index: Brazil"}
+  - {id: "itcrm:cn", source: itcrm, frequency: D, measure: index, allow_gaps: true, stale_days: 10, label: "Bilateral real exchange rate index: China"}
+  - {id: "itcrm:eu", source: itcrm, frequency: D, measure: index, allow_gaps: true, stale_days: 10, label: "Bilateral real exchange rate index: euro area"}
   - {id: "rem:fx12", source: rem, frequency: M, measure: index, allow_gaps: true, label: "REM: median expected official exchange rate, twelve months ahead"}
   # Dollar futures (A3 Mercados, formerly MATba-Rofex; the exchange's market-data API, not an official statistic).
   - {id: "a3:f12", source: a3, frequency: D, measure: index, allow_gaps: true, stale_days: 7, label: "Dollar futures: price twelve months ahead (interpolated), pesos per US dollar"}
@@ -4564,6 +4570,76 @@ indicators:
         ccl:  {label: CCL,             expr: "100 * (ccl / ofx - 1)"}
         mep:  {label: MEP,             expr: "100 * (mep / ofx - 1)"}
         blue: {label: Blue (informal), expr: "100 * (blue / ofx - 1)"}
+
+  - id: fx_rer
+    topic: fx
+    wide: true
+    kind: variants
+    measure: index
+    title: Real Exchange Rate
+    short_title: Real exchange rate
+    description: >-
+      The BCRA's multilateral real exchange rate index (the peso against
+      the currencies of Argentina's trading partners, adjusted for
+      inflation here and there), the same at the market (CCL) rate, and
+      bilateral indices. Daily since 1997, 17 December 2015 = 100. Higher
+      means a weaker (more competitive) peso.
+    source: derived
+    source_label: BCRA (Índice Tipo de Cambio Real Multilateral); ArgentinaDatos and DolarAPI (CCL, unofficial)
+    frequency: D
+    units: Index, 17 Dec 2015 = 100
+    transforms: [level, yoy]
+    ranges: [5Y, 10Y, Max]
+    ref_line: 100
+    note: >-
+      Weights: each partner's share of Argentina's trade (Brazil, China, the
+      euro area and the US weigh most). For the latest months, not yet
+      covered by the CPI, the BCRA uses the inflation expected in its survey
+      (REM), so recent values are revised. At the CCL rate: the index
+      multiplied by the CCL over the official rate, the relevant price for
+      most private transactions while exchange controls were in force;
+      before November 2011 there were no controls and it equals the official
+      index; for November 2011 to December 2012 there is no CCL series.
+    method_links: [{anchor: fx-rer, label: "About the real exchange rate"}]
+    default: {variant: m, transform: level, range: Max}
+    derive:
+      method: formula
+      anchor: m
+      vars: {m: "itcrm:m", us: "itcrm:us", br: "itcrm:br", cn: "itcrm:cn", eu: "itcrm:eu", ccl: "dolar:ccl", ofx: "bcra:5"}
+      variants:
+        m:   {label: Multilateral (official rate), expr: "m"}
+        mkt: {label: Multilateral (CCL rate),      expr: "fill(m * ccl / ofx, upto(m, \"2011-10-31\"))"}
+        us:  {label: United States,                expr: "us"}
+        br:  {label: Brazil,                       expr: "br"}
+        cn:  {label: China,                        expr: "cn"}
+        eu:  {label: Euro area,                    expr: "eu"}
+
+  - id: fx_rer_calc
+    topic: fx
+    wide: true
+    kind: rer_calc
+    measure: index
+    title: Where Would the Exchange Rate Be?
+    short_title: RER calculator
+    description: >-
+      The exchange rate that would put the real exchange rate back where it
+      was at a reference date or period, against the rate today. Arithmetic,
+      not an estimate of equilibrium: see the caveats below.
+    source: derived
+    source_label: BCRA (ITCRM, official rate); ArgentinaDatos and DolarAPI (CCL, unofficial)
+    frequency: D
+    units: Pesos per US dollar
+    method_links: [{anchor: fx-rer, label: "About the real exchange rate and this calculator"}]
+    default: {variant: m}
+    derive:
+      method: formula
+      anchor: m
+      vars: {m: "itcrm:m", ccl: "dolar:ccl", ofx: "bcra:5"}
+      variants:
+        m:   {label: Multilateral (official rate), expr: "m"}
+        mkt: {label: Multilateral (CCL rate),      expr: "fill(m * ccl / ofx, upto(m, \"2011-10-31\"))"}
+        ofx: {label: Official rate,                expr: "ofx"}
+        ccl: {label: CCL rate,                     expr: "ccl"}
 
   - id: fx_carry
     topic: fx
