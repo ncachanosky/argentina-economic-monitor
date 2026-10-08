@@ -366,6 +366,24 @@ inputs:
   - {id: 144.4_AVOSOTRAL_0_T_46, source: datos_gob, frequency: Q, measure: flow, allow_gaps: true, label: "IIP assets of other sectors: direct investment"}
   - {id: 144.4_AVOSOTLES_0_T_48, source: datos_gob, frequency: Q, measure: flow, allow_gaps: true, label: "IIP assets of other sectors: portfolio investment"}
   - {id: 144.4_AVOSOTUAL_0_T_54, source: datos_gob, frequency: Q, measure: flow, allow_gaps: true, label: "IIP assets of other sectors: other investment"}
+  # Labor and social (INDEC EPH, wages, minimum wage, poverty), via datos.gob.ar unless noted.
+  - {id: 43.2_ECTAT_0_T_33, source: datos_gob, frequency: Q, measure: flow, label: "EPH: activity rate (share)"}
+  - {id: 44.2_ECTET_0_T_30, source: datos_gob, frequency: Q, measure: flow, label: "EPH: employment rate (share)"}
+  - {id: 45.2_ECTDT_0_T_33, source: datos_gob, frequency: Q, measure: flow, label: "EPH: unemployment rate (share)"}
+  - {id: 46.2_ECTST_0_T_36, source: datos_gob, frequency: Q, measure: flow, label: "EPH: underemployment rate (share)"}
+  - {id: 158.1_REPTE_0_0_5, source: datos_gob, frequency: M, measure: index, label: "RIPTE: average taxable wage of stable workers, pesos"}
+  - {id: 57.1_SMVMM_0_M_34, source: datos_gob, frequency: M, measure: index, label: "Minimum wage, monthly, in the currency of each period"}
+  - {id: 58.1_MP_0_M_24, source: datos_gob, frequency: M, measure: index, label: "Minimum pension, monthly, in the currency of each period"}
+  - {id: 150.1_LA_POBREZA_0_D_13, source: datos_gob, frequency: M, measure: index, label: "Poverty line, typical household (2 adults, 2 children), pesos"}
+  - {id: 150.1_LA_INDICIA_0_D_16, source: datos_gob, frequency: M, measure: index, label: "Indigence line, typical household, pesos"}
+  - {id: 155.2_TLTAL_S_0_0_5, source: datos_gob, frequency: Q, measure: index, stale_days: 480, label: "Registered private wage earners (SIPA), seasonally adjusted"}
+  - {id: 53.1_TRTA_0_0_37, source: datos_gob, frequency: Q, measure: flow, label: "Employee compensation, share of GDP at factor cost"}
+  - {id: 53.1_TIMB_0_0_25, source: datos_gob, frequency: Q, measure: flow, label: "Mixed income, share of GDP at factor cost"}
+  - {id: 53.1_EBE_0_0_27, source: datos_gob, frequency: Q, measure: flow, label: "Operating surplus, share of GDP at factor cost"}
+  - {id: "indec_poverty", source: manual, frequency: S, measure: flow, allow_gaps: true, label: "INDEC poverty, persons, % (hand-kept from INDEC reports)"}
+  - {id: "indec_poverty#households", source: manual, frequency: S, measure: flow, allow_gaps: true, label: "INDEC poverty, households, %"}
+  - {id: "indec_poverty#indigence", source: manual, frequency: S, measure: flow, allow_gaps: true, label: "INDEC indigence, persons, %"}
+  - {id: "indec_poverty#indigence_households", source: manual, frequency: S, measure: flow, allow_gaps: true, label: "INDEC indigence, households, %"}
   # Finance Secretariat, central administration gross debt (monthly bulletin), millions of US dollars.
   - {id: "fin:a3|pesos_other", source: finanzas, frequency: M, measure: index, label: "Debt in pesos, not CER-linked"}
   - {id: "fin:a3|pesos_cer", source: finanzas, frequency: M, measure: index, label: "Debt in pesos, CER-linked"}
@@ -534,6 +552,16 @@ topics:
       reserve requirements, dollar deposits, loan quality, capital and
       profitability, concentration and the largest banks. From the BCRA's
       banking report and its monthly data on each institution.
+
+  - id: labor
+    slug: labor-social
+    group: Labor & Social
+    title: Labor & Poverty
+    description: >-
+      The labor market, wages and living standards: employment and
+      unemployment, registered jobs, real and dollar wages, the minimum
+      wage since 1965, poverty and indigence, what incomes buy, and income
+      distribution. From INDEC, the Ministry of Labor and ANSES.
 
   - id: fiscal
     slug: fiscal
@@ -3567,6 +3595,317 @@ indicators:
         osp: {label: Portfolio investment, expr: "osp"}
         osd: {label: Direct investment, expr: "osd"}
         tot: {label: Total, expr: "tot"}
+
+  # ---------------- Labor & social ----------------
+  - id: labor_rates
+    topic: labor
+    wide: true
+    kind: variants
+    overlay: true
+    measure: rate
+    title: Employment and Unemployment
+    short_title: Labor market
+    description: >-
+      Activity, employment, unemployment and underemployment rates from
+      INDEC's household survey (EPH), urban areas, quarterly since 2003.
+    source: derived
+    source_label: INDEC (Encuesta Permanente de Hogares), via datos.gob.ar
+    frequency: Q
+    units: "%"
+    transforms: [level, yoy]
+    ranges: [10Y, Max]
+    bands:
+      - {start: "2007-01-01", end: "2015-12-01", key: "INDEC intervention (2007-2015): survey figures to be used with caution"}
+    note: >-
+      Activity and employment rates: the labor force and the employed over
+      total population (all ages) of the 31 urban areas surveyed.
+      Unemployment and underemployment (working under 35 hours a week and
+      wanting more): over the labor force. Original data, not seasonally
+      adjusted: compare a quarter with the same quarter a year earlier. INDEC
+      itself warned in 2016 that EPH figures for 2007-2015 should be used with
+      caution (population projections and survey quality); the shaded period
+      marks them.
+    default: {variant: unemployment, transform: level, range: Max}
+    derive:
+      method: formula
+      anchor: u
+      vars: {a: 43.2_ECTAT_0_T_33, e: 44.2_ECTET_0_T_30, u: 45.2_ECTDT_0_T_33, s: 46.2_ECTST_0_T_36}
+      variants:
+        unemployment:    {label: Unemployment,    expr: "100 * u"}
+        underemployment: {label: Underemployment, expr: "100 * s"}
+        employment:      {label: Employment rate, expr: "100 * e"}
+        activity:        {label: Activity rate,   expr: "100 * a"}
+
+  - id: labor_registered
+    topic: labor
+    kind: variants
+    title: Registered Private Employment
+    short_title: Registered jobs
+    description: >-
+      Private-sector wage earners registered in the social security system
+      (SIPA), seasonally adjusted, quarterly since 1996.
+    source: datos_gob
+    source_label: Ministerio de Capital Humano (SIPA, EIL), via datos.gob.ar
+    frequency: Q
+    units: Workers
+    transforms: [level, yoy]
+    ranges: [10Y, Max]
+    note: >-
+      Registered (formal) private wage earners only: public employees, the
+      self-employed (monotributistas) and informal workers are not included.
+      The series on datos.gob.ar lags the Ministry's own releases by a few
+      months.
+    variants:
+      sipa: {label: Registered private wage earners (SIPA), id: 155.2_TLTAL_S_0_0_5}
+    default: {variant: sipa, transform: level, range: Max}
+
+  - id: labor_wages_real
+    topic: labor
+    wide: true
+    kind: variants
+    title: Real Wages
+    short_title: Real wages
+    description: >-
+      INDEC's wage index for registered private, public and unregistered
+      workers, and the average taxable wage of stable workers (RIPTE), in
+      real terms (deflated by the CPI). Monthly.
+    source: datos_gob
+    source_label: INDEC (Índice de salarios); Secretaría de Seguridad Social (RIPTE); via datos.gob.ar
+    frequency: M
+    units: Index and pesos
+    transforms: [level, yoy, mom]
+    ranges: [5Y, 10Y, Max]
+    deflate_with: {indicator: cpi_long, variant: corrected, label: CPI}
+    note: >-
+      Real terms: deflated by the CPI (corrected for 2007-2016, see the
+      long-run CPI). Use "Base = 100" to compare from the start of a
+      presidency. The unregistered (informal) wage index is published with a
+      five-month lag and moves in steps, as INDEC estimates it from the
+      household survey. RIPTE is the average taxable wage of workers employed
+      by the same firm for 13 months, before deductions, since 1994.
+    variants:
+      private:  {label: Registered private (index), id: 149.1_SOR_PRIADO_OCTU_0_25}
+      public:   {label: Public (index),             id: 149.1_SOR_PUBICO_OCTU_0_14}
+      informal: {label: Unregistered (index),       id: 149.1_SOR_PRIADO_OCTU_0_28}
+      total:    {label: All workers (index),        id: 149.1_TL_INDIIOS_OCTU_0_21}
+      ripte:    {label: RIPTE (pesos),              id: 158.1_REPTE_0_0_5}
+    default: {variant: private, transform: level, range: 10Y, real: true, base: "2023-11-01"}
+
+  - id: labor_minimum_wage
+    topic: labor
+    wide: true
+    kind: variants
+    log_level: false
+    title: Minimum Wage and Minimum Pension since 1965
+    short_title: Minimum wage
+    description: >-
+      The legal minimum wage (salario mínimo, vital y móvil, since 1965) and
+      the minimum pension (since 1971), monthly, in current pesos, converted
+      across Argentina's four currency changes; in real terms by default.
+    source: derived
+    source_label: Ministerio de Capital Humano and ANSES, via datos.gob.ar; deflated by the long-run CPI
+    frequency: M
+    units: Pesos per month
+    transforms: [level, yoy]
+    ranges: [10Y, 25Y, 50Y, Max]
+    deflate_with: {indicator: cpi_long, variant: corrected, label: CPI}
+    note: >-
+      Amounts in pesos moneda nacional, pesos ley 18.188, pesos argentinos
+      and australes are converted to today's pesos (1 peso = 10,000 australes
+      = 10 million pesos argentinos = 10^11 pesos ley = 10^13 pesos moneda
+      nacional). Real terms: deflated by the CPI since 1943 corrected for the
+      2007-2015 INDEC intervention, in pesos of the latest month. The minimum
+      wage was not updated for long stretches (1993-2003 among them), so
+      inflation eroded it in real terms. Future months show increases already
+      decreed.
+    default: {variant: smvm, transform: level, range: Max, real: true}
+    derive:
+      method: formula
+      anchor: w
+      vars: {w: 57.1_SMVMM_0_M_34, p: 58.1_MP_0_M_24}
+      variants:
+        smvm:    {label: Minimum wage,    expr: "ars(w)"}
+        pension: {label: Minimum pension, expr: "ars(p)"}
+
+  - id: labor_wages_usd
+    topic: labor
+    kind: variants
+    overlay: true
+    measure: flow
+    plain_level: true
+    title: Wages in Dollars
+    short_title: Dollar wages
+    description: >-
+      The average wage (RIPTE) converted to US dollars at the month's
+      average official rate and at the CCL rate, US dollars per month,
+      since 1994.
+    source: derived
+    source_label: Secretaría de Seguridad Social (RIPTE), via datos.gob.ar; BCRA; ArgentinaDatos and DolarAPI (CCL, unofficial)
+    frequency: M
+    units: US dollars per month
+    transforms: [level]
+    ranges: [10Y, Max]
+    note: >-
+      Another way to read the real exchange rate: what labor costs in
+      dollars (before employer contributions). During convertibility
+      (1994-2001) one peso was one dollar. At the CCL rate: the market rate
+      under exchange controls; before November 2011 it equals the official
+      rate, and there is no CCL series for November 2011 to December 2012.
+      Not adjusted for US inflation.
+    method_links: [{anchor: fx-rer, label: "About the real exchange rate"}]
+    default: {variant: official, transform: level, range: Max}
+    derive:
+      method: formula
+      anchor: r
+      vars: {r: 158.1_REPTE_0_0_5, ofx: "bcra:5", ccl: "dolar:ccl"}
+      vars_how: {ofx: mean, ccl: mean}
+      variants:
+        official: {label: At the official rate, expr: "fill(r / ofx, upto(r, \"2001-12-31\"))"}
+        ccl:      {label: At the CCL rate,      expr: "fill(r / ccl, upto(fill(r / ofx, upto(r, \"2001-12-31\")), \"2011-10-31\"))"}
+
+  - id: poverty
+    topic: labor
+    wide: true
+    kind: variants
+    overlay: true
+    measure: rate
+    plain_level: true
+    title: Poverty and Indigence
+    short_title: Poverty
+    description: >-
+      Share of people and households with incomes below the poverty line
+      and the indigence (extreme poverty) line, urban areas, by semester,
+      as published by INDEC since 2003.
+    source: manual
+    source_label: INDEC (Incidencia de la pobreza y la indigencia), from its reports
+    frequency: S
+    units: "%"
+    transforms: [level]
+    ranges: [Max]
+    bands:
+      - {start: "2007-01-01", end: "2013-01-01", key: "INDEC intervention: lines deflated by the intervened CPI, poverty understated"}
+      - {start: "2013-07-01", end: "2016-01-01", style: outline, key: "Not published (H2 2013 - H1 2016)"}
+    note: >-
+      Poverty: household income below the cost of the basic total basket
+      (food and other goods and services) for its members; indigence: below
+      the basic food basket. 2007-2013: INDEC kept publishing, but its baskets
+      were priced with the intervened CPI, so the lines were far too low and
+      poverty fell to implausible levels (4.7% in H1 2013); INDEC stopped
+      publishing after that semester and, after the 2016 statistical
+      emergency, resumed with a new method in H2 2016. The H2 2007 figure was
+      never estimated. Figures before and after 2016 are not comparable: the
+      2016 method uses new baskets and adult-equivalence scales.
+    variants:
+      persons:    {label: "Poverty, persons",      id: "indec_poverty"}
+      households: {label: "Poverty, households",   id: "indec_poverty#households"}
+      indigence:  {label: "Indigence, persons",    id: "indec_poverty#indigence"}
+      indig_hh:   {label: "Indigence, households", id: "indec_poverty#indigence_households"}
+    default: {variant: persons, transform: level, range: Max}
+
+  - id: labor_purchasing
+    topic: labor
+    wide: true
+    kind: variants
+    overlay: true
+    measure: flow
+    plain_level: true
+    title: What Incomes Buy
+    short_title: Incomes vs. poverty line
+    description: >-
+      The minimum wage, the minimum pension and the average wage (RIPTE)
+      as a multiple of the poverty line of a typical household (two adults,
+      two children), monthly since 2016.
+    source: derived
+    source_label: INDEC (canastas básicas); Ministerio de Capital Humano; ANSES; via datos.gob.ar
+    frequency: M
+    units: Times the household poverty line
+    transforms: [level]
+    ranges: [5Y, Max]
+    ref_line: 1
+    note: >-
+      Above 1: the income alone covers the basic total basket of a
+      household of four in Greater Buenos Aires (INDEC's reference
+      household: a man and a woman of 35 and 31, children of 6 and 8).
+      Each income is a single person's, gross (RIPTE before deductions),
+      while the household may have more earners and receive transfers, so
+      this is not a poverty measure. The minimum pension excludes the fixed
+      bonus paid on top of it (ARS 70,000 a month since March 2024), which
+      matters for this comparison.
+    default: {variant: smvm, transform: level, range: Max}
+    derive:
+      method: formula
+      anchor: lp
+      vars: {lp: 150.1_LA_POBREZA_0_D_13, w: 57.1_SMVMM_0_M_34, p: 58.1_MP_0_M_24, r: 158.1_REPTE_0_0_5}
+      variants:
+        smvm:    {label: Minimum wage,     expr: "w / lp"}
+        pension: {label: Minimum pension,  expr: "p / lp"}
+        ripte:   {label: Average wage (RIPTE), expr: "r / lp"}
+
+  - id: labor_inequality
+    topic: labor
+    kind: variants
+    plain_level: true
+    measure: flow
+    title: Income Inequality
+    short_title: Gini
+    description: >-
+      Gini coefficient of per capita household income (0: everyone has the
+      same income; 1: one household has everything), urban areas,
+      quarterly since 2003.
+    source: datos_gob
+    source_label: INDEC (Encuesta Permanente de Hogares), via datos.gob.ar
+    frequency: Q
+    units: Gini coefficient
+    transforms: [level]
+    ranges: [10Y, Max]
+    bands:
+      - {start: "2007-01-01", end: "2015-12-01", key: "INDEC intervention (2007-2015): survey figures to be used with caution"}
+    note: >-
+      From INDEC's household survey, which under-reports income at the top,
+      so the level is understated, as in most surveys. Quarters missing in
+      2007-2015 were not published.
+    variants:
+      gini: {label: Gini (per capita household income), id: 65.1_CGI_0_0_21}
+    default: {variant: gini, transform: level, range: Max}
+
+  - id: labor_share
+    topic: labor
+    kind: contributions
+    measure: flow
+    title: Labor Share of Income
+    short_title: Labor share
+    description: >-
+      Gross value added split into wages (employee compensation), mixed
+      income of the self-employed, and operating surplus, % of GDP at
+      factor cost, quarterly since 2016.
+    source: derived
+    source_label: INDEC (Cuenta generación del ingreso), via datos.gob.ar
+    frequency: Q
+    units: "% of GDP at factor cost"
+    ranges: [Max]
+    note: >-
+      Mixed income: earnings of the self-employed and unincorporated
+      businesses, part labor and part capital income. Operating surplus:
+      the return to capital of firms (before interest and taxes on profits).
+    contributions:
+      precomputed: true
+      total: total
+      total_label: GDP at factor cost
+      units: "%"
+      groups:
+        - {key: wages,   label: Employee compensation, add: [wages], color: copper}
+        - {key: mixed,   label: Mixed income,          add: [mixed], color: gold}
+        - {key: surplus, label: Operating surplus,     add: [surplus], color: sky}
+    default: {variant: wages, transform: level, range: Max}
+    derive:
+      method: formula
+      anchor: w
+      vars: {w: 53.1_TRTA_0_0_37, m: 53.1_TIMB_0_0_25, s: 53.1_EBE_0_0_27}
+      variants:
+        wages:   {label: Employee compensation, expr: "100 * w"}
+        mixed:   {label: Mixed income, expr: "100 * m"}
+        surplus: {label: Operating surplus, expr: "100 * s"}
+        total:   {label: Total, expr: "100 * (w + m + s)"}
 
   - id: fiscal_balance
     topic: fiscal

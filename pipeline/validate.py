@@ -36,6 +36,14 @@ def check_series(new: pd.Series, old: pd.Series, frequency: str = "M", measure: 
         return c
     if new.index.has_duplicates:
         c.errors.append("duplicate dates")
+    if frequency == "S":
+        # Semesters: H1 dated 1 January, H2 dated 1 July.
+        if not ((new.index.day == 1) & new.index.month.isin([1, 7])).all():
+            c.errors.append("semiannual dates not on 1 January / 1 July")
+        expected = pd.date_range(new.index.min(), new.index.max(), freq="6MS")
+        missing = expected.difference(new.index)
+        if len(missing):
+            (c.warnings if allow_gaps else c.errors).append(f"{len(missing)} missing semester(s), first {missing[0]:%Y-%m}")
     if frequency == "Y":
         if not ((new.index.day == 1) & (new.index.month == 1)).all():
             c.errors.append("annual dates not on 1 January")
@@ -110,6 +118,8 @@ def is_stale(last_obs: pd.Timestamp, today: pd.Timestamp, frequency: str = "M", 
         return months > STALE_MONTHS
     if frequency == "Q":  # quarter start dates; GDP lags ~2.5 months after quarter end
         return months > 9
+    if frequency == "S":  # INDEC publishes a semester about three months after it ends
+        return months > 15
     if frequency == "Y":  # 1 January of the year; published during the following year
         return months > 30
     return False

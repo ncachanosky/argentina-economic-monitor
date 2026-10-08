@@ -624,3 +624,17 @@ def test_itcrm_workbook_parse():
     pd.DataFrame(rows).to_excel(buf, header=False, index=False)
     p = itcrm.parse(buf.getvalue())
     assert p["m"].tolist() == [100.0, 99.0] and p["us"].iloc[0] == 102.0
+
+
+def test_currency_conversion_and_semiannual_validation():
+    from pipeline import derive
+    x = pd.Series([20000.0, 220.0, 7e6, 700.0, 59365.0, 59.37, 970000.0, 97.0],
+                  index=pd.to_datetime(["1969-12-01", "1970-01-01", "1983-05-01", "1983-06-01", "1985-06-01", "1985-07-01", "1991-12-01", "1992-01-01"]))
+    y = derive.to_current_pesos(x)
+    assert y.iloc[1] / y.iloc[0] == pytest.approx(1.1)        # 20,000 m$n = 200 pesos ley; then a 10% raise
+    assert y.iloc[3] == pytest.approx(y.iloc[2])               # same wage across the June 1983 change
+    assert y.iloc[5] == pytest.approx(y.iloc[4], rel=1e-3)     # and across the austral
+    assert y.iloc[-1] == 97.0 and y.iloc[-2] == pytest.approx(97.0)
+    s = pd.Series([1.0, 2.0, 3.0], index=pd.to_datetime(["2025-01-01", "2025-07-01", "2026-01-01"]))
+    assert validate.check_series(s, pd.Series(dtype=float), "S", "flow").ok
+    assert not validate.check_series(s.drop(pd.Timestamp("2025-07-01")), pd.Series(dtype=float), "S", "flow").ok

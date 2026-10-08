@@ -15,7 +15,7 @@ TABLE_KINDS = {"balance_sheet", "top10", "schedule", "placements", "curve"}   # 
 DERIVE_METHODS = {"splice", "reweight", "ratio", "tracker", "monthly", "flows", "expectations", "formula", "net_reserves"}
 RANGE_KEYS = {"2Y", "5Y", "10Y", "25Y", "50Y", "Max"}
 TRANSFORMS = {"level", "yoy", "mom", "ytd", "acc", "share"}
-FREQUENCIES = {"M", "Q", "D", "Y"}
+FREQUENCIES = {"M", "Q", "D", "Y", "S"}
 
 
 @dataclass(frozen=True)

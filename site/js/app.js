@@ -72,6 +72,7 @@
   const fmtDay = (iso) => new Date(iso + "T00:00:00Z").toLocaleDateString("en-US", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" });
   const fmtPeriod = (iso, freq) => {
     if (freq === "Y") return iso.length > 4 ? iso.slice(0, 4) : iso;
+    if (freq === "S") return `${Number(iso.slice(5, 7)) < 7 ? "H1" : "H2"} ${iso.slice(0, 4)}`;
     if (freq === "D") return fmtDay(iso);
     if (freq !== "Q") return fmtShortMonth(iso);
     const [y, m] = iso.split("-").map(Number);
@@ -548,10 +549,10 @@
     const real = Object.fromEntries(Object.entries(nominal).map(([k, vals]) =>
       [k, vals.map((x, i) => (x === null || !D.values[i] ? null : (x / D.values[i]) * D.latest_value))]));
     ind._realUnits = `${ind.units}, ${fmtShortMonth(D.latest)} prices`;
-    const seg = segmented([["nominal", "Nominal"], ["real", "Real"]], "nominal", (k) => {
-      for (const kk of Object.keys(ind.variants)) ind.variants[kk].values = k === "real" ? real[kk] : nominal[kk];
-      ind._real = k === "real"; seg.update(k); onChange();
-    }, "Nominal or real terms");
+    const apply = (k) => { for (const kk of Object.keys(ind.variants)) ind.variants[kk].values = k === "real" ? real[kk] : nominal[kk]; ind._real = k === "real"; };
+    const start = ind.default && ind.default.real ? "real" : "nominal";
+    if (start === "real") apply("real");
+    const seg = segmented([["nominal", "Nominal"], ["real", "Real"]], start, (k) => { apply(k); seg.update(k); onChange(); }, "Nominal or real terms");
     seg.title = `Real: deflated by the ${D.label}, in pesos of ${fmtMonth(D.latest)}`;
     return seg;
   }
@@ -807,12 +808,14 @@
           const ii = ind.overlay ? ind.dates.map((d, i) => i).filter((i) => (!start || ind.dates[i] >= start) && (!x.length || ind.dates[i] <= x[x.length - 1]) && (ind.frequency !== "D" || s.y[i] !== null)) : idx;
           let xx = ii.map((i) => ind.dates[i]), yy = ii.map((i) => s.y[i]);
           if (ind.frequency === "D") [xx, yy] = breakGaps(xx, yy);
+          if (ind.frequency === "S") [xx, yy] = breakGaps(xx, yy, 200);
           const color = cssVar(SERIES_VARS[slot]);
-          const hover = `%{x|${DF}}: <b>%{y:${yFmt()}}${sfx}</b><extra>${s.v.label}</extra>`;
+          const hover = `${ind.frequency === "S" ? "%{customdata}" : `%{x|${DF}}`}: <b>%{y:${yFmt()}}${sfx}</b><extra>${s.v.label}</extra>`;
           const emph = ind.emphasis === k;   // e.g. a total: thick and dark
           traces.push(state.transform === "mom"
             ? { type: "bar", x: xx, y: yy, name: s.v.label, marker: { color }, hovertemplate: hover, _slot: slot }
-            : { type: "scatter", mode: "lines", x: xx, y: yy, name: s.v.label, connectgaps: false,
+            : { type: "scatter", mode: ind.frequency === "S" ? "lines+markers" : "lines", x: xx, y: yy, name: s.v.label, connectgaps: false,
+                ...(ind.frequency === "S" ? { customdata: xx.map((d) => fmtPeriod(d, "S")), marker: { size: 5, color } } : {}),
                 line: emph ? { color: cssVar("--ink"), width: 3.2 } : slot && !ind.emphasis ? { color, width: 1.8, dash: "dash" } : { color, width: 2 },
                 ...(emph ? { _light: "#36454F" } : {}), hovertemplate: hover, _slot: slot });
         });

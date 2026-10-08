@@ -320,6 +320,20 @@ def gdp12(gdp: pd.Series, cpi: pd.Series) -> pd.Series:
     return out.reindex(idx)
 
 
+# Argentine currencies, as monthly series switch units: from these months a series is in
+# the new unit. Factor: units of that currency per current peso.
+#   peso moneda nacional -> peso ley 18.188 (1 Jan 1970, /100) -> peso argentino (Jun 1983,
+#   /10,000) -> austral (Jun 1985, /1,000; monthly series switch in July) -> peso (1 Jan 1992, /10,000).
+CURRENCY_STEPS = [("1970-01-01", 1e11), ("1983-06-01", 1e7), ("1985-07-01", 1e4), ("1992-01-01", 1.0)]
+
+
+def to_current_pesos(x: pd.Series) -> pd.Series:
+    factor = pd.Series(1e13, index=x.index)
+    for start, f in CURRENCY_STEPS:
+        factor[x.index >= pd.Timestamp(start)] = f
+    return x / factor
+
+
 def formula(ind, frames: dict[str, pd.Series]) -> tuple[pd.DataFrame, dict]:
     import ast
     spec = ind.derive
@@ -355,9 +369,10 @@ def formula(ind, frames: dict[str, pd.Series]) -> tuple[pd.DataFrame, dict]:
     env["lag"] = lambda x, k=1: x.shift(int(k))         # value k periods earlier
     env["gdp12"] = lambda gdp, cpi: gdp12(gdp, cpi)     # nominal GDP of the last twelve months, monthly
     env["fill"] = lambda x, y: x.fillna(y)               # x, and y where x is missing
+    env["ars"] = to_current_pesos                         # amounts in the currency of their time -> current pesos
     env["upto"] = lambda x, d: x.where(x.index <= pd.Timestamp(str(d)))   # x through date d, empty after
     env["cum12"] = lambda x: ((1 + x / 100).rolling(12).apply(np.prod, raw=True) - 1) * 100   # compounded % over 12 periods
-    funcs = {"nz", "sum4", "sum12", "avg12", "lag", "gdp12", "cum12", "fill", "upto"}
+    funcs = {"nz", "sum4", "sum12", "avg12", "lag", "gdp12", "cum12", "fill", "upto", "ars"}
     allowed = (ast.Expression, ast.BinOp, ast.UnaryOp, ast.Add, ast.Sub, ast.Mult, ast.Div, ast.Pow, ast.USub,
                ast.Name, ast.Load, ast.Constant, ast.Call)
     out = {}
