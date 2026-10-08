@@ -561,21 +561,25 @@
     dates.forEach((d, i) => { const v = values[i]; if (v === null || v === undefined) return; const y = d.slice(0, 4); if (!by.has(y)) by.set(y, []); by.get(y).push([Number(d.slice(5, 7)), v, d]); });
     const years = [], vals = []; let partial = null;
     const ys = [...by.keys()].sort();
+    // Quarterly data (quarter-start dates): a year is complete with four quarters, its last being Q4.
+    const quarterly = dates.length > 1 && dates.every((d) => [1, 4, 7, 10].includes(Number(d.slice(5, 7))));
+    const lastM = quarterly ? 10 : 12, full = quarterly ? 4 : 12;
     ys.forEach((y, n) => {
       const ms = by.get(y), last = ms[ms.length - 1];
       const nMonths = new Set(ms.map((m) => m[0])).size;
-      const complete = how === "sum" ? nMonths === 12 : last[0] === 12;
+      const complete = how === "sum" ? nMonths === full : last[0] === lastM;
       if (!complete && n < ys.length - 1) return;           // incomplete early years are skipped
       if (!complete && how === "sum" && n === 0) return;
-      const dec = ms.filter((m) => m[0] === 12);
+      const dec = ms.filter((m) => m[0] === lastM);
       const v = how === "sum" ? ms.reduce((a, m) => a + m[1], 0) : (dec.length ? dec[dec.length - 1] : last)[1];
       years.push(complete ? y : `${y}*`); vals.push(v);
-      if (!complete) partial = { year: y, first: ms[0][2], last: last[2] };
+      if (!complete) partial = { year: y, first: ms[0][2], last: last[2], quarterly };
     });
     return { years, values: vals, partial };
   }
   const yearlyNote = (how, partial) => (!partial ? "" : how === "sum"
-    ? `*${partial.year}: ${fmtShortMonth(partial.first).split(" ")[0]}–${fmtShortMonth(partial.last)}, year to date.`
+    ? (partial.quarterly ? `*${partial.year}: ${fmtPeriod(partial.first, "Q").split(" ")[0]}–${fmtPeriod(partial.last, "Q")}, year to date.`
+      : `*${partial.year}: ${fmtShortMonth(partial.first).split(" ")[0]}–${fmtShortMonth(partial.last)}, year to date.`)
     : `*${partial.year}: twelve months to ${fmtShortMonth(partial.last)}.`);
 
   // Where GDP comes from in ratios to GDP, and links to the methodology.
@@ -1376,6 +1380,90 @@
       h("a", { href: `${ROOT}about/`, "aria-current": PAGE === "about" ? "page" : null }, "About"));
   }
 
+  // ---------- card: a statement (balance of payments, investment position) as a table ----------
+  // Flows: a quarter, the last four quarters, the year to date or a calendar year, against
+  // the same period a year earlier. Stocks: a quarter-end against a quarter and a year earlier.
+  function statementCard(ind) {
+    const S = ind.statement || {};
+    const card = cardFrame(ind, true);
+    const D = ind.dates;
+    const V = (k) => (ind.variants[k] ? ind.variants[k].values : []);
+    const last = (() => { for (let i = D.length - 1; i >= 0; i--) if (V(S.rows.find((r) => r.key).key)[i] !== null) return i; return D.length - 1; })();
+    const qLabel = (i) => fmtPeriod(D[i], "Q");
+    const state = { mode: S.stock ? "stock" : "q", end: last };
+    const fmt = (v) => (v === null || v === undefined || Number.isNaN(v) ? "–" : (v < 0 ? "−" : "") + Math.abs(Math.round(v)).toLocaleString("en-US"));
+    const fmtD = (v) => (v === null || v === undefined || Number.isNaN(v) ? "–" : (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(Math.round(v)).toLocaleString("en-US"));
+    // Sum of quarters i0..i1 (inclusive) of a row; null if any is missing.
+    const sum = (k, i0, i1) => { if (i0 < 0) return null; let a = 0; for (let i = i0; i <= i1; i++) { const v = V(k)[i]; if (v === null || v === undefined) return null; a += v; } return a; };
+    const quarterNo = (i) => Math.floor((Number(D[i].slice(5, 7)) - 1) / 3) + 1;
+    // Period [i0, i1] for the mode and its end quarter; and its label.
+    function period(end) {
+      if (state.mode === "q" || state.mode === "stock") return [end, end, qLabel(end)];
+      if (state.mode === "l4") return [end - 3, end, `4 quarters to ${qLabel(end)}`];
+      if (state.mode === "ytd") { const n = quarterNo(end); return [end - n + 1, end, n === 4 ? D[end].slice(0, 4) : `${D[end].slice(0, 4)} to Q${n}`]; }
+      return [end - 3, end, D[end].slice(0, 4)];   // calendar year: end is a Q4
+    }
+    const endChoices = () => D.map((d, i) => i).filter((i) => i <= last && (state.mode !== "year" || quarterNo(i) === 4) && (state.mode === "q" || state.mode === "stock" || i >= 3));
+    const modeSeg = S.stock ? null : segmented([["q", "Quarter"], ["l4", "Last 4 quarters"], ["ytd", "Year to date"], ["year", "Calendar year"]], state.mode, (k) => {
+      state.mode = k; modeSeg.update(k);
+      const ok = endChoices(); if (!ok.includes(state.end)) state.end = ok[ok.length - 1];
+      fillSel(); draw();
+    }, "Period");
+    const sel = h("select", { "aria-label": "Period" });
+    sel.addEventListener("change", () => { state.end = Number(sel.value); draw(); });
+    function fillSel() {
+      sel.replaceChildren(...endChoices().slice().reverse().map((i) => h("option", { value: i, selected: i === state.end ? true : null },
+        state.mode === "year" ? D[i].slice(0, 4) : qLabel(i))));
+    }
+    const tableEl = h("div", { class: "table-scroll flat" });
+    const hint = h("p", { class: "hint" });
+    let view = null;
+    function draw() {
+      const [i0, i1, lab] = period(state.end);
+      let cols;   // [{label, get(key)}]
+      if (S.stock) {
+        cols = [
+          { label: qLabel(i1), get: (k) => V(k)[i1] },
+          { label: i1 >= 1 ? qLabel(i1 - 1) : "–", get: (k) => (i1 >= 1 ? V(k)[i1 - 1] : null) },
+          { label: i1 >= 4 ? qLabel(i1 - 4) : "–", get: (k) => (i1 >= 4 ? V(k)[i1 - 4] : null) },
+        ];
+        cols.push({ label: "Change, quarter", delta: true, get: (k) => (cols[0].get(k) !== null && cols[1].get(k) !== null && cols[1].get(k) !== undefined ? cols[0].get(k) - cols[1].get(k) : null) });
+        cols.push({ label: "Change, year", delta: true, get: (k) => (cols[0].get(k) !== null && cols[2].get(k) !== null && cols[2].get(k) !== undefined ? cols[0].get(k) - cols[2].get(k) : null) });
+      } else {
+        const prevLab = period(state.end - 4)[2];
+        cols = [
+          { label: lab, get: (k) => sum(k, i0, i1) },
+          { label: state.end >= 4 ? prevLab : "–", get: (k) => sum(k, i0 - 4, i1 - 4) },
+        ];
+        cols.push({ label: "Change", delta: true, get: (k) => { const a = cols[0].get(k), b = cols[1].get(k); return a !== null && b !== null ? a - b : null; } });
+      }
+      const rows = S.rows.map((r) => {
+        if (!r.key) return h("tr", { class: "st-head" + (r.rule ? " rule" : "") }, h("td", { class: "pres", colspan: cols.length + 1 }, r.heading));
+        const label = ind.variants[r.key] ? ind.variants[r.key].label : r.key;
+        const cls = [r.bold ? "st-bold" : "", r.rule ? "rule" : ""].join(" ").trim();
+        return h("tr", { class: cls || null },
+          h("td", { class: "pres", style: `padding-left:${10 + 18 * (r.indent || 0)}px` }, label),
+          ...cols.map((c) => { const v = c.get(r.key); return h("td", { class: c.delta ? "st-delta" : null }, c.delta ? fmtD(v) : fmt(v)); }));
+      });
+      tableEl.replaceChildren(h("table", { class: "data statement" },
+        h("thead", {}, h("tr", {}, h("th", {}, ind.units), ...cols.map((c) => h("th", {}, c.label)))), h("tbody", {}, rows)));
+      hint.textContent = S.stock ? `End-of-quarter positions; latest: ${qLabel(last)}.`
+        : `Flows over the period, against the same period a year earlier. Latest quarter: ${qLabel(last)}.`;
+      view = { header: ["item", ...cols.map((c) => c.label)],
+        rows: S.rows.filter((r) => r.key).map((r) => [ind.variants[r.key].label, ...cols.map((c) => { const v = c.get(r.key); return v === null || v === undefined ? "" : +v.toFixed(1); })]) };
+    }
+    const onCSV = () => { if (view) downloadBlob(toCSV(view.header, view.rows), `${ind.id}_${state.mode}_${D[state.end]}.csv`, "text/csv"); };
+    fillSel();
+    appendAll(card, h("div", { class: "controls" }, modeSeg, h("span", { class: "spacer" }), h("label", { class: "inline-select" }, S.stock ? "Quarter: " : "Ending: ", sel)),
+      hint, tableEl, ind.note ? h("p", { class: "chips-note" }, ind.note) : null, methodLine(ind),
+      h("div", { class: "card-foot" },
+        h("span", {}, `Source: ${ind.source_label} · Latest: ${qLabel(last)}`),
+        h("div", { class: "actions" },
+          h("button", { class: "btn", type: "button", onclick: onCSV, title: "Download this view as CSV" }, "CSV"))));
+    card.draw = () => draw();
+    return card;
+  }
+
   // ---------- card: dollar futures curve ----------
   function curveCard(ind) {
     const T = ind.table;
@@ -1800,7 +1888,7 @@
     const chipsEl = h("div", { class: "chips", role: "group", "aria-label": "Components to compare" });
     const rSeg = segmented(rangeKeys(ind).map((k) => [k, k]), state.range, (k) => { state.range = k; drawAll(); }, "Time range");
     const CY = C.yearly;
-    const ySeg = CY ? segmented([["monthly", "Monthly"], ["yearly", "Yearly"]], "monthly", (k) => { state.yearly = k === "yearly"; ySeg.update(k); drawAll(); }, "Frequency") : null;
+    const ySeg = CY ? segmented([["monthly", ind.frequency === "Q" ? "Quarterly" : "Monthly"], ["yearly", "Yearly"]], "monthly", (k) => { state.yearly = k === "yearly"; ySeg.update(k); drawAll(); }, "Frequency") : null;
     const hintEl = h("p", { class: "hint" });
     let table;
 
@@ -2041,6 +2129,7 @@
         : ind.kind === "schedule" ? scheduleCard(ind)
         : ind.kind === "placements" ? placementsCard(ind)
         : ind.kind === "curve" ? curveCard(ind)
+        : ind.kind === "statement" ? statementCard(ind)
         : variantsCard(ind, !!ind.wide)));
     topicsEl2.replaceChildren(h("section", { class: "topic", id: `topic-${topic.id}` }, cards));
     $("#tiles").replaceChildren(...inds.filter((i) => i.headline).map((i) => tile(i)).filter(Boolean));

@@ -221,6 +221,12 @@ details.table-view { margin-top: 8px; font-family: var(--font-ui); font-size: 13
 details.table-view summary { cursor: pointer; color: var(--ink-2); }
 .table-scroll { max-height: 280px; overflow: auto; margin-top: 6px; border: 1px solid var(--rule); border-radius: 6px; }
 .table-scroll.flat { max-height: none; }
+table.statement td.pres { white-space: normal; min-width: 220px; }
+table.statement tr.st-bold td { font-weight: 700; color: var(--ink); }
+table.statement tr.rule td { border-top: 1px solid var(--rule); }
+table.statement tr.st-head td { font-family: var(--font-ui); font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-3); padding-top: 12px; }
+table.statement td.st-delta { color: var(--ink-2); }
+.inline-select { font-family: var(--font-ui); font-size: 14px; color: var(--ink-2); display: inline-flex; align-items: center; gap: 6px; }
 table.data { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; }
 table.data th, table.data td { padding: 4px 10px; text-align: right; border-bottom: 1px solid var(--grid); white-space: nowrap; }
 table.data th:first-child, table.data td:first-child { text-align: left; }

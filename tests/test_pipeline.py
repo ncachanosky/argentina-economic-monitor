@@ -599,3 +599,15 @@ def test_annual_series_validation():
     assert not validate.check_series(gap, pd.Series(dtype=float), "Y", "flow").ok
     assert not validate.is_stale(pd.Timestamp("2025-01-01"), pd.Timestamp("2026-10-08"), "Y")
     assert validate.is_stale(pd.Timestamp("2023-01-01"), pd.Timestamp("2026-10-08"), "Y")
+
+
+def test_formula_inputs_aggregate_by_vars_how():
+    from types import SimpleNamespace
+    from pipeline import derive
+    m = monthly([1.0] * 6 + [2.0] * 6, start="2025-01-01")
+    ind = SimpleNamespace(frequency="Q", derive={"vars": {"a": "x", "b": "y"}, "vars_how": {"a": "sum"},
+                                                 "variants": {"s": {"label": "s", "expr": "a"}, "l": {"label": "l", "expr": "b"}}},
+                          variants={"s": SimpleNamespace(source_id="d:s"), "l": SimpleNamespace(source_id="d:l")})
+    out, _ = derive.formula(ind, {"x": m, "y": m})
+    assert out["d:s"].tolist() == [3.0, 3.0, 6.0, 6.0]        # quarterly sums
+    assert out["d:l"].tolist() == [1.0, 1.0, 2.0, 2.0]        # last month of the quarter

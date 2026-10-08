@@ -10,7 +10,7 @@ ROOT = Path(__file__).resolve().parents[1]
 REGISTRY_PATH = ROOT / "registry" / "series.yaml"
 RELEASES_PATH = ROOT / "registry" / "releases.yaml"
 
-KINDS = {"variants", "panel", "contributions", "balance_sheet", "top10", "schedule", "placements", "curve"}
+KINDS = {"variants", "panel", "contributions", "balance_sheet", "top10", "schedule", "placements", "curve", "statement"}
 TABLE_KINDS = {"balance_sheet", "top10", "schedule", "placements", "curve"}   # cards that read a full table (data/tables/<source>), no series
 DERIVE_METHODS = {"splice", "reweight", "ratio", "tracker", "monthly", "flows", "expectations", "formula", "net_reserves"}
 RANGE_KEYS = {"2Y", "5Y", "10Y", "25Y", "50Y", "Max"}
@@ -72,6 +72,7 @@ class Indicator:
     yearly: dict | None = None         # monthly cards: a yearly view {how: december|sum, variants: [...]} (see app.js)
     ref_line: float | None = None      # variants card: a dashed horizontal reference line (e.g. 100)
     method_links: list | None = None   # [{anchor, label}]: links to sections of the methodology page
+    statement: dict | None = None      # statement card: {rows: [{key, label, indent, bold}], ...} over the variants
 
     def input_ids(self) -> list[str]:
         """Source series this indicator reads (its variants, or a derivation's inputs)."""
@@ -311,6 +312,7 @@ def load(path: Path = REGISTRY_PATH, releases_path: Path = RELEASES_PATH) -> Reg
                 yearly=item.get("yearly"),
                 ref_line=item.get("ref_line"),
                 method_links=item.get("method_links"),
+                statement=item.get("statement"),
                 view_start=str(item["view_start"]) + ("-01" if len(str(item["view_start"])) == 7 else "") if item.get("view_start") else None,
             )
         )

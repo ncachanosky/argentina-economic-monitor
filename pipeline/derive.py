@@ -325,23 +325,27 @@ def formula(ind, frames: dict[str, pd.Series]) -> tuple[pd.DataFrame, dict]:
     spec = ind.derive
     names = spec["vars"]
     idx = pd.DatetimeIndex(sorted(set().union(*[frames[i].index for i in names.values()])))
+    # How a higher-frequency input is brought to the formula's frequency: its
+    # last value (default), or the period's sum (flows) or mean (averages).
+    how = spec.get("vars_how") or {}
+    agg = lambda r, v: (r.sum(min_count=1) if how.get(v) == "sum" else r.mean() if how.get(v) == "mean" else r.last())
     if ind.frequency == "Q":
-        # Monthly inputs enter a quarterly formula at their quarter's last month.
-        def q(sr):
+        # Monthly (and daily) inputs enter a quarterly formula at their quarter's last value, or as set in vars_how.
+        def q(sr, k):
             sr = sr.dropna()
             if len(sr) > 2 and sr.index.to_series().diff().dt.days.median() < 40:
-                sr = sr.resample("QS").last()
+                sr = agg(sr.resample("QS"), k)
             return sr
-        frames = {**frames, **{v: q(frames[v]) for v in names.values()}}
+        frames = {**frames, **{v: q(frames[v], k) for k, v in names.items()}}
         idx = pd.DatetimeIndex(sorted(set().union(*[frames[i].index for i in names.values()])))
     elif ind.frequency == "M":
         # Daily inputs enter a monthly formula at their month's last value.
-        def m(sr):
+        def m(sr, k):
             sr = sr.dropna()
             if len(sr) > 2 and sr.index.to_series().diff().dt.days.median() < 20:
-                sr = sr.resample("MS").last()
+                sr = agg(sr.resample("MS"), k)
             return sr
-        frames = {**frames, **{v: m(frames[v]) for v in names.values()}}
+        frames = {**frames, **{v: m(frames[v], k) for k, v in names.items()}}
         idx = pd.DatetimeIndex(sorted(set().union(*[frames[i].index for i in names.values()])))
     env = {k: frames[v].reindex(idx) for k, v in names.items()}
     env["nz"] = lambda x: x.fillna(0)

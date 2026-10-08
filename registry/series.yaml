@@ -308,6 +308,58 @@ inputs:
   - {id: 81.2_IICING_0_T_47, source: datos_gob, frequency: Q, measure: index, label: "Import quantity index (2004 = 100)"}
   - {id: 183.1_COBROS_EXPNES_0_M_27, source: datos_gob, frequency: M, measure: flow, label: "Balance cambiario: export receipts (goods)"}
   - {id: 183.1_PAGOS_IMPONES_0_M_26, source: datos_gob, frequency: M, measure: flow, label: "Balance cambiario: import payments (goods)"}
+  # Balance of payments (INDEC, BPM6) and international investment position, quarterly, millions of US dollars, via datos.gob.ar.
+  - {id: 160.2_TL_CUENNTE_0_T_22, source: datos_gob, frequency: Q, measure: flow, allow_gaps: true, label: "Current account"}
+  - {id: 160.2_CTA_CORIOS_0_T_39, source: datos_gob, frequency: Q, measure: flow, allow_gaps: true, label: "Goods and services"}
+  - {id: 160.2_CTA_CORNES_0_T_46, source: datos_gob, frequency: Q, measure: flow, allow_gaps: true, label: "Goods"}
+  - {id: 160.2_CTA_CORFOB_0_T_59, source: datos_gob, frequency: Q, measure: flow, allow_gaps: true, label: "Goods exports FOB"}
+  - {id: 160.2_CTA_CORRFOB_0_T_59, source: datos_gob, frequency: Q, measure: flow, allow_gaps: true, label: "Goods imports FOB"}
+  - {id: 160.2_CTA_CORIOS_0_T_49, source: datos_gob, frequency: Q, measure: flow, allow_gaps: true, label: "Services"}
+  - {id: 160.2_CTA_CORIOS_0_T_52, source: datos_gob, frequency: Q, measure: flow, allow_gaps: true, label: "Services credits"}
+  - {id: 160.2_CTA_CORIOS_0_T_51, source: datos_gob, frequency: Q, measure: flow, allow_gaps: true, label: "Services debits"}
+  - {id: 160.2_CTA_CORIOS_0_T_41, source: datos_gob, frequency: Q, measure: flow, allow_gaps: true, label: "Primary income"}
+  - {id: 160.2_CTA_CORDOS_0_T_49, source: datos_gob, frequency: Q, measure: flow, allow_gaps: true, label: "Compensation of employees"}
+  - {id: 160.2_CTA_CORION_0_T_58, source: datos_gob, frequency: Q, measure: flow, allow_gaps: true, label: "Investment income"}
+  - {id: 160.2_CCTE_INCTA_0_T_51, source: datos_gob, frequency: Q, measure: flow, allow_gaps: true, label: "Investment income: direct investment"}
+  - {id: 160.2_IESOS_PERA_0_T_53, source: datos_gob, frequency: Q, measure: flow, allow_gaps: true, label: "Investment income: portfolio investment"}
+  - {id: 160.2_CTA_CORION_0_T_57, source: datos_gob, frequency: Q, measure: flow, allow_gaps: true, label: "Investment income: other investment"}
+  - {id: 160.2_CTA_CORIOS_0_T_37, source: datos_gob, frequency: Q, measure: flow, allow_gaps: true, label: "Secondary income"}
+  - {id: 160.2_TL_CUENTAL_0_T_20, source: datos_gob, frequency: Q, measure: flow, allow_gaps: true, label: "Capital account"}
+  - {id: 160.2_TL_CUENERA_0_T_23, source: datos_gob, frequency: Q, measure: flow, allow_gaps: true, label: "Financial account"}
+  - {id: 160.2_CTA_FINCTA_0_T_41, source: datos_gob, frequency: Q, measure: flow, allow_gaps: true, label: "Financial account: direct investment"}
+  - {id: 160.2_CFIN_INTAL_0_T_57, source: datos_gob, frequency: Q, measure: flow, allow_gaps: true, label: "Direct investment assets: equity"}
+  - {id: 160.2_CTA_FINUDA_0_T_59, source: datos_gob, frequency: Q, measure: flow, allow_gaps: true, label: "Direct investment assets: debt"}
+  - {id: 160.2_CFIN_PASINTAL_0_T_57, source: datos_gob, frequency: Q, measure: flow, allow_gaps: true, label: "Direct investment liabilities: equity"}
+  - {id: 160.2_CFIN_INUDA_0_T_52, source: datos_gob, frequency: Q, measure: flow, allow_gaps: true, label: "Direct investment liabilities: debt"}
+  - {id: 160.2_CTA_FINERA_0_T_41, source: datos_gob, frequency: Q, measure: flow, allow_gaps: true, label: "Financial account: portfolio investment"}
+  - {id: 160.2_CFIN_INTAL_AC_0_T_57, source: datos_gob, frequency: Q, measure: flow, allow_gaps: true, label: "Portfolio assets: equity"}
+  - {id: 160.2_CTA_ACFINUDA_0_T_59, source: datos_gob, frequency: Q, measure: flow, allow_gaps: true, label: "Portfolio assets: debt"}
+  - {id: 160.2_CFIN_PAINTAL_0_T_57, source: datos_gob, frequency: Q, measure: flow, allow_gaps: true, label: "Portfolio liabilities: equity"}
+  - {id: 160.2_CTA_PAFINUDA_0_T_59, source: datos_gob, frequency: Q, measure: flow, allow_gaps: true, label: "Portfolio liabilities: debt"}
+  - {id: 160.2_CTA_FINROS_0_T_36, source: datos_gob, frequency: Q, measure: flow, allow_gaps: true, label: "Financial derivatives"}
+  - {id: 160.2_CTA_FINION_0_T_38, source: datos_gob, frequency: Q, measure: flow, allow_gaps: true, label: "Financial account: other investment"}
+  - {id: 160.2_AVOS_RERVA_0_T_15, source: datos_gob, frequency: Q, measure: flow, allow_gaps: true, label: "Reserve assets"}
+  - {id: 160.2_ERES_OMTOS_0_T_23, source: datos_gob, frequency: Q, measure: flow, allow_gaps: true, label: "Net errors and omissions"}
+  - {id: 144.2_PCIONETA_0_T_37, source: datos_gob, frequency: Q, measure: flow, allow_gaps: true, label: "Net international investment position"}
+  - {id: 144.2_AVOSCALES_0_T_24, source: datos_gob, frequency: Q, measure: flow, allow_gaps: true, label: "IIP assets: total"}
+  - {id: 144.2_IRSIONCTA_0_T_17, source: datos_gob, frequency: Q, measure: flow, allow_gaps: true, label: "IIP assets: direct investment"}
+  - {id: 144.2_IRSIONERA_0_T_17, source: datos_gob, frequency: Q, measure: flow, allow_gaps: true, label: "IIP assets: portfolio investment"}
+  - {id: 144.2_OINVERRAL_0_T_25, source: datos_gob, frequency: Q, measure: flow, allow_gaps: true, label: "IIP assets: other investment"}
+  - {id: 144.2_MDADEPRAL_0_T_27, source: datos_gob, frequency: Q, measure: flow, allow_gaps: true, label: "IIP assets: currency and deposits"}
+  - {id: 144.2_AVOSRELES_0_T_29, source: datos_gob, frequency: Q, measure: flow, allow_gaps: true, label: "IIP assets: reserve assets"}
+  - {id: 144.2_PVOSTRLES_0_T_20, source: datos_gob, frequency: Q, measure: flow, allow_gaps: true, label: "IIP liabilities: total"}
+  - {id: 144.2_PVOSINLES_0_T_38, source: datos_gob, frequency: Q, measure: flow, allow_gaps: true, label: "IIP liabilities: direct investment"}
+  - {id: 144.2_PVOSINLESC_0_T_38, source: datos_gob, frequency: Q, measure: flow, allow_gaps: true, label: "IIP liabilities: portfolio investment"}
+  - {id: 144.2_PVOSDELES_0_T_42, source: datos_gob, frequency: Q, measure: flow, allow_gaps: true, label: "IIP liabilities: financial derivatives"}
+  - {id: 144.2_PVOSOTION_0_T_22, source: datos_gob, frequency: Q, measure: flow, allow_gaps: true, label: "IIP liabilities: other investment"}
+  - {id: 144.4_BOCENTRAL_0_T_19, source: datos_gob, frequency: Q, measure: flow, allow_gaps: true, label: "Net IIP: central bank"}
+  - {id: 144.4_GERNOGRAL_0_T_22, source: datos_gob, frequency: Q, measure: flow, allow_gaps: true, label: "Net IIP: general government"}
+  - {id: 144.4_SEDADESTOS_0_T_31, source: datos_gob, frequency: Q, measure: flow, allow_gaps: true, label: "Net IIP: deposit-taking corporations"}
+  - {id: 144.4_OSSECTRES_0_T_14, source: datos_gob, frequency: Q, measure: flow, allow_gaps: true, label: "Net IIP: other sectors"}
+  - {id: 144.4_AVOSOTLESIN_0_T_30, source: datos_gob, frequency: Q, measure: flow, allow_gaps: true, label: "IIP assets of other sectors: total"}
+  - {id: 144.4_AVOSOTRAL_0_T_46, source: datos_gob, frequency: Q, measure: flow, allow_gaps: true, label: "IIP assets of other sectors: direct investment"}
+  - {id: 144.4_AVOSOTLES_0_T_48, source: datos_gob, frequency: Q, measure: flow, allow_gaps: true, label: "IIP assets of other sectors: portfolio investment"}
+  - {id: 144.4_AVOSOTUAL_0_T_54, source: datos_gob, frequency: Q, measure: flow, allow_gaps: true, label: "IIP assets of other sectors: other investment"}
   # Finance Secretariat, central administration gross debt (monthly bulletin), millions of US dollars.
   - {id: "fin:a3|pesos_other", source: finanzas, frequency: M, measure: index, label: "Debt in pesos, not CER-linked"}
   - {id: "fin:a3|pesos_cer", source: finanzas, frequency: M, measure: index, label: "Debt in pesos, CER-linked"}
@@ -416,7 +468,7 @@ topics:
       component and by industry.
   - id: trade
     slug: international-trade
-    group: Activity
+    group: External Sector
     title: International Trade
     description: >-
       Exports and imports of goods: the trade balance since 1910, what
@@ -424,6 +476,16 @@ topics:
       the terms of trade, trading partners, and goods shipped against the
       dollars settled in the foreign-exchange market. From INDEC and the
       BCRA.
+
+  - id: bop
+    slug: balance-of-payments
+    group: External Sector
+    title: Balance of Payments
+    description: >-
+      Argentina's transactions with the rest of the world, quarterly: the
+      current account and its parts, how it was financed, investment income,
+      and the international investment position (what residents own abroad
+      and owe to non-residents). From INDEC.
 
   - id: prices
     slug: prices
@@ -3033,6 +3095,472 @@ indicators:
   # Fiscal flows: national non-financial public sector, cash basis (IMIG,
   # Secretaría de Hacienda). Ratios to GDP: the last twelve months over the
   # nominal GDP of the same twelve months (gdp12 in pipeline/derive.py).
+
+  # ---------------- Balance of payments ----------------
+  - id: bop_statement
+    topic: bop
+    wide: true
+    kind: statement
+    measure: flow
+    title: Balance of Payments
+    short_title: BoP statement
+    description: >-
+      The balance of payments as a statement, millions of US dollars: a
+      quarter, the last four quarters, the year to date or a calendar year,
+      against the same period a year earlier.
+    source: derived
+    source_label: INDEC (Balance de pagos, BPM6), via datos.gob.ar
+    frequency: Q
+    units: Millions of US dollars
+    note: >-
+      Sixth edition of the IMF's Balance of Payments Manual (BPM6). In the
+      financial account a positive figure is net lending to the rest of the
+      world: residents acquired more foreign assets than the liabilities
+      they incurred (assets and liabilities are each shown as net flows, a
+      positive liability being an inflow). The current and capital accounts
+      plus net errors and omissions equal the financial account. Investment
+      income from reserve assets and items INDEC does not break out are in
+      "Reserve assets and other".
+    method_links: [{anchor: bop, label: "Reading the balance of payments"}]
+    statement:
+      rows:
+        - {key: ca,  bold: true}
+        - {key: gs,  indent: 1}
+        - {key: gd,  indent: 2}
+        - {key: gx,  indent: 3}
+        - {key: gm,  indent: 3}
+        - {key: sv,  indent: 2}
+        - {key: sx,  indent: 3}
+        - {key: sm,  indent: 3}
+        - {key: pi,  indent: 1}
+        - {key: cw,  indent: 2}
+        - {key: ii,  indent: 2}
+        - {key: id,  indent: 3}
+        - {key: ip,  indent: 3}
+        - {key: io,  indent: 3}
+        - {key: ir,  indent: 3}
+        - {key: si,  indent: 1}
+        - {key: ka,  bold: true}
+        - {key: nl,  bold: true, rule: true}
+        - {key: fa,  bold: true}
+        - {key: di,  indent: 1}
+        - {key: da,  indent: 2}
+        - {key: dl,  indent: 2}
+        - {key: pf,  indent: 1}
+        - {key: pa,  indent: 2}
+        - {key: pl,  indent: 2}
+        - {key: dv,  indent: 1}
+        - {key: oi,  indent: 1}
+        - {key: ra,  indent: 1}
+        - {key: eo,  bold: true, rule: true}
+    default: {variant: ca}
+    derive:
+      method: formula
+      anchor: ca
+      vars: {ca: 160.2_TL_CUENNTE_0_T_22, gs: 160.2_CTA_CORIOS_0_T_39, gd: 160.2_CTA_CORNES_0_T_46, gx: 160.2_CTA_CORFOB_0_T_59, gm: 160.2_CTA_CORRFOB_0_T_59, sv: 160.2_CTA_CORIOS_0_T_49, sx: 160.2_CTA_CORIOS_0_T_52, sm: 160.2_CTA_CORIOS_0_T_51, pi: 160.2_CTA_CORIOS_0_T_41, cw: 160.2_CTA_CORDOS_0_T_49, ii: 160.2_CTA_CORION_0_T_58, id: 160.2_CCTE_INCTA_0_T_51, ip: 160.2_IESOS_PERA_0_T_53, io: 160.2_CTA_CORION_0_T_57, si: 160.2_CTA_CORIOS_0_T_37, ka: 160.2_TL_CUENTAL_0_T_20, fa: 160.2_TL_CUENERA_0_T_23, di: 160.2_CTA_FINCTA_0_T_41, dae: 160.2_CFIN_INTAL_0_T_57, dad: 160.2_CTA_FINUDA_0_T_59, dle: 160.2_CFIN_PASINTAL_0_T_57, dld: 160.2_CFIN_INUDA_0_T_52, pf: 160.2_CTA_FINERA_0_T_41, pae: 160.2_CFIN_INTAL_AC_0_T_57, pad: 160.2_CTA_ACFINUDA_0_T_59, ple: 160.2_CFIN_PAINTAL_0_T_57, pld: 160.2_CTA_PAFINUDA_0_T_59, dv: 160.2_CTA_FINROS_0_T_36, oi: 160.2_CTA_FINION_0_T_38, ra: 160.2_AVOS_RERVA_0_T_15, eo: 160.2_ERES_OMTOS_0_T_23}
+      variants:
+        ca: {label: Current account, expr: "ca"}
+        gs: {label: Goods and services, expr: "gs"}
+        gd: {label: Goods, expr: "gd"}
+        gx: {label: "Exports (FOB)", expr: "gx"}
+        gm: {label: "Imports (FOB)", expr: "gm"}
+        sv: {label: Services, expr: "sv"}
+        sx: {label: Credits (exports), expr: "sx"}
+        sm: {label: Debits (imports), expr: "sm"}
+        pi: {label: Primary income, expr: "pi"}
+        cw: {label: Compensation of employees, expr: "cw"}
+        ii: {label: Investment income, expr: "ii"}
+        id: {label: Direct investment, expr: "id"}
+        ip: {label: Portfolio investment, expr: "ip"}
+        io: {label: Other investment, expr: "io"}
+        ir: {label: Reserve assets and other, expr: "ii - id - ip - io"}
+        si: {label: Secondary income, expr: "si"}
+        ka: {label: Capital account, expr: "ka"}
+        nl: {label: "Net lending (+) / borrowing (−), current and capital accounts", expr: "ca + ka"}
+        fa: {label: "Financial account (net lending +)", expr: "fa"}
+        di: {label: Direct investment, expr: "di"}
+        da: {label: Net acquisition of assets, expr: "dae + dad"}
+        dl: {label: Net incurrence of liabilities, expr: "dle + dld"}
+        pf: {label: Portfolio investment, expr: "pf"}
+        pa: {label: Net acquisition of assets, expr: "pae + pad"}
+        pl: {label: Net incurrence of liabilities, expr: "ple + pld"}
+        dv: {label: Financial derivatives, expr: "dv"}
+        oi: {label: Other investment, expr: "oi"}
+        ra: {label: Reserve assets, expr: "ra"}
+        eo: {label: Net errors and omissions, expr: "eo"}
+
+  - id: bop_current_account
+    topic: bop
+    wide: true
+    kind: contributions
+    measure: flow
+    title: The Current Account and Its Parts
+    short_title: Current account
+    description: >-
+      Goods, services, primary income (interest, profits and dividends) and
+      secondary income (transfers), and the current-account balance,
+      millions of US dollars, quarterly since 2006.
+    source: derived
+    source_label: INDEC (Balance de pagos), via datos.gob.ar
+    frequency: Q
+    units: Millions of US dollars
+    ranges: [5Y, 10Y, Max]
+    note: >-
+      Accrual basis: transactions when they happen, not when they are paid
+      (for the cash view, see the balance cambiario on the Exchange Rate
+      page). Goods here are valued FOB on both sides, so the goods balance
+      differs from the customs trade balance, which values imports CIF.
+    method_links: [{anchor: bop, label: "Reading the balance of payments"}]
+    contributions:
+      precomputed: true
+      total: ca
+      total_label: Current account
+      units: "US$ m"
+      suffix: " m"
+      groups:
+        - {key: gd, label: Goods,            add: [gd], color: copper}
+        - {key: sv, label: Services,         add: [sv], color: sky}
+        - {key: pi, label: Primary income,   add: [pi], color: lavender}
+        - {key: si, label: Secondary income, add: [si], color: sage}
+    yearly: {how: sum}
+    default: {variant: gd, transform: level, range: Max}
+    derive:
+      method: formula
+      anchor: ca
+      vars: {ca: 160.2_TL_CUENNTE_0_T_22, gd: 160.2_CTA_CORNES_0_T_46, sv: 160.2_CTA_CORIOS_0_T_49, pi: 160.2_CTA_CORIOS_0_T_41, si: 160.2_CTA_CORIOS_0_T_37}
+      variants:
+        gd: {label: Goods, expr: "gd"}
+        sv: {label: Services, expr: "sv"}
+        pi: {label: Primary income, expr: "pi"}
+        si: {label: Secondary income, expr: "si"}
+        ca: {label: Current account, expr: "ca"}
+
+  - id: bop_ca_gdp
+    topic: bop
+    kind: variants
+    overlay: true
+    measure: rate
+    validate_as: flow
+    plain_level: true
+    title: Current Account, % of GDP
+    short_title: Current account, % GDP
+    description: >-
+      The current-account balance of the last four quarters as a share of
+      GDP in dollars, and the goods-and-services balance.
+    source: derived
+    source_label: INDEC (balance of payments, GDP); BCRA (exchange rate)
+    frequency: Q
+    units: "% of GDP"
+    transforms: [level]
+    ranges: [10Y, Max]
+    ref_line: 0
+    note: >-
+      GDP in dollars: each quarter's GDP at current prices converted at that
+      quarter's average official (wholesale) exchange rate. When the
+      official rate is held far below the market rate (2011-2015, 2019-2025)
+      this overstates dollar GDP and so understates the ratios.
+    method_links: [{anchor: bop, label: "Reading the balance of payments"}]
+    default: {variant: ca, transform: level, range: Max}
+    derive:
+      method: formula
+      anchor: ca
+      vars: {ca: 160.2_TL_CUENNTE_0_T_22, gs: 160.2_CTA_CORIOS_0_T_39, gdp: 4.4_OGP_2004_T_17, fx: "bcra:5"}
+      vars_how: {fx: mean}
+      variants:
+        ca: {label: Current account,    expr: "100 * sum4(ca) / sum4(gdp / 4 / fx)"}
+        gs: {label: Goods and services, expr: "100 * sum4(gs) / sum4(gdp / 4 / fx)"}
+
+  - id: bop_financing
+    topic: bop
+    wide: true
+    kind: contributions
+    measure: flow
+    title: How the Current Account Was Financed
+    short_title: Financing
+    description: >-
+      The balance of the current and capital accounts (the line) and where
+      it went: the financial account by type of flow, and errors and
+      omissions, millions of US dollars, quarterly since 2006.
+    source: derived
+    source_label: INDEC (Balance de pagos), via datos.gob.ar
+    frequency: Q
+    units: Millions of US dollars
+    ranges: [5Y, 10Y, Max]
+    note: >-
+      Above zero: net lending to the rest of the world (residents acquiring
+      more foreign assets than they borrow: capital outflow, or reserves
+      rising). Below zero: net borrowing (capital inflow, or reserves
+      falling). A current-account deficit (line below zero) must be matched
+      by bars below zero. Other investment includes residents' purchases of
+      foreign currency and deposits abroad and trade credit; errors and
+      omissions are shown with the sign that closes the identity.
+    method_links: [{anchor: bop, label: "Reading the balance of payments"}]
+    contributions:
+      precomputed: true
+      total: nl
+      total_label: Current and capital accounts
+      units: "US$ m"
+      suffix: " m"
+      groups:
+        - {key: di, label: Direct investment,    add: [di], color: copper}
+        - {key: pf, label: Portfolio investment, add: [pf], color: sky}
+        - {key: oi, label: Other investment,     add: [oi], color: sage}
+        - {key: dv, label: Derivatives,          add: [dv], color: slate}
+        - {key: ra, label: Reserve assets,       add: [ra], color: gold}
+        - {key: eo, label: Errors and omissions, add: [eo], color: neutral}
+    yearly: {how: sum}
+    default: {variant: di, transform: level, range: Max}
+    derive:
+      method: formula
+      anchor: fa
+      vars: {fa: 160.2_TL_CUENERA_0_T_23, ca: 160.2_TL_CUENNTE_0_T_22, ka: 160.2_TL_CUENTAL_0_T_20, di: 160.2_CTA_FINCTA_0_T_41, pf: 160.2_CTA_FINERA_0_T_41, oi: 160.2_CTA_FINION_0_T_38, dv: 160.2_CTA_FINROS_0_T_36, ra: 160.2_AVOS_RERVA_0_T_15, eo: 160.2_ERES_OMTOS_0_T_23}
+      variants:
+        di: {label: Direct investment, expr: "di"}
+        pf: {label: Portfolio investment, expr: "pf"}
+        oi: {label: Other investment, expr: "oi"}
+        dv: {label: Derivatives, expr: "dv"}
+        ra: {label: Reserve assets, expr: "ra"}
+        eo: {label: Errors and omissions, expr: "-eo"}
+        nl: {label: Current and capital accounts, expr: "ca + ka"}
+
+  - id: bop_income
+    topic: bop
+    wide: true
+    kind: contributions
+    measure: flow
+    title: Interest, Profits and Dividends
+    short_title: Primary income
+    description: >-
+      Primary income by type: what Argentina earns on its foreign assets
+      minus what it pays on its foreign liabilities, millions of US dollars,
+      quarterly since 2006.
+    source: derived
+    source_label: INDEC (Balance de pagos), via datos.gob.ar
+    frequency: Q
+    units: Millions of US dollars
+    ranges: [5Y, 10Y, Max]
+    note: >-
+      Direct investment income: profits and dividends of foreign-owned
+      firms (paid out or reinvested) net of those of Argentine firms abroad.
+      Portfolio income: interest and dividends on securities, including the
+      government's bonds. Other investment: interest on loans (the IMF and
+      other official lenders among them) and deposits. Reserve assets and
+      other: what INDEC does not break out, mainly the return on reserves.
+    contributions:
+      precomputed: true
+      total: pi
+      total_label: Primary income
+      units: "US$ m"
+      suffix: " m"
+      groups:
+        - {key: id, label: Direct investment,    add: [id], color: copper}
+        - {key: ip, label: Portfolio investment, add: [ip], color: sky}
+        - {key: io, label: Other investment,     add: [io], color: sage}
+        - {key: ir, label: Reserve assets and other, add: [ir], color: gold}
+        - {key: cw, label: Compensation of employees, add: [cw], color: neutral}
+    yearly: {how: sum}
+    default: {variant: id, transform: level, range: Max}
+    derive:
+      method: formula
+      anchor: pi
+      vars: {pi: 160.2_CTA_CORIOS_0_T_41, cw: 160.2_CTA_CORDOS_0_T_49, ii: 160.2_CTA_CORION_0_T_58, id: 160.2_CCTE_INCTA_0_T_51, ip: 160.2_IESOS_PERA_0_T_53, io: 160.2_CTA_CORION_0_T_57}
+      variants:
+        id: {label: Direct investment, expr: "id"}
+        ip: {label: Portfolio investment, expr: "ip"}
+        io: {label: Other investment, expr: "io"}
+        ir: {label: Reserve assets and other, expr: "ii - id - ip - io"}
+        cw: {label: Compensation of employees, expr: "cw"}
+        pi: {label: Primary income, expr: "pi"}
+
+  - id: bop_accrual_cash
+    topic: bop
+    kind: variants
+    overlay: true
+    measure: flow
+    plain_level: true
+    title: Accrual against Cash
+    short_title: Accrual vs. cash
+    description: >-
+      The goods-and-services balance in the balance of payments against the
+      same balance in the foreign-exchange market (balance cambiario), last
+      four quarters, millions of US dollars.
+    source: derived
+    source_label: INDEC (balance of payments); BCRA (balance cambiario)
+    frequency: Q
+    units: Millions of US dollars, last 4 quarters
+    transforms: [level]
+    ranges: [10Y, Max]
+    ref_line: 0
+    note: >-
+      The balance of payments records goods and services when they are
+      traded; the balance cambiario records the dollars when they are paid.
+      A cash balance below the accrual balance means exporters and importers
+      are financing trade abroad (or holding export dollars out of the
+      market); above it, they are bringing the dollars in early.
+    method_links: [{anchor: balance-cambiario, label: "About the balance cambiario"}]
+    default: {variant: bop, transform: level, range: Max}
+    derive:
+      method: formula
+      anchor: gs
+      vars: {gs: 160.2_CTA_CORIOS_0_T_39, cg: "bcrabc:goods", cs: "bcrabc:services"}
+      vars_how: {cg: sum, cs: sum}
+      variants:
+        bop:  {label: Balance of payments (accrual), expr: "sum4(gs)"}
+        cash: {label: Balance cambiario (cash),      expr: "sum4(cg + cs)"}
+
+  - id: iip_statement
+    topic: bop
+    wide: true
+    kind: statement
+    measure: flow
+    title: International Investment Position
+    short_title: Investment position
+    description: >-
+      What residents own abroad and owe to non-residents at the end of each
+      quarter, millions of US dollars, against a quarter and a year earlier.
+    source: derived
+    source_label: INDEC (Posición de inversión internacional), via datos.gob.ar
+    frequency: Q
+    units: Millions of US dollars
+    note: >-
+      Stocks at market value at the end of the quarter, so they change with
+      flows and also with prices and exchange rates. A positive net position
+      means residents own more abroad than they owe: Argentina's is positive
+      because the private sector's holdings abroad, largely foreign currency
+      and deposits, exceed the government's foreign debt.
+    method_links: [{anchor: bop, label: "Reading the balance of payments"}]
+    statement:
+      stock: true
+      rows:
+        - {key: net, bold: true}
+        - {key: at,  bold: true, rule: true}
+        - {key: adi, indent: 1}
+        - {key: apf, indent: 1}
+        - {key: aoi, indent: 1}
+        - {key: acd, indent: 2}
+        - {key: ara, indent: 1}
+        - {key: lt,  bold: true, rule: true}
+        - {key: ldi, indent: 1}
+        - {key: lpf, indent: 1}
+        - {key: ldv, indent: 1}
+        - {key: loi, indent: 1}
+        - {heading: Net position by sector, rule: true}
+        - {key: ncb, indent: 1}
+        - {key: ngg, indent: 1}
+        - {key: ndc, indent: 1}
+        - {key: nos, indent: 1}
+    default: {variant: net}
+    derive:
+      method: formula
+      anchor: net
+      vars: {net: 144.2_PCIONETA_0_T_37, at: 144.2_AVOSCALES_0_T_24, adi: 144.2_IRSIONCTA_0_T_17, apf: 144.2_IRSIONERA_0_T_17, aoi: 144.2_OINVERRAL_0_T_25, acd: 144.2_MDADEPRAL_0_T_27, ara: 144.2_AVOSRELES_0_T_29, lt: 144.2_PVOSTRLES_0_T_20, ldi: 144.2_PVOSINLES_0_T_38, lpf: 144.2_PVOSINLESC_0_T_38, ldv: 144.2_PVOSDELES_0_T_42, loi: 144.2_PVOSOTION_0_T_22, ncb: 144.4_BOCENTRAL_0_T_19, ngg: 144.4_GERNOGRAL_0_T_22, ndc: 144.4_SEDADESTOS_0_T_31, nos: 144.4_OSSECTRES_0_T_14, ost: 144.4_AVOSOTLESIN_0_T_30, osd: 144.4_AVOSOTRAL_0_T_46, osp: 144.4_AVOSOTLES_0_T_48, oso: 144.4_AVOSOTUAL_0_T_54}
+      variants:
+        net: {label: Net international investment position, expr: "net"}
+        at:  {label: Assets, expr: "at"}
+        adi: {label: Direct investment, expr: "adi"}
+        apf: {label: Portfolio investment, expr: "apf"}
+        aoi: {label: Other investment, expr: "aoi"}
+        acd: {label: of which currency and deposits, expr: "acd"}
+        ara: {label: Reserve assets, expr: "ara"}
+        lt:  {label: Liabilities, expr: "lt"}
+        ldi: {label: Direct investment, expr: "ldi"}
+        lpf: {label: Portfolio investment, expr: "lpf"}
+        ldv: {label: Financial derivatives, expr: "ldv"}
+        loi: {label: Other investment, expr: "loi"}
+        ncb: {label: Central bank, expr: "ncb"}
+        ngg: {label: General government, expr: "ngg"}
+        ndc: {label: Banks (deposit-taking corporations), expr: "ndc"}
+        nos: {label: Other sectors (firms and households), expr: "nos"}
+
+  - id: iip_sectors
+    topic: bop
+    wide: true
+    kind: contributions
+    measure: flow
+    title: Net Investment Position by Sector
+    short_title: Net position by sector
+    description: >-
+      Each sector's foreign assets minus its foreign liabilities, and the
+      country's net international investment position (the line), millions
+      of US dollars, quarterly since 2016.
+    source: derived
+    source_label: INDEC (Posición de inversión internacional), via datos.gob.ar
+    frequency: Q
+    units: Millions of US dollars
+    ranges: [5Y, Max]
+    note: >-
+      The general government is a large net debtor (bonds, the IMF and other
+      official lenders); firms and households are a larger net creditor,
+      through assets held abroad and foreign currency held at home. The
+      central bank's position nets its reserves against its foreign
+      liabilities (the China swap and repos among them).
+    method_links: [{anchor: bop, label: "Reading the balance of payments"}]
+    contributions:
+      precomputed: true
+      total: net
+      total_label: Net international investment position
+      units: "US$ m"
+      suffix: " m"
+      groups:
+        - {key: nos, label: Other sectors (firms and households), add: [nos], color: sage}
+        - {key: ncb, label: Central bank, add: [ncb], color: gold}
+        - {key: ndc, label: Banks, add: [ndc], color: sky}
+        - {key: ngg, label: General government, add: [ngg], color: copper}
+    default: {variant: nos, transform: level, range: Max}
+    derive:
+      method: formula
+      anchor: net
+      vars: {net: 144.2_PCIONETA_0_T_37, ncb: 144.4_BOCENTRAL_0_T_19, ngg: 144.4_GERNOGRAL_0_T_22, ndc: 144.4_SEDADESTOS_0_T_31, nos: 144.4_OSSECTRES_0_T_14}
+      variants:
+        nos: {label: Other sectors, expr: "nos"}
+        ncb: {label: Central bank, expr: "ncb"}
+        ndc: {label: Banks, expr: "ndc"}
+        ngg: {label: General government, expr: "ngg"}
+        net: {label: Net position, expr: "net"}
+
+  - id: iip_private_abroad
+    topic: bop
+    wide: true
+    kind: contributions
+    measure: flow
+    title: What Firms and Households Hold Abroad
+    short_title: Private assets abroad
+    description: >-
+      Foreign assets of the private non-financial sector by type, millions
+      of US dollars, quarterly since 2016.
+    source: derived
+    source_label: INDEC (Posición de inversión internacional), via datos.gob.ar
+    frequency: Q
+    units: Millions of US dollars
+    ranges: [5Y, Max]
+    note: >-
+      "Other sectors" in INDEC's terms: firms other than banks, and
+      households. Other investment is mostly foreign currency and deposits:
+      dollar banknotes kept outside the banking system ("in the mattress")
+      and deposits in banks abroad, which INDEC estimates partly from
+      purchases recorded in the foreign-exchange market. Portfolio
+      investment: foreign securities. Direct investment: Argentine firms'
+      stakes in companies abroad.
+    contributions:
+      precomputed: true
+      total: tot
+      total_label: Total foreign assets
+      units: "US$ m"
+      suffix: " m"
+      groups:
+        - {key: oso, label: Other investment (mostly currency and deposits), add: [oso], color: sage}
+        - {key: osp, label: Portfolio investment, add: [osp], color: sky}
+        - {key: osd, label: Direct investment, add: [osd], color: copper}
+    default: {variant: oso, transform: level, range: Max}
+    derive:
+      method: formula
+      anchor: tot
+      vars: {tot: 144.4_AVOSOTLESIN_0_T_30, osd: 144.4_AVOSOTRAL_0_T_46, osp: 144.4_AVOSOTLES_0_T_48, oso: 144.4_AVOSOTUAL_0_T_54}
+      variants:
+        oso: {label: Other investment, expr: "oso"}
+        osp: {label: Portfolio investment, expr: "osp"}
+        osd: {label: Direct investment, expr: "osd"}
+        tot: {label: Total, expr: "tot"}
 
   - id: fiscal_balance
     topic: fiscal
