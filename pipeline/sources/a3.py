@@ -35,6 +35,7 @@ from . import FetchResult
 URL = ("https://apicem.matbarofex.com.ar/api/v2/closing-prices?product=DLR&segment=Monedas&type=FUT"
        "&excludeEmptyVol=false&from={a}&to={b}&page={p}&pageSize={n}")
 FIRST = dt.date(2019, 1, 1)
+RECENT_DAYS = 120          # once the history is stored, each run fetches only this window
 PAGE = 5000
 TIMEOUT = 90
 CONTRACT_USD = 1000
@@ -128,14 +129,34 @@ def series(df: pd.DataFrame) -> dict[str, pd.Series]:
     return {"f12": pd.Series(f12).sort_index(), "f6": pd.Series(f6).sort_index(), "oi": pd.Series(oi).sort_index()}
 
 
+def _stored(sid: str) -> pd.Series:
+    try:
+        from .. import store
+        return store.as_of(sid)
+    except Exception:
+        return pd.Series(dtype=float)
+
+
 def fetch(ids, rows: list[dict] | None = None) -> FetchResult:
+    """Full history on the first run (or with AEM_FULL_REFRESH=1); afterwards only the last
+    RECENT_DAYS, spliced onto the stored history (the API is undocumented: go easy on it)."""
+    import os
     global LAST
     try:
-        df = frame(rows if rows is not None else download())
+        since = None
+        if rows is None:
+            held = _stored("a3:oi")
+            if len(held) and held.index.min() <= pd.Timestamp(FIRST) + pd.Timedelta(days=400) and not os.environ.get("AEM_FULL_REFRESH"):
+                since = (held.index.max() - pd.Timedelta(days=RECENT_DAYS)).date()
+            rows = download(first=since or FIRST)
+        df = frame(rows)
         if df.empty:
             raise ValueError("no futures data returned")
         LAST = df
         parsed = series(df)
+        if since is not None:
+            cut = pd.Timestamp(df.date.min())
+            parsed = {k: pd.concat([_stored(f"a3:{k}").loc[lambda x: x.index < cut], v]) for k, v in parsed.items()}
     except Exception as exc:
         return FetchResult(data=pd.DataFrame(columns=["date", "series_id", "value"]), errors={sid: str(exc) for sid in ids})
     frames, meta, errors = [], {}, {}
