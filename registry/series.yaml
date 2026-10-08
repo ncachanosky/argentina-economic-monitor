@@ -3523,20 +3523,20 @@ indicators:
       parity: the month's average yield on fixed-rate Treasury letters (TEA)
       over the US Treasury 52-week bill yield; it includes any risk premium,
       so it overstates expected devaluation when holding pesos is risky.
-      Futures: the six-month dollar-futures price over the official rate at
-      the end of the month, annualized (A3 Mercados, from 2020).
+      Futures: the twelve-month dollar-futures price over the official rate
+      at the end of the month (A3 Mercados, from 2020).
       Actual: the change in the official rate over the following twelve
       months, known only a year later.
     method_links: [{anchor: fx-devaluation, label: "How devaluation expectations are measured"}]
     default: {variant: survey, transform: level, range: 5Y}
     derive:
       method: formula
-      vars: {rem: "rem:fx12", offa: "@fx_official:wholesale:avg", ofx: "bcra:5", f6: "a3:f6", be: "fin:col|breakeven", tea: "fin:col|tea_fixed_m", ust: "ust:52w"}
+      vars: {rem: "rem:fx12", offa: "@fx_official:wholesale:avg", ofx: "bcra:5", f12: "a3:f12", be: "fin:col|breakeven", tea: "fin:col|tea_fixed_m", ust: "ust:52w"}
       variants:
         survey:   {label: Survey (REM),          expr: "100 * (rem / offa - 1)"}
         auctions: {label: Auctions (breakeven),  expr: "be"}
         parity:   {label: Interest parity,       expr: "100 * ((1 + tea / 100) / (1 + ust / 100) - 1)"}
-        futures:  {label: Futures (A3),          expr: "100 * ((f6 / ofx) ** (365 / 182) - 1)"}
+        futures:  {label: Futures (A3),          expr: "100 * (f12 / ofx - 1)"}
         actual:   {label: "Actual, next 12 months", expr: "100 * (lag(offa, -12) / offa - 1)"}
 
   - id: fx_futures_curve
@@ -3592,13 +3592,14 @@ indicators:
     note: >-
       Each day the curve of settlement prices is interpolated (log-linearly
       in days to expiry) at 182 and 365 days. Six months: annualized by
-      compounding. Twelve months: only when the longest contract reaches
-      about ten months (rarely before 2025), extrapolating the last stretch.
+      compounding. Twelve months: extrapolated from the two longest contracts
+      when the curve stops short of a year (empty if it stops before ten
+      months).
       Futures prices include a risk premium, so they are an upper estimate
       of the expected rate. Compounding six months to a year overstates the
       annual figure when the market expects a one-off jump (late 2023).
     method_links: [{anchor: fx-futures, label: "About dollar futures"}]
-    default: {variant: m6, transform: level, range: 2Y}
+    default: {variant: m12, transform: level, range: 2Y}
     derive:
       method: formula
       anchor: ofx
