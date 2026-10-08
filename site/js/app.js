@@ -1482,7 +1482,7 @@
     const D = ind.dates, V = (k) => ind.variants[k].values;
     const weekday = D.map((d) => { const w = new Date(d + "T00:00:00Z").getUTCDay(); return w !== 0 && w !== 6; });
     const lastIdx = (k) => { const v = V(k); for (let i = v.length - 1; i >= 0; i--) if (v[i] !== null) return i; return -1; };
-    const state = { mode: "m", ref: "avg2003", date: "2015-12-17" };
+    const state = { mode: "m", ref: "avg2003", date: "2015-12-17", calc: "one", dA: "2015-12-17", dB: D[D.length - 1], alpha: 0.5 };
     const REFS = [
       ["avg1997", "Average since 1997"], ["avg2003", "Average since 2003 (after convertibility)"], ["avg2016", "Average since 2016"],
       ["med2003", "Median since 2003"], ["d20151217", "17 Dec 2015 (exchange-rate unification)"], ["date", "A date of your choice…"],
@@ -1492,6 +1492,16 @@
     const dateIn = h("input", { type: "date", value: state.date, min: D[0], max: D[D.length - 1], "aria-label": "Reference date", hidden: true });
     refSel.addEventListener("change", () => { state.ref = refSel.value; dateIn.hidden = state.ref !== "date"; draw(); });
     dateIn.addEventListener("change", () => { if (dateIn.value) { state.date = dateIn.value; draw(); } });
+    const calcSeg = segmented([["one", "Restore a reference"], ["two", "Two equilibrium dates"]], state.calc, (c) => {
+      state.calc = c; calcSeg.update(c); refWrap.hidden = c !== "one"; twoWrap.hidden = c !== "two"; draw();
+    }, "Question");
+    const inA = h("input", { type: "date", value: state.dA, min: D[0], max: D[D.length - 1], "aria-label": "First equilibrium date" });
+    const inB = h("input", { type: "date", value: state.dB, min: D[0], max: D[D.length - 1], "aria-label": "Second equilibrium date" });
+    inA.addEventListener("change", () => { if (inA.value) { state.dA = inA.value; draw(); } });
+    inB.addEventListener("change", () => { if (inB.value) { state.dB = inB.value; draw(); } });
+    const aOut = h("b", {}, state.alpha.toFixed(2));
+    const aIn = h("input", { type: "range", min: "0.3", max: "0.7", step: "0.05", value: String(state.alpha), "aria-label": "Weight of non-tradables (alpha)" });
+    aIn.addEventListener("input", () => { state.alpha = Number(aIn.value); aOut.textContent = state.alpha.toFixed(2); draw(); });
     const outEl = h("div", { class: "rer-out" });
     const chartEl = h("div", { class: "chart", role: "img", "aria-label": "Real exchange rate and the reference" });
     const fmtR = (v, d = 0) => (v === null || v === undefined || isNaN(v) ? "–" : Number(v).toLocaleString("en-US", { minimumFractionDigits: d, maximumFractionDigits: d }));
@@ -1499,6 +1509,29 @@
     const sample = (k, from) => V(k).map((v, i) => [D[i], v]).filter(([d, v], i) => v !== null && weekday[i] && d >= from).map(([, v]) => v);
     const mean = (a) => a.reduce((x, y) => x + y, 0) / a.length;
     const quant = (a, q) => { const b = [...a].sort((x, y) => x - y); const p = (b.length - 1) * q, lo = Math.floor(p); return b[lo] + (b[Math.min(lo + 1, b.length - 1)] - b[lo]) * (p - lo); };
+    function at(k, day) { let j = -1; for (let i = 0; i < D.length && D[i] <= day; i++) if (V(k)[i] !== null) j = i; return j; }
+    function drawTwo() {
+      const k = state.mode, a = Math.min(at(k, state.dA), at(k, state.dB)), b = Math.max(at(k, state.dA), at(k, state.dB));
+      if (a < 0 || b < 0 || a === b) { outEl.replaceChildren(h("p", { class: "hint" }, "Pick two different dates with data.")); return null; }
+      const rA = V(k)[a], rB = V(k)[b], dln = Math.log(rB / rA), al = state.alpha;
+      const years = (isoMs(D[b]) - isoMs(D[a])) / (365.25 * dayMs);
+      const g = -dln / al, total = 100 * (Math.exp(g) - 1), perYear = 100 * (Math.exp(g / years) - 1);
+      const tA = at("tot", D[a]), tB = at("tot", D[b]);
+      const totCh = tA >= 0 && tB >= 0 && tA !== tB ? 100 * (V("tot")[tB] / V("tot")[tA] - 1) : null;
+      const rer = 100 * (rB / rA - 1);
+      outEl.replaceChildren(
+        h("div", { class: "rer-grid" },
+          h("div", { class: "rer-tile" }, h("div", { class: "rer-k" }, "Real exchange rate"), h("div", { class: "rer-v" }, `${fmtR(rA, 1)} → ${fmtR(rB, 1)}`),
+            h("div", { class: "rer-s" }, `${fmtDay(D[a])} to ${fmtDay(D[b])}: ${pct(rer)} (${rer < 0 ? "real appreciation" : "real depreciation"})`)),
+          h("div", { class: "rer-tile" }, h("div", { class: "rer-k" }, "Required change in relative productivity, total"), h("div", { class: "rer-v" }, pct(total)),
+            h("div", { class: "rer-s" }, `over ${years.toFixed(1)} years, with α = ${al.toFixed(2)}`)),
+          h("div", { class: "rer-tile" }, h("div", { class: "rer-k" }, "Required change, per year"), h("div", { class: "rer-v" }, pct(perYear)),
+            h("div", { class: "rer-s" }, "compounded annual rate")),
+          h("div", { class: "rer-tile" }, h("div", { class: "rer-k" }, "Terms of trade over the same span"), h("div", { class: "rer-v" }, totCh === null ? "–" : pct(totCh)),
+            h("div", { class: "rer-s" }, totCh === null ? "no quarterly data for these dates" : `${fmtPeriod(D[tA], "Q")} to ${fmtPeriod(D[tB], "Q")} (INDEC); a rise also supports a stronger peso`))),
+        h("p", { class: "hint" }, `If both dates were equilibria, Argentina's productivity in tradables relative to non-tradables, compared with its trading partners, must have ${g >= 0 ? "risen" : "fallen"} ${pct(Math.abs(total)).replace("+", "")} for the real exchange rate to move ${pct(rer)} (Balassa–Samuelson: Δln RER = −α × Δln relative productivity). Everything is attributed to productivity: other fundamentals, such as the terms of trade, would reduce or add to it.`));
+      return { a, b };
+    }
     function refValue(k) {
       const r = state.ref;
       if (r === "avg1997") return { v: mean(sample(k, "1997-01-01")), label: "average since 1997" };
@@ -1511,6 +1544,7 @@
       return j < 0 ? { v: null, label: fmtDay(day) } : { v: V(k)[j], label: fmtDay(D[j]), date: D[j] };
     }
     function draw() {
+      if (state.calc === "two") return drawTwoChart(drawTwo());
       const k = state.mode, fxk = k === "m" ? "ofx" : "ccl", fxName = k === "m" ? "official (wholesale) rate" : "CCL rate";
       const i = lastIdx(k), jf = lastIdx(fxk);
       const now = V(k)[i], fxNow = V(fxk)[jf];
@@ -1546,13 +1580,35 @@
       ];
       Plotly.react(chartEl, tr, baseLayout({ yaxis: { tickformat: ".0f" }, extra: { shapes, showlegend: false, hovermode: "closest", margin: { l: 48, r: 16, t: 10, b: 36 } } }), PLOT_CONFIG);
     }
+    function lineXY(k) {
+      const x = [], y = [];
+      D.forEach((d, n) => {
+        if (V(k)[n] === null || !weekday[n]) return;
+        if (x.length && isoMs(d) - isoMs(x[x.length - 1]) > 31 * dayMs) { x.push(d); y.push(null); }
+        x.push(d); y.push(V(k)[n]);
+      });
+      return { x, y };
+    }
+    function drawTwoChart(sel) {
+      const k = state.mode, { x, y } = lineXY(k);
+      const tr = [{ type: "scatter", mode: "lines", name: ind.variants[k].label, x, y, line: { color: cssVar(SERIES_VARS[0]), width: 1.6 },
+        hovertemplate: "%{x|%d %b %Y}: <b>%{y:.1f}</b><extra></extra>" }];
+      if (sel) tr.push({ type: "scatter", mode: "markers+text", name: "Equilibrium dates", x: [D[sel.a], D[sel.b]], y: [V(k)[sel.a], V(k)[sel.b]],
+        text: ["A", "B"], textposition: "top center", textfont: { color: cssVar("--ink") },
+        marker: { color: cssVar("--ink"), size: 10, symbol: "diamond" }, hovertemplate: "%{x|%d %b %Y}: <b>%{y:.1f}</b><extra></extra>" });
+      Plotly.react(chartEl, tr, baseLayout({ yaxis: { tickformat: ".0f" }, extra: { showlegend: false, hovermode: "closest", margin: { l: 48, r: 16, t: 10, b: 36 } } }), PLOT_CONFIG);
+    }
     const caveats = h("div", { class: "chips-note rer-caveats" },
       h("p", {}, h("b", {}, "Read with care. "), "This is relative purchasing-power parity: it assumes the reference was an equilibrium and that nothing fundamental has changed since. Both are strong assumptions. ",
         "The terms of trade are about 45% above their 2004 level and energy has turned from a deficit into a surplus, changes that support a stronger peso than history suggests; productivity growth relative to partners (the Balassa–Samuelson effect) works the same way. Single dates can be overshoots: the index spiked after the 2002 and December 2023 devaluations, and was at its strongest at the end of convertibility in 2001. The range across reference choices is the honest answer, not any one number."),
       h("p", {}, "Model-based assessments (the IMF's External Balance Assessment) estimate the real exchange rate consistent with fundamentals and desirable policies. The IMF's May 2026 staff report judges Argentina's external position \"weaker than the level implied by medium-term fundamentals and desirable policies\", a preliminary assessment subject to exceptionally high uncertainty. ",
         h("a", { href: "https://www.imf.org/en/publications/cr/issues/2026/05/22/argentina-2026-article-iv-consultation-second-review-under-the-extended-arrangement-under-576253", target: "_blank", rel: "noopener" }, "IMF Country Report, May 2026"), "."));
-    appendAll(card, h("div", { class: "controls" }, modeSeg, h("span", { class: "spacer" }), h("label", { class: "inline-select" }, "Reference: ", refSel, dateIn)),
-      outEl, chartEl, h("p", { class: "hint" }, "Shaded: the middle half of the index since 2003 (25th to 75th percentile); dashed: the reference."),
+    const refWrap = h("label", { class: "inline-select" }, "Reference: ", refSel, dateIn);
+    const twoWrap = h("div", { class: "inline-select rer-two", hidden: true },
+      h("label", {}, "A: ", inA), h("label", {}, "B: ", inB),
+      h("label", { title: "Weight of non-tradables in the price index" }, "α: ", aIn, aOut));
+    appendAll(card, h("div", { class: "controls" }, calcSeg, modeSeg, h("span", { class: "spacer" }), refWrap, twoWrap),
+      outEl, chartEl, h("p", { class: "hint rer-legend" }, "Restore a reference: shaded is the middle half of the index since 2003 (25th to 75th percentile), dashed is the reference. Two dates: A and B are marked."),
       caveats, methodLine(ind),
       h("div", { class: "card-foot" }, h("span", {}, `Source: ${ind.source_label} · Latest: ${fmtDay(ind.last_obs)}`)));
     card.draw = () => draw();

@@ -4622,11 +4622,13 @@ indicators:
     title: Where Would the Exchange Rate Be?
     short_title: RER calculator
     description: >-
-      The exchange rate that would put the real exchange rate back where it
-      was at a reference date or period, against the rate today. Arithmetic,
-      not an estimate of equilibrium: see the caveats below.
+      Two questions, by arithmetic: what exchange rate would put the real
+      exchange rate back where it was at a reference date or period; and,
+      if two dates are both taken as equilibria, how much relative
+      productivity would have to change to explain the move between them.
+      Not an estimate of equilibrium: see the caveats below.
     source: derived
-    source_label: BCRA (ITCRM, official rate); ArgentinaDatos and DolarAPI (CCL, unofficial)
+    source_label: BCRA (ITCRM, official rate); ArgentinaDatos and DolarAPI (CCL, unofficial); INDEC (terms of trade)
     frequency: D
     units: Pesos per US dollar
     method_links: [{anchor: fx-rer, label: "About the real exchange rate and this calculator"}]
@@ -4634,12 +4636,13 @@ indicators:
     derive:
       method: formula
       anchor: m
-      vars: {m: "itcrm:m", ccl: "dolar:ccl", ofx: "bcra:5"}
+      vars: {m: "itcrm:m", ccl: "dolar:ccl", ofx: "bcra:5", tot: 82.2_ITI_2004_T_27}
       variants:
         m:   {label: Multilateral (official rate), expr: "m"}
         mkt: {label: Multilateral (CCL rate),      expr: "fill(m * ccl / ofx, upto(m, \"2011-10-31\"))"}
         ofx: {label: Official rate,                expr: "ofx"}
         ccl: {label: CCL rate,                     expr: "ccl"}
+        tot: {label: Terms of trade (quarterly, 2004 = 100), expr: "tot"}
 
   - id: fx_carry
     topic: fx

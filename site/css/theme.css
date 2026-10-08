@@ -232,6 +232,10 @@ table.statement td.st-delta { color: var(--ink-2); }
 .rer-v { font-family: var(--font-ui); font-size: 26px; font-weight: 700; color: var(--ink); margin: 4px 0; font-variant-numeric: tabular-nums; }
 .rer-s { font-family: var(--font-ui); font-size: 12px; color: var(--ink-2); }
 .rer-caveats p { margin: 6px 0; }
+.rer-two { gap: 12px; flex-wrap: wrap; }
+.rer-two[hidden], .inline-select[hidden] { display: none; }
+.rer-two input[type=range] { accent-color: var(--accent); }
+.rer-two input[type=range] { width: 110px; vertical-align: middle; }
 .inline-select input[type=date] { font: inherit; }
 @media (max-width: 860px) { .rer-grid { grid-template-columns: repeat(2, 1fr); } }
 .inline-select { font-family: var(--font-ui); font-size: 14px; color: var(--ink-2); display: inline-flex; align-items: center; gap: 6px; }
