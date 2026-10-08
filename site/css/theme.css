@@ -317,3 +317,13 @@ table.data.plc { font-size: 13px; }
 table.data.plc th { white-space: normal; vertical-align: bottom; }
 table.data.plc td:nth-child(2) { text-align: left; }
 table.data.sched tr.total td { font-weight: 700; border-top: 2px solid var(--ink-3); }
+
+/* Chips: toggle overlay series (comparison countries) */
+.chip-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 6px 0 2px; font-family: var(--font-ui); font-size: 12.5px; }
+.chip-label { color: var(--ink-3); margin-right: 2px; }
+.chip { border: 1px solid var(--rule); background: var(--surface); color: var(--ink-2); border-radius: 999px; padding: 3px 10px; font: inherit; cursor: pointer; }
+.chip[aria-pressed="true"] { background: var(--surface-2); color: var(--ink); border-color: var(--ink-3); font-weight: 600; }
+.chip[aria-pressed="true"]::before { content: "✓ "; }
+.chip:hover { border-color: var(--ink-3); }
+.band-sw.hatch { background: repeating-linear-gradient(135deg, var(--ink-3) 0 2px, transparent 2px 5px); }
+.band-sw.dashline { background: none; height: 0; border-top: 1.5px dashed var(--ink); }

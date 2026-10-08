@@ -48,8 +48,13 @@ def check_series(new: pd.Series, old: pd.Series, frequency: str = "M", measure: 
         if not ((new.index.day == 1) & (new.index.month == 1)).all():
             c.errors.append("annual dates not on 1 January")
         missing = sorted(set(range(new.index.min().year, new.index.max().year + 1)) - set(new.index.year))
-        if missing:
-            (c.warnings if allow_gaps else c.errors).append(f"{len(missing)} missing year(s), first {missing[0]}")
+        if missing and not allow_gaps:
+            c.errors.append(f"{len(missing)} missing year(s), first {missing[0]}")
+        # Known gaps in annual data (an index published every five years, years
+        # under military rule) are structural: only a gap in the last five years is news.
+        recent = [y for y in missing if y > new.index.max().year - 5]
+        if allow_gaps and recent:
+            c.warnings.append(f"{len(recent)} missing recent year(s), first {recent[0]}")
     if frequency in ("M", "Q"):
         if not (new.index.day == 1).all():
             c.errors.append("dates not on period start")

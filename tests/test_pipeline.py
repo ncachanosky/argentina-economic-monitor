@@ -638,3 +638,62 @@ def test_currency_conversion_and_semiannual_validation():
     s = pd.Series([1.0, 2.0, 3.0], index=pd.to_datetime(["2025-01-01", "2025-07-01", "2026-01-01"]))
     assert validate.check_series(s, pd.Series(dtype=float), "S", "flow").ok
     assert not validate.check_series(s.drop(pd.Timestamp("2025-07-01")), pd.Series(dtype=float), "S", "flow").ok
+
+
+def test_annual_known_gaps_only_warn_when_recent():
+    yrs = ["1970-01-01", "1975-01-01"] + [f"{y}-01-01" for y in range(2000, 2011)]
+    five = pd.Series(range(len(yrs)), index=pd.to_datetime(yrs), dtype=float)
+    c = validate.check_series(five, pd.Series(dtype=float), "Y", "flow", allow_gaps=True)
+    assert c.ok and not c.warnings                        # structural 1970-2000 spacing: silent
+    late = pd.Series([1.0, 2.0], index=pd.to_datetime(["2020-01-01", "2024-01-01"]))
+    c = validate.check_series(late, pd.Series(dtype=float), "Y", "flow", allow_gaps=True)
+    assert c.ok and c.warnings                            # a recent hole is reported
+
+
+def test_officials_list_counts_and_incumbent_check(tmp_path):
+    from pipeline.sources import officials
+    p = tmp_path / "o.csv"
+    p.write_text("role,name,start,end,note,source\n"
+                 "bcra,A Uno,2019-12-10,2023-12-10,,x\nbcra,Santiago Bausili,2023-12-11,,,x\n"
+                 "economia,B Dos,2022-08-03,2023-12-10,,x\neconomia,Luis Caputo,2023-12-10,,,x\n", encoding="utf-8")
+    r = officials.fetch(["officials:bcra"], path=p, today=pd.Timestamp("2026-10-08"), check=False)
+    s = r.data.set_index("date")["value"]
+    assert s[pd.Timestamp("2019-01-01")] == 1 and s[pd.Timestamp("2023-01-01")] == 1 and s[pd.Timestamp("2026-01-01")] == 0
+    page = "<p>Santiago Bausili | Presidente – Director</p><p>Vladimir Werning | Vicepresidente</p>"
+    assert officials.check_incumbent("bcra", "Santiago Bausili", page) is None
+    assert "update" in officials.check_incumbent("bcra", "Santiago Bausili", page.replace("Santiago Bausili", "Otro Nombre"))
+    assert officials.check_incumbent("economia", "Luis Caputo", "Noticias: Luis Caputo anunció") is None
+    t = officials.table(officials.load(p), pd.Timestamp("2026-10-08"))
+    assert t["roles"]["economia"]["rows"][-1] == {"name": "Luis Caputo", "start": "2023-12-10", "end": None, "note": None}
+    bad = tmp_path / "bad.csv"
+    bad.write_text("role,name,start,end\nbcra,A,2020-01-01,2021-01-01\nbcra,B,2020-06-01,\n", encoding="utf-8")
+    with pytest.raises(ValueError, match="overlapping"):
+        officials.load(bad)
+
+
+def test_officials_file_is_consistent():
+    from pipeline.sources import officials
+    df = officials.load()
+    assert set(df["role"]) == {"bcra", "economia"}
+    assert df.groupby("role")["end"].apply(lambda e: e.isna().sum()).tolist() == [1, 1]
+
+
+def test_vdem_parse_and_latam_median(monkeypatch):
+    from pipeline.sources import vdem
+    csv = ("entity,code,year,libdem_vdem__estimate_best,owid_region\n"
+           "Argentina,ARG,2024,0.6,South America\nArgentina,ARG,2025,0.52,South America\n"
+           "Chile,CHL,2025,0.7,South America\nBrazil,BRA,2025,0.5,South America\n"
+           "World,OWID_WRL,2025,0.3,\n")
+    w = vdem.parse(csv.encode())
+    assert "OWID_WRL" not in w and w.loc["2025-01-01", "ARG"] == 0.52
+    monkeypatch.setattr(vdem, "download", lambda slug, retries=3: csv.encode())
+    r = vdem.fetch(["vdem:libdem:ARG", "vdem:libdem:LATAM"])
+    lat = r.data[r.data.series_id == "vdem:libdem:LATAM"].set_index("date")["value"]
+    assert lat[pd.Timestamp("2025-01-01")] == pytest.approx(0.52)
+
+
+def test_registry_ranges_and_chips():
+    assert registry.valid_range("Since 1946") and registry.valid_range("10Y") and not registry.valid_range("Since 46")
+    reg = registry.load()
+    efw = next(i for i in reg.indicators if i.id == "inst_efw")
+    assert set(efw.overlay_default) <= set(efw.variants) and efw.emphasis == "arg"

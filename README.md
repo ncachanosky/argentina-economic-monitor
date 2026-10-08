@@ -71,6 +71,15 @@ Hand-maintained series live in `data/manual/<id>.csv` (`date,value`) and are
 read by the `manual` source. Editing a file is recorded as a revision on the
 next run. See `data/manual/README.md` for provenance.
 
+Two hand-kept inputs need attention once a year or on events:
+
+- `data/manual/officials.csv` (BCRA presidents and economy ministers, read by
+  the `officials` source): close the row and add the new official when one
+  changes; the run warns when the BCRA's board page or the Ministry of
+  Economy's site no longer names the official in office.
+- `pipeline/sources/efw.py` `URL`: the Fraser Institute's Economic Freedom of
+  the World workbook moves to a new address with each edition (autumn).
+
 ## Release calendar
 
 `registry/releases.yaml` holds INDEC's published release dates; each card

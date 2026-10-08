@@ -10,10 +10,15 @@ ROOT = Path(__file__).resolve().parents[1]
 REGISTRY_PATH = ROOT / "registry" / "series.yaml"
 RELEASES_PATH = ROOT / "registry" / "releases.yaml"
 
-KINDS = {"variants", "panel", "contributions", "balance_sheet", "top10", "schedule", "placements", "curve", "statement", "rer_calc"}
-TABLE_KINDS = {"balance_sheet", "top10", "schedule", "placements", "curve"}   # cards that read a full table (data/tables/<source>), no series
+KINDS = {"variants", "panel", "contributions", "balance_sheet", "top10", "schedule", "placements", "curve", "statement", "rer_calc", "tenure"}
+TABLE_KINDS = {"balance_sheet", "top10", "schedule", "placements", "curve", "tenure"}   # cards that read a full table (data/tables/<source>), no series
 DERIVE_METHODS = {"splice", "reweight", "ratio", "tracker", "monthly", "flows", "expectations", "formula", "net_reserves"}
 RANGE_KEYS = {"2Y", "5Y", "10Y", "25Y", "50Y", "Max"}
+
+
+def valid_range(key: str) -> bool:
+    """A range button: a fixed window ("10Y") or a start year ("Since 1946")."""
+    return key in RANGE_KEYS or bool(__import__("re").fullmatch(r"Since \d{4}", str(key)))
 TRANSFORMS = {"level", "yoy", "mom", "ytd", "acc", "share"}
 FREQUENCIES = {"M", "Q", "D", "Y", "S"}
 
@@ -73,6 +78,9 @@ class Indicator:
     ref_line: float | None = None      # variants card: a dashed horizontal reference line (e.g. 100)
     method_links: list | None = None   # [{anchor, label}]: links to sections of the methodology page
     statement: dict | None = None      # statement card: {rows: [{key, label, indent, bold}], ...} over the variants
+    overlay_default: list | None = None  # overlay cards: variants drawn at first; the rest are toggled with chips
+    muted: list | None = None          # overlay cards: variants drawn as thin grey reference lines (e.g. a regional median)
+    term_shading: bool = False         # shade presidential terms behind the chart (annual series)
 
     def input_ids(self) -> list[str]:
         """Source series this indicator reads (its variants, or a derivation's inputs)."""
@@ -218,7 +226,7 @@ def load(path: Path = REGISTRY_PATH, releases_path: Path = RELEASES_PATH) -> Reg
                                          for k, v in (derive.get("variants") or {}).items()}}
         elif item.get("source") == "derived":
             raise RegistryError(f"{where}: source: derived needs a derive block")
-        if item.get("ranges") and not set(item["ranges"]) <= RANGE_KEYS:
+        if item.get("ranges") and not all(valid_range(r) for r in item["ranges"]):
             raise RegistryError(f"{where}: unknown ranges {item['ranges']}")
         variants = {}
         for key, v in (item.get("variants") or {}).items():
@@ -264,6 +272,9 @@ def load(path: Path = REGISTRY_PATH, releases_path: Path = RELEASES_PATH) -> Reg
             raise RegistryError(f"{where}: release {item['release']!r} not in releases.yaml")
         if headline and headline.get("variant") not in variants:
             raise RegistryError(f"{where}: headline variant not defined")
+        for fld in ("overlay_default", "muted"):
+            if item.get(fld) and not set(item[fld]) <= set(variants):
+                raise RegistryError(f"{where}: {fld} names unknown variants")
 
         indicators.append(
             Indicator(
@@ -313,6 +324,9 @@ def load(path: Path = REGISTRY_PATH, releases_path: Path = RELEASES_PATH) -> Reg
                 ref_line=item.get("ref_line"),
                 method_links=item.get("method_links"),
                 statement=item.get("statement"),
+                overlay_default=item.get("overlay_default"),
+                muted=item.get("muted"),
+                term_shading=bool(item.get("term_shading", False)),
                 view_start=str(item["view_start"]) + ("-01" if len(str(item["view_start"])) == 7 else "") if item.get("view_start") else None,
             )
         )

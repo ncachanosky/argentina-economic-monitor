@@ -182,6 +182,8 @@
   // First month to show: the card's fixed start, or the range back from the latest.
   function viewStart(ind, rangeKey) {
     if (ind.view_start) return ind.view_start;
+    const since = /^Since (\d{4})$/.exec(rangeKey || "");
+    if (since) return `${since[1]}-01-01`;
     return startDate(ind.last_obs, RANGES[rangeKey]);
   }
   function startDate(lastIso, years) {
@@ -275,6 +277,9 @@
     if (extras.uniformtext) layout.uniformtext = extras.uniformtext;
     if (extras.barmode) layout.barmode = extras.barmode;
     if (extras.xcategory) layout.xaxis.type = "category";
+    if (extras.xaxis) Object.assign(layout.xaxis, extras.xaxis);
+    if (extras.margin) Object.assign(layout.margin, extras.margin);
+    if (extras.sourceY !== undefined) layout.annotations.slice(-2).forEach((a) => { a.y = extras.sourceY; });
     if (data[0] && data[0].orientation === "h") { layout.xaxis.ticksuffix = (extras.xsuffix !== undefined ? extras.xsuffix : specOf(pct).suffix); if (extras.xrange) layout.xaxis.range = extras.xrange; layout.yaxis.ticksuffix = ""; layout.margin.l = 260; }
     const url = await Plotly.toImage({ data, layout }, { format: "png", width: EXPORT.width, height: EXPORT.height });
     const a = h("a", { href: url, download: filename });
@@ -624,6 +629,7 @@
       byPres: false,
       episodes: false,            // mark dated shocks (registry `episodes`)
       yearly: false,              // yearly view (registry `yearly`)
+      shown: new Set(ind.overlay_default || variantKeys),   // overlay series drawn (chips toggle the rest)
     };
     const card = cardFrame(ind, !!wide);
     const Y = ind.yearly;
@@ -657,7 +663,7 @@
       draw();
     });
     customIn.addEventListener("change", () => { if (customIn.value) { state.customBase = customIn.value + "-01"; draw(); } });
-    const baseWrap = isRate || ind.plain_level ? null : h("label", { class: "base-pick" }, h("span", {}, "Base = 100:"), baseSel, customIn);
+    const baseWrap = isRate || ind.plain_level || ind.default.rebase === false ? null : h("label", { class: "base-pick" }, h("span", {}, "Base = 100:"), baseSel, customIn);
 
     const EP = ind.episodes || [];
     const epBtn = EP.length ? h("button", { class: "btn toggle", type: "button", "aria-pressed": "false", title: "Mark dated shocks on the chart and show presidency averages without them",
@@ -669,6 +675,12 @@
     const realSeg = realSwitch(ind, () => draw());
     const presBtn = PRESIDENCIES.length && !ind.plain_level ? h("button", { class: "btn toggle", type: "button", "aria-pressed": "false", onclick: () => { state.byPres = !state.byPres; draw(); } }, "By presidency") : null;
     let table;
+    // Chips: add or remove overlay series (e.g. comparison countries); the default series always stays.
+    const chipButtons = {};
+    const chipRow = ind.overlay && ind.overlay_default ? h("div", { class: "chip-row", role: "group", "aria-label": "Series shown" },
+      h("span", { class: "chip-label" }, "Show:"),
+      variantKeys.filter((k) => k !== ind.default.variant).map((k) => (chipButtons[k] = h("button", { type: "button", class: "chip", "aria-pressed": String(state.shown.has(k)),
+        onclick: () => { state.shown.has(k) ? state.shown.delete(k) : state.shown.add(k); chipButtons[k].setAttribute("aria-pressed", String(state.shown.has(k))); draw(); } }, ind.variants[k].label)))) : null;
 
     function baseMonth() {
       if (state.transform !== "level" || state.base === "published") return null;
@@ -711,6 +723,18 @@
     // Shaded periods (e.g. the INDEC intervention), clipped to the visible range.
     function bandShapes(x) {
       const shapes = [], annotations = [];
+      if (ind.term_shading && x.length && !state.byPres) {
+        // Presidential terms behind annual series: a light band in the party's color, labelled at the top.
+        const x0 = x[0], x1 = addMonths(x[x.length - 1], 12);
+        PRESIDENCIES.forEach((p, n) => {
+          const a = p.start, b = p.end || x1;
+          if (b <= x0 || a >= x1) return;
+          shapes.push({ type: "rect", xref: "x", yref: "paper", x0: a < x0 ? x0 : a, x1: b > x1 ? x1 : b, y0: 0, y1: 1, layer: "below",
+            fillcolor: termColor(p), opacity: 0.13, line: { width: 0 }, _lightFill: termLight(p) });
+          annotations.push({ xref: "x", yref: "paper", x: a < x0 ? x0 : a, y: 1, xanchor: "left", yanchor: "top", showarrow: false, textangle: -90,
+            text: p.short, font: { size: 9, color: cssVar("--ink-3") } });
+        });
+      }
       if (!ind.bands || !x.length) return { shapes, annotations };
       const x0 = x[0], x1 = x[x.length - 1];
       for (const b of ind.bands) {
@@ -799,25 +823,31 @@
         return { traces, shapes: [], annotations: [], main, t, x: xs, y: traces.length ? traces[0].y : [] };
       }
       if (!state.byPres) {
-        const keys = ind.overlay ? [state.variant, ...variantKeys.filter((k) => k !== state.variant)] : [state.variant];
+        const keys = overlayKeys();
         const start = viewStart(ind, state.range);
         keys.forEach((k, slot) => {
           const s = k === state.variant ? main : series(k);
           // Overlays keep empty months in range so a gap in one series shows as a gap.
           // (Daily overlays drop each series' empty days, since sources keep different calendars.)
-          const ii = ind.overlay ? ind.dates.map((d, i) => i).filter((i) => (!start || ind.dates[i] >= start) && (!x.length || ind.dates[i] <= x[x.length - 1]) && ((ind.frequency !== "D" && ind.frequency !== "S") || s.y[i] !== null)) : idx;
+          const ii = ind.overlay ? ind.dates.map((d, i) => i).filter((i) => (!start || ind.dates[i] >= start) && (!x.length || ind.dates[i] <= x[x.length - 1]) && (!["D", "S", "Y"].includes(ind.frequency) || s.y[i] !== null)) : idx;
           let xx = ii.map((i) => ind.dates[i]), yy = ii.map((i) => s.y[i]);
           if (ind.frequency === "D") [xx, yy] = breakGaps(xx, yy);
           if (ind.frequency === "S") [xx, yy] = breakGaps(xx, yy, 400);
-          const color = cssVar(SERIES_VARS[slot]);
+          // With chips, each series keeps the color of its place in the full list, so adding one does not recolor the rest.
+          const cslot = ind.overlay_default ? variantKeys.filter((q) => q !== ind.emphasis && !(ind.muted || []).includes(q)).indexOf(k) : slot;
+          const color = cssVar(SERIES_VARS[Math.max(0, cslot) % SERIES_VARS.length]);
           const hover = `${ind.frequency === "S" ? "%{customdata}" : `%{x|${DF}}`}: <b>%{y:${yFmt()}}${sfx}</b><extra>${s.v.label}</extra>`;
           const emph = ind.emphasis === k;   // e.g. a total: thick and dark
+          const muted = (ind.muted || []).includes(k);   // e.g. a regional median: grey reference
+          const marks = ind.frequency === "S" || ind.frequency === "Y";
           traces.push(state.transform === "mom"
             ? { type: "bar", x: xx, y: yy, name: s.v.label, marker: { color }, hovertemplate: hover, _slot: slot }
-            : { type: "scatter", mode: ind.frequency === "S" ? "lines+markers" : "lines", x: xx, y: yy, name: s.v.label, connectgaps: false,
-                ...(ind.frequency === "S" ? { customdata: xx.map((d) => fmtPeriod(d, "S")), marker: { size: 5, color } } : {}),
-                line: emph ? { color: cssVar("--ink"), width: 3.2 } : slot && !ind.emphasis ? { color, width: 1.8, dash: "dash" } : { color, width: 2 },
-                ...(emph ? { _light: "#36454F" } : {}), hovertemplate: hover, _slot: slot });
+            : { type: "scatter", mode: marks ? "lines+markers" : "lines", x: xx, y: yy, name: s.v.label, connectgaps: false,
+                ...(ind.frequency === "S" ? { customdata: xx.map((d) => fmtPeriod(d, "S")) } : {}),
+                ...(marks ? { marker: { size: ind.frequency === "Y" ? 4 : 5, color: emph ? cssVar("--ink") : muted ? cssVar("--ink-3") : color } } : {}),
+                line: emph ? { color: cssVar("--ink"), width: 3.2 } : muted ? { color: cssVar("--ink-3"), width: 2, dash: "dot" }
+                  : cslot >= SERIES_VARS.length ? { color, width: 1.8, dash: "dashdot" } : slot && !ind.emphasis && !ind.overlay_default ? { color, width: 1.8, dash: "dash" } : { color, width: 2 },
+                ...(emph ? { _light: "#36454F" } : muted ? { _light: "#85909A" } : {}), hovertemplate: hover, _slot: emph || muted ? undefined : Math.max(0, cslot) % SERIES_VARS.length });
         });
       } else if (state.transform === "mom") {
         const terms = x.map((d) => termOf(d, ind.frequency));
@@ -902,7 +932,7 @@
     // Yearly view: grouped bars of each variant's yearly value.
     function buildYearly() {
       const t = T.level || Object.values(T)[0];
-      const keys = Y.variants || (ind.overlay ? [state.variant, ...variantKeys.filter((k) => k !== state.variant)] : [state.variant]);
+      const keys = Y.variants || (ind.overlay ? [state.variant, ...variantKeys.filter((k) => k !== state.variant && state.shown.has(k))] : [state.variant]);
       const start = viewStart(ind, state.range);
       let partial = null, labels = null;
       const traces = keys.map((k, slot) => {
@@ -1019,7 +1049,7 @@
       table && table.refresh(x, cols, t, ind.frequency);
     }
 
-    const overlayKeys = () => (ind.overlay && !state.byPres ? [state.variant, ...variantKeys.filter((k) => k !== state.variant)] : [state.variant]);
+    function overlayKeys() { return ind.overlay && !state.byPres ? [state.variant, ...variantKeys.filter((k) => k !== state.variant && state.shown.has(k))] : [state.variant]; }
     const subtitle = (main, t) => `${overlayKeys().map((k) => ind.variants[k].label).join(" vs. ")} · ${t.change ? t.short : main.units}`;
     const fileTag = () => `${ind.id}_${state.variant}_${state.transform}${baseMonth() ? "_base" + baseMonth().slice(0, 7) : ""}${state.byPres ? "_presidencies" : ""}`;
     const onPNG = () => {
@@ -1055,7 +1085,7 @@
       // A short fixed window (view_start) has no use for rebasing or presidencies.
       ind.view_start ? null : h("div", { class: "controls" }, realSeg, baseWrap, presBtn, epBtn),
       ind.caveat ? h("p", { class: "caveat" }, ind.caveat) : null,
-      trackerLine(), summaryEl, hint, methodLine(ind), bandKey, epKey, chartEl, statsEl);
+      trackerLine(), summaryEl, hint, methodLine(ind), bandKey, epKey, chartEl, chipRow, statsEl);
     drawSummary();
     table = tableView([], [], false, ind.frequency);
     appendAll(card, breakdownTable(ind), table, annualTable(ind), weightsTable(ind), ind.note ? h("p", { class: "chips-note" }, ind.note) : null, footer(ind, onPNG, onCSV));
@@ -1699,6 +1729,128 @@
     return card;
   }
 
+  // ---------- card: tenure of officials (BCRA presidents, ministers of the economy) ----------
+  function tenureCard(ind) {
+    const T = ind.table;
+    const card = cardFrame(ind, true);
+    let data = null;
+    const state = { range: "1983" };
+    const chartEl = h("div", { class: "chart tall-ish", role: "img", "aria-label": `${ind.title} chart` });
+    const hint = h("p", { class: "hint" });
+    const keyEl = h("p", { class: "band-key" });
+    const sumEl = h("div", { class: "table-scroll flat" });
+    const rSeg = segmented([["1983", "Since 1983"], ["all", "All"]], state.range, (k) => { state.range = k; rSeg.update(k); draw(); }, "Period");
+    const DAY = 864e5;
+    const today = new Date().toISOString().slice(0, 10);
+    const daysBetween = (a, b) => Math.round((Date.parse(b) - Date.parse(a)) / DAY);
+    const fmtInt = (v) => Math.round(v).toLocaleString("en-US");
+    const yrs = (d) => (d / 365.25).toFixed(1);
+    const START_1983 = "1983-12-10";
+
+    function rows() {
+      return data.roles[T.role].rows.map((r, i) => {
+        const p = termOf(r.start, "D");
+        return { ...r, i, open: !r.end, days: daysBetween(r.start, r.end || today), pres: r.start >= START_1983 ? p : null };
+      });
+    }
+    function view() { const all = rows(); return state.range === "1983" ? all.filter((r) => r.start >= START_1983) : all; }
+    const mean = (xs) => (xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : null);
+    const median = (xs) => { if (!xs.length) return null; const s = [...xs].sort((a, b) => a - b), m = s.length >> 1; return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2; };
+    const shortName = (n) => {
+      const w = n.replace(/\s*\(.*?\)\s*/g, " ").trim().split(" ");
+      let i = w.length - 1;
+      while (i > 1 && /^(de|del|la|las|los|y)$/.test(w[i - 1])) i -= 2;   // "Marcó del Pont", "Martínez de Hoz"
+      return w.slice(Math.max(1, i), w.length).join(" ");
+    };
+
+    function build(light) {
+      const V = view();
+      const many = V.length > 30;
+      const colors = V.map((r) => (r.pres ? (light ? termLight(r.pres) : termColor(r.pres)) : light ? "#C9CED3" : cssVar("--ink-3")));
+      const tr = [{
+        type: "bar", x: V.map((r, j) => j), y: V.map((r) => r.days),
+        marker: { color: colors, opacity: V.map((r) => (r.open ? 0.6 : 1)), pattern: { shape: V.map((r) => (r.open ? "/" : "")), fgcolor: light ? "#36454F" : cssVar("--ink"), size: 6 } },
+        _lightColors: V.map((r) => (r.pres ? termLight(r.pres) : "#C9CED3")),
+        text: V.map((r) => fmtInt(r.days)), textposition: "outside", cliponaxis: false, textangle: many ? -90 : 0,
+        textfont: { size: many ? 9 : 11, color: light ? "#5A6872" : cssVar("--ink-2") },
+        customdata: V.map((r) => [r.name, fmtDay(r.start), r.open ? "in office" : fmtDay(r.end), r.pres ? r.pres.short : "", yrs(r.days)]),
+        hovertemplate: "<b>%{customdata[0]}</b><br>%{customdata[1]} – %{customdata[2]}<br>%{y:,} days (%{customdata[4]} years)<extra>%{customdata[3]}</extra>",
+        showlegend: false,
+      }];
+      const done = V.filter((r) => !r.open).map((r) => r.days);
+      const avg = mean(done);
+      const shapes = avg === null ? [] : [{ type: "line", xref: "paper", x0: 0, x1: 1, yref: "y", y0: avg, y1: avg, line: { color: light ? "#36454F" : cssVar("--ink"), width: 1.5, dash: "dash", _light: "#36454F" } }];
+      const annotations = [];
+      const xaxis = { type: "linear", tickmode: "array", tickvals: V.map((r, j) => j), ticktext: V.map((r) => (many ? shortName(r.name) : r.name)), tickangle: -60, tickfont: { size: many ? 9 : 11 }, range: [-0.7, V.length - 0.3] };
+      return { V, tr, shapes, annotations, xaxis, avg, done };
+    }
+
+    function draw() {
+      if (!data) return;
+      const { V, tr, shapes, annotations, xaxis, avg, done } = build(false);
+      Plotly.react(chartEl, tr, baseLayout({
+        yaxis: { tickformat: ",.0f", title: { text: "Days in office", font: { size: 12 } } },
+        extra: { xaxis, shapes, annotations, showlegend: false, bargap: 0.25, hovermode: "closest", margin: { l: 64, r: 16, t: 24, b: V.length > 30 ? 90 : 130 } },
+      }), PLOT_CONFIG);
+      // Party key (presidencies since 1983).
+      const seen = new Map();
+      V.forEach((r) => { if (r.pres && !seen.has(r.pres.party)) seen.set(r.pres.party, r.pres); });
+      keyEl.replaceChildren(...[...seen.values()].map((p) => h("span", {}, h("span", { class: "band-sw", style: `background:${termColor(p)}` }), (PARTY_COLORS[p.party] || {}).label || p.party)),
+        ...(V.some((r) => !r.pres) ? [h("span", {}, h("span", { class: "band-sw", style: `background:${cssVar("--ink-3")}` }),
+          V.some((r) => !r.pres && r.start < START_1983) ? "Before December 1983" : "Interim presidents (December 2001)")] : []),
+        h("span", {}, h("span", { class: "band-sw hatch" }), "In office (to today)"),
+        avg !== null ? h("span", {}, h("span", { class: "band-sw dashline" }), `Average of completed tenures: ${fmtInt(avg)} days (${yrs(avg)} years)`) : null);
+      // Summary line.
+      const cur = V.find((r) => r.open);
+      const role = data.roles[T.role].label;
+      const plural = T.role === "bcra" ? "presidents of the BCRA" : "ministers of the economy";
+      let msg = `${state.range === "1983" ? "Since December 1983" : `Since ${V[0].start.slice(0, 4)}`}: ${V.length} ${plural}` +
+        (avg !== null ? `; completed tenures average ${fmtInt(avg)} days (${yrs(avg)} years), median ${fmtInt(median(done))}.` : ".");
+      if (cur) {
+        const longer = done.filter((d) => d < cur.days).length;
+        msg += ` ${role} in office: ${cur.name}, ${fmtInt(cur.days)} days so far, longer than ${longer} of the ${done.length} completed tenures shown.`;
+      }
+      hint.textContent = msg;
+      // By presidency (since 1983).
+      const all = rows().filter((r) => r.pres);
+      const byP = PRESIDENCIES.map((p) => {
+        const rs = all.filter((r) => r.pres.id === p.id);
+        const comp = rs.filter((r) => !r.open).map((r) => r.days);
+        const long = rs.reduce((a, r) => (!a || r.days > a.days ? r : a), null);
+        return { p, n: rs.length, avg: mean(comp), long, open: rs.some((r) => r.open) };
+      }).filter((x) => x.n);
+      sumEl.replaceChildren(h("table", { class: "data sched" },
+        h("thead", {}, h("tr", {}, h("th", {}, "Appointed under"), h("th", {}, "Officials"), h("th", {}, "Average tenure, days"), h("th", {}, "Longest"))),
+        h("tbody", {}, byP.map((x) => h("tr", {}, h("td", { class: "pres" }, x.p.name), h("td", {}, String(x.n)),
+          h("td", {}, x.avg === null ? "–" : fmtInt(x.avg)), h("td", {}, x.long ? `${x.long.name} (${fmtInt(x.long.days)}${x.long.open ? ", in office" : ""})` : "–"))))));
+    }
+
+    const onPNG = () => {
+      const { V, tr, shapes, annotations, xaxis, avg } = build(true);
+      exportPNG(ind, tr, `Days in office, ${state.range === "1983" ? "since December 1983" : `since ${V[0].start.slice(0, 4)}`}; dashed line: average of completed tenures (${fmtInt(avg)} days)`, { suffix: "", signed: false },
+        `${ind.id}_${state.range}.png`, { shapes, annotations, xaxis: { ...xaxis, tickfont: { size: V.length > 30 ? 11 : 14 } }, margin: { b: 250 }, sourceY: -0.5 });
+    };
+    const onCSV = () => {
+      const R = rows();
+      downloadBlob(toCSV(["name", "start", "end", "days_in_office", "in_office", "appointed_under", "note"],
+        R.map((r) => [r.name, r.start, r.end || "", r.days, r.open ? "yes" : "", r.pres ? r.pres.name : "", r.note || ""])), `${ind.id}.csv`, "text/csv");
+    };
+    appendAll(card, h("div", { class: "controls" }, h("span", { class: "spacer" }), rSeg), hint, methodLine(ind), keyEl, chartEl, sumEl,
+      ind.note ? h("p", { class: "chips-note" }, ind.note) : null,
+      h("div", { class: "card-foot" },
+        h("span", {}, `Source: ${ind.source_label}`, data && data.latest ? ` · Latest change: ${fmtDay(data.latest)}` : ""),
+        h("div", { class: "actions" },
+          h("button", { class: "btn", type: "button", onclick: onPNG, title: "Download this chart as a 1200×800 PNG" }, "PNG"),
+          h("button", { class: "btn", type: "button", onclick: onCSV, title: "Download the full list as CSV" }, "CSV"))));
+    card.draw = async () => {
+      if (!data) {
+        try { data = await getJSON(`${DATA}${T.path}${T.file}`); } catch (e) { console.error(e); chartEl.replaceChildren(h("div", { class: "error-box" }, "The list of officials could not be loaded.")); return; }
+      }
+      draw();
+    };
+    return card;
+  }
+
   // ---------- card: Treasury placements, auction by auction ----------
   function placementsCard(ind) {
     const T = ind.table;
@@ -2283,6 +2435,7 @@
         : ind.kind === "schedule" ? scheduleCard(ind)
         : ind.kind === "placements" ? placementsCard(ind)
         : ind.kind === "curve" ? curveCard(ind)
+        : ind.kind === "tenure" ? tenureCard(ind)
         : ind.kind === "statement" ? statementCard(ind)
         : ind.kind === "rer_calc" ? rerCalcCard(ind)
         : variantsCard(ind, !!ind.wide)));

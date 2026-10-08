@@ -89,8 +89,8 @@ def run(dry_run: bool = False, strict: bool = False) -> int:
                         lines.append(
                             f"- `{sid}`: OK, {ar.new_obs} new / {ar.revised_obs} revised / {ar.deleted_obs} removed obs"
                         )
-                    entry["warnings"] = chk.warnings
-                    for w in chk.warnings:
+                    entry["warnings"] = chk.warnings + list(getattr(res, "warnings", {}).get(sid, []))
+                    for w in entry["warnings"]:
                         lines.append(f"  - ⚠️ {w}")
                         print(f"::warning title={sid}::{w}")
 

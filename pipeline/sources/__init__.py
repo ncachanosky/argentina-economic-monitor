@@ -14,6 +14,8 @@ class FetchResult:
     meta: dict[str, dict] = field(default_factory=dict)
     # series_id -> error message for ids that could not be fetched
     errors: dict[str, str] = field(default_factory=dict)
+    # series_id -> warnings from the source itself (e.g. a hand-kept list that may be out of date)
+    warnings: dict[str, list[str]] = field(default_factory=dict)
 
 
 def get_adapter(name: str):
@@ -73,6 +75,18 @@ def get_adapter(name: str):
         from . import a3
 
         return a3
+    if name == "officials":
+        from . import officials
+
+        return officials
+    if name == "efw":
+        from . import efw
+
+        return efw
+    if name == "vdem":
+        from . import vdem
+
+        return vdem
     if name == "manual":
         from . import manual
 

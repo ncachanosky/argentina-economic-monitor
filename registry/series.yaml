@@ -387,6 +387,109 @@ inputs:
   - {id: "indec_poverty#households", source: manual, frequency: S, measure: flow, allow_gaps: true, label: "INDEC poverty, households, %"}
   - {id: "indec_poverty#indigence", source: manual, frequency: S, measure: flow, allow_gaps: true, label: "INDEC indigence, persons, %"}
   - {id: "indec_poverty#indigence_households", source: manual, frequency: S, measure: flow, allow_gaps: true, label: "INDEC indigence, households, %"}
+  # Institutions. Tenure of officials: hand-kept list (data/manual/officials.csv); count of appointments per year.
+  - {id: "officials:bcra", source: officials, frequency: Y, measure: flow, label: "BCRA presidents taking office per year"}
+  - {id: "officials:economia", source: officials, frequency: Y, measure: flow, label: "Ministers of the economy taking office per year"}
+  # UTDT consumer confidence (ICC, 0-100) and confidence in government (ICG, 0-5), via datos.gob.ar.
+  - {id: 380.3_ICC_NACIONNAL_0_T_12, source: datos_gob, frequency: M, measure: index, allow_gaps: true, label: "UTDT ICC, national"}
+  - {id: 380.3_DESAGREGACCRO_0_T_40, source: datos_gob, frequency: M, measure: index, allow_gaps: true, label: "UTDT ICC: macroeconomic situation"}
+  - {id: 380.3_DESAGREGACNAL_0_T_43, source: datos_gob, frequency: M, measure: index, allow_gaps: true, label: "UTDT ICC: personal situation"}
+  - {id: 380.3_DESAGREGACLES_0_T_50, source: datos_gob, frequency: M, measure: index, allow_gaps: true, label: "UTDT ICC: durables and real estate"}
+  - {id: 380.3_DESAGREGACTAL_0_T_30, source: datos_gob, frequency: M, measure: index, allow_gaps: true, label: "UTDT ICC: City of Buenos Aires"}
+  - {id: 380.3_DESAGREGACGBA_0_T_26, source: datos_gob, frequency: M, measure: index, allow_gaps: true, label: "UTDT ICC: Greater Buenos Aires"}
+  - {id: 380.3_DESAGREGACIOR_0_T_31, source: datos_gob, frequency: M, measure: index, allow_gaps: true, label: "UTDT ICC: interior"}
+  - {id: 370.3_ICG_NIVEL_RAL_0_0_17_94, source: datos_gob, frequency: M, measure: index, allow_gaps: true, label: "UTDT ICG, general"}
+  - {id: 370.3_EVALUACIONRAL_0_0_18_90, source: datos_gob, frequency: M, measure: index, allow_gaps: true, label: "UTDT ICG: overall assessment"}
+  - {id: 370.3_INTERES_GERAL_0_0_15_61, source: datos_gob, frequency: M, measure: index, allow_gaps: true, label: "UTDT ICG: concern for the general interest"}
+  - {id: 370.3_EFICIENCIACIA_0_0_10_66, source: datos_gob, frequency: M, measure: index, allow_gaps: true, label: "UTDT ICG: efficiency"}
+  - {id: 370.3_HONESTIDADDAD_0_0_10_58, source: datos_gob, frequency: M, measure: index, allow_gaps: true, label: "UTDT ICG: honesty"}
+  - {id: 370.3_CAPACIDADDAD_0_0_9_83, source: datos_gob, frequency: M, measure: index, allow_gaps: true, label: "UTDT ICG: capacity to solve problems"}
+  # Economic Freedom of the World (Fraser Institute), 0-10; 1970-2000 every five years.
+  - {id: "efw:ARG:summary", source: efw, frequency: Y, measure: flow, allow_gaps: true, label: "EFW, Argentina: summary"}
+  - {id: "efw:ARG:rank", source: efw, frequency: Y, measure: flow, allow_gaps: true, label: "EFW, Argentina: rank"}
+  - {id: "efw:ARG:a1", source: efw, frequency: Y, measure: flow, allow_gaps: true, label: "EFW, Argentina: a1"}
+  - {id: "efw:ARG:a2", source: efw, frequency: Y, measure: flow, allow_gaps: true, label: "EFW, Argentina: a2"}
+  - {id: "efw:ARG:a3", source: efw, frequency: Y, measure: flow, allow_gaps: true, label: "EFW, Argentina: a3"}
+  - {id: "efw:ARG:a4", source: efw, frequency: Y, measure: flow, allow_gaps: true, label: "EFW, Argentina: a4"}
+  - {id: "efw:ARG:a5", source: efw, frequency: Y, measure: flow, allow_gaps: true, label: "EFW, Argentina: a5"}
+  - {id: "efw:ALL:count", source: efw, frequency: Y, measure: flow, allow_gaps: true, label: "EFW: number of countries ranked"}
+  - {id: "efw:CHL:summary", source: efw, frequency: Y, measure: flow, allow_gaps: true, label: "EFW summary rating, Chile"}
+  - {id: "efw:URY:summary", source: efw, frequency: Y, measure: flow, allow_gaps: true, label: "EFW summary rating, Uruguay"}
+  - {id: "efw:BRA:summary", source: efw, frequency: Y, measure: flow, allow_gaps: true, label: "EFW summary rating, Brazil"}
+  - {id: "efw:LATAM:summary", source: efw, frequency: Y, measure: flow, allow_gaps: true, label: "EFW summary rating, Latin America (median)"}
+  - {id: "efw:MEX:summary", source: efw, frequency: Y, measure: flow, allow_gaps: true, label: "EFW summary rating, Mexico"}
+  - {id: "efw:COL:summary", source: efw, frequency: Y, measure: flow, allow_gaps: true, label: "EFW summary rating, Colombia"}
+  - {id: "efw:PER:summary", source: efw, frequency: Y, measure: flow, allow_gaps: true, label: "EFW summary rating, Peru"}
+  - {id: "efw:VEN:summary", source: efw, frequency: Y, measure: flow, allow_gaps: true, label: "EFW summary rating, Venezuela"}
+  - {id: "efw:ECU:summary", source: efw, frequency: Y, measure: flow, allow_gaps: true, label: "EFW summary rating, Ecuador"}
+  - {id: "efw:PAN:summary", source: efw, frequency: Y, measure: flow, allow_gaps: true, label: "EFW summary rating, Panama"}
+  - {id: "efw:SLV:summary", source: efw, frequency: Y, measure: flow, allow_gaps: true, label: "EFW summary rating, El Salvador"}
+  - {id: "efw:AUS:summary", source: efw, frequency: Y, measure: flow, allow_gaps: true, label: "EFW summary rating, Australia"}
+  - {id: "efw:CAN:summary", source: efw, frequency: Y, measure: flow, allow_gaps: true, label: "EFW summary rating, Canada"}
+  - {id: "efw:ESP:summary", source: efw, frequency: Y, measure: flow, allow_gaps: true, label: "EFW summary rating, Spain"}
+  # V-Dem indices (0-1) via Our World in Data.
+  - {id: "vdem:libdem:ARG", source: vdem, frequency: Y, measure: flow, allow_gaps: true, label: "V-Dem Liberal democracy, Argentina"}
+  - {id: "vdem:electdem:ARG", source: vdem, frequency: Y, measure: flow, allow_gaps: true, label: "V-Dem Electoral democracy, Argentina"}
+  - {id: "vdem:judicial:ARG", source: vdem, frequency: Y, measure: flow, allow_gaps: true, label: "V-Dem Judicial constraints on the executive, Argentina"}
+  - {id: "vdem:legislative:ARG", source: vdem, frequency: Y, measure: flow, allow_gaps: true, label: "V-Dem Legislative constraints on the executive, Argentina"}
+  - {id: "vdem:rol:ARG", source: vdem, frequency: Y, measure: flow, allow_gaps: true, label: "V-Dem Rule of law, Argentina"}
+  - {id: "vdem:corruption:ARG", source: vdem, frequency: Y, measure: flow, allow_gaps: true, label: "V-Dem Political corruption, Argentina"}
+  - {id: "vdem:libdem:CHL", source: vdem, frequency: Y, measure: flow, allow_gaps: true, label: "V-Dem Liberal democracy, Chile"}
+  - {id: "vdem:libdem:URY", source: vdem, frequency: Y, measure: flow, allow_gaps: true, label: "V-Dem Liberal democracy, Uruguay"}
+  - {id: "vdem:libdem:BRA", source: vdem, frequency: Y, measure: flow, allow_gaps: true, label: "V-Dem Liberal democracy, Brazil"}
+  - {id: "vdem:libdem:LATAM", source: vdem, frequency: Y, measure: flow, allow_gaps: true, label: "V-Dem Liberal democracy, Latin America (median)"}
+  - {id: "vdem:libdem:MEX", source: vdem, frequency: Y, measure: flow, allow_gaps: true, label: "V-Dem Liberal democracy, Mexico"}
+  - {id: "vdem:libdem:COL", source: vdem, frequency: Y, measure: flow, allow_gaps: true, label: "V-Dem Liberal democracy, Colombia"}
+  - {id: "vdem:libdem:PER", source: vdem, frequency: Y, measure: flow, allow_gaps: true, label: "V-Dem Liberal democracy, Peru"}
+  - {id: "vdem:libdem:VEN", source: vdem, frequency: Y, measure: flow, allow_gaps: true, label: "V-Dem Liberal democracy, Venezuela"}
+  - {id: "vdem:libdem:ECU", source: vdem, frequency: Y, measure: flow, allow_gaps: true, label: "V-Dem Liberal democracy, Ecuador"}
+  - {id: "vdem:libdem:PAN", source: vdem, frequency: Y, measure: flow, allow_gaps: true, label: "V-Dem Liberal democracy, Panama"}
+  - {id: "vdem:libdem:SLV", source: vdem, frequency: Y, measure: flow, allow_gaps: true, label: "V-Dem Liberal democracy, El Salvador"}
+  - {id: "vdem:libdem:AUS", source: vdem, frequency: Y, measure: flow, allow_gaps: true, label: "V-Dem Liberal democracy, Australia"}
+  - {id: "vdem:libdem:CAN", source: vdem, frequency: Y, measure: flow, allow_gaps: true, label: "V-Dem Liberal democracy, Canada"}
+  - {id: "vdem:libdem:ESP", source: vdem, frequency: Y, measure: flow, allow_gaps: true, label: "V-Dem Liberal democracy, Spain"}
+  - {id: "vdem:rol:CHL", source: vdem, frequency: Y, measure: flow, allow_gaps: true, label: "V-Dem Rule of law, Chile"}
+  - {id: "vdem:rol:URY", source: vdem, frequency: Y, measure: flow, allow_gaps: true, label: "V-Dem Rule of law, Uruguay"}
+  - {id: "vdem:rol:BRA", source: vdem, frequency: Y, measure: flow, allow_gaps: true, label: "V-Dem Rule of law, Brazil"}
+  - {id: "vdem:rol:LATAM", source: vdem, frequency: Y, measure: flow, allow_gaps: true, label: "V-Dem Rule of law, Latin America (median)"}
+  - {id: "vdem:rol:MEX", source: vdem, frequency: Y, measure: flow, allow_gaps: true, label: "V-Dem Rule of law, Mexico"}
+  - {id: "vdem:rol:COL", source: vdem, frequency: Y, measure: flow, allow_gaps: true, label: "V-Dem Rule of law, Colombia"}
+  - {id: "vdem:rol:PER", source: vdem, frequency: Y, measure: flow, allow_gaps: true, label: "V-Dem Rule of law, Peru"}
+  - {id: "vdem:rol:VEN", source: vdem, frequency: Y, measure: flow, allow_gaps: true, label: "V-Dem Rule of law, Venezuela"}
+  - {id: "vdem:rol:ECU", source: vdem, frequency: Y, measure: flow, allow_gaps: true, label: "V-Dem Rule of law, Ecuador"}
+  - {id: "vdem:rol:PAN", source: vdem, frequency: Y, measure: flow, allow_gaps: true, label: "V-Dem Rule of law, Panama"}
+  - {id: "vdem:rol:SLV", source: vdem, frequency: Y, measure: flow, allow_gaps: true, label: "V-Dem Rule of law, El Salvador"}
+  - {id: "vdem:rol:AUS", source: vdem, frequency: Y, measure: flow, allow_gaps: true, label: "V-Dem Rule of law, Australia"}
+  - {id: "vdem:rol:CAN", source: vdem, frequency: Y, measure: flow, allow_gaps: true, label: "V-Dem Rule of law, Canada"}
+  - {id: "vdem:rol:ESP", source: vdem, frequency: Y, measure: flow, allow_gaps: true, label: "V-Dem Rule of law, Spain"}
+  - {id: "vdem:judicial:CHL", source: vdem, frequency: Y, measure: flow, allow_gaps: true, label: "V-Dem Judicial constraints on the executive, Chile"}
+  - {id: "vdem:judicial:URY", source: vdem, frequency: Y, measure: flow, allow_gaps: true, label: "V-Dem Judicial constraints on the executive, Uruguay"}
+  - {id: "vdem:judicial:BRA", source: vdem, frequency: Y, measure: flow, allow_gaps: true, label: "V-Dem Judicial constraints on the executive, Brazil"}
+  - {id: "vdem:judicial:LATAM", source: vdem, frequency: Y, measure: flow, allow_gaps: true, label: "V-Dem Judicial constraints on the executive, Latin America (median)"}
+  - {id: "vdem:judicial:MEX", source: vdem, frequency: Y, measure: flow, allow_gaps: true, label: "V-Dem Judicial constraints on the executive, Mexico"}
+  - {id: "vdem:judicial:COL", source: vdem, frequency: Y, measure: flow, allow_gaps: true, label: "V-Dem Judicial constraints on the executive, Colombia"}
+  - {id: "vdem:judicial:PER", source: vdem, frequency: Y, measure: flow, allow_gaps: true, label: "V-Dem Judicial constraints on the executive, Peru"}
+  - {id: "vdem:judicial:VEN", source: vdem, frequency: Y, measure: flow, allow_gaps: true, label: "V-Dem Judicial constraints on the executive, Venezuela"}
+  - {id: "vdem:judicial:ECU", source: vdem, frequency: Y, measure: flow, allow_gaps: true, label: "V-Dem Judicial constraints on the executive, Ecuador"}
+  - {id: "vdem:judicial:PAN", source: vdem, frequency: Y, measure: flow, allow_gaps: true, label: "V-Dem Judicial constraints on the executive, Panama"}
+  - {id: "vdem:judicial:SLV", source: vdem, frequency: Y, measure: flow, allow_gaps: true, label: "V-Dem Judicial constraints on the executive, El Salvador"}
+  - {id: "vdem:judicial:AUS", source: vdem, frequency: Y, measure: flow, allow_gaps: true, label: "V-Dem Judicial constraints on the executive, Australia"}
+  - {id: "vdem:judicial:CAN", source: vdem, frequency: Y, measure: flow, allow_gaps: true, label: "V-Dem Judicial constraints on the executive, Canada"}
+  - {id: "vdem:judicial:ESP", source: vdem, frequency: Y, measure: flow, allow_gaps: true, label: "V-Dem Judicial constraints on the executive, Spain"}
+  - {id: "vdem:corruption:CHL", source: vdem, frequency: Y, measure: flow, allow_gaps: true, label: "V-Dem Political corruption, Chile"}
+  - {id: "vdem:corruption:URY", source: vdem, frequency: Y, measure: flow, allow_gaps: true, label: "V-Dem Political corruption, Uruguay"}
+  - {id: "vdem:corruption:BRA", source: vdem, frequency: Y, measure: flow, allow_gaps: true, label: "V-Dem Political corruption, Brazil"}
+  - {id: "vdem:corruption:LATAM", source: vdem, frequency: Y, measure: flow, allow_gaps: true, label: "V-Dem Political corruption, Latin America (median)"}
+  - {id: "vdem:corruption:MEX", source: vdem, frequency: Y, measure: flow, allow_gaps: true, label: "V-Dem Political corruption, Mexico"}
+  - {id: "vdem:corruption:COL", source: vdem, frequency: Y, measure: flow, allow_gaps: true, label: "V-Dem Political corruption, Colombia"}
+  - {id: "vdem:corruption:PER", source: vdem, frequency: Y, measure: flow, allow_gaps: true, label: "V-Dem Political corruption, Peru"}
+  - {id: "vdem:corruption:VEN", source: vdem, frequency: Y, measure: flow, allow_gaps: true, label: "V-Dem Political corruption, Venezuela"}
+  - {id: "vdem:corruption:ECU", source: vdem, frequency: Y, measure: flow, allow_gaps: true, label: "V-Dem Political corruption, Ecuador"}
+  - {id: "vdem:corruption:PAN", source: vdem, frequency: Y, measure: flow, allow_gaps: true, label: "V-Dem Political corruption, Panama"}
+  - {id: "vdem:corruption:SLV", source: vdem, frequency: Y, measure: flow, allow_gaps: true, label: "V-Dem Political corruption, El Salvador"}
+  - {id: "vdem:corruption:AUS", source: vdem, frequency: Y, measure: flow, allow_gaps: true, label: "V-Dem Political corruption, Australia"}
+  - {id: "vdem:corruption:CAN", source: vdem, frequency: Y, measure: flow, allow_gaps: true, label: "V-Dem Political corruption, Canada"}
+  - {id: "vdem:corruption:ESP", source: vdem, frequency: Y, measure: flow, allow_gaps: true, label: "V-Dem Political corruption, Spain"}
   # Finance Secretariat, central administration gross debt (monthly bulletin), millions of US dollars.
   - {id: "fin:a3|pesos_other", source: finanzas, frequency: M, measure: index, label: "Debt in pesos, not CER-linked"}
   - {id: "fin:a3|pesos_cer", source: finanzas, frequency: M, measure: index, label: "Debt in pesos, CER-linked"}
@@ -575,6 +678,16 @@ topics:
       financial balance, revenue and spending, interest paid and interest
       capitalized outside the budget, the debt stock, the maturity profile,
       payments, and Treasury placements and auctions.
+
+  - id: institutions
+    slug: institutions
+    group: Institutions
+    title: Institutions
+    description: >-
+      The institutional setting: confidence in the government and consumer
+      confidence, how long central bank presidents and economy ministers
+      last, economic freedom, and democracy and the rule of law, with
+      comparison countries. From UTDT, the Fraser Institute and V-Dem.
 
 indicators:
   - id: emae
@@ -5265,3 +5378,457 @@ indicators:
         official: {label: Official lenders,    expr: "nz(imf) + nz(ifis)"}
         other:    {label: Other,               expr: "cap + fin - hold - nz(imf) - nz(ifis)"}
         reserves: {label: Change in reserves,  expr: "res"}
+
+  # ---------------- Institutions ----------------
+  - id: inst_icg
+    topic: institutions
+    wide: true
+    kind: variants
+    overlay: true
+    overlay_default: [general]
+    emphasis: general
+    title: Confidence in Government
+    short_title: Confidence in government
+    description: >-
+      Universidad Torcuato Di Tella's index of confidence in the national
+      government (ICG), monthly since November 2001, and its five
+      dimensions. Scale 0 (no confidence) to 5.
+    source: datos_gob
+    source_label: Universidad Torcuato Di Tella (Escuela de Gobierno), via datos.gob.ar
+    frequency: M
+    units: Index, 0-5
+    transforms: [level]
+    ranges: [5Y, 10Y, Max]
+    note: >-
+      A monthly telephone survey of about 1,000 adults across the country,
+      run for UTDT by Poliarquía. Each dimension is the average answer to one
+      question about the government: its overall assessment, whether it
+      governs for the general interest or for particular interests, the
+      efficiency of its spending, the honesty of its officials, and its
+      capacity to solve the country's problems. The general index is their
+      average. Elections and changes of government move it sharply.
+    method_links: [{anchor: utdt, label: "About the UTDT surveys"}]
+    variants:
+      general:    {label: "General index",                    id: 370.3_ICG_NIVEL_RAL_0_0_17_94}
+      evaluation: {label: "Overall assessment",               id: 370.3_EVALUACIONRAL_0_0_18_90}
+      interest:   {label: "Governs for the general interest", id: 370.3_INTERES_GERAL_0_0_15_61}
+      efficiency: {label: "Efficiency",                       id: 370.3_EFICIENCIACIA_0_0_10_66}
+      honesty:    {label: "Honesty",                          id: 370.3_HONESTIDADDAD_0_0_10_58}
+      capacity:   {label: "Capacity to solve problems",       id: 370.3_CAPACIDADDAD_0_0_9_83}
+    default: {variant: general, transform: level, range: Max, rebase: false}
+
+  - id: inst_icc
+    topic: institutions
+    wide: true
+    kind: variants
+    overlay: true
+    overlay_default: [national, macro, personal, durables]
+    emphasis: national
+    title: Consumer Confidence
+    short_title: Consumer confidence
+    description: >-
+      Universidad Torcuato Di Tella's consumer confidence index (ICC),
+      monthly since March 2001: national, its three components, and by
+      region. Scale 0 to 100.
+    source: datos_gob
+    source_label: Universidad Torcuato Di Tella (Centro de Investigación en Finanzas), via datos.gob.ar
+    frequency: M
+    units: Index, 0-100
+    transforms: [level, yoy]
+    ranges: [5Y, 10Y, Max]
+    note: >-
+      Built from the same monthly survey as the confidence in government
+      index. Personal situation: households' view of their own economic
+      situation now and a year ahead; macroeconomic situation: the
+      country's, now and expected; durables and real estate: whether it is
+      a good time to buy them. 50 is the midpoint of the scale, not a
+      neutral reading.
+    method_links: [{anchor: utdt, label: "About the UTDT surveys"}]
+    variants:
+      national: {label: "National",                         id: 380.3_ICC_NACIONNAL_0_T_12}
+      macro:    {label: "Macroeconomic situation",          id: 380.3_DESAGREGACCRO_0_T_40}
+      personal: {label: "Personal situation",               id: 380.3_DESAGREGACNAL_0_T_43}
+      durables: {label: "Durables and real estate",         id: 380.3_DESAGREGACLES_0_T_50}
+      caba:     {label: "City of Buenos Aires",             id: 380.3_DESAGREGACTAL_0_T_30}
+      gba:      {label: "Greater Buenos Aires",             id: 380.3_DESAGREGACGBA_0_T_26}
+      interior: {label: "Interior",                         id: 380.3_DESAGREGACIOR_0_T_31}
+    default: {variant: national, transform: level, range: Max, rebase: false}
+
+  - id: inst_tenure_bcra
+    topic: institutions
+    kind: tenure
+    wide: true
+    title: Tenure of BCRA Presidents
+    short_title: BCRA presidents
+    description: >-
+      Days in office of each president of the Central Bank, in order, with the average; the president in office is counted to today.
+    source: table
+    source_label: "Compiled by N. Cachanosky from official records (BCRA, Ministry of Economy)"
+    frequency: Y
+    units: Days in office
+    default: {}
+    table:
+      source: officials
+      file: tenure.json
+      role: bcra
+      status_id: "officials:bcra"
+    note: >-
+      Bars are colored by the party of the president who appointed each
+      official (presidencies since December 1983; earlier bars are grey).
+      The average leaves out the official in office, whose tenure is not yet
+      complete. Interim officials who served days are kept: they are part of
+      the turnover. Before 1983 the list spans civilian and military
+      governments; the dashed line is the average of the period shown.
+    method_links: [{anchor: tenure, label: "About the list of officials"}]
+
+  - id: inst_tenure_economia
+    topic: institutions
+    kind: tenure
+    wide: true
+    title: Tenure of Ministers of the Economy
+    short_title: Ministers of the economy
+    description: >-
+      Days in office of each minister of the economy (under the ministry's successive names), in order, with the average; the minister in office is counted to today.
+    source: table
+    source_label: "Compiled by N. Cachanosky from official records (BCRA, Ministry of Economy)"
+    frequency: Y
+    units: Days in office
+    default: {}
+    table:
+      source: officials
+      file: tenure.json
+      role: economia
+      status_id: "officials:economia"
+    note: >-
+      Bars are colored by the party of the president who appointed each
+      official (presidencies since December 1983; earlier bars are grey).
+      The average leaves out the official in office, whose tenure is not yet
+      complete. Interim officials who served days are kept: they are part of
+      the turnover. Before 1983 the list spans civilian and military
+      governments; the dashed line is the average of the period shown.
+    method_links: [{anchor: tenure, label: "About the list of officials"}]
+
+  - id: inst_efw
+    topic: institutions
+    wide: true
+    kind: variants
+    overlay: true
+    overlay_default: [arg, chl, ury, bra, latam]
+    muted: [latam]
+    emphasis: arg
+    term_shading: true
+    plain_level: true
+    measure: flow
+    title: Economic Freedom of the World
+    short_title: Economic freedom
+    description: >-
+      The Fraser Institute's summary rating of economic freedom, 0 (least
+      free) to 10: Argentina and comparison countries. 1970-2000 every five
+      years, annual since. Add countries with the buttons below the chart.
+    source: efw
+    source_label: "Fraser Institute, Economic Freedom of the World: 2026 Annual Report"
+    frequency: Y
+    units: Rating, 0-10
+    transforms: [level]
+    ranges: [Since 2000, Max]
+    note: >-
+      The summary rating is the average of five areas (size of government,
+      legal system and property rights, sound money, freedom to trade
+      internationally, regulation), built from about 45 components drawn from
+      the IMF, the World Bank, the World Economic Forum and other sources.
+      Each edition revises earlier years. The Latin American median is taken
+      over the countries rated each year (fewer before 2000).
+    method_links: [{anchor: efw, label: "About the EFW index"}]
+    variants:
+      arg: {label: "Argentina", id: "efw:ARG:summary"}
+      chl: {label: "Chile", id: "efw:CHL:summary"}
+      ury: {label: "Uruguay", id: "efw:URY:summary"}
+      bra: {label: "Brazil", id: "efw:BRA:summary"}
+      latam: {label: "Latin America (median)", id: "efw:LATAM:summary"}
+      mex: {label: "Mexico", id: "efw:MEX:summary"}
+      col: {label: "Colombia", id: "efw:COL:summary"}
+      per: {label: "Peru", id: "efw:PER:summary"}
+      ven: {label: "Venezuela", id: "efw:VEN:summary"}
+      ecu: {label: "Ecuador", id: "efw:ECU:summary"}
+      pan: {label: "Panama", id: "efw:PAN:summary"}
+      slv: {label: "El Salvador", id: "efw:SLV:summary"}
+      aus: {label: "Australia", id: "efw:AUS:summary"}
+      can: {label: "Canada", id: "efw:CAN:summary"}
+      esp: {label: "Spain", id: "efw:ESP:summary"}
+    default: {variant: arg, transform: level, range: Max}
+
+  - id: inst_efw_areas
+    topic: institutions
+    wide: true
+    kind: variants
+    overlay: true
+    emphasis: summary
+    term_shading: true
+    plain_level: true
+    measure: flow
+    title: "Economic Freedom: Argentina by Area"
+    short_title: EFW areas
+    description: >-
+      Argentina's summary rating and the five areas it averages, 0 to 10.
+    source: efw
+    source_label: "Fraser Institute, Economic Freedom of the World: 2026 Annual Report"
+    frequency: Y
+    units: Rating, 0-10
+    transforms: [level]
+    ranges: [Since 2000, Max]
+    note: >-
+      Sound money rates money growth, the level and variability of
+      inflation, and the freedom to hold foreign-currency bank accounts; it
+      is the area that moves Argentina's rating most. Area 2 includes the
+      adjustment for legal gender disparities used in the summary rating.
+    method_links: [{anchor: efw, label: "About the EFW index"}]
+    variants:
+      summary: {label: "Summary rating", id: "efw:ARG:summary"}
+      a1: {label: "Area 1: Size of government", id: "efw:ARG:a1"}
+      a2: {label: "Area 2: Legal system and property rights", id: "efw:ARG:a2"}
+      a3: {label: "Area 3: Sound money", id: "efw:ARG:a3"}
+      a4: {label: "Area 4: Freedom to trade internationally", id: "efw:ARG:a4"}
+      a5: {label: "Area 5: Regulation", id: "efw:ARG:a5"}
+    default: {variant: summary, transform: level, range: Max}
+
+  - id: inst_efw_rank
+    topic: institutions
+    kind: variants
+    overlay: true
+    term_shading: true
+    plain_level: true
+    measure: flow
+    title: "Economic Freedom: Argentina's Rank"
+    short_title: EFW rank
+    description: >-
+      Argentina's place in the world ranking of economic freedom (1 = most
+      free) and the number of countries ranked.
+    source: efw
+    source_label: "Fraser Institute, Economic Freedom of the World: 2026 Annual Report"
+    frequency: Y
+    units: Rank
+    transforms: [level]
+    ranges: [Since 2000, Max]
+    note: >-
+      The number of countries rated grew from about 100 in 1970 to 165, so
+      ranks far apart in time are not strictly comparable: a falling share
+      of countries ahead is the cleaner comparison.
+    method_links: [{anchor: efw, label: "About the EFW index"}]
+    variants:
+      rank:  {label: "Argentina's rank",  id: "efw:ARG:rank"}
+      count: {label: "Countries ranked",  id: "efw:ALL:count"}
+    default: {variant: rank, transform: level, range: Max}
+
+  - id: inst_vdem
+    topic: institutions
+    wide: true
+    kind: variants
+    overlay: true
+    overlay_default: [libdem, electdem, rol]
+    term_shading: true
+    plain_level: true
+    measure: flow
+    title: "Democracy and the Rule of Law in Argentina (V-Dem)"
+    short_title: V-Dem, Argentina
+    description: >-
+      Six indices from the Varieties of Democracy project, 0 to 1, yearly:
+      the quality of democracy, the constraints on the executive, the rule
+      of law and corruption.
+    source: vdem
+    source_label: "V-Dem Institute, Varieties of Democracy dataset (v16), via Our World in Data"
+    frequency: Y
+    units: Index, 0-1
+    transforms: [level]
+    ranges: [Since 1983, Since 1946, Since 1900, Max]
+    note: >-
+      V-Dem's indices aggregate the ratings of several country experts per
+      question with a measurement model; the line is the point estimate
+      (the confidence intervals are not shown). Political corruption runs
+      the other way: higher is more corrupt. Legislative constraints are
+      blank in years without a sitting legislature (the military
+      governments).
+    method_links: [{anchor: vdem, label: "About the V-Dem indices"}]
+    variants:
+      libdem: {label: "Liberal democracy", id: "vdem:libdem:ARG"}
+      electdem: {label: "Electoral democracy", id: "vdem:electdem:ARG"}
+      judicial: {label: "Judicial constraints on the executive", id: "vdem:judicial:ARG"}
+      legislative: {label: "Legislative constraints on the executive", id: "vdem:legislative:ARG"}
+      rol: {label: "Rule of law", id: "vdem:rol:ARG"}
+      corruption: {label: "Political corruption", id: "vdem:corruption:ARG"}
+    default: {variant: libdem, transform: level, range: Since 1946}
+
+  - id: inst_vdem_libdem
+    topic: institutions
+    wide: true
+    kind: variants
+    overlay: true
+    overlay_default: [arg, chl, ury, bra, latam]
+    muted: [latam]
+    emphasis: arg
+    term_shading: true
+    plain_level: true
+    measure: flow
+    title: "Liberal democracy: Argentina and Comparison Countries"
+    short_title: "Liberal democracy"
+    description: >-
+      V-Dem's liberal democracy index, 0 to 1. Add
+      countries with the buttons below the chart.
+    source: vdem
+    source_label: "V-Dem Institute, Varieties of Democracy dataset (v16), via Our World in Data"
+    frequency: Y
+    units: Index, 0-1
+    transforms: [level]
+    ranges: [Since 1983, Since 1946, Since 1900, Max]
+    note: >-
+      Liberal democracy combines electoral democracy (free and fair elections, suffrage, freedom of expression and association) with the liberal component: equality before the law, individual liberties, and judicial and legislative constraints on the executive. The Latin American median is taken over the countries
+      with data each year.
+    method_links: [{anchor: vdem, label: "About the V-Dem indices"}]
+    variants:
+      arg: {label: "Argentina", id: "vdem:libdem:ARG"}
+      chl: {label: "Chile", id: "vdem:libdem:CHL"}
+      ury: {label: "Uruguay", id: "vdem:libdem:URY"}
+      bra: {label: "Brazil", id: "vdem:libdem:BRA"}
+      latam: {label: "Latin America (median)", id: "vdem:libdem:LATAM"}
+      mex: {label: "Mexico", id: "vdem:libdem:MEX"}
+      col: {label: "Colombia", id: "vdem:libdem:COL"}
+      per: {label: "Peru", id: "vdem:libdem:PER"}
+      ven: {label: "Venezuela", id: "vdem:libdem:VEN"}
+      ecu: {label: "Ecuador", id: "vdem:libdem:ECU"}
+      pan: {label: "Panama", id: "vdem:libdem:PAN"}
+      slv: {label: "El Salvador", id: "vdem:libdem:SLV"}
+      aus: {label: "Australia", id: "vdem:libdem:AUS"}
+      can: {label: "Canada", id: "vdem:libdem:CAN"}
+      esp: {label: "Spain", id: "vdem:libdem:ESP"}
+    default: {variant: arg, transform: level, range: Since 1946}
+
+  - id: inst_vdem_rol
+    topic: institutions
+    wide: true
+    kind: variants
+    overlay: true
+    overlay_default: [arg, chl, ury, bra, latam]
+    muted: [latam]
+    emphasis: arg
+    term_shading: true
+    plain_level: true
+    measure: flow
+    title: "Rule of law: Argentina and Comparison Countries"
+    short_title: "Rule of law"
+    description: >-
+      V-Dem's rule of law index, 0 to 1. Add
+      countries with the buttons below the chart.
+    source: vdem
+    source_label: "V-Dem Institute, Varieties of Democracy dataset (v16), via Our World in Data"
+    frequency: Y
+    units: Index, 0-1
+    transforms: [level]
+    ranges: [Since 1983, Since 1946, Since 1900, Max]
+    note: >-
+      Rule of law: to what extent laws are transparently, independently, predictably, impartially and equally enforced, and the actions of government officials comply with the law. The Latin American median is taken over the countries
+      with data each year.
+    method_links: [{anchor: vdem, label: "About the V-Dem indices"}]
+    variants:
+      arg: {label: "Argentina", id: "vdem:rol:ARG"}
+      chl: {label: "Chile", id: "vdem:rol:CHL"}
+      ury: {label: "Uruguay", id: "vdem:rol:URY"}
+      bra: {label: "Brazil", id: "vdem:rol:BRA"}
+      latam: {label: "Latin America (median)", id: "vdem:rol:LATAM"}
+      mex: {label: "Mexico", id: "vdem:rol:MEX"}
+      col: {label: "Colombia", id: "vdem:rol:COL"}
+      per: {label: "Peru", id: "vdem:rol:PER"}
+      ven: {label: "Venezuela", id: "vdem:rol:VEN"}
+      ecu: {label: "Ecuador", id: "vdem:rol:ECU"}
+      pan: {label: "Panama", id: "vdem:rol:PAN"}
+      slv: {label: "El Salvador", id: "vdem:rol:SLV"}
+      aus: {label: "Australia", id: "vdem:rol:AUS"}
+      can: {label: "Canada", id: "vdem:rol:CAN"}
+      esp: {label: "Spain", id: "vdem:rol:ESP"}
+    default: {variant: arg, transform: level, range: Since 1946}
+
+  - id: inst_vdem_judicial
+    topic: institutions
+    wide: true
+    kind: variants
+    overlay: true
+    overlay_default: [arg, chl, ury, bra, latam]
+    muted: [latam]
+    emphasis: arg
+    term_shading: true
+    plain_level: true
+    measure: flow
+    title: "Judicial constraints on the executive: Argentina and Comparison Countries"
+    short_title: "Judicial constraints on the executive"
+    description: >-
+      V-Dem's judicial constraints on the executive index, 0 to 1. Add
+      countries with the buttons below the chart.
+    source: vdem
+    source_label: "V-Dem Institute, Varieties of Democracy dataset (v16), via Our World in Data"
+    frequency: Y
+    units: Index, 0-1
+    transforms: [level]
+    ranges: [Since 1983, Since 1946, Since 1900, Max]
+    note: >-
+      Judicial constraints on the executive: to what extent the executive respects the constitution and complies with court rulings, and the judiciary is able to act independently. The Latin American median is taken over the countries
+      with data each year.
+    method_links: [{anchor: vdem, label: "About the V-Dem indices"}]
+    variants:
+      arg: {label: "Argentina", id: "vdem:judicial:ARG"}
+      chl: {label: "Chile", id: "vdem:judicial:CHL"}
+      ury: {label: "Uruguay", id: "vdem:judicial:URY"}
+      bra: {label: "Brazil", id: "vdem:judicial:BRA"}
+      latam: {label: "Latin America (median)", id: "vdem:judicial:LATAM"}
+      mex: {label: "Mexico", id: "vdem:judicial:MEX"}
+      col: {label: "Colombia", id: "vdem:judicial:COL"}
+      per: {label: "Peru", id: "vdem:judicial:PER"}
+      ven: {label: "Venezuela", id: "vdem:judicial:VEN"}
+      ecu: {label: "Ecuador", id: "vdem:judicial:ECU"}
+      pan: {label: "Panama", id: "vdem:judicial:PAN"}
+      slv: {label: "El Salvador", id: "vdem:judicial:SLV"}
+      aus: {label: "Australia", id: "vdem:judicial:AUS"}
+      can: {label: "Canada", id: "vdem:judicial:CAN"}
+      esp: {label: "Spain", id: "vdem:judicial:ESP"}
+    default: {variant: arg, transform: level, range: Since 1946}
+
+  - id: inst_vdem_corruption
+    topic: institutions
+    wide: true
+    kind: variants
+    overlay: true
+    overlay_default: [arg, chl, ury, bra, latam]
+    muted: [latam]
+    emphasis: arg
+    term_shading: true
+    plain_level: true
+    measure: flow
+    title: "Political corruption: Argentina and Comparison Countries"
+    short_title: "Political corruption"
+    description: >-
+      V-Dem's political corruption index, 0 to 1, higher is more corrupt. Add
+      countries with the buttons below the chart.
+    source: vdem
+    source_label: "V-Dem Institute, Varieties of Democracy dataset (v16), via Our World in Data"
+    frequency: Y
+    units: Index, 0-1
+    transforms: [level]
+    ranges: [Since 1983, Since 1946, Since 1900, Max]
+    note: >-
+      Political corruption: executive, legislative and judicial corruption and public-sector corruption (bribes, embezzlement). Higher is MORE corrupt, unlike the other indices. The Latin American median is taken over the countries
+      with data each year.
+    method_links: [{anchor: vdem, label: "About the V-Dem indices"}]
+    variants:
+      arg: {label: "Argentina", id: "vdem:corruption:ARG"}
+      chl: {label: "Chile", id: "vdem:corruption:CHL"}
+      ury: {label: "Uruguay", id: "vdem:corruption:URY"}
+      bra: {label: "Brazil", id: "vdem:corruption:BRA"}
+      latam: {label: "Latin America (median)", id: "vdem:corruption:LATAM"}
+      mex: {label: "Mexico", id: "vdem:corruption:MEX"}
+      col: {label: "Colombia", id: "vdem:corruption:COL"}
+      per: {label: "Peru", id: "vdem:corruption:PER"}
+      ven: {label: "Venezuela", id: "vdem:corruption:VEN"}
+      ecu: {label: "Ecuador", id: "vdem:corruption:ECU"}
+      pan: {label: "Panama", id: "vdem:corruption:PAN"}
+      slv: {label: "El Salvador", id: "vdem:corruption:SLV"}
+      aus: {label: "Australia", id: "vdem:corruption:AUS"}
+      can: {label: "Canada", id: "vdem:corruption:CAN"}
+      esp: {label: "Spain", id: "vdem:corruption:ESP"}
+    default: {variant: arg, transform: level, range: Since 1946}
