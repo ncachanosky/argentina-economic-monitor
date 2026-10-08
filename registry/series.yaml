@@ -367,15 +367,16 @@ inputs:
   - {id: 144.4_AVOSOTLES_0_T_48, source: datos_gob, frequency: Q, measure: flow, allow_gaps: true, label: "IIP assets of other sectors: portfolio investment"}
   - {id: 144.4_AVOSOTUAL_0_T_54, source: datos_gob, frequency: Q, measure: flow, allow_gaps: true, label: "IIP assets of other sectors: other investment"}
   # Labor and social (INDEC EPH, wages, minimum wage, poverty), via datos.gob.ar unless noted.
-  - {id: 43.2_ECTAT_0_T_33, source: datos_gob, frequency: Q, measure: flow, label: "EPH: activity rate (share)"}
-  - {id: 44.2_ECTET_0_T_30, source: datos_gob, frequency: Q, measure: flow, label: "EPH: employment rate (share)"}
-  - {id: 45.2_ECTDT_0_T_33, source: datos_gob, frequency: Q, measure: flow, label: "EPH: unemployment rate (share)"}
-  - {id: 46.2_ECTST_0_T_36, source: datos_gob, frequency: Q, measure: flow, label: "EPH: underemployment rate (share)"}
+  - {id: 43.2_ECTAT_0_T_33, source: datos_gob, frequency: Q, measure: flow, allow_gaps: true, label: "EPH: activity rate (share)"}
+  - {id: 44.2_ECTET_0_T_30, source: datos_gob, frequency: Q, measure: flow, allow_gaps: true, label: "EPH: employment rate (share)"}
+  - {id: 45.2_ECTDT_0_T_33, source: datos_gob, frequency: Q, measure: flow, allow_gaps: true, label: "EPH: unemployment rate (share)"}
+  - {id: 46.2_ECTST_0_T_36, source: datos_gob, frequency: Q, measure: flow, allow_gaps: true, label: "EPH: underemployment rate (share)"}
   - {id: 158.1_REPTE_0_0_5, source: datos_gob, frequency: M, measure: index, label: "RIPTE: average taxable wage of stable workers, pesos"}
   - {id: 57.1_SMVMM_0_M_34, source: datos_gob, frequency: M, measure: index, label: "Minimum wage, monthly, in the currency of each period"}
   - {id: 58.1_MP_0_M_24, source: datos_gob, frequency: M, measure: index, label: "Minimum pension, monthly, in the currency of each period"}
   - {id: 150.1_LA_POBREZA_0_D_13, source: datos_gob, frequency: M, measure: index, label: "Poverty line, typical household (2 adults, 2 children), pesos"}
   - {id: 150.1_LA_INDICIA_0_D_16, source: datos_gob, frequency: M, measure: index, label: "Indigence line, typical household, pesos"}
+  - {id: 65.1_CGI_0_0_21, source: datos_gob, frequency: Q, measure: flow, allow_gaps: true, label: "Gini coefficient, per capita household income (EPH)"}
   - {id: 155.2_TLTAL_S_0_0_5, source: datos_gob, frequency: Q, measure: index, stale_days: 480, label: "Registered private wage earners (SIPA), seasonally adjusted"}
   - {id: 53.1_TRTA_0_0_37, source: datos_gob, frequency: Q, measure: flow, label: "Employee compensation, share of GDP at factor cost"}
   - {id: 53.1_TIMB_0_0_25, source: datos_gob, frequency: Q, measure: flow, label: "Mixed income, share of GDP at factor cost"}
