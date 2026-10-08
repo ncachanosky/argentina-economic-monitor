@@ -258,6 +258,8 @@ inputs:
   - {id: "bcrabc:cash_purchases", source: bcra_cambiario, frequency: M, measure: flow, stale_days: 120, label: "Balance cambiario: cash_purchases"}
   - {id: "bcrabc:reserves", source: bcra_cambiario, frequency: M, measure: flow, stale_days: 120, label: "Balance cambiario: reserves"}
   - {id: "bcra:78", source: bcra, frequency: D, measure: flow, allow_gaps: true, label: "Change in international reserves from BCRA purchases of foreign currency (USD m)"}
+  - {id: "bcra:1187", source: bcra, frequency: D, measure: index, allow_gaps: true, label: "Exchange-rate band: lower limit"}
+  - {id: "bcra:1188", source: bcra, frequency: D, measure: index, allow_gaps: true, label: "Exchange-rate band: upper limit"}
   # Market exchange rates (unofficial: ArgentinaDatos and DolarAPI, compiled from the financial press), pesos per US dollar, selling.
   - {id: "dolar:blue", source: dolar, frequency: D, measure: index, allow_gaps: true, stale_days: 7, label: "Informal (blue) dollar"}
   - {id: "dolar:mep", source: dolar, frequency: D, measure: index, allow_gaps: true, stale_days: 7, label: "MEP dollar (bond trades, local)"}
@@ -3367,6 +3369,76 @@ indicators:
         blue:     {label: Blue (informal),      expr: "blue"}
         card:     {label: Card (tarjeta),       expr: "card"}
         crypto:   {label: Crypto,               expr: "cry"}
+
+  - id: fx_band
+    topic: fx
+    wide: true
+    kind: variants
+    overlay: true
+    plain_level: true
+    title: The Exchange-Rate Band
+    short_title: Band
+    description: >-
+      The official wholesale rate and the band's floor and ceiling, pesos per
+      US dollar, daily since the band started on 14 April 2025. Inside the
+      band the rate floats; at the limits the BCRA buys (floor) or sells
+      (ceiling).
+    source: derived
+    source_label: BCRA (Régimen de bandas cambiarias; Communication A 3500)
+    frequency: D
+    units: Pesos per US dollar
+    transforms: [level]
+    ranges: [2Y, Max]
+    note: >-
+      The BCRA's published limits (it sets them in advance through the end
+      of each month; the chart shows them through today). The band started at 1,000
+      and 1,400 pesos per dollar; until December 2025 the floor fell and the
+      ceiling rose 1% a month, prorated by day, and since January 2026 the
+      BCRA has widened it each month at a different pace. Before the band,
+      see Official Exchange Rate.
+    method_links: [{anchor: fx-band, label: "About the band"}]
+    default: {variant: official, transform: level, range: Max}
+    derive:
+      method: formula
+      vars: {ofx: "bcra:5", lo: "bcra:1187", hi: "bcra:1188"}
+      start: "2025-04-14"
+      variants:
+        official: {label: Official (wholesale), expr: "ofx"}
+        ceiling:  {label: Ceiling,              expr: "hi"}
+        floor:    {label: Floor,                expr: "lo"}
+
+  - id: fx_band_room
+    topic: fx
+    kind: variants
+    measure: rate
+    validate_as: flow
+    plain_level: true
+    title: Room to the Band's Ceiling
+    short_title: Room to ceiling
+    description: >-
+      How much the official rate could rise before reaching the ceiling of
+      the band, where the BCRA must sell dollars: the ceiling over the
+      official wholesale rate, minus one, percent. Daily.
+    source: derived
+    source_label: BCRA
+    frequency: D
+    units: "% below the ceiling"
+    transforms: [level]
+    ranges: [2Y, Max]
+    ref_line: 0
+    note: >-
+      Zero means the rate is at the ceiling. The room grows by itself as the
+      band widens; it shrinks when the peso depreciates faster than the
+      ceiling rises.
+    method_links: [{anchor: fx-band, label: "About the band"}]
+    default: {variant: room, transform: level, range: Max}
+    derive:
+      method: formula
+      anchor: ofx
+      vars: {ofx: "bcra:5", hi: "bcra:1188"}
+      start: "2025-04-14"
+      variants:
+        room: {label: Room to the ceiling, expr: "100 * (hi / ofx - 1)"}
 
   - id: fx_gaps
     topic: fx
