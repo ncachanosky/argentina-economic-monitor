@@ -274,6 +274,11 @@ inputs:
   - {id: "itcrm:cn", source: itcrm, frequency: D, measure: index, allow_gaps: true, stale_days: 10, label: "Bilateral real exchange rate index: China"}
   - {id: "itcrm:eu", source: itcrm, frequency: D, measure: index, allow_gaps: true, stale_days: 10, label: "Bilateral real exchange rate index: euro area"}
   - {id: "rem:fx12", source: rem, frequency: M, measure: index, allow_gaps: true, label: "REM: median expected official exchange rate, twelve months ahead"}
+  - {id: "rem:cpi12", source: rem, frequency: M, measure: flow, allow_gaps: true, label: "REM: expected CPI inflation, next 12 months, %, median"}
+  - {id: "rem:cpi12_p10", source: rem, frequency: M, measure: flow, allow_gaps: true, label: "REM: expected CPI inflation, next 12 months, %, 10th percentile"}
+  - {id: "rem:cpi12_p25", source: rem, frequency: M, measure: flow, allow_gaps: true, label: "REM: expected CPI inflation, next 12 months, %, 25th percentile"}
+  - {id: "rem:cpi12_p75", source: rem, frequency: M, measure: flow, allow_gaps: true, label: "REM: expected CPI inflation, next 12 months, %, 75th percentile"}
+  - {id: "rem:cpi12_p90", source: rem, frequency: M, measure: flow, allow_gaps: true, label: "REM: expected CPI inflation, next 12 months, %, 90th percentile"}
   # Dollar futures (A3 Mercados, formerly MATba-Rofex; the exchange's market-data API, not an official statistic).
   - {id: "a3:f12", source: a3, frequency: D, measure: index, allow_gaps: true, stale_days: 7, label: "Dollar futures: price twelve months ahead (interpolated), pesos per US dollar"}
   - {id: "a3:f6", source: a3, frequency: D, measure: index, allow_gaps: true, stale_days: 7, label: "Dollar futures: price six months ahead (interpolated), pesos per US dollar"}
@@ -907,6 +912,8 @@ indicators:
       once GDP is published the two agree; before that, EMAE is the earliest
       official reading of the quarter, and it is revised with each release.
     default: {variant: emae, transform: mom, start: "2024-07"}
+    forecast:
+      - {variant: gdp, rem: gdp, transform: mom, label: "REM expectation, GDP q/q s.a. (median)"}
     derive:
       method: tracker
       monthly_sa: 143.3_NO_PR_2004_A_31
@@ -1166,6 +1173,9 @@ indicators:
       regulated: {label: Regulated, id: 148.3_IREGULANAL_DICI_M_22}
       seasonal:  {label: Seasonal,  id: 148.3_IESTACINAL_DICI_M_25}
     default: {variant: headline, transform: mom, start: "2017-01"}
+    forecast:
+      - {variant: headline, rem: cpi, transform: mom}
+      - {variant: core, rem: core, transform: mom}
     headline: {variant: headline, transform: mom}
 
   - id: cpi_long
@@ -1361,6 +1371,72 @@ indicators:
         expected: {label: Expected (REM median)}
         realized: {label: Realized next 12 months}
         past:     {label: Past 12 months}
+
+  - id: inflation_expectations_range
+    topic: prices
+    wide: true
+    kind: variants
+    overlay: true
+    measure: rate
+    plain_level: true
+    emphasis: median
+    title: How Much Forecasters Disagree
+    short_title: Expectations range
+    description: >-
+      The spread of inflation expected over the next 12 months among the
+      forecasters in the BCRA's survey (REM): the median, the middle half of
+      answers (shaded) and the 10th and 90th percentiles, monthly since 2016.
+    source: rem
+    source_label: BCRA (REM)
+    frequency: M
+    units: "%"
+    transforms: [level]
+    ranges: [2Y, 5Y, Max]
+    fan: {lo: p25, hi: p75, label: "25th-75th percentile"}
+    muted: [p10, p90]
+    note: >-
+      A wider band means less agreement about where inflation is going, a
+      rough measure of uncertainty about the disinflation path. The band
+      narrows when inflation falls, so it is also worth reading relative to
+      the median.
+    method_links: [{anchor: rem, label: "About the REM survey"}]
+    variants:
+      median: {label: Median,          id: "rem:cpi12"}
+      p25:    {label: 25th percentile, id: "rem:cpi12_p25"}
+      p75:    {label: 75th percentile, id: "rem:cpi12_p75"}
+      p10:    {label: 10th percentile, id: "rem:cpi12_p10"}
+      p90:    {label: 90th percentile, id: "rem:cpi12_p90"}
+    default: {variant: median, transform: level, range: Max}
+
+  - id: rem_revisions
+    topic: prices
+    kind: rem_revisions
+    wide: true
+    title: How Forecasts Changed
+    short_title: Forecast revisions
+    description: >-
+      Each line is one calendar year: what the forecasters in the BCRA's
+      survey (REM) expected for it, survey by survey, against the outcome
+      once known. December inflation, GDP growth, the December exchange rate
+      and the primary fiscal balance.
+    source: table
+    source_label: BCRA (REM); outcomes from INDEC, BCRA and the Secretaría de Hacienda
+    frequency: M
+    units: ""
+    default: {}
+    table:
+      source: rem
+      file: revisions.json
+      status_id: "rem:cpi12"
+    note: >-
+      Medians of the survey. December inflation is the change in the CPI
+      from December to December; GDP growth is the change in the year's
+      average; the exchange rate is December's average official (wholesale)
+      rate; the primary balance is the national non-financial public
+      sector's, cash basis, in billions of pesos of each year. Outcomes:
+      INDEC's CPI and quarterly GDP, the BCRA's wholesale rate and the
+      Secretaría de Hacienda's monthly fiscal data.
+    method_links: [{anchor: rem, label: "About the REM survey"}]
 
   - id: cpi_regions
     topic: prices
@@ -1607,6 +1683,36 @@ indicators:
       overdraft: {label: Overdrafts,                                           id: "bcra:13"}
       personal: {label: Personal loans,                                        id: "bcra:14"}
     default: {variant: [badlar, deposits, personal], transform: level, start: "2023-01"}
+
+  - id: tamar
+    topic: money
+    kind: variants
+    measure: rate
+    validate_as: flow
+    title: Benchmark Rate (TAMAR) and Expected Path
+    short_title: TAMAR
+    description: >-
+      TAMAR, the rate private banks pay on large time deposits, the
+      benchmark since the policy rate was discontinued, daily, with the path
+      expected in the latest REM survey.
+    source: bcra
+    source_label: BCRA; REM survey
+    frequency: D
+    units: "% nominal annual"
+    transforms: [level]
+    ranges: [2Y, 5Y, Max]
+    note: >-
+      The dashed line is the median monthly average expected by the
+      forecasters in the BCRA's survey (REM) for the next six months; the
+      shaded band spans the middle half of their answers (25th to 75th
+      percentile). The survey closes in the last days of each month and is
+      published early the next.
+    method_links: [{anchor: rem, label: "About the REM survey"}]
+    variants:
+      tamar: {label: TAMAR, id: "bcra:44"}
+    forecast:
+      - {variant: tamar, rem: tamar, transform: level}
+    default: {variant: tamar, transform: level, range: 2Y}
 
   - id: policy_rate
     topic: money
@@ -3743,6 +3849,8 @@ indicators:
       caution (population projections and survey quality); the shaded period
       marks them.
     default: {variant: unemployment, transform: level, range: Max}
+    forecast:
+      - {variant: unemployment, rem: unemp, transform: level}
     derive:
       method: formula
       anchor: u
@@ -5251,6 +5359,8 @@ indicators:
       file: curve.json
       status_id: "a3:f6"
       source_url: https://www.a3mercados.com.ar/
+    forecast:
+      - {rem: fx, label: "REM survey, monthly average (median)"}
     note: >-
       Each contract settles at the BCRA's wholesale rate (Communication A
       3500) of its expiry month's last business day, in pesos, so its price

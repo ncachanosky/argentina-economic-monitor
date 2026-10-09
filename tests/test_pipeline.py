@@ -708,3 +708,21 @@ def test_country_risk_cleaning_and_jump_warning(monkeypatch):
     monkeypatch.setattr(riesgo, "_get", lambda url, retries=3: {"fecha": "2020-09-10", "valor": 1101} if url.endswith("ultimo") else rows)
     r = riesgo.fetch(["riesgo:embi"])
     assert not r.errors and r.warnings["riesgo:embi"]          # a -48% day is accepted but flagged
+
+
+def test_rem_periods_paths_and_revisions():
+    import datetime as dt
+    from pipeline.sources import rem
+    assert rem._period(dt.datetime(2026, 10, 1)) == ("m", pd.Timestamp("2026-10-01"))
+    assert rem._period("Trim. III-26") == ("q", pd.Timestamp("2026-07-01"))
+    assert rem._period(2027) == ("y", pd.Timestamp("2027-01-01"))
+    assert rem._period("Próx. 12 meses")[0] == "n12"
+    rows = [{"survey": pd.Timestamp(f"2026-0{m}-01"), "var": "cpi", "kind": k, "period": per, "med": v, "p10": None, "p25": v - 1, "p75": v + 1, "p90": None, "n": 40.0}
+            for m in (8, 9) for k, per, v in (("y", pd.Timestamp("2026-01-01"), 20.0 + m), ("n12", None, 18.0), ("m", pd.Timestamp("2026-10-01"), 1.9))]
+    df = pd.DataFrame(rows)
+    s = rem.series(df.assign(var=lambda d: d["var"]).pipe(lambda d: pd.concat([d, d.assign(var="fx")])))
+    assert s["cpi12"].iloc[-1] == 18.0 and s["cpi12_p75"].iloc[-1] == 19.0
+    p = rem.paths(df)
+    assert p["survey"] == "2026-09-01" and p["vars"]["cpi"]["points"][0]["med"] == 1.9
+    r = rem.revisions(df)
+    assert [q[1] for q in r["vars"]["cpi"]["2026"]] == [28.0, 29.0]

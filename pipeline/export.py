@@ -177,6 +177,52 @@ def deflator_for(ind, reg, dates: pd.DatetimeIndex) -> dict | None:
             "label": spec.get("label", "CPI")}
 
 
+REM_LABELS = {"cpi": "REM expectation (median)", "core": "REM expectation, core (median)", "fx": "REM expectation (median)",
+              "tamar": "REM expectation (median)", "gdp": "REM expectation (median)", "unemp": "REM expectation (median)"}
+
+
+def rem_forecast(ind) -> dict | None:
+    """The latest REM survey's expected path for each of the card's `forecast` entries."""
+    if not ind.forecast:
+        return None
+    from .update import TABLES_DIR
+    p = TABLES_DIR / "rem" / "paths.json"
+    if not p.exists():
+        return None
+    paths = json.loads(p.read_text(encoding="utf-8"))
+    items = []
+    for f in ind.forecast:
+        v = paths["vars"].get(f["rem"])
+        if v and v["points"]:
+            items.append({**f, "label": f.get("label") or REM_LABELS.get(f["rem"], "REM expectation"), "points": v["points"]})
+    return {"survey": paths["survey"], "items": items} if items else None
+
+
+def rem_outcomes() -> dict:
+    """Actual values for the calendar years the REM forecasts, for comparison with its forecasts."""
+    out = {}
+    cpi = store.as_of("148.3_INIVELNAL_DICI_M_26")
+    if not cpi.empty:
+        dec = cpi[cpi.index.month == 12]
+        out["cpi"] = {str(d.year): 100 * (v / dec.get(d - pd.DateOffset(years=1)) - 1) for d, v in dec.items()
+                      if dec.get(d - pd.DateOffset(years=1)) is not None}
+    gdp = store.as_of("3.2_OGP_D_2004_T_17")
+    if not gdp.empty:
+        yr = gdp.groupby(gdp.index.year).agg(["sum", "count"])
+        yr = yr[yr["count"] == 4]["sum"]
+        out["gdp"] = {str(y): 100 * (yr[y] / yr[y - 1] - 1) for y in yr.index if y - 1 in yr.index}
+    fx = store.as_of("bcra:5")
+    if not fx.empty:
+        dec = fx[fx.index.month == 12]
+        full = [y for y in sorted(set(dec.index.year)) if dec[dec.index.year == y].index.max().day >= 28]
+        out["fx"] = {str(y): float(dec[dec.index.year == y].mean()) for y in full}
+    prim = store.as_of("379.9_SUPERAVIT_017__23_94")
+    if not prim.empty:
+        yr = prim.groupby(prim.index.year).agg(["sum", "count"])
+        out["primary"] = {str(y): float(r["sum"]) / 1000 for y, r in yr.iterrows() if r["count"] == 12}
+    return {k: {y: float(v) for y, v in d.items()} for k, d in out.items()}
+
+
 def export_table(ind, out: Path, status: dict) -> dict | None:
     """Copy a full table (data/tables/<source>/*.json) next to the site data and write the card's payload."""
     import shutil
@@ -202,7 +248,8 @@ def export_table(ind, out: Path, status: dict) -> dict | None:
         "id": ind.id, "topic": ind.topic, "kind": ind.kind, "title": ind.title, "short_title": ind.short_title,
         "description": ind.description, "note": ind.note, "source_label": ind.source_label, "wide": True,
         "frequency": ind.frequency, "units": ind.units, "table": {**ind.table, "path": f"tables/{ind.table['source']}/"},
-        "method_links": ind.method_links,
+        "method_links": ind.method_links, "forecast": rem_forecast(ind),
+        "outcomes": rem_outcomes() if ind.kind == "rem_revisions" else None,
         "years": index.get("years"), "groups": index.get("groups"), "group_labels": index.get("group_labels"),
         "status": st.get("status", "ok"), "last_obs": last,
         "last_checked": st.get("last_checked"), "last_changed": st.get("last_changed"),
@@ -283,6 +330,8 @@ def export(out: Path) -> None:
             "muted": ind.muted,
             "term_shading": ind.term_shading,
             "term_colored": ind.term_colored,
+            "forecast": rem_forecast(ind),
+            "fan": ind.fan,
             "secondary_bar": ind.secondary_bar,
             "source_label": ind.source_label,
             "default": ind.default,

@@ -11,6 +11,7 @@
   <a href="#gdp">GDP</a>
   <a href="#cpi-long">CPI since 1943</a>
   <a href="#cpi-basket">CPI with the 2017/18 basket</a>
+  <a href="#rem">Market expectations (REM)</a>
   <a href="#money">Money & Banking</a>
   <a href="#net-reserves">Net reserves</a>
   <a href="#banks">Banks</a>
@@ -84,6 +85,12 @@
 <p>The national CPI weights each of its twelve divisions by spending shares from the 2004/05 household expenditure survey (<a href="https://www.indec.gob.ar/ftp/cuadros/economia/metodologia_ipc_nacional_2019.pdf">INDEC, CPI methodology</a>). INDEC prepared a new index with weights from the 2017/18 survey, due to start with January 2026 data; its introduction was postponed. The estimate applies the new division weights to the published division indices from December 2025:</p>
 <p class="formula">CF<sub>t</sub> = <i>H<sub>t</sub></i> × Σ<sub>i</sub> <i>w</i><sup>new</sup><sub>i</sub> <i>r<sub>i,t</sub></i> / Σ<sub>i</sub> <i>w</i><sup>old</sup><sub>i</sub> <i>r<sub>i,t</sub></i>, &nbsp; <i>r<sub>i,t</sub></i> = <i>I<sub>i,t</sub></i> / <i>I<sub>i</sub></i><sub>,Dec 2025</sub></p>
 <p><i>H</i> is the official headline index; <i>w</i><sup>old</sup> are the current basket's weights (recovered as above) at December 2025 prices; <i>w</i><sup>new</sup> are the 2017/18 division weights, taken as applying in December 2025. The denominator rebuilds the official index from the same division data, so the gap between the two series is the effect of reweighting alone (the rebuilt index matches the official one within 0.02%). The estimate captures only the shift in weights across divisions; the new index would also change the items and weights within divisions and by region, which cannot be reproduced from published data.</p>
+
+<h2 id="rem">Market expectations (REM)</h2>
+<p>The BCRA's <i>Relevamiento de Expectativas de Mercado</i> asks about 40 forecasters (banks, consultancies, universities) each month for their forecasts of inflation (headline and core), the official exchange rate, the TAMAR rate, GDP, unemployment, trade and the primary fiscal balance. The survey closes in the last days of the month and is published early the next; we date it by the month it closes and read every figure from the BCRA's historical workbook, which reports the median, the mean, percentiles and the number of answers.</p>
+<p><b>Expected paths.</b> Several charts extend the data with the latest survey's expected path: monthly inflation (next seven months), TAMAR (monthly average, next six months), GDP (quarter on quarter, seasonally adjusted, next three quarters), unemployment (next three quarters) and the official exchange rate (monthly average, on the futures curve). The dashed line is the median; the band, the middle half of the answers (25th to 75th percentile). The path starts at the first period not yet published, so it can include the month the survey was taken.</p>
+<p><b>Disagreement.</b> The spread of 12-month inflation expectations across forecasters (10th, 25th, 75th and 90th percentiles around the median) is a simple measure of how uncertain or credible the disinflation path looks.</p>
+<p><b>Forecast revisions.</b> For each calendar year, the median forecast in every survey that asked about it (up to about three years ahead), against the outcome: December-to-December CPI inflation (INDEC), the change in the year's average real GDP (INDEC quarterly GDP), the December average of the official wholesale rate (BCRA, Communication A 3500) and the primary balance of the national non-financial public sector, cash basis (Secretaría de Hacienda; the survey's figure, in billions of pesos). The survey's GDP and primary-balance definitions follow INDEC's and the Secretaría's, but first estimates are revised, so outcomes may move after the fact.</p>
 
 <h2 id="money">Money & Banking</h2>
 <p>Data come from the BCRA's statistics API, daily. Exchange rates, interest rates and reserves are shown daily. For daily data, a month-on-month or year-on-year change compares with the last business day on or before the same date a month or a year earlier.</p>
@@ -247,6 +254,7 @@
   <li>Coppedge, M. et al. (2026). V-Dem Country-Year Dataset v16. Varieties of Democracy (V-Dem) Project. <a href="https://www.v-dem.net/data/the-v-dem-dataset/">v-dem.net</a>; republished by Our World in Data: <a href="https://ourworldindata.org/democracy">ourworldindata.org</a>.</li>
   <li>Pemstein, D. et al. The V-Dem measurement model: latent variable analysis for cross-national and cross-temporal expert-coded data. V-Dem Working Paper 21. <a href="https://www.v-dem.net/">v-dem.net</a>.</li>
   <li>BCRA. Directorio (board of directors). <a href="https://www.bcra.gob.ar/directorio/">bcra.gob.ar</a>.</li>
+  <li>BCRA. <i>Relevamiento de Expectativas de Mercado</i> (REM), historical results. <a href="https://www.bcra.gob.ar/archivos/Pdfs/PublicacionesEstadisticas/informes/relevamiento-expectativas-mercado-historico.xlsx">workbook</a>.</li>
   <li>ArgentinaDatos. Country risk (riesgo país), daily, from Ámbito Financiero. <a href="https://argentinadatos.com/">argentinadatos.com</a>.</li>
   <li>Datos Argentina. Time-series API. <a href="https://datos.gob.ar/">datos.gob.ar</a>.</li>
 </ul>

@@ -10,8 +10,8 @@ ROOT = Path(__file__).resolve().parents[1]
 REGISTRY_PATH = ROOT / "registry" / "series.yaml"
 RELEASES_PATH = ROOT / "registry" / "releases.yaml"
 
-KINDS = {"variants", "panel", "contributions", "balance_sheet", "top10", "schedule", "placements", "curve", "statement", "rer_calc", "tenure"}
-TABLE_KINDS = {"balance_sheet", "top10", "schedule", "placements", "curve", "tenure"}   # cards that read a full table (data/tables/<source>), no series
+KINDS = {"variants", "panel", "contributions", "balance_sheet", "top10", "schedule", "placements", "curve", "statement", "rer_calc", "tenure", "rem_revisions"}
+TABLE_KINDS = {"balance_sheet", "top10", "schedule", "placements", "curve", "tenure", "rem_revisions"}   # cards that read a full table (data/tables/<source>), no series
 DERIVE_METHODS = {"splice", "reweight", "ratio", "tracker", "monthly", "flows", "expectations", "formula", "net_reserves"}
 RANGE_KEYS = {"2Y", "5Y", "10Y", "25Y", "50Y", "Max"}
 
@@ -83,6 +83,8 @@ class Indicator:
     term_shading: bool = False         # shade presidential terms behind the chart (annual series)
     term_colored: bool = False         # overlay cards: the emphasis variant drawn in presidency colors
     secondary_bar: dict | None = None  # overlay cards: {variant, of, label, axis}: bars on a right axis (e.g. a rank)
+    forecast: list | None = None       # [{variant, rem, transform}]: the latest REM path drawn after the data (see export)
+    fan: dict | None = None            # overlay cards: {lo, hi, label}: a shaded band between two variants
 
     def input_ids(self) -> list[str]:
         """Source series this indicator reads (its variants, or a derivation's inputs)."""
@@ -274,6 +276,12 @@ def load(path: Path = REGISTRY_PATH, releases_path: Path = RELEASES_PATH) -> Reg
             raise RegistryError(f"{where}: release {item['release']!r} not in releases.yaml")
         if headline and headline.get("variant") not in variants:
             raise RegistryError(f"{where}: headline variant not defined")
+        for f in item.get("forecast") or []:
+            if item["kind"] not in TABLE_KINDS and f.get("variant") not in variants:
+                raise RegistryError(f"{where}: forecast for unknown variant {f.get('variant')!r}")
+        fan = item.get("fan")
+        if fan and not {fan.get("lo"), fan.get("hi")} <= set(variants):
+            raise RegistryError(f"{where}: fan names unknown variants")
         sb = item.get("secondary_bar")
         if sb and not ({sb.get("variant")} | ({sb["of"]} if sb.get("of") else set())) <= set(variants):
             raise RegistryError(f"{where}: secondary_bar names unknown variants")
@@ -334,6 +342,8 @@ def load(path: Path = REGISTRY_PATH, releases_path: Path = RELEASES_PATH) -> Reg
                 term_shading=bool(item.get("term_shading", False)),
                 term_colored=bool(item.get("term_colored", False)),
                 secondary_bar=item.get("secondary_bar"),
+                forecast=item.get("forecast"),
+                fan=item.get("fan"),
                 view_start=str(item["view_start"]) + ("-01" if len(str(item["view_start"])) == 7 else "") if item.get("view_start") else None,
             )
         )

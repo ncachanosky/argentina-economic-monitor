@@ -226,6 +226,14 @@
   };
 
   // ---------- downloads ----------
+  // A color with transparency, from "#rrggbb" or "rgb(r, g, b)".
+  function alpha(color, a) {
+    const c = String(color).trim();
+    let m = /^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i.exec(c);
+    if (m) return `rgba(${parseInt(m[1], 16)}, ${parseInt(m[2], 16)}, ${parseInt(m[3], 16)}, ${a})`;
+    m = /^rgba?\((\d+),\s*(\d+),\s*(\d+)/i.exec(c);
+    return m ? `rgba(${m[1]}, ${m[2]}, ${m[3]}, ${a})` : c;
+  }
   function downloadBlob(text, filename, type) {
     const url = URL.createObjectURL(new Blob([text], { type }));
     const a = h("a", { href: url, download: filename });
@@ -250,7 +258,8 @@
         const mc = t._lightColors || (Array.isArray(c.marker && c.marker.color) ? c.marker.color.map((x) => x === "__muted__" ? "#C9CED3" : x) : color);
         c.marker = { ...(c.marker || {}), color: mc };
       }
-      if (c.line) c.line = { ...c.line, color, width: c.line.dash ? 1.5 : 2.5 };
+      if (c.line) c.line = { ...c.line, color, width: c.line.width === 0 ? 0 : c.line.dash ? 1.5 : 2.5 };
+      if (t._lightFill) c.fillcolor = t._lightFill;
       return c;
     });
     const layout = {
@@ -842,7 +851,9 @@
       if (!state.byPres) {
         const keys = overlayKeys();
         const start = viewStart(ind, state.range);
+        const FAN = ind.fan || null;
         keys.forEach((k, slot) => {
+          if (FAN && (k === FAN.lo || k === FAN.hi)) return;   // drawn as a band below
           const s = k === state.variant ? main : series(k);
           // Overlays keep empty months in range so a gap in one series shows as a gap.
           // (Daily overlays drop each series' empty days, since sources keep different calendars.)
@@ -884,6 +895,48 @@
                   : cslot >= SERIES_VARS.length ? { color, width: lighter ? 1.4 : 1.8, dash: "dashdot" } : slot && !ind.emphasis && !ind.overlay_default ? { color, width: 1.8, dash: "dash" } : { color, width: lighter ? 1.5 : 2 },
                 ...(lighter ? { opacity: 0.65 } : {}),
                 ...(emph ? { _light: "#36454F" } : muted ? { _light: "#85909A" } : {}), hovertemplate: hover, _slot: emph || muted ? undefined : Math.max(0, cslot) % SERIES_VARS.length });
+        });
+        // Shaded band between two variants (e.g. the 25th and 75th percentiles of a survey).
+        if (FAN && ind.variants[FAN.lo] && ind.variants[FAN.hi]) {
+          const lo = series(FAN.lo).y, hi = series(FAN.hi).y;
+          const ii = ind.dates.map((d, i) => i).filter((i) => (!start || ind.dates[i] >= start) && lo[i] !== null && hi[i] !== null);
+          const xs = ii.map((i) => ind.dates[i]);
+          traces.unshift(
+            { type: "scatter", mode: "lines", x: xs, y: ii.map((i) => lo[i]), line: { width: 0 }, showlegend: false, name: ind.variants[FAN.lo].label,
+              hovertemplate: `%{x|${DF}}: <b>%{y:${yFmt()}}${sfx}</b><extra>${ind.variants[FAN.lo].label}</extra>` },
+            { type: "scatter", mode: "lines", x: xs, y: ii.map((i) => hi[i]), fill: "tonexty", fillcolor: alpha(cssVar("--ink-3"), 0.3), line: { width: 0 },
+              name: FAN.label, _lightFill: "rgba(133, 144, 154, 0.3)", hovertemplate: `%{x|${DF}}: <b>%{y:${yFmt()}}${sfx}</b><extra>${ind.variants[FAN.hi].label}</extra>` });
+        }
+        // The latest REM survey's expected path, after the last observation: dashed median and a 25th-75th percentile band.
+        const FC = ind.forecast;
+        if (FC && !state.yearly && !ind._real) FC.items.forEach((f) => {
+          if ((f.transform || "level") !== state.transform || !keys.includes(f.variant)) return;
+          const sv = f.variant === state.variant ? main : series(f.variant);
+          if (sv.rebased) return;
+          let li = sv.y.length - 1;
+          while (li >= 0 && (sv.y[li] === null || sv.y[li] === undefined)) li--;
+          if (li < 0) return;
+          const d0 = ind.dates[li];
+          const at = (iso) => (ind.frequency === "D" ? iso.slice(0, 8) + "15" : iso);
+          const pts = f.points.filter((q) => at(q.date) > d0 && q.med !== null);
+          if (!pts.length) return;
+          const xs = [d0, ...pts.map((q) => at(q.date))];
+          const pos = keys.filter((q) => !(FAN && (q === FAN.lo || q === FAN.hi))).indexOf(f.variant);
+          const color = ind.emphasis === f.variant ? cssVar("--ink") : cssVar(SERIES_VARS[Math.max(0, pos) % SERIES_VARS.length]);
+          const light = ind.emphasis === f.variant ? "#36454F" : undefined;
+          const vl = ind.variants[f.variant].label;
+          const lab = keys.length > 1 && !f.label.toLowerCase().includes(vl.toLowerCase()) ? `${f.label}, ${vl.toLowerCase()}` : f.label;
+          if (pts.some((q) => q.p25 !== null && q.p75 !== null)) {
+            traces.push(
+              { type: "scatter", mode: "lines", x: xs, y: [sv.y[li], ...pts.map((q) => q.p25)], line: { width: 0 }, showlegend: false, hoverinfo: "skip" },
+              { type: "scatter", mode: "lines", x: xs, y: [sv.y[li], ...pts.map((q) => q.p75)], fill: "tonexty", fillcolor: alpha(color, 0.2), line: { width: 0 },
+                showlegend: false, hoverinfo: "skip", _lightFill: alpha(light || ["#B87333", "#5B9BD5", "#87A96B", "#8E7AB5", "#C9A227", "#C96B7E", "#3E9C9A", "#6C7A89"][Math.max(0, pos) % 8], 0.2) });
+          }
+          traces.push({ type: "scatter", mode: "lines+markers", x: xs, y: [sv.y[li], ...pts.map((q) => q.med)], name: lab,
+            line: { color, width: 2, dash: "dash" }, marker: { size: [0, ...pts.map(() => 5)], color }, _light: light, _slot: light ? undefined : Math.max(0, pos) % SERIES_VARS.length,
+            customdata: [null, ...pts.map((q) => [q.p25, q.p75])],
+            hovertemplate: `%{x|${ind.frequency === "Q" ? "Q%q %Y" : "%b %Y"}}: <b>%{y:${yFmt()}}${sfx}</b> expected (middle half %{customdata[0]:.1f}–%{customdata[1]:.1f})<extra>REM</extra>` });
+          state._fcNote = `Dashed: expected in the BCRA's REM survey of ${fmtMonth(FC.survey)} (median; band: middle half of forecasters).`;
         });
         if (SB && ind.variants[SB.variant]) {
           const vb = ind.variants[SB.variant], vo = SB.of ? ind.variants[SB.of] : null;
@@ -1070,6 +1123,7 @@
       if (ind.overlay && state.byPres) msgs.push(`By presidency shows the ${main.v.label.toLowerCase()} series.`);
       if (isLog()) msgs.push("Log scale: equal distances are equal percentage changes.");
       if (ind._real) msgs.push(`Real terms: deflated by the ${ind.deflator.label}, in pesos of ${fmtMonth(ind.deflator.latest)}; months after that have no CPI yet.`);
+      if (state._fcNote) { msgs.push(state._fcNote); state._fcNote = null; }
       if (partialNote(ind)) msgs.push(partialNote(ind));
       hint.textContent = msgs.join(" ");
 
@@ -1724,6 +1778,17 @@
         tr.push({ type: "scatter", mode: "lines", name: label, x: [B[k].date, ...B[k].projected.map((p) => p.expiry)], y: [B[k].value, ...B[k].projected.map((p) => p.value)],
           line: { color: ink3, width: 1.5, dash: "dash" }, _light: "#85909A", hovertemplate: `${label}: <b>%{y:,.0f}</b><extra></extra>` });
       });
+      // REM survey: expected monthly average of the official rate (median, middle half as error bars), mid-month.
+      const R = ind.forecast && ind.forecast.items[0];
+      if (R) {
+        const t0 = data.curves[0].date, pts = R.points.filter((q) => q.date.slice(0, 8) + "15" > t0.slice(0, 8) + "00" && q.med !== null);
+        if (pts.length) tr.push({ type: "scatter", mode: "lines+markers", name: `REM survey, ${fmtMonth(ind.forecast.survey)} (monthly average, median)`,
+          x: pts.map((q) => q.date.slice(0, 8) + "15"), y: pts.map((q) => q.med), line: { color: cssVar(SERIES_VARS[1]), width: 1.8, dash: "dash" },
+          marker: { size: 6, symbol: "square", color: cssVar(SERIES_VARS[1]) }, _slot: 1,
+          error_y: { type: "data", symmetric: false, array: pts.map((q) => (q.p75 !== null ? q.p75 - q.med : 0)), arrayminus: pts.map((q) => (q.p25 !== null ? q.med - q.p25 : 0)),
+            color: cssVar(SERIES_VARS[1]), thickness: 1, width: 3 },
+          hovertemplate: `REM, %{x|%b %Y} average: <b>%{y:,.0f}</b><extra></extra>` });
+      }
       if (data.spot) tr.push({ type: "scatter", mode: "markers", name: `Official rate (${fmtDay(data.spot.date)})`, x: [data.spot.date], y: [data.spot.value],
         marker: { color: ink, size: 10, symbol: "diamond", line: { color: cssVar("--surface"), width: 1 } }, _light: "#36454F",
         hovertemplate: `Official rate: <b>%{y:,.2f}</b><extra></extra>` });
@@ -1753,6 +1818,7 @@
       const last = rows[rows.length - 1];
       hint.textContent = `Settlement prices on ${fmtDay(C.date)}` + (spot ? `; official wholesale rate ${fmt(spot, 2)}.` : ".") +
         (last && last.dev !== null ? ` The longest contract (${fmtShortMonth(last.k.expiry)}) prices a ${pct(last.dev)} rise in the official rate (${pct(last.ann)} a year).` : "") +
+        (ind.forecast ? ` Squares: the monthly average expected in the BCRA's REM survey of ${fmtMonth(ind.forecast.survey)} (median; bars: middle half of forecasters); futures settle on the month's last business day, so they run slightly above a monthly average when the rate is rising.` : "") +
         ((data.band || {}).ceiling ? ` The grey dashed line extends the band's ceiling at the pace of its last three months (${(100 * data.band.ceiling.monthly_pace).toFixed(2)}% a month): an illustration, not an announced path.` : "");
       view = { header: ["curve_date", "symbol", "expiry", "settlement", "open_interest_contracts"],
         rows: data.curves.flatMap((c) => c.contracts.map((k) => [c.date, k.symbol, k.expiry, k.settlement, k.oi])) };
@@ -1893,6 +1959,82 @@
     card.draw = async () => {
       if (!data) {
         try { data = await getJSON(`${DATA}${T.path}${T.file}`); } catch (e) { console.error(e); chartEl.replaceChildren(h("div", { class: "error-box" }, "The list of officials could not be loaded.")); return; }
+      }
+      draw();
+    };
+    return card;
+  }
+
+
+  // ---------- card: REM forecasts for each calendar year, survey by survey ----------
+  function remRevisionsCard(ind) {
+    const T = ind.table;
+    const card = cardFrame(ind, true);
+    let data = null;
+    const VARS = {
+      cpi: { label: "Inflation (Dec/Dec)", units: "%", fmt: ",.1f", sfx: "%" },
+      gdp: { label: "GDP growth", units: "%", fmt: ",.1f", sfx: "%" },
+      fx: { label: "Exchange rate (Dec)", units: "Pesos per US dollar, December average", fmt: ",.0f", sfx: "", log: true },
+      primary: { label: "Primary balance", units: "Billions of pesos", fmt: ",.0f", sfx: "" },
+    };
+    const state = { v: "cpi", range: "recent" };
+    const chartEl = h("div", { class: "chart tall-ish", role: "img", "aria-label": `${ind.title} chart` });
+    const hint = h("p", { class: "hint" });
+    const vSeg = segmented(Object.entries(VARS).map(([k, v]) => [k, v.label]), state.v, (k) => { state.v = k; vSeg.update(k); draw(); }, "Variable");
+    const rSeg = segmented([["recent", "Last 5 years"], ["all", "All"]], state.range, (k) => { state.range = k; rSeg.update(k); draw(); }, "Years");
+
+    function build(light) {
+      const V = VARS[state.v], D = data.vars[state.v] || {}, O = (ind.outcomes || {})[state.v] || {};
+      let years = Object.keys(D).sort();
+      if (state.range === "recent") years = years.slice(-5);
+      const tr = [];
+      years.forEach((y, n) => {
+        const pts = D[y], slot = n % SERIES_VARS.length, c = light ? undefined : cssVar(SERIES_VARS[slot]);
+        tr.push({ type: "scatter", mode: "lines+markers", name: y, x: pts.map((q) => q[0]), y: pts.map((q) => q[1]), line: { color: c, width: 2 }, marker: { size: 4, color: c }, _slot: slot,
+          hovertemplate: `Survey of %{x|%b %Y}: <b>%{y:${V.fmt}}${V.sfx}</b><extra>${y}</extra>` });
+        if (O[y] !== undefined) {
+          const x0 = pts[0][0], x1 = pts[pts.length - 1][0];
+          tr.push({ type: "scatter", mode: "lines+markers", name: `${y} actual`, showlegend: false, x: [x0, x1], y: [O[y], O[y]],
+            line: { color: c, width: 1.2, dash: "dot" }, marker: { size: [0, 9], symbol: "star", color: c }, _slot: slot,
+            hovertemplate: `Actual ${y}: <b>%{y:${V.fmt}}${V.sfx}</b><extra></extra>` });
+        }
+      });
+      return { tr, V, years };
+    }
+
+    function draw() {
+      if (!data) return;
+      const { tr, V, years } = build(false);
+      Plotly.react(chartEl, tr, baseLayout({
+        yaxis: { tickformat: V.sfx === "%" ? ",.0f" : V.fmt, ticksuffix: V.sfx, ...(V.log ? { type: "log" } : {}), ...(V.sfx === "%" ? {} : { title: { text: V.units, font: { size: 11 } } }) },
+        extra: { showlegend: true, legend: { orientation: "h", x: 0, y: 1.02, yanchor: "bottom", font: { color: cssVar("--ink") } }, hovermode: "closest", margin: { l: 64, r: 16, t: 30, b: 36 } },
+      }), PLOT_CONFIG);
+      const O = (ind.outcomes || {})[state.v] || {}, D = data.vars[state.v] || {};
+      const done = years.filter((y) => O[y] !== undefined);
+      const msg = [`Each line is one year's forecast as it evolved; stars and dotted lines mark the outcome. Latest survey: ${fmtMonth(data.latest)}.`];
+      if (done.length) {
+        const y = done[done.length - 1], first = D[y][0];
+        msg.push(` For ${y}, the first survey (${fmtShortMonth(first[0])}) expected ${first[1].toLocaleString("en-US", { maximumFractionDigits: 1 })}${V.sfx}; the outcome was ${O[y].toLocaleString("en-US", { maximumFractionDigits: 1 })}${V.sfx}.`);
+      }
+      if (V.log) msg.push(" Log scale.");
+      hint.textContent = msg.join("");
+    }
+    const onPNG = () => { const { tr, V } = build(true);
+      exportPNG(ind, tr, `${V.label}: REM median forecast for each year, by survey date; dotted: outcome`, { suffix: V.sfx, signed: false }, `${ind.id}_${state.v}.png`, { ylog: !!V.log }); };
+    const onCSV = () => {
+      const D = data.vars[state.v] || {}, O = (ind.outcomes || {})[state.v] || {};
+      const rows = Object.keys(D).sort().flatMap((y) => D[y].map((q) => [y, q[0], q[1], q[2] ?? "", q[3] ?? "", O[y] ?? ""]));
+      downloadBlob(toCSV(["target_year", "survey", "median", "p25", "p75", "outcome"], rows), `${ind.id}_${state.v}.csv`, "text/csv");
+    };
+    appendAll(card, h("div", { class: "controls" }, vSeg, h("span", { class: "spacer" }), rSeg), hint, methodLine(ind), chartEl,
+      ind.note ? h("p", { class: "chips-note" }, ind.note) : null,
+      h("div", { class: "card-foot" }, h("span", {}, `Source: ${ind.source_label} · Latest survey: ${ind.last_obs ? fmtMonth(ind.last_obs) : "–"}`),
+        h("div", { class: "actions" },
+          h("button", { class: "btn", type: "button", onclick: onPNG, title: "Download this chart as a 1200×800 PNG" }, "PNG"),
+          h("button", { class: "btn", type: "button", onclick: onCSV, title: "Download every survey's forecasts for this variable as CSV" }, "CSV"))));
+    card.draw = async () => {
+      if (!data) {
+        try { data = await getJSON(`${DATA}${T.path}${T.file}`); } catch (e) { console.error(e); chartEl.replaceChildren(h("div", { class: "error-box" }, "The survey data could not be loaded.")); return; }
       }
       draw();
     };
@@ -2484,6 +2626,7 @@
         : ind.kind === "placements" ? placementsCard(ind)
         : ind.kind === "curve" ? curveCard(ind)
         : ind.kind === "tenure" ? tenureCard(ind)
+        : ind.kind === "rem_revisions" ? remRevisionsCard(ind)
         : ind.kind === "statement" ? statementCard(ind)
         : ind.kind === "rer_calc" ? rerCalcCard(ind)
         : variantsCard(ind, !!ind.wide)));
