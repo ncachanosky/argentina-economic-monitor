@@ -135,3 +135,7 @@ Source data: INDEC (via [datos.gob.ar](https://datos.gob.ar/), CC BY 4.0), the
 BCRA, the Ministry of Economy and other official agencies, under their terms.
 Market quotes (informal and bond-market dollars, dollar futures) come from
 market-data services and are marked as unofficial on the site.
+
+## Licence
+
+Code: MIT (`LICENSE`). Charts, derived series and text: CC BY 4.0 (`LICENSE-CONTENT.md`). Third-party source data keep their owners' terms.
