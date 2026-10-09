@@ -17,6 +17,7 @@ permissions:
   contents: write
   pages: write
   id-token: write
+  issues: write
 
 concurrency:
   group: update-and-deploy
@@ -56,6 +57,13 @@ jobs:
             # Someone may have pushed code meanwhile: rebase the data commit on top.
             for i in 1 2 3; do git pull --rebase -q origin main && git push && break; sleep 5; done
           fi
+
+      - name: Alert on failing sources
+        # Opens (or closes) the "data-alert" issue; GitHub emails the repository's watchers.
+        if: github.event_name != 'push'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python -m pipeline.alerts --issue || echo "alert step failed (not blocking the deploy)"
 
       - name: Fonts for preview images
         # Carlito (metric-compatible with Calibri, the EO font); falls back to DejaVu if unavailable.

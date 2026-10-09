@@ -744,3 +744,15 @@ def test_dashboard_changes_and_zscores(tmp_path):
     assert v == pytest.approx(-5.0, abs=0.01) and z == -3          # worse than usual, capped
     m, partial = dashboard._calendar(pd.Series([1.0, 3.0], index=pd.to_datetime(["2026-10-01", "2026-10-08"])), "D", "mean")
     assert m.iloc[0] == 2.0 and partial == "2026-10-08"
+
+
+def test_alert_report_needs_two_failed_runs():
+    from datetime import datetime, timezone
+    from pipeline import alerts
+    now = datetime(2026, 10, 9, 12, tzinfo=timezone.utc)
+    status = {"a": {"status": "error", "error": "boom", "error_since": "2026-10-08T20:30:00+00:00", "source": "x"},
+              "b": {"status": "error", "error": "blip", "error_since": "2026-10-09T10:30:00+00:00", "source": "x"},
+              "c": {"status": "ok", "warnings": ["BCRA board page lists 'X' as Presidente: update data/manual/officials.csv"]}}
+    ids, body = alerts.report(status, now)
+    assert ids == ["a", "c"] and "boom" in body and "blip" not in body and "<!-- ids: a,c -->" in body
+    assert alerts.report({"d": {"status": "ok"}}, now)[0] == []

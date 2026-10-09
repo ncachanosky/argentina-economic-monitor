@@ -385,3 +385,7 @@ body[data-page="embed"] .card { border: 0; box-shadow: none; margin: 0; }
 .tl-sub { color: var(--ink-3); font-size: 12.5px; }
 .tl-none { font-family: var(--font-ui); font-size: 13px; color: var(--ink-3); margin: 0; }
 @media (max-width: 760px) { .timeline { grid-template-columns: 1fr; } }
+
+/* Narrow screens: segmented controls wrap; wide tables in text scroll inside their box */
+.seg { flex-wrap: wrap; max-width: 100%; }
+.prose table { display: block; max-width: 100%; overflow-x: auto; }

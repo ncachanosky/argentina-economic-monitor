@@ -13,6 +13,7 @@ import argparse
 import json
 import os
 import sys
+import time
 from datetime import datetime, timezone
 
 import pandas as pd
@@ -44,8 +45,10 @@ def run(dry_run: bool = False, strict: bool = False) -> int:
     lines: list[str] = []
     n_err = n_changed = 0
 
+    timings: list[tuple[float, str, int]] = []
     for (source, _freq), ids in reg.series_by_source().items():
         adapter = get_adapter(source)
+        t0 = time.monotonic()
         try:
             res = adapter.fetch(ids)
             # Sources that also feed a full table (the BCRA balance sheet) write it here.
@@ -56,6 +59,7 @@ def run(dry_run: bool = False, strict: bool = False) -> int:
         except Exception as exc:  # whole source down
             res = None
             source_error = str(exc)
+        timings.append((time.monotonic() - t0, f"{source} ({_freq})", len(ids)))
 
         for sid in sorted(ids):
             entry = status.get(sid, {})
@@ -97,10 +101,12 @@ def run(dry_run: bool = False, strict: bool = False) -> int:
             if problem is not None:
                 n_err += 1
                 entry["error"] = problem
+                entry.setdefault("error_since", now.isoformat(timespec="seconds"))
                 lines.append(f"- `{sid}`: ❌ {problem} (keeping last good data)")
                 print(f"::error title={sid}::{problem}")
             else:
                 entry.pop("error", None)
+                entry.pop("error_since", None)
 
             latest = store.as_of(sid) if not dry_run else old
             if not latest.empty:
@@ -128,6 +134,14 @@ def run(dry_run: bool = False, strict: bool = False) -> int:
     registered = {sid for ids in reg.series_by_source().values() for sid in ids}
     for sid in [k for k in status if k not in registered]:
         del status[sid]
+
+    # Where the run's time goes (slowest sources first), to keep the twice-daily run short.
+    timings.sort(reverse=True)
+    lines.append("\n<details><summary>Fetch time by source</summary>\n")
+    lines += [f"- {name}: {secs:.0f}s, {n} series" for secs, name, n in timings]
+    lines.append(f"- total: {sum(t[0] for t in timings):.0f}s\n</details>")
+    (STATUS_PATH.parent / "timings.json").write_text(json.dumps(
+        [{"source": name, "seconds": round(secs, 1), "series": n} for secs, name, n in timings], indent=1) + "\n", encoding="utf-8") if not dry_run else None
 
     header = (
         f"## Data update {vintage}\n\n"
