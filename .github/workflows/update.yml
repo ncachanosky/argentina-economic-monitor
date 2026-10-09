@@ -57,6 +57,10 @@ jobs:
             for i in 1 2 3; do git pull --rebase -q origin main && git push && break; sleep 5; done
           fi
 
+      - name: Fonts for preview images
+        # Carlito (metric-compatible with Calibri, the EO font); falls back to DejaVu if unavailable.
+        run: sudo apt-get install -y -qq fonts-crosextra-carlito >/dev/null 2>&1 || true
+
       - name: Build site
         # One page per topic; the tag cache-busts CSS/JS so browsers never
         # pair new data with stale code.

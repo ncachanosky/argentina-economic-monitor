@@ -21,6 +21,7 @@ site:
   publisher: Economic Order
   publisher_url: https://economicorder.substack.com   # header link and subscribe button
   repo_url: https://github.com/ncachanosky/argentina-economic-monitor
+  site_url: https://ncachanosky.github.io/argentina-economic-monitor/   # absolute links for previews and embeds
 
 # Presidential terms, used to color charts by presidency, compute per-term
 # statistics, and rebase indices to the start of a term.

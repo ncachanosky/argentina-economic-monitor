@@ -2764,8 +2764,18 @@
     container.querySelectorAll(".card").forEach((card) => {
       const id = card.id.replace(/^ind-/, ""), actions = card.querySelector(".card-foot .actions");
       if (!actions || !id) return;
-      actions.append(h("button", { class: "btn", type: "button", title: "Embed this chart in another page", onclick: () => embedDialog(card, id) }, "Embed"));
+      actions.append(h("button", { class: "btn", type: "button", title: "Copy a link to this chart (with a preview for social media)", onclick: (e) => shareCard(card, id, e.currentTarget) }, "Share"),
+        h("button", { class: "btn", type: "button", title: "Embed this chart in another page", onclick: () => embedDialog(card, id) }, "Embed"));
     });
+  }
+  // Share: the card's share page (title, description and preview image for social media) redirects to the card.
+  async function shareCard(card, id, btn) {
+    const url = new URL(`${ROOT}share/${id}/`, location.href).href;
+    const title = card.querySelector("h3").firstChild.textContent;
+    if (navigator.share && matchMedia("(pointer: coarse)").matches) { try { await navigator.share({ title, url }); return; } catch (e) {} }
+    const old = btn.textContent;
+    try { await navigator.clipboard.writeText(url); btn.textContent = "Link copied"; } catch (e) { window.prompt("Copy this link:", url); }
+    setTimeout(() => { btn.textContent = old; }, 1800);
   }
   function embedDialog(card, id) {
     const base = new URL(`${ROOT}embed/`, location.href).href;
