@@ -266,6 +266,7 @@ inputs:
   - {id: "dolar:ccl", source: dolar, frequency: D, measure: index, allow_gaps: true, stale_days: 7, label: "CCL dollar (bond trades, abroad)"}
   - {id: "dolar:tarjeta", source: dolar, frequency: D, measure: index, allow_gaps: true, stale_days: 7, label: "Card (tarjeta) dollar"}
   - {id: "dolar:cripto", source: dolar, frequency: D, measure: index, allow_gaps: true, stale_days: 7, label: "Crypto dollar (stablecoins)"}
+  - {id: "riesgo:embi", source: riesgo, frequency: D, measure: index, allow_gaps: true, stale_days: 7, label: "Country risk: JP Morgan EMBI spread for Argentina, basis points (Ámbito via ArgentinaDatos)"}
   # Real exchange rate (BCRA ITCRM workbook), daily since 1997, 17-Dec-2015 = 100; a rise is a real depreciation.
   - {id: "itcrm:m",  source: itcrm, frequency: D, measure: index, allow_gaps: true, stale_days: 10, label: "Multilateral real exchange rate index (ITCRM)"}
   - {id: "itcrm:us", source: itcrm, frequency: D, measure: index, allow_gaps: true, stale_days: 10, label: "Bilateral real exchange rate index: United States"}
@@ -4524,6 +4525,42 @@ indicators:
         usd:         {label: US dollars,           expr: "usd / 1000"}
         sdr:         {label: SDR,                  expr: "sdr / 1000"}
         other:       {label: Other currencies,     expr: "(nz(eur) + nz(jpy) + nz(oth)) / 1000"}
+
+  - id: country_risk
+    topic: fiscal
+    wide: true
+    kind: variants
+    title: Country Risk
+    short_title: Country risk
+    description: >-
+      "Riesgo país": the spread of Argentina's dollar bonds over US
+      Treasuries in JP Morgan's EMBI index, in basis points (100 = one
+      percentage point), daily since 1999.
+    source: riesgo
+    source_label: "JP Morgan EMBI, as published by Ámbito Financiero, via ArgentinaDatos (market data, not an official statistic)"
+    frequency: D
+    units: Basis points
+    transforms: [level]
+    ranges: [2Y, 5Y, 10Y, Max]
+    bands:
+      - {start: "2005-06-01", end: "2005-06-01", label: "2005 swap"}
+      - {start: "2020-09-01", end: "2020-09-01", label: "2020 restructuring"}
+    note: >-
+      The spread is the extra yield investors demand to hold Argentina's
+      dollar bonds instead of US Treasuries of similar maturity: a market
+      price of default risk. It depends on which bonds are in the index, so
+      some one-day jumps reflect changes in its composition rather than in
+      market conditions. The largest come after the debt restructurings:
+      in June 2005 the spread fell from about 6,600 to under 900 when the
+      bonds issued in the swap entered the index (and to about 450 at the
+      end of the month), and on 10 September 2020 it halved, from about
+      2,100 to 1,100, when the restructured bonds replaced the old ones.
+      Smaller breaks (for example in April 2016) may have the same origin.
+      Weekends are left out.
+    method_links: [{anchor: country-risk, label: "About country risk"}]
+    variants:
+      embi: {label: "Country risk (EMBI spread)", id: "riesgo:embi"}
+    default: {variant: embi, transform: level, range: 5Y, rebase: false}
 
   - id: debt_gdp
     topic: fiscal

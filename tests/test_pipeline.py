@@ -697,3 +697,14 @@ def test_registry_ranges_and_chips():
     reg = registry.load()
     efw = next(i for i in reg.indicators if i.id == "inst_efw")
     assert set(efw.overlay_default) <= set(efw.variants) and efw.emphasis == "arg"
+
+
+def test_country_risk_cleaning_and_jump_warning(monkeypatch):
+    from pipeline.sources import riesgo
+    rows = [{"fecha": "2020-09-04", "valor": 2117}, {"fecha": "2020-09-05", "valor": 2117},   # Saturday repeat
+            {"fecha": "2020-09-06", "valor": 2117}, {"fecha": "2020-09-09", "valor": 2120}]
+    s = riesgo.clean(rows, {"fecha": "2020-09-10", "valor": 1101})
+    assert list(s.index.strftime("%Y-%m-%d")) == ["2020-09-04", "2020-09-09", "2020-09-10"]
+    monkeypatch.setattr(riesgo, "_get", lambda url, retries=3: {"fecha": "2020-09-10", "valor": 1101} if url.endswith("ultimo") else rows)
+    r = riesgo.fetch(["riesgo:embi"])
+    assert not r.errors and r.warnings["riesgo:embi"]          # a -48% day is accepted but flagged

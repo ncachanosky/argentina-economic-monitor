@@ -87,6 +87,10 @@ def get_adapter(name: str):
         from . import vdem
 
         return vdem
+    if name == "riesgo":
+        from . import riesgo
+
+        return riesgo
     if name == "manual":
         from . import manual
 
