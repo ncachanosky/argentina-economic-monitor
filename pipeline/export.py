@@ -282,6 +282,8 @@ def export(out: Path) -> None:
             "overlay_default": ind.overlay_default,
             "muted": ind.muted,
             "term_shading": ind.term_shading,
+            "term_colored": ind.term_colored,
+            "secondary_bar": ind.secondary_bar,
             "source_label": ind.source_label,
             "default": ind.default,
             "headline": ind.headline,

@@ -278,6 +278,12 @@
     if (extras.barmode) layout.barmode = extras.barmode;
     if (extras.xcategory) layout.xaxis.type = "category";
     if (extras.xaxis) Object.assign(layout.xaxis, extras.xaxis);
+    if (extras.yaxis2) {
+      // Right axis: keep the subtitle clear by moving the (long) legend under the plot.
+      layout.yaxis2 = extras.yaxis2; layout.margin.r = 110; layout.margin.b = 200;
+      layout.legend = { ...layout.legend, y: -0.09, yanchor: "top" };
+      layout.annotations.slice(-2).forEach((a) => { a.y = -0.36; });
+    }
     if (extras.margin) Object.assign(layout.margin, extras.margin);
     if (extras.sourceY !== undefined) layout.annotations.slice(-2).forEach((a) => { a.y = extras.sourceY; });
     if (data[0] && data[0].orientation === "h") { layout.xaxis.ticksuffix = (extras.xsuffix !== undefined ? extras.xsuffix : specOf(pct).suffix); if (extras.xrange) layout.xaxis.range = extras.xrange; layout.yaxis.ticksuffix = ""; layout.margin.l = 260; }
@@ -631,6 +637,9 @@
       yearly: false,              // yearly view (registry `yearly`)
       shown: new Set(ind.overlay_default || variantKeys),   // overlay series drawn (chips toggle the rest)
     };
+    // A secondary series drawn as bars on a right axis (e.g. a rank), not one of the overlay lines.
+    const SB = ind.secondary_bar || null;
+    const lineKeys = SB ? variantKeys.filter((k) => k !== SB.variant && k !== SB.of) : variantKeys;
     const card = cardFrame(ind, !!wide);
     const Y = ind.yearly;
     const ySeg = Y ? segmented([["monthly", ind.frequency === "D" ? "Daily" : "Monthly"], ["yearly", "Yearly"]], "monthly", (k) => { state.yearly = k === "yearly"; ySeg.update(k); draw(); }, "Frequency") : null;
@@ -675,11 +684,19 @@
     const realSeg = realSwitch(ind, () => draw());
     const presBtn = PRESIDENCIES.length && !ind.plain_level ? h("button", { class: "btn toggle", type: "button", "aria-pressed": "false", onclick: () => { state.byPres = !state.byPres; draw(); } }, "By presidency") : null;
     let table;
+    // Party key for a line colored by presidency.
+    function termKey() {
+      if (!ind.term_colored) return null;
+      const seen = new Map(); PRESIDENCIES.forEach((p) => { if (!seen.has(p.party)) seen.set(p.party, p); });
+      return h("p", { class: "band-key" },
+        h("span", {}, h("span", { class: "band-sw", style: `background:${cssVar("--ink")}` }), "Before December 1983"),
+        [...seen.values()].map((p) => h("span", {}, h("span", { class: "band-sw", style: `background:${termColor(p)}` }), (PARTY_COLORS[p.party] || {}).label || p.party)));
+    }
     // Chips: add or remove overlay series (e.g. comparison countries); the default series always stays.
     const chipButtons = {};
     const chipRow = ind.overlay && ind.overlay_default ? h("div", { class: "chip-row", role: "group", "aria-label": "Series shown" },
       h("span", { class: "chip-label" }, "Show:"),
-      variantKeys.filter((k) => k !== ind.default.variant).map((k) => (chipButtons[k] = h("button", { type: "button", class: "chip", "aria-pressed": String(state.shown.has(k)),
+      lineKeys.filter((k) => k !== ind.default.variant).map((k) => (chipButtons[k] = h("button", { type: "button", class: "chip", "aria-pressed": String(state.shown.has(k)),
         onclick: () => { state.shown.has(k) ? state.shown.delete(k) : state.shown.add(k); chipButtons[k].setAttribute("aria-pressed", String(state.shown.has(k))); draw(); } }, ind.variants[k].label)))) : null;
 
     function baseMonth() {
@@ -834,21 +851,48 @@
           if (ind.frequency === "D") [xx, yy] = breakGaps(xx, yy);
           if (ind.frequency === "S") [xx, yy] = breakGaps(xx, yy, 400);
           // With chips, each series keeps the color of its place in the full list, so adding one does not recolor the rest.
-          const cslot = ind.overlay_default ? variantKeys.filter((q) => q !== ind.emphasis && !(ind.muted || []).includes(q)).indexOf(k) : slot;
+          const cslot = ind.overlay_default ? lineKeys.filter((q) => q !== ind.emphasis && !(ind.muted || []).includes(q)).indexOf(k) : slot;
           const color = cssVar(SERIES_VARS[Math.max(0, cslot) % SERIES_VARS.length]);
           const hover = `${ind.frequency === "S" ? "%{customdata}" : `%{x|${DF}}`}: <b>%{y:${yFmt()}}${sfx}</b><extra>${s.v.label}</extra>`;
           const emph = ind.emphasis === k;   // e.g. a total: thick and dark
           const muted = (ind.muted || []).includes(k);   // e.g. a regional median: grey reference
           const marks = ind.frequency === "S" || ind.frequency === "Y";
+          if (emph && ind.term_colored && state.transform !== "mom") {
+            // The emphasized series (e.g. Argentina) colored by presidency; before December 1983 in ink.
+            const at = (d) => termOf(ind.frequency === "Y" ? d.slice(0, 4) + "-07-01" : d, ind.frequency === "Y" ? "M" : ind.frequency);
+            const segs = [];
+            xx.forEach((d, j) => { if (yy[j] === null) return; const p = at(d); const last = segs[segs.length - 1];
+              if (last && last.p === p) { last.x.push(d); last.y.push(yy[j]); } else segs.push({ p, x: [d], y: [yy[j]] }); });
+            const ink = cssVar("--ink");
+            traces.push({ type: "scatter", mode: "lines", x: [null], y: [null], name: `${s.v.label} (colored by presidency)`, line: { color: ink, width: 3.2 }, _light: "#36454F", hoverinfo: "skip" });
+            segs.forEach((g, n) => {
+              const c = g.p ? termColor(g.p) : ink, cl = g.p ? termLight(g.p) : "#36454F";
+              if (n) { const pv = segs[n - 1]; traces.push({ type: "scatter", mode: "lines", x: [pv.x[pv.x.length - 1], g.x[0]], y: [pv.y[pv.y.length - 1], g.y[0]], line: { color: c, width: 3.2 }, _light: cl, showlegend: false, hoverinfo: "skip" }); }
+              traces.push({ type: "scatter", mode: marks ? "lines+markers" : "lines", x: g.x, y: g.y, name: s.v.label, showlegend: false,
+                line: { color: c, width: 3.2 }, marker: { size: 5, color: c }, _light: cl,
+                hovertemplate: `%{x|${DF}}: <b>%{y:${yFmt()}}${sfx}</b><extra>${s.v.label}${g.p ? " · " + g.p.short : ""}</extra>` });
+            });
+            return;
+          }
+          const lighter = ind.term_colored && !emph && !muted;   // comparison lines recede behind the emphasized one
           traces.push(state.transform === "mom"
             ? { type: "bar", x: xx, y: yy, name: s.v.label, marker: { color }, hovertemplate: hover, _slot: slot }
             : { type: "scatter", mode: marks ? "lines+markers" : "lines", x: xx, y: yy, name: s.v.label, connectgaps: false,
                 ...(ind.frequency === "S" ? { customdata: xx.map((d) => fmtPeriod(d, "S")) } : {}),
                 ...(marks ? { marker: { size: ind.frequency === "Y" ? 4 : 5, color: emph ? cssVar("--ink") : muted ? cssVar("--ink-3") : color } } : {}),
                 line: emph ? { color: cssVar("--ink"), width: 3.2 } : muted ? { color: cssVar("--ink-3"), width: 2, dash: "dot" }
-                  : cslot >= SERIES_VARS.length ? { color, width: 1.8, dash: "dashdot" } : slot && !ind.emphasis && !ind.overlay_default ? { color, width: 1.8, dash: "dash" } : { color, width: 2 },
+                  : cslot >= SERIES_VARS.length ? { color, width: lighter ? 1.4 : 1.8, dash: "dashdot" } : slot && !ind.emphasis && !ind.overlay_default ? { color, width: 1.8, dash: "dash" } : { color, width: lighter ? 1.5 : 2 },
+                ...(lighter ? { opacity: 0.65 } : {}),
                 ...(emph ? { _light: "#36454F" } : muted ? { _light: "#85909A" } : {}), hovertemplate: hover, _slot: emph || muted ? undefined : Math.max(0, cslot) % SERIES_VARS.length });
         });
+        if (SB && ind.variants[SB.variant]) {
+          const vb = ind.variants[SB.variant], vo = SB.of ? ind.variants[SB.of] : null;
+          const ii = ind.dates.map((d, i) => i).filter((i) => (!start || ind.dates[i] >= start) && vb.values[i] !== null);
+          traces.unshift({ type: "bar", x: ii.map((i) => ind.dates[i]), y: ii.map((i) => vb.values[i]), yaxis: "y2", name: SB.label || vb.label,
+            marker: { color: cssVar("--ink-3"), opacity: 0.28 }, _light: "#C9CED3",
+            customdata: ii.map((i) => (vo ? vo.values[i] : null)),
+            hovertemplate: `%{x|${DF}}: <b>%{y:,.0f}</b>${vo ? " of %{customdata:,.0f}" : ""}<extra>${SB.label || vb.label}</extra>` });
+        }
       } else if (state.transform === "mom") {
         const terms = x.map((d) => termOf(d, ind.frequency));
         traces.push({
@@ -1037,7 +1081,8 @@
           bargap: 0.2, shapes, annotations, barmode: state.transform === "share" ? "stack" : "group",
           showlegend: (state.byPres && state.transform !== "mom") || (ind.overlay && !state.byPres),
           legend: { orientation: "h", x: 0, y: 1.02, yanchor: "bottom", font: { color: cssVar("--ink") } },
-          margin: { l: 52, r: 16, t: state.byPres ? 30 : 10, b: 36 },
+          margin: { l: 52, r: SB ? 56 : 16, t: state.byPres ? 30 : 10, b: 36 },
+          ...(SB ? { yaxis2: y2Axis(false) } : {}),
         },
       }), PLOT_CONFIG);
       drawStats(main, t);
@@ -1049,7 +1094,10 @@
       table && table.refresh(x, cols, t, ind.frequency);
     }
 
-    function overlayKeys() { return ind.overlay && !state.byPres ? [state.variant, ...variantKeys.filter((k) => k !== state.variant && state.shown.has(k))] : [state.variant]; }
+    const y2Axis = (light) => ({ overlaying: "y", side: "right", showgrid: false, zeroline: false, rangemode: "tozero",
+      title: { text: SB.axis || SB.label, font: { size: light ? 15 : 11, color: light ? "#85909A" : cssVar("--ink-3") } },
+      tickfont: { color: light ? "#85909A" : cssVar("--ink-3") } });
+    function overlayKeys() { return ind.overlay && !state.byPres ? [state.variant, ...lineKeys.filter((k) => k !== state.variant && state.shown.has(k))] : [state.variant]; }
     const subtitle = (main, t) => `${overlayKeys().map((k) => ind.variants[k].label).join(" vs. ")} · ${t.change ? t.short : main.units}`;
     const fileTag = () => `${ind.id}_${state.variant}_${state.transform}${baseMonth() ? "_base" + baseMonth().slice(0, 7) : ""}${state.byPres ? "_presidencies" : ""}`;
     const onPNG = () => {
@@ -1058,7 +1106,7 @@
         return exportPNG(ind, yb.traces, `${yb.traces.map((tr) => tr.name).join(" vs. ")} · yearly${yb.partial ? " · " + yearlyNote(Y.how, yb.partial) : ""}`, yb.t, `${ind.id}_yearly.png`, { shapes: yb.shapes, barmode: "group", xcategory: true });
       }
       const { traces, shapes, annotations, main, t } = build();
-      exportPNG(ind, traces, subtitle(main, t), t, `${fileTag()}.png`, { shapes, annotations, ylog: isLog(), barmode: state.transform === "share" ? "stack" : "group" });
+      exportPNG(ind, traces, subtitle(main, t), t, `${fileTag()}.png`, { shapes, annotations, ylog: isLog(), barmode: state.transform === "share" ? "stack" : "group", ...(SB ? { yaxis2: y2Axis(true) } : {}) });
     };
     const onCSV = () => {
       if (state.yearly) {
@@ -1067,7 +1115,7 @@
         return downloadBlob(toCSV(["year", ...yb.traces.map((tr) => `${ind.short_title} — ${tr.name} — ${unitsOf(ind)}`)], rows), `${ind.id}_yearly.csv`, "text/csv");
       }
       const { main, t, x, y } = build();
-      const ks = overlayKeys();
+      const ks = [...overlayKeys(), ...(SB && !state.byPres ? [SB.variant, SB.of].filter(Boolean) : [])];
       const ys = ks.map((k) => (k === state.variant ? main.y : series(k).y));
       const header = ["date", ...ks.map((k) => `${ind.short_title} — ${ind.variants[k].label} — ${t.change ? t.short : main.units}`)];
       if (state.byPres) header.push("presidency");
@@ -1085,7 +1133,7 @@
       // A short fixed window (view_start) has no use for rebasing or presidencies.
       ind.view_start ? null : h("div", { class: "controls" }, realSeg, baseWrap, presBtn, epBtn),
       ind.caveat ? h("p", { class: "caveat" }, ind.caveat) : null,
-      trackerLine(), summaryEl, hint, methodLine(ind), bandKey, epKey, chartEl, chipRow, statsEl);
+      trackerLine(), summaryEl, hint, methodLine(ind), bandKey, termKey(), epKey, chartEl, chipRow, statsEl);
     drawSummary();
     table = tableView([], [], false, ind.frequency);
     appendAll(card, breakdownTable(ind), table, annualTable(ind), weightsTable(ind), ind.note ? h("p", { class: "chips-note" }, ind.note) : null, footer(ind, onPNG, onCSV));
@@ -1820,7 +1868,7 @@
         return { p, n: rs.length, avg: mean(comp), long, open: rs.some((r) => r.open) };
       }).filter((x) => x.n);
       sumEl.replaceChildren(h("table", { class: "data sched" },
-        h("thead", {}, h("tr", {}, h("th", {}, "Appointed under"), h("th", {}, "Officials"), h("th", {}, "Average tenure, days"), h("th", {}, "Longest"))),
+        h("thead", {}, h("tr", {}, h("th", {}, "Appointed under"), h("th", {}, "Appointed"), h("th", {}, "Average tenure, days"), h("th", {}, "Longest"))),
         h("tbody", {}, byP.map((x) => h("tr", {}, h("td", { class: "pres" }, x.p.name), h("td", {}, String(x.n)),
           h("td", {}, x.avg === null ? "–" : fmtInt(x.avg)), h("td", {}, x.long ? `${x.long.name} (${fmtInt(x.long.days)}${x.long.open ? ", in office" : ""})` : "–"))))));
     }

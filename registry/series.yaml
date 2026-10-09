@@ -5516,14 +5516,16 @@ indicators:
     overlay_default: [arg, chl, ury, bra, latam]
     muted: [latam]
     emphasis: arg
-    term_shading: true
+    term_colored: true
+    secondary_bar: {variant: rank, of: count, label: "Argentina's world rank (bars, right axis)", axis: "World rank (1 = most free)"}
     plain_level: true
     measure: flow
     title: Economic Freedom of the World
     short_title: Economic freedom
     description: >-
       The Fraser Institute's summary rating of economic freedom, 0 (least
-      free) to 10: Argentina and comparison countries. 1970-2000 every five
+      free) to 10: Argentina, colored by presidency, and comparison
+      countries; the bars are Argentina's world rank. 1970-2000 every five
       years, annual since. Add countries with the buttons below the chart.
     source: efw
     source_label: "Fraser Institute, Economic Freedom of the World: 2026 Annual Report"
@@ -5537,7 +5539,9 @@ indicators:
       internationally, regulation), built from about 45 components drawn from
       the IMF, the World Bank, the World Economic Forum and other sources.
       Each edition revises earlier years. The Latin American median is taken
-      over the countries rated each year (fewer before 2000).
+      over the countries rated each year (fewer before 2000). The number of
+      countries ranked grew from about 100 in 1970 to 165, so ranks far apart
+      in time are not strictly comparable (hover shows "rank of N").
     method_links: [{anchor: efw, label: "About the EFW index"}]
     variants:
       arg: {label: "Argentina", id: "efw:ARG:summary"}
@@ -5555,6 +5559,8 @@ indicators:
       aus: {label: "Australia", id: "efw:AUS:summary"}
       can: {label: "Canada", id: "efw:CAN:summary"}
       esp: {label: "Spain", id: "efw:ESP:summary"}
+      rank: {label: "Argentina's world rank", id: "efw:ARG:rank"}
+      count: {label: "Countries ranked", id: "efw:ALL:count"}
     default: {variant: arg, transform: level, range: Max}
 
   - id: inst_efw_areas
@@ -5563,7 +5569,6 @@ indicators:
     kind: variants
     overlay: true
     emphasis: summary
-    term_shading: true
     plain_level: true
     measure: flow
     title: "Economic Freedom: Argentina by Area"
@@ -5591,41 +5596,12 @@ indicators:
       a5: {label: "Area 5: Regulation", id: "efw:ARG:a5"}
     default: {variant: summary, transform: level, range: Max}
 
-  - id: inst_efw_rank
-    topic: institutions
-    kind: variants
-    overlay: true
-    term_shading: true
-    plain_level: true
-    measure: flow
-    title: "Economic Freedom: Argentina's Rank"
-    short_title: EFW rank
-    description: >-
-      Argentina's place in the world ranking of economic freedom (1 = most
-      free) and the number of countries ranked.
-    source: efw
-    source_label: "Fraser Institute, Economic Freedom of the World: 2026 Annual Report"
-    frequency: Y
-    units: Rank
-    transforms: [level]
-    ranges: [Since 2000, Max]
-    note: >-
-      The number of countries rated grew from about 100 in 1970 to 165, so
-      ranks far apart in time are not strictly comparable: a falling share
-      of countries ahead is the cleaner comparison.
-    method_links: [{anchor: efw, label: "About the EFW index"}]
-    variants:
-      rank:  {label: "Argentina's rank",  id: "efw:ARG:rank"}
-      count: {label: "Countries ranked",  id: "efw:ALL:count"}
-    default: {variant: rank, transform: level, range: Max}
-
   - id: inst_vdem
     topic: institutions
     wide: true
     kind: variants
     overlay: true
     overlay_default: [libdem, electdem, rol]
-    term_shading: true
     plain_level: true
     measure: flow
     title: "Democracy and the Rule of Law in Argentina (V-Dem)"
@@ -5665,7 +5641,7 @@ indicators:
     overlay_default: [arg, chl, ury, bra, latam]
     muted: [latam]
     emphasis: arg
-    term_shading: true
+    term_colored: true
     plain_level: true
     measure: flow
     title: "Liberal democracy: Argentina and Comparison Countries"
@@ -5709,7 +5685,7 @@ indicators:
     overlay_default: [arg, chl, ury, bra, latam]
     muted: [latam]
     emphasis: arg
-    term_shading: true
+    term_colored: true
     plain_level: true
     measure: flow
     title: "Rule of law: Argentina and Comparison Countries"
@@ -5753,7 +5729,7 @@ indicators:
     overlay_default: [arg, chl, ury, bra, latam]
     muted: [latam]
     emphasis: arg
-    term_shading: true
+    term_colored: true
     plain_level: true
     measure: flow
     title: "Judicial constraints on the executive: Argentina and Comparison Countries"
@@ -5797,7 +5773,7 @@ indicators:
     overlay_default: [arg, chl, ury, bra, latam]
     muted: [latam]
     emphasis: arg
-    term_shading: true
+    term_colored: true
     plain_level: true
     measure: flow
     title: "Political corruption: Argentina and Comparison Countries"

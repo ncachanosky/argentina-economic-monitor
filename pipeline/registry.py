@@ -81,6 +81,8 @@ class Indicator:
     overlay_default: list | None = None  # overlay cards: variants drawn at first; the rest are toggled with chips
     muted: list | None = None          # overlay cards: variants drawn as thin grey reference lines (e.g. a regional median)
     term_shading: bool = False         # shade presidential terms behind the chart (annual series)
+    term_colored: bool = False         # overlay cards: the emphasis variant drawn in presidency colors
+    secondary_bar: dict | None = None  # overlay cards: {variant, of, label, axis}: bars on a right axis (e.g. a rank)
 
     def input_ids(self) -> list[str]:
         """Source series this indicator reads (its variants, or a derivation's inputs)."""
@@ -272,6 +274,9 @@ def load(path: Path = REGISTRY_PATH, releases_path: Path = RELEASES_PATH) -> Reg
             raise RegistryError(f"{where}: release {item['release']!r} not in releases.yaml")
         if headline and headline.get("variant") not in variants:
             raise RegistryError(f"{where}: headline variant not defined")
+        sb = item.get("secondary_bar")
+        if sb and not ({sb.get("variant")} | ({sb["of"]} if sb.get("of") else set())) <= set(variants):
+            raise RegistryError(f"{where}: secondary_bar names unknown variants")
         for fld in ("overlay_default", "muted"):
             if item.get(fld) and not set(item[fld]) <= set(variants):
                 raise RegistryError(f"{where}: {fld} names unknown variants")
@@ -327,6 +332,8 @@ def load(path: Path = REGISTRY_PATH, releases_path: Path = RELEASES_PATH) -> Reg
                 overlay_default=item.get("overlay_default"),
                 muted=item.get("muted"),
                 term_shading=bool(item.get("term_shading", False)),
+                term_colored=bool(item.get("term_colored", False)),
+                secondary_bar=item.get("secondary_bar"),
                 view_start=str(item["view_start"]) + ("-01" if len(str(item["view_start"])) == 7 else "") if item.get("view_start") else None,
             )
         )
