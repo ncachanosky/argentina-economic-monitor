@@ -25,7 +25,7 @@ site:
   # Privacy-friendly page counts (GoatCounter: no cookies, no personal data). Create a site at
   # https://www.goatcounter.com/signup and put its code here (e.g. "aem" for aem.goatcounter.com);
   # empty: no analytics.
-  goatcounter: ""
+  goatcounter: "ncachanosky"
   # Spanish site (/es/): built always; linked from the header, listed for search engines and
   # given hreflang links only when true. Texts: registry/i18n/es.yaml.
   spanish: true
