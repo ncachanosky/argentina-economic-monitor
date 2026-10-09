@@ -2825,6 +2825,7 @@ indicators:
   # ---------------- International trade ----------------
   - id: trade_balance
     topic: trade
+    release: ica
     wide: true
     kind: contributions
     measure: flow
@@ -2894,6 +2895,7 @@ indicators:
 
   - id: trade_exports_type
     topic: trade
+    release: ica
     wide: true
     kind: contributions
     measure: flow
@@ -2940,6 +2942,7 @@ indicators:
 
   - id: trade_exports_growth
     topic: trade
+    release: ica
     wide: true
     kind: contributions
     measure: flow
@@ -2983,6 +2986,7 @@ indicators:
 
   - id: trade_imports_use
     topic: trade
+    release: ica
     wide: true
     kind: contributions
     measure: flow
@@ -3033,6 +3037,7 @@ indicators:
 
   - id: trade_imports_growth
     topic: trade
+    release: ica
     wide: true
     kind: contributions
     measure: flow
@@ -3076,6 +3081,7 @@ indicators:
 
   - id: trade_energy
     topic: trade
+    release: ica
     wide: true
     kind: contributions
     measure: flow
@@ -3219,6 +3225,7 @@ indicators:
 
   - id: trade_partners_exports
     topic: trade
+    release: ica
     wide: true
     kind: contributions
     measure: flow
@@ -3267,6 +3274,7 @@ indicators:
 
   - id: trade_partners_imports
     topic: trade
+    release: ica
     wide: true
     kind: contributions
     measure: flow
@@ -3311,6 +3319,7 @@ indicators:
 
   - id: trade_settlement
     topic: trade
+    release: ica
     wide: true
     kind: variants
     overlay: true
@@ -3358,6 +3367,7 @@ indicators:
   # ---------------- Balance of payments ----------------
   - id: bop_statement
     topic: bop
+    release: bop
     wide: true
     kind: statement
     measure: flow
@@ -3450,6 +3460,7 @@ indicators:
 
   - id: bop_current_account
     topic: bop
+    release: bop
     wide: true
     kind: contributions
     measure: flow
@@ -3496,6 +3507,7 @@ indicators:
 
   - id: bop_ca_gdp
     topic: bop
+    release: bop
     kind: variants
     overlay: true
     measure: rate
@@ -3531,6 +3543,7 @@ indicators:
 
   - id: bop_financing
     topic: bop
+    release: bop
     wide: true
     kind: contributions
     measure: flow
@@ -3584,6 +3597,7 @@ indicators:
 
   - id: bop_income
     topic: bop
+    release: bop
     wide: true
     kind: contributions
     measure: flow
@@ -3633,6 +3647,7 @@ indicators:
 
   - id: bop_accrual_cash
     topic: bop
+    release: bop
     kind: variants
     overlay: true
     measure: flow
@@ -3669,6 +3684,7 @@ indicators:
 
   - id: iip_statement
     topic: bop
+    release: bop
     wide: true
     kind: statement
     measure: flow
@@ -3733,6 +3749,7 @@ indicators:
 
   - id: iip_sectors
     topic: bop
+    release: bop
     wide: true
     kind: contributions
     measure: flow
@@ -3779,6 +3796,7 @@ indicators:
 
   - id: iip_private_abroad
     topic: bop
+    release: bop
     wide: true
     kind: contributions
     measure: flow
@@ -3824,6 +3842,7 @@ indicators:
   # ---------------- Labor & social ----------------
   - id: labor_rates
     topic: labor
+    release: eph
     wide: true
     kind: variants
     overlay: true
@@ -3888,6 +3907,7 @@ indicators:
 
   - id: labor_wages_real
     topic: labor
+    release: salarios
     wide: true
     kind: variants
     title: Real Wages
@@ -4078,6 +4098,7 @@ indicators:
 
   - id: labor_inequality
     topic: labor
+    release: distribucion
     kind: variants
     plain_level: true
     measure: flow
@@ -4105,6 +4126,7 @@ indicators:
 
   - id: labor_share
     topic: labor
+    release: ingreso_generacion
     kind: contributions
     measure: flow
     title: Labor Share of Income

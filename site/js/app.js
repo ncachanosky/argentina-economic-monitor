@@ -2637,6 +2637,39 @@
     return wrap;
   }
 
+  // ---------- home: what's new and what's coming (data/updates.json) ----------
+  function timelineView(U, pageHref) {
+    const day = (iso) => new Date(iso + "T12:00:00Z").toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", timeZone: "UTC" });
+    const per = (iso, f) => (f === "Q" ? fmtPeriod(iso.slice(0, 7) + "-01", "Q") : f === "S" ? fmtPeriod(iso.slice(0, 7) + "-01", "S") : fmtMonth(iso.slice(0, 7) + "-01"));
+    const recent = U.recent.length ? h("ul", { class: "tl-list" }, U.recent.map((r) => h("li", {},
+      h("span", { class: "tl-date" }, day(r.seen)),
+      h("a", { href: pageHref(r.topic, `ind-${r.id}`) }, r.title), h("span", { class: "tl-sub" }, ` · ${per(r.period, r.frequency)}`))))
+      : h("p", { class: "tl-none" }, "No new monthly or quarterly releases in the last three weeks.");
+    const ahead = U.ahead.length ? h("ul", { class: "tl-list" }, U.ahead.map((r) => h("li", {},
+      h("span", { class: "tl-date" }, day(r.date)),
+      r.indicators.length ? h("a", { href: pageHref(r.indicators[0].topic, `ind-${r.indicators[0].id}`), title: r.name }, shortRelease(r.name)) : h("span", { title: r.name }, shortRelease(r.name)),
+      h("span", { class: "tl-sub" }, ` · ${per(r.period, r.frequency)}`))))
+      : h("p", { class: "tl-none" }, "No scheduled INDEC releases in the next three weeks.");
+    return h("section", { class: "timeline", "aria-label": "Recent and upcoming releases" },
+      h("div", {}, h("h3", {}, "New data"), recent),
+      h("div", {}, h("h3", {}, "Coming up (INDEC calendar)"), ahead));
+  }
+  // "Índice de precios al consumidor (IPC)" -> "CPI"; other names keep their acronym or a short form.
+  function shortRelease(name) {
+    const MAP = { IPC: "Consumer prices (CPI)", EMAE: "Economic activity (EMAE)", "IPI manufacturero": "Industrial production (IPI)", UCII: "Capacity utilization",
+      SIPM: "Wholesale prices", ICA: "International trade", "PIB trimestral": "GDP" };
+    const m = /\(([^)]+)\)\s*$/.exec(name || "");
+    if (m && MAP[m[1]]) return MAP[m[1]];
+    if (/construcci/i.test(name)) return "Construction (ISAC)";
+    if (/salarios/i.test(name)) return "Wages (INDEC index)";
+    if (/pobreza/i.test(name)) return "Poverty and indigence";
+    if (/Balanza de pagos/i.test(name)) return "Balance of payments";
+    if (/Mercado de trabajo/i.test(name)) return "Labor market (EPH)";
+    if (/generaci/i.test(name)) return "Labor share of income";
+    if (/distribuci/i.test(name)) return "Income distribution (EPH)";
+    return name;
+  }
+
   // ---------- page ----------
   async function main() {
     const topicsEl = $("#topics");
@@ -2691,7 +2724,10 @@
       // Home: the summary dashboard, then one card per topic.
       let dash = null;
       try { dash = await getJSON(`${DATA}dashboard.json`); } catch (e) { console.error(e); }
+      let upd = null;
+      try { upd = await getJSON(`${DATA}updates.json`); } catch (e) { console.error(e); }
       if (dash && dash.rows.length) { $("#tiles").className = "dash-host"; $("#tiles").replaceChildren(dashboardView(dash, pageHref)); }
+      if (upd) $("#tiles").after(timelineView(upd, pageHref));
       else {
         const heads = await Promise.all(manifest.indicators.filter((m) => m.headline)
           .map((m) => getJSON(`${DATA}${m.id}.json`).catch((e) => { console.error(e); return null; })));

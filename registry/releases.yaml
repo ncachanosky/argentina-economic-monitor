@@ -73,3 +73,67 @@ sipm:
     - {date: "2026-10-16", period: "2026-09"}
     - {date: "2026-11-17", period: "2026-10"}
     - {date: "2026-12-17", period: "2026-11"}
+
+
+ica:
+  name: Intercambio comercial argentino (ICA)
+  frequency: M
+  calendar_url: https://www.indec.gob.ar/ftp/cuadros/publicaciones/calendario_2sem2026.pdf
+  dates:
+    - {date: "2026-07-20", period: "2026-06"}
+    - {date: "2026-08-20", period: "2026-07"}
+    - {date: "2026-09-18", period: "2026-08"}
+    - {date: "2026-10-19", period: "2026-09"}
+    - {date: "2026-11-19", period: "2026-10"}
+    - {date: "2026-12-18", period: "2026-11"}
+
+salarios:
+  name: Índice de salarios
+  frequency: M
+  calendar_url: https://www.indec.gob.ar/ftp/cuadros/publicaciones/calendario_2sem2026.pdf
+  dates:
+    - {date: "2026-07-20", period: "2026-05"}
+    - {date: "2026-08-20", period: "2026-06"}
+    - {date: "2026-09-22", period: "2026-07"}
+    - {date: "2026-10-21", period: "2026-08"}
+    - {date: "2026-11-13", period: "2026-09"}
+    - {date: "2026-12-16", period: "2026-10"}
+
+pobreza:
+  name: Incidencia de la pobreza y de la indigencia
+  frequency: S
+  calendar_url: https://www.indec.gob.ar/ftp/cuadros/publicaciones/calendario_2sem2026.pdf
+  dates:
+    - {date: "2026-09-24", period: "2026-01"}
+
+bop:
+  name: Balanza de pagos, posición de inversión internacional y deuda externa
+  frequency: Q
+  calendar_url: https://www.indec.gob.ar/ftp/cuadros/publicaciones/calendario_2sem2026.pdf
+  dates:
+    - {date: "2026-09-29", period: "2026-04"}
+    - {date: "2026-12-22", period: "2026-07"}
+
+eph:
+  name: Mercado de trabajo. Tasas e indicadores socioeconómicos (EPH)
+  frequency: Q
+  calendar_url: https://www.indec.gob.ar/ftp/cuadros/publicaciones/calendario_2sem2026.pdf
+  dates:
+    - {date: "2026-09-17", period: "2026-04"}
+    - {date: "2026-12-18", period: "2026-07"}
+
+ingreso_generacion:
+  name: Cuenta de generación del ingreso e insumo de mano de obra
+  frequency: Q
+  calendar_url: https://www.indec.gob.ar/ftp/cuadros/publicaciones/calendario_2sem2026.pdf
+  dates:
+    - {date: "2026-07-16", period: "2026-01"}
+    - {date: "2026-10-15", period: "2026-04"}
+
+distribucion:
+  name: Evolución de la distribución del ingreso (EPH)
+  frequency: Q
+  calendar_url: https://www.indec.gob.ar/ftp/cuadros/publicaciones/calendario_2sem2026.pdf
+  dates:
+    - {date: "2026-10-01", period: "2026-04"}
+    - {date: "2026-12-23", period: "2026-07"}

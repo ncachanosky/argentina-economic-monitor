@@ -372,3 +372,16 @@ body[data-page="embed"] .card { border: 0; box-shadow: none; margin: 0; }
 .embed-code { width: 100%; font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 12px; background: var(--surface-2); color: var(--ink); border: 1px solid var(--rule); border-radius: 6px; padding: 8px; resize: vertical; }
 .embed-actions { display: flex; gap: 8px; align-items: center; margin-top: 10px; flex-wrap: wrap; }
 .embed-actions .embed-status { color: var(--pos); font-size: 13px; margin-right: auto; }
+
+/* Home: new data and upcoming releases */
+.timeline { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 16px 0 8px; }
+.timeline > div { background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius); padding: 14px 18px; box-shadow: var(--shadow); }
+.timeline h3 { font-family: var(--font-ui); font-size: 15px; margin: 0 0 8px; }
+.tl-list { list-style: none; margin: 0; padding: 0; font-family: var(--font-ui); font-size: 14px; }
+.tl-list li { padding: 4px 0; border-bottom: 1px solid var(--grid); display: flex; gap: 10px; align-items: baseline; }
+.tl-list li:last-child { border-bottom: 0; }
+.tl-date { color: var(--ink-3); font-size: 12.5px; min-width: 84px; font-variant-numeric: tabular-nums; }
+.tl-list a { color: var(--ink); }
+.tl-sub { color: var(--ink-3); font-size: 12.5px; }
+.tl-none { font-family: var(--font-ui); font-size: 13px; color: var(--ink-3); margin: 0; }
+@media (max-width: 760px) { .timeline { grid-template-columns: 1fr; } }

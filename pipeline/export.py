@@ -259,6 +259,51 @@ def export_table(ind, out: Path, status: dict) -> dict | None:
             "status": payload["status"], "last_obs": last, "headline": False}
 
 
+def first_seen(series_id: str) -> tuple[str, str] | None:
+    """(latest period, vintage when it first appeared) for a stored series; None if it came with the first load."""
+    h = store.load(series_id)
+    if h.empty:
+        return None
+    last = h["date"].max()
+    seen = h.loc[h["date"] == last, "vintage"].min()
+    if seen == h["vintage"].min():          # part of the initial history, not a release we saw
+        return None
+    return pd.Timestamp(last).strftime("%Y-%m-%d"), str(seen)
+
+
+def updates(reg, days_back: int = 21, days_ahead: int = 21) -> dict:
+    """Recent releases (new periods seen in the last weeks) and scheduled INDEC releases ahead."""
+    today = pd.Timestamp(datetime.now(timezone.utc).date())
+    recent = []
+    meta = reg.series_meta()
+    for ind in reg.indicators:
+        if ind.hidden or ind.frequency == "D" or ind.kind in registry.TABLE_KINDS:
+            continue
+        # Only releases of monthly or slower source series (daily inputs change every day).
+        ids = [sid for sid in ind.input_ids() if sid in meta and meta[sid]["frequency"] != "D"]
+        seen = [x for x in (first_seen(sid) for sid in ids) if x]
+        if not seen:
+            continue
+        period, vintage = max(seen, key=lambda x: (x[1], x[0]))
+        if pd.Timestamp(vintage) >= today - pd.Timedelta(days=days_back):
+            recent.append({"id": ind.id, "title": ind.short_title, "topic": ind.topic, "frequency": ind.frequency,
+                           "period": period, "seen": vintage})
+    recent.sort(key=lambda r: (r["seen"], r["title"]), reverse=True)
+    by_release = {}
+    for ind in reg.indicators:
+        if ind.release and not ind.hidden:
+            by_release.setdefault(ind.release, []).append({"id": ind.id, "title": ind.short_title, "topic": ind.topic})
+    ahead = []
+    for key, cal in reg.releases.items():
+        for d in cal.get("dates", []):
+            day = pd.Timestamp(d["date"])
+            if today <= day <= today + pd.Timedelta(days=days_ahead):
+                ahead.append({"date": d["date"], "period": d["period"], "name": cal.get("name"), "frequency": cal.get("frequency", "M"),
+                              "indicators": by_release.get(key, [])[:3]})
+    ahead.sort(key=lambda r: (r["date"], r["name"]))
+    return {"today": today.strftime("%Y-%m-%d"), "recent": recent[:12], "ahead": ahead}
+
+
 def export(out: Path) -> None:
     reg = registry.load()
     status = json.loads(STATUS_PATH.read_text(encoding="utf-8")) if STATUS_PATH.exists() else {}
@@ -406,6 +451,7 @@ def export(out: Path) -> None:
     print(f"exported {len(manifest_inds)} indicators to {out}")
     from . import dashboard
     dashboard.write(out)
+    (out / "updates.json").write_text(json.dumps(updates(reg), separators=(",", ":")), encoding="utf-8")
 
 
 def main(argv: list[str] | None = None) -> int:
