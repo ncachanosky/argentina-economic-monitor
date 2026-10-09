@@ -2670,6 +2670,14 @@
     return name;
   }
 
+  // Count downloads, shares and embeds as events when analytics (GoatCounter) is on; nothing otherwise.
+  document.addEventListener("click", (e) => {
+    const b = e.target.closest && e.target.closest(".card-foot .btn, .dash .seg button");
+    if (!b || !window.goatcounter || !window.goatcounter.count) return;
+    const card = b.closest(".card");
+    window.goatcounter.count({ path: `${b.textContent.trim().toLowerCase().replace(/\s+/g, "-")}${card ? "/" + card.id.replace(/^ind-/, "") : ""}`, title: b.textContent.trim(), event: true });
+  });
+
   // ---------- page ----------
   async function main() {
     const topicsEl = $("#topics");

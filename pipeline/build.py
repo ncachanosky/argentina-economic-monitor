@@ -22,6 +22,18 @@ HOME_LEDE = ("Official statistics, checked every morning against the source and 
              "as a new release lands. Every chart is interactive and exportable as an image or data file.")
 
 
+ANALYTICS = ""   # set in build() from the registry's site.goatcounter
+
+
+def analytics_tag(code: str) -> str:
+    """GoatCounter's script (no cookies); empty when no code is configured."""
+    import re
+    if not code or not re.fullmatch(r"[a-z0-9-]+", code):
+        return ""
+    return (f'  <script data-goatcounter="https://{code}.goatcounter.com/count" '
+            f'async src="//gc.zgo.at/count.js"></script>')
+
+
 LOADING = '<div class="loading">Loading data…</div>'
 
 
@@ -30,7 +42,7 @@ def render(template: str, *, page: str, root: str, title: str, desc: str, h1: st
     esc = lambda s: html.escape(" ".join(str(s).split()), quote=True)
     out = template
     for key, val in {"__TITLE__": esc(title), "__DESC__": esc(desc), "__H1__": esc(h1), "__LEDE__": esc(lede),
-                     "__PAGE__": page, "__ROOT__": root, "__BUILD__": tag, "__URL__": esc(url), "__OGIMAGE__": esc(image),
+                     "__PAGE__": page, "__ROOT__": root, "__BUILD__": tag, "__URL__": esc(url), "__OGIMAGE__": esc(image), "__ANALYTICS__": ANALYTICS,
                      "__CONTENT__": content}.items():
         out = out.replace(key, val)
     return out
@@ -38,6 +50,8 @@ def render(template: str, *, page: str, root: str, title: str, desc: str, h1: st
 
 def build(out: Path, tag: str, with_data: bool = True) -> None:
     reg = registry.load()
+    global ANALYTICS
+    ANALYTICS = analytics_tag(str(reg.site.get("goatcounter") or ""))
     site_name = reg.site.get("title", "Argentina Economic Monitor")
     base = reg.site.get("site_url", "")
     img = lambda slug: f"{base}social/{slug}.png?v={tag}"

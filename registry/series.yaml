@@ -22,6 +22,10 @@ site:
   publisher_url: https://economicorder.substack.com   # header link and subscribe button
   repo_url: https://github.com/ncachanosky/argentina-economic-monitor
   site_url: https://ncachanosky.github.io/argentina-economic-monitor/   # absolute links for previews and embeds
+  # Privacy-friendly page counts (GoatCounter: no cookies, no personal data). Create a site at
+  # https://www.goatcounter.com/signup and put its code here (e.g. "aem" for aem.goatcounter.com);
+  # empty: no analytics.
+  goatcounter: ""
 
 # Presidential terms, used to color charts by presidency, compute per-term
 # statistics, and rebase indices to the start of a term.
