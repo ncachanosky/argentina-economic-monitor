@@ -62,6 +62,17 @@ topics:
   institutions: {title: Instituciones, group: Instituciones, description: "El marco institucional: la confianza en el gobierno y la confianza del consumidor, cuánto duran los presidentes del Banco Central y los ministros de Economía, la libertad económica, y la democracia y el Estado de derecho, con países de comparación. De la UTDT, el Fraser Institute y V-Dem."}
 
 ui:
+  m/m: mensual
+  q/q: trimestral
+  "Ending:": "Hasta:"
+  "Quarter:": "Trimestre:"
+  REM expectations: Expectativas REM
+  "Show or hide the expectations of the BCRA's survey of analysts (REM)": Mostrar u ocultar las expectativas del Relevamiento de Expectativas de Mercado del BCRA (REM)
+  Collapse all: Contraer todo
+  Expand all: Expandir todo
+  Hide the items below: Ocultar los rubros de abajo
+  Show the items below: Mostrar los rubros de abajo
+  View: Vista
   # Navigation and page
   Dashboards: Tableros
   Methodology: Metodología

@@ -772,3 +772,21 @@ def test_spanish_translations_load_and_patterns_compile():
         assert all(int(n) <= groups for n in _re.findall(r"\$(\d)", out)), pat
     reg = registry.load()
     assert set(es["topics"]) == {t["id"] for t in reg.topics}
+
+
+def test_display_options_and_unlisted_cards():
+    reg = registry.load()
+    by = {i.id: i for i in reg.indicators}
+    # Cards the home dashboard reads stay exported but leave the topic pages.
+    assert by["ipi"].unlisted and by["isac"].unlisted and by["reserves"].unlisted
+    # Display options pass through, and boxes name real variants.
+    assert by["industry_construction"].display["tiles"][0]["variant"] in by["industry_construction"].variants
+    groups = {}
+    for i in reg.indicators:
+        sw = (i.display or {}).get("switch")
+        if sw:
+            groups.setdefault((i.topic, sw["group"]), []).append(i.id)
+    assert all(len(v) >= 2 for v in groups.values()), groups
+    assert set(groups[("trade", "partners")]) == {"trade_partners_exports", "trade_partners_imports", "trade_partners_balance"}
+    halves = [i.id for i in reg.indicators if (i.display or {}).get("half") and not i.unlisted]
+    assert len(halves) % 2 == 0, halves   # half-width cards come in pairs

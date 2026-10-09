@@ -277,7 +277,7 @@ def updates(reg, days_back: int = 21, days_ahead: int = 21) -> dict:
     recent = []
     meta = reg.series_meta()
     for ind in reg.indicators:
-        if ind.hidden or ind.frequency == "D" or ind.kind in registry.TABLE_KINDS:
+        if ind.hidden or ind.unlisted or ind.frequency == "D" or ind.kind in registry.TABLE_KINDS:
             continue
         # Only releases of monthly or slower source series (daily inputs change every day).
         ids = [sid for sid in ind.input_ids() if sid in meta and meta[sid]["frequency"] != "D"]
@@ -291,7 +291,7 @@ def updates(reg, days_back: int = 21, days_ahead: int = 21) -> dict:
     recent.sort(key=lambda r: (r["seen"], r["title"]), reverse=True)
     by_release = {}
     for ind in reg.indicators:
-        if ind.release and not ind.hidden:
+        if ind.release and not ind.hidden and not ind.unlisted:
             by_release.setdefault(ind.release, []).append({"id": ind.id, "title": ind.short_title, "topic": ind.topic})
     ahead = []
     for key, cal in reg.releases.items():
@@ -416,6 +416,8 @@ def export(out: Path) -> None:
             payload["contributions"] = contributions(ind, raw_wide)
         if ind.weights:
             payload["weights"] = sector_weights(ind, reg)
+        if ind.display:
+            payload.update(ind.display)
         (out / f"{ind.id}.json").write_text(json.dumps(payload, separators=(",", ":")), encoding="utf-8")
 
         # The downloadable "all data" CSV keeps the source units (e.g. millions of 2004 pesos).
@@ -433,6 +435,8 @@ def export(out: Path) -> None:
                 out / "vintages" / f"{ind.id}.csv", index=False, date_format="%Y-%m-%d"
             )
 
+        if ind.unlisted:
+            continue
         manifest_inds.append({
             "id": ind.id, "topic": ind.topic, "kind": ind.kind, "title": ind.title,
             "short_title": ind.short_title, "status": worst, "last_obs": payload["last_obs"],

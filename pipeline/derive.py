@@ -480,6 +480,10 @@ def net_reserves(ind, frames: dict[str, pd.Series]) -> tuple[pd.DataFrame, dict]
                         for k, _, convs in NET_ROWS if conv in convs) for conv, _ in NET_CONVENTIONS}
     out = {"gross": gross}
     out.update({conv: gross - deduct[conv] for conv, _ in NET_CONVENTIONS})
+    if i.get("gross_daily") and i["gross_daily"] in frames:
+        # The gross line itself from the daily series (the conventions stay on weekly balances).
+        gd = frames[i["gross_daily"]].dropna()
+        out["gross"] = gd[gd.index >= idx.min()]
     df = pd.DataFrame({ind.variants[k].source_id: s for k, s in out.items() if k in ind.variants}).sort_index()
 
     # Line-by-line construction at the latest balance.

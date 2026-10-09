@@ -41,7 +41,7 @@ groups:
       - {ind: trade_balance, variant: exports, label: "Exports", mm: null, yy: pct, good: up, scale: 0.001, unit: " US$ bn"}
       - {ind: trade_balance, variant: imports, abs: true, label: "Imports", mm: null, yy: pct, good: none, scale: 0.001, unit: " US$ bn"}
       - {ind: fiscal_balance, variant: primary, label: "Primary balance, % of GDP (12 months)", mm: diff, yy: diff, good: up, unit: "% of GDP"}
-      - {ind: country_risk, variant: embi, label: "Country risk (EMBI)", mm: pct, yy: pct, good: down, unit: " bp"}
+      - {ind: country_risk, variant: embi, label: "Country risk (EMBI)", mm: diff, yy: diff, good: down, unit: " bp"}
   - label: Labor
     rows:
       - {ind: labor_wages_real, variant: total, real: true, label: "Real wages", mm: pct, mm_nsa: true, yy: pct, good: up, unit: " (index)"}
