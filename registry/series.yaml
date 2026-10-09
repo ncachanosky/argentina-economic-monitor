@@ -1378,6 +1378,7 @@ indicators:
     kind: variants
     overlay: true
     measure: rate
+    validate_as: flow       # expectations exceeded 100% in 2023
     plain_level: true
     emphasis: median
     title: How Much Forecasters Disagree
