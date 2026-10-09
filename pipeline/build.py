@@ -48,6 +48,7 @@ EN = {
     "topics_aria": "Topics",
     "subscribe": "Subscribe",
     "theme": "Toggle dark mode",
+    "share": "Share this page",
     "onpage": "On this page",
     "latest": "Latest readings",
     "switch_label": "Español",
@@ -57,6 +58,7 @@ EN = {
         <h4>About</h4>
         <p>The Argentina Economic Monitor is a project of <a id="eo-link" href="#">Economic Order</a>, by Nicolás Cachanosky. Data are pulled automatically from their sources twice a day, validated, and stored with their full revision history.</p>
         <p>Source data: INDEC, the BCRA, the Ministry of Economy and other official agencies; market quotes from market-data services, marked as unofficial. Charts and transformations are ours; errors are ours too. Corrections are welcome on <a id="repo-link" href="#">GitHub</a>. <a href="__ROOT__about/">More about the Monitor</a>.</p>
+        <p class="social-links">Nicolás Cachanosky: <a href="https://x.com/n_cachanosky" rel="me noopener" target="_blank">X</a> · <a href="https://www.linkedin.com/in/ncachanosky/" rel="me noopener" target="_blank">LinkedIn</a> · <a href="https://www.ncachanosky.com/" rel="me noopener" target="_blank">ncachanosky.com</a></p>
       </div>
       <div>
         <h4>Data</h4>
@@ -98,7 +100,7 @@ def render(template: str, *, page: str, root: str, title: str, desc: str, h1: st
         "__ANALYTICS__": ANALYTICS, "__LANG__": lang, "__DATA__": data if data is not None else f"{assets}data/",
         "__HREFLANG__": hreflang, "__LANGSWITCH__": switch_html,
         "__T_HOME_ARIA__": esc(T["home_aria"]), "__T_BY__": esc(T["by"]), "__T_TOPICS__": esc(T["topics_aria"]),
-        "__T_SUBSCRIBE__": esc(T["subscribe"]), "__T_THEME__": esc(T["theme"]), "__T_ONPAGE__": esc(T["onpage"]),
+        "__T_SUBSCRIBE__": esc(T["subscribe"]), "__T_THEME__": esc(T["theme"]), "__T_SHARE__": esc(T["share"]), "__T_ONPAGE__": esc(T["onpage"]),
         "__T_LATEST__": esc(T["latest"]), "__FOOTER__": T["footer"],
         "__CONTENT__": content,
     }

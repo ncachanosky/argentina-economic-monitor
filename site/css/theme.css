@@ -389,3 +389,17 @@ body[data-page="embed"] .card { border: 0; box-shadow: none; margin: 0; }
 /* Narrow screens: segmented controls wrap; wide tables in text scroll inside their box */
 .seg { flex-wrap: wrap; max-width: 100%; }
 .prose table { display: block; max-width: 100%; overflow-x: auto; }
+
+/* Site share menu (header) and footer social links */
+.header-tools { position: relative; }
+.share-menu { position: absolute; top: calc(100% + 6px); width: 180px; z-index: 60; display: flex; flex-direction: column;
+  background: var(--surface); border: 1px solid var(--rule); border-radius: 8px; box-shadow: 0 6px 20px rgba(0,0,0,.12); padding: 4px; font-family: var(--font-ui); font-size: 14px; }
+.share-menu a, .share-menu button { display: block; text-align: left; padding: 7px 10px; border-radius: 5px; color: var(--ink); text-decoration: none; background: none; border: 0; font: inherit; cursor: pointer; }
+.share-menu a:hover, .share-menu button:hover, .share-menu a:focus-visible, .share-menu button:focus-visible { background: var(--surface-2); }
+.site-footer .social-links { font-family: var(--font-ui); font-size: 14px; }
+@media (max-width: 520px) {
+  .brand-name { font-size: 16px; line-height: 1.25; }
+  .header-tools { gap: 5px; }
+  .header-tools .btn:not(.icon-btn) { padding-left: 8px; padding-right: 8px; font-size: 13px; }
+  .header-tools .icon-btn { width: 30px; height: 30px; }
+}

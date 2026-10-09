@@ -30,6 +30,7 @@ site:
   topics_aria: Temas
   subscribe: Suscribirse
   theme: Cambiar a modo oscuro o claro
+  share: Compartir esta página
   onpage: En esta página
   latest: Últimos datos
   switch_label: English
@@ -40,6 +41,7 @@ site:
             <h4>Acerca del Monitor</h4>
             <p>El Monitor de la Economía Argentina es un proyecto de <a id="eo-link" href="#">Economic Order</a>, de Nicolás Cachanosky. Los datos se descargan automáticamente de sus fuentes dos veces por día, se validan y se guardan con todo su historial de revisiones.</p>
             <p>Fuentes: INDEC, el BCRA, el Ministerio de Economía y otros organismos oficiales; cotizaciones de mercado de servicios de datos de mercado, señaladas como no oficiales. Los gráficos y las transformaciones son nuestros, y los errores también. Las correcciones son bienvenidas en <a id="repo-link" href="#">GitHub</a>. <a href="__ROOT__about/">Más sobre el Monitor</a>.</p>
+            <p class="social-links">Nicolás Cachanosky: <a href="https://x.com/n_cachanosky" rel="me noopener" target="_blank">X</a> · <a href="https://www.linkedin.com/in/ncachanosky/" rel="me noopener" target="_blank">LinkedIn</a> · <a href="https://www.ncachanosky.com/" rel="me noopener" target="_blank">ncachanosky.com</a></p>
           </div>
           <div>
             <h4>Datos</h4>
@@ -147,6 +149,8 @@ ui:
   Share: Compartir
   Embed: Insertar
   Link copied: Enlace copiado
+  Copy link: Copiar enlace
+  Email: Correo electrónico
   Download this chart as a 1200×800 PNG: Descargar este gráfico como PNG de 1200×800
   Download the data in this view as CSV: Descargar los datos de esta vista en CSV
   All variants, levels, as published: Todas las series, en niveles, tal como se publican

@@ -2835,6 +2835,36 @@
     });
     window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => { if (!document.documentElement.dataset.theme) redraw(); });
 
+    // Share this page: the phone's share sheet where there is one, else a small menu.
+    const shareBtn = $("#site-share");
+    if (shareBtn) shareBtn.addEventListener("click", async (ev) => {
+      ev.stopPropagation();
+      const url = (document.querySelector('link[rel="canonical"]') || {}).href || location.href.split(/[?#]/)[0];
+      const title = document.title;
+      if (navigator.share && matchMedia("(pointer: coarse)").matches) { try { await navigator.share({ title, url }); return; } catch (e) { return; } }
+      const old = document.getElementById("share-menu");
+      if (old) { old.remove(); return; }
+      const u = encodeURIComponent(url), t = encodeURIComponent(title);
+      const item = (label, href) => h("a", { role: "menuitem", href, target: "_blank", rel: "noopener" }, label);
+      const copy = h("button", { role: "menuitem", type: "button" }, tr("Copy link"));
+      copy.addEventListener("click", async () => {
+        try { await navigator.clipboard.writeText(url); copy.textContent = tr("Link copied"); } catch (e) { window.prompt("", url); }
+        setTimeout(() => menu.remove(), 1200);
+      });
+      const menu = h("div", { class: "share-menu", id: "share-menu", role: "menu" },
+        item("X", `https://x.com/intent/post?text=${t}&url=${u}`),
+        item("LinkedIn", `https://www.linkedin.com/sharing/share-offsite/?url=${u}`),
+        item("WhatsApp", `https://wa.me/?text=${t}%20${u}`),
+        item(tr("Email"), `mailto:?subject=${t}&body=${u}`),
+        copy);
+      shareBtn.parentElement.append(menu);
+      const r = shareBtn.getBoundingClientRect(), pr = shareBtn.parentElement.getBoundingClientRect();
+      menu.style.left = `${Math.max(0, r.left - pr.left + r.width - 180)}px`;
+      const close = (e) => { if (!menu.contains(e.target)) { menu.remove(); document.removeEventListener("click", close); } };
+      document.addEventListener("click", close);
+      document.addEventListener("keydown", function esc(e) { if (e.key === "Escape") { menu.remove(); document.removeEventListener("keydown", esc); } });
+    });
+
     const topicsEl2 = $("#topics");
     if (PAGE === "methodology" || PAGE === "about") return;   // static pages: nothing to load
     if (PAGE === "home") {
