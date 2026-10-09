@@ -1,78 +1,78 @@
 [
  {
+  "source": "datos_gob (M)",
+  "seconds": 92.3,
+  "series": 139
+ },
+ {
   "source": "bcra (D)",
-  "seconds": 72.3,
+  "seconds": 57.3,
   "series": 46
  },
  {
+  "source": "datos_gob (Q)",
+  "seconds": 46.3,
+  "series": 101
+ },
+ {
   "source": "bcra_entities (M)",
-  "seconds": 33.9,
+  "seconds": 28.2,
   "series": 32
  },
  {
   "source": "finanzas (M)",
-  "seconds": 29.2,
+  "seconds": 21.8,
   "series": 39
  },
  {
   "source": "ustreasury (D)",
-  "seconds": 17.2,
+  "seconds": 19.3,
   "series": 1
  },
  {
   "source": "bcra_fx (D)",
-  "seconds": 8.8,
+  "seconds": 8.6,
   "series": 1
  },
  {
   "source": "itcrm (D)",
-  "seconds": 8.0,
+  "seconds": 4.7,
   "series": 5
  },
  {
-  "source": "a3 (D)",
-  "seconds": 6.6,
-  "series": 3
- },
- {
-  "source": "vdem (Y)",
-  "seconds": 6.3,
-  "series": 62
+  "source": "bcra_cambiario (M)",
+  "seconds": 4.3,
+  "series": 14
  },
  {
   "source": "bcra_banks (M)",
-  "seconds": 2.9,
+  "seconds": 3.5,
   "series": 67
  },
  {
   "source": "efw (Y)",
-  "seconds": 2.9,
+  "seconds": 2.5,
   "series": 22
  },
  {
-  "source": "datos_gob (M)",
-  "seconds": 2.4,
-  "series": 139
- },
- {
   "source": "bcra_weekly (D)",
-  "seconds": 2.3,
+  "seconds": 1.9,
   "series": 6
  },
  {
   "source": "rem (M)",
-  "seconds": 2.2,
+  "seconds": 1.8,
   "series": 6
  },
  {
-  "source": "datos_gob (Q)",
-  "seconds": 1.2,
-  "series": 101
+  "source": "bcra_balance (M)",
+  "seconds": 1.3,
+  "series": 20
  },
  {
-  "source": "bcra_balance (M)",
-  "seconds": 1.1,
-  "series": 20
+  "source": "datos_gob (Y)",
+  "seconds": 1.2,
+  "series": 2
  },
  {
   "source": "dolar (D)",
@@ -81,13 +81,18 @@
  },
  {
   "source": "bcra (M)",
-  "seconds": 1.0,
+  "seconds": 0.9,
   "series": 1
  },
  {
-  "source": "bcra_cambiario (M)",
+  "source": "vdem (Y)",
   "seconds": 0.6,
-  "series": 14
+  "series": 62
+ },
+ {
+  "source": "a3 (D)",
+  "seconds": 0.5,
+  "series": 3
  },
  {
   "source": "riesgo (D)",
@@ -96,12 +101,7 @@
  },
  {
   "source": "officials (Y)",
-  "seconds": 0.2,
-  "series": 2
- },
- {
-  "source": "datos_gob (Y)",
-  "seconds": 0.2,
+  "seconds": 0.1,
   "series": 2
  },
  {
