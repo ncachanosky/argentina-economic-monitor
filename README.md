@@ -142,4 +142,4 @@ Pages under `/es/` are built from the same template and data. Translations: `reg
 
 ## Licence
 
-Code: MIT (`LICENSE`). Charts, derived series and text: CC BY 4.0 (`LICENSE-CONTENT.md`). Third-party source data keep their owners' terms.
+Code: MIT (`LICENSE`). Charts, derived series and text: CC BY 4.0 (`LICENSE-CONTENT.md`). Third-party source data keep their owners' terms. The web fonts in `site/fonts/` are renamed subsets of Carlito (SIL OFL 1.1) and TeX Gyre Pagella (GUST Font License); see `site/fonts/LICENSE.md`.

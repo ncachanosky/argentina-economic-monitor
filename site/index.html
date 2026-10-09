@@ -25,6 +25,8 @@ __HREFLANG__
     // Apply the saved theme before first paint to avoid a flash.
     try { var t = localStorage.getItem("aem-theme"); if (t) document.documentElement.dataset.theme = t; } catch (e) {}
   </script>
+  <link rel="preload" href="__ASSETS__fonts/aem-serif-regular.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="__ASSETS__fonts/aem-sans-regular.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="__ASSETS__css/theme.css?v=__BUILD__">
   <script src="https://cdn.jsdelivr.net/npm/plotly.js-basic-dist-min@3.7.0/plotly-basic.min.js" defer></script>
   <script src="__ASSETS__js/app.js?v=__BUILD__" defer></script>

@@ -266,7 +266,7 @@
   async function exportPNG(ind, traces, subtitle, pct, filename, extras = {}) {
     const light = { ink: "#36454F", ink2: "#5A6872", ink3: "#85909A", grid: "#ECE9E3", rule: "#E3E0D9" };
     const lightSeries = ["#B87333", "#5B9BD5", "#87A96B", "#8E7AB5", "#C9A227", "#C96B7E", "#3E9C9A", "#6C7A89"];
-    const font = '"Calibri", "Carlito", "Segoe UI", Arial, sans-serif';
+    const font = '"AEM Sans", "Calibri", "Carlito", "Segoe UI", Arial, sans-serif';
     const data = traces.map((t, i) => {
       const c = { ...t };
       const color = t._light || (t._slot !== undefined ? lightSeries[t._slot] : lightSeries[0]);
