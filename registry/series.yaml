@@ -405,28 +405,28 @@ inputs:
   - {id: 370.3_HONESTIDADDAD_0_0_10_58, source: datos_gob, frequency: M, measure: index, allow_gaps: true, label: "UTDT ICG: honesty"}
   - {id: 370.3_CAPACIDADDAD_0_0_9_83, source: datos_gob, frequency: M, measure: index, allow_gaps: true, label: "UTDT ICG: capacity to solve problems"}
   # Economic Freedom of the World (Fraser Institute), 0-10; 1970-2000 every five years.
-  - {id: "efw:ARG:summary", source: efw, frequency: Y, measure: flow, allow_gaps: true, label: "EFW, Argentina: summary"}
-  - {id: "efw:ARG:rank", source: efw, frequency: Y, measure: flow, allow_gaps: true, label: "EFW, Argentina: rank"}
-  - {id: "efw:ARG:a1", source: efw, frequency: Y, measure: flow, allow_gaps: true, label: "EFW, Argentina: a1"}
-  - {id: "efw:ARG:a2", source: efw, frequency: Y, measure: flow, allow_gaps: true, label: "EFW, Argentina: a2"}
-  - {id: "efw:ARG:a3", source: efw, frequency: Y, measure: flow, allow_gaps: true, label: "EFW, Argentina: a3"}
-  - {id: "efw:ARG:a4", source: efw, frequency: Y, measure: flow, allow_gaps: true, label: "EFW, Argentina: a4"}
-  - {id: "efw:ARG:a5", source: efw, frequency: Y, measure: flow, allow_gaps: true, label: "EFW, Argentina: a5"}
-  - {id: "efw:ALL:count", source: efw, frequency: Y, measure: flow, allow_gaps: true, label: "EFW: number of countries ranked"}
-  - {id: "efw:CHL:summary", source: efw, frequency: Y, measure: flow, allow_gaps: true, label: "EFW summary rating, Chile"}
-  - {id: "efw:URY:summary", source: efw, frequency: Y, measure: flow, allow_gaps: true, label: "EFW summary rating, Uruguay"}
-  - {id: "efw:BRA:summary", source: efw, frequency: Y, measure: flow, allow_gaps: true, label: "EFW summary rating, Brazil"}
-  - {id: "efw:LATAM:summary", source: efw, frequency: Y, measure: flow, allow_gaps: true, label: "EFW summary rating, Latin America (median)"}
-  - {id: "efw:MEX:summary", source: efw, frequency: Y, measure: flow, allow_gaps: true, label: "EFW summary rating, Mexico"}
-  - {id: "efw:COL:summary", source: efw, frequency: Y, measure: flow, allow_gaps: true, label: "EFW summary rating, Colombia"}
-  - {id: "efw:PER:summary", source: efw, frequency: Y, measure: flow, allow_gaps: true, label: "EFW summary rating, Peru"}
-  - {id: "efw:VEN:summary", source: efw, frequency: Y, measure: flow, allow_gaps: true, label: "EFW summary rating, Venezuela"}
-  - {id: "efw:ECU:summary", source: efw, frequency: Y, measure: flow, allow_gaps: true, label: "EFW summary rating, Ecuador"}
-  - {id: "efw:PAN:summary", source: efw, frequency: Y, measure: flow, allow_gaps: true, label: "EFW summary rating, Panama"}
-  - {id: "efw:SLV:summary", source: efw, frequency: Y, measure: flow, allow_gaps: true, label: "EFW summary rating, El Salvador"}
-  - {id: "efw:AUS:summary", source: efw, frequency: Y, measure: flow, allow_gaps: true, label: "EFW summary rating, Australia"}
-  - {id: "efw:CAN:summary", source: efw, frequency: Y, measure: flow, allow_gaps: true, label: "EFW summary rating, Canada"}
-  - {id: "efw:ESP:summary", source: efw, frequency: Y, measure: flow, allow_gaps: true, label: "EFW summary rating, Spain"}
+  - {id: "efw:ARG:summary", source: efw, frequency: Y, measure: flow, allow_gaps: true, stale_days: 1400, label: "EFW, Argentina: summary"}
+  - {id: "efw:ARG:rank", source: efw, frequency: Y, measure: flow, allow_gaps: true, stale_days: 1400, label: "EFW, Argentina: rank"}
+  - {id: "efw:ARG:a1", source: efw, frequency: Y, measure: flow, allow_gaps: true, stale_days: 1400, label: "EFW, Argentina: a1"}
+  - {id: "efw:ARG:a2", source: efw, frequency: Y, measure: flow, allow_gaps: true, stale_days: 1400, label: "EFW, Argentina: a2"}
+  - {id: "efw:ARG:a3", source: efw, frequency: Y, measure: flow, allow_gaps: true, stale_days: 1400, label: "EFW, Argentina: a3"}
+  - {id: "efw:ARG:a4", source: efw, frequency: Y, measure: flow, allow_gaps: true, stale_days: 1400, label: "EFW, Argentina: a4"}
+  - {id: "efw:ARG:a5", source: efw, frequency: Y, measure: flow, allow_gaps: true, stale_days: 1400, label: "EFW, Argentina: a5"}
+  - {id: "efw:ALL:count", source: efw, frequency: Y, measure: flow, allow_gaps: true, stale_days: 1400, label: "EFW: number of countries ranked"}
+  - {id: "efw:CHL:summary", source: efw, frequency: Y, measure: flow, allow_gaps: true, stale_days: 1400, label: "EFW summary rating, Chile"}
+  - {id: "efw:URY:summary", source: efw, frequency: Y, measure: flow, allow_gaps: true, stale_days: 1400, label: "EFW summary rating, Uruguay"}
+  - {id: "efw:BRA:summary", source: efw, frequency: Y, measure: flow, allow_gaps: true, stale_days: 1400, label: "EFW summary rating, Brazil"}
+  - {id: "efw:LATAM:summary", source: efw, frequency: Y, measure: flow, allow_gaps: true, stale_days: 1400, label: "EFW summary rating, Latin America (median)"}
+  - {id: "efw:MEX:summary", source: efw, frequency: Y, measure: flow, allow_gaps: true, stale_days: 1400, label: "EFW summary rating, Mexico"}
+  - {id: "efw:COL:summary", source: efw, frequency: Y, measure: flow, allow_gaps: true, stale_days: 1400, label: "EFW summary rating, Colombia"}
+  - {id: "efw:PER:summary", source: efw, frequency: Y, measure: flow, allow_gaps: true, stale_days: 1400, label: "EFW summary rating, Peru"}
+  - {id: "efw:VEN:summary", source: efw, frequency: Y, measure: flow, allow_gaps: true, stale_days: 1400, label: "EFW summary rating, Venezuela"}
+  - {id: "efw:ECU:summary", source: efw, frequency: Y, measure: flow, allow_gaps: true, stale_days: 1400, label: "EFW summary rating, Ecuador"}
+  - {id: "efw:PAN:summary", source: efw, frequency: Y, measure: flow, allow_gaps: true, stale_days: 1400, label: "EFW summary rating, Panama"}
+  - {id: "efw:SLV:summary", source: efw, frequency: Y, measure: flow, allow_gaps: true, stale_days: 1400, label: "EFW summary rating, El Salvador"}
+  - {id: "efw:AUS:summary", source: efw, frequency: Y, measure: flow, allow_gaps: true, stale_days: 1400, label: "EFW summary rating, Australia"}
+  - {id: "efw:CAN:summary", source: efw, frequency: Y, measure: flow, allow_gaps: true, stale_days: 1400, label: "EFW summary rating, Canada"}
+  - {id: "efw:ESP:summary", source: efw, frequency: Y, measure: flow, allow_gaps: true, stale_days: 1400, label: "EFW summary rating, Spain"}
   # V-Dem indices (0-1) via Our World in Data.
   - {id: "vdem:libdem:ARG", source: vdem, frequency: Y, measure: flow, allow_gaps: true, label: "V-Dem Liberal democracy, Argentina"}
   - {id: "vdem:electdem:ARG", source: vdem, frequency: Y, measure: flow, allow_gaps: true, label: "V-Dem Electoral democracy, Argentina"}
