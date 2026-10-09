@@ -7,6 +7,7 @@
 # país, base monetaria, interanual).
 
 site:
+  site_name: Monitor de la Economía Argentina
   home_h1: La economía argentina, actualizada todos los días
   home_lede: >-
     Estadísticas oficiales, verificadas cada mañana contra la fuente y graficadas

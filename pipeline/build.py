@@ -93,7 +93,7 @@ def render(template: str, *, page: str, root: str, title: str, desc: str, h1: st
     if T.get("pending_note") and content and not content.startswith('<div class="loading">'):
         content = f'<p class="caveat">{esc(T["pending_note"])}</p>\n' + content
     vals = {
-        "__TITLE__": esc(title), "__DESC__": esc(desc), "__H1__": esc(h1), "__LEDE__": esc(lede),
+        "__TITLE__": esc(title), "__SITE_NAME__": esc(T.get("site_name") or "Argentina Economic Monitor"), "__DESC__": esc(desc), "__H1__": esc(h1), "__LEDE__": esc(lede),
         "__PAGE__": page, "__BUILD__": tag, "__URL__": esc(url), "__OGIMAGE__": esc(image),
         "__ANALYTICS__": ANALYTICS, "__LANG__": lang, "__DATA__": data if data is not None else f"{assets}data/",
         "__HREFLANG__": hreflang, "__LANGSWITCH__": switch_html,
@@ -164,6 +164,7 @@ def build(out: Path, tag: str, with_data: bool = True) -> None:
     def pages(lang: str):
         """(path under the language root, page id, title, h1, lede, desc, content, image) for every page."""
         T = {**EN, **((es.get("site") or {}) if lang == "es" else {})}
+        site_name = T.get("site_name") or reg.site.get("title", "Argentina Economic Monitor")
         tops = {t["id"]: {**t, **((es.get("topics") or {}).get(t["id"], {}) if lang == "es" else {})} for t in reg.topics}
         yield "", "home", site_name, T["home_h1"], T["home_lede"], T["home_desc"], None, img("home")
         for t in reg.topics:
