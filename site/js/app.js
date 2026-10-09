@@ -2546,6 +2546,97 @@
       yoy ? h("div", { class: "tile-sub" }, isRate ? `${fmtNum(yoy.value, yoySpec)} vs. a year earlier` : `${fmtNum(yoy.value, yoySpec)} y/y (original series, ${fmtPeriod(yoy.date, ind.frequency)})`) : null);
   }
 
+  // ---------- home: summary dashboard (data/dashboard.json, built by pipeline/dashboard.py) ----------
+  function dashboardView(D, pageHref) {
+    let mode = "mm";
+    try { mode = localStorage.getItem("aem-dash-mode") || "mm"; } catch (e) {}
+    const wrap = h("section", { class: "dash", "aria-label": "Summary of the latest data" });
+    const MON = (iso) => new Date(iso + "T00:00:00Z").toLocaleString("en-US", { month: "short", timeZone: "UTC" });
+    const YR = (iso) => iso.slice(2, 4);
+    const QN = (iso) => `Q${Math.floor((Number(iso.slice(5, 7)) - 1) / 3) + 1}`;
+    const nf = (v, d) => Number(v).toLocaleString("en-US", { minimumFractionDigits: d, maximumFractionDigits: d });
+    const signed = (v, d) => { const r = Number(v.toFixed(d)); return `${r > 0 ? "+" : r < 0 ? "−" : ""}${nf(Math.abs(r), d)}`; };
+    const isPctUnit = (u) => /^%/.test(u.trim());
+    function fmtChange(r, kind, v) {
+      if (kind === "pct") return `${signed(v, 1)}%`;
+      if (isPctUnit(r.unit)) return `${signed(v, 1)} pp`;
+      if (/bn/.test(r.unit)) return signed(v, 1);
+      return signed(v, Math.abs(v) < 10 ? 1 : 0);
+    }
+    function fmtLevel(r) {
+      if (/\(index\)/.test(r.unit)) return "";
+      const d = Math.abs(r.level) >= 1000 ? 0 : Math.abs(r.level) >= 100 ? 0 : 1;
+      return `${nf(r.level, d)}${r.unit}`;
+    }
+    // Cell color from the signed z-score: green better than usual, red worse, grey unusual with no direction.
+    function cellStyle(r, z) {
+      if (z === null || z === undefined || Math.abs(z) < 0.5) return "";
+      const a = (0.12 + 0.5 * Math.min(1, (Math.abs(z) - 0.5) / 2.5)).toFixed(2);
+      const v = r.good === "none" ? "--ink-3" : z > 0 ? "--pos" : "--neg";
+      return `background:${alpha(cssVar(v), a)}`;
+    }
+    function spark(r) {
+      const ys = r.spark; if (!ys || ys.length < 2) return h("span");
+      const W = 90, H = 24, lo = Math.min(...ys), hi = Math.max(...ys), sp = hi - lo || 1;
+      const pts = ys.map((y, i) => `${(i / (ys.length - 1) * W).toFixed(1)},${(H - 2 - (y - lo) / sp * (H - 4)).toFixed(1)}`).join(" ");
+      const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      svg.setAttribute("viewBox", `0 0 ${W} ${H}`); svg.setAttribute("width", W); svg.setAttribute("height", H); svg.setAttribute("aria-hidden", "true");
+      const pl = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
+      pl.setAttribute("points", pts); pl.setAttribute("fill", "none"); pl.setAttribute("stroke", "currentColor"); pl.setAttribute("stroke-width", "1.5");
+      svg.append(pl);
+      return svg;
+    }
+    const seg = segmented([["mm", "Month on month (s.a.)"], ["yy", "12-month change"]], mode, (k) => {
+      mode = k; seg.update(k); try { localStorage.setItem("aem-dash-mode", k); } catch (e) {} render();
+    }, "Change shown");
+    const tableWrap = h("div", { class: "dash-scroll" });
+    const foot = h("p", { class: "dash-foot" });
+
+    function render() {
+      const cols = D.columns;
+      const partial = D.rows.find((r) => r.partial);
+      const head = h("tr", {}, h("th", { class: "dash-name", scope: "col" }, "Indicator"),
+        cols.map((c, i) => h("th", { scope: "col" }, `${MON(c)} ${YR(c)}`, partial && i === cols.length - 1 ? "*" : "")),
+        h("th", { scope: "col", class: "dash-level" }, "Latest"), h("th", { scope: "col" }, "3 years"));
+      const body = [];
+      let group = null;
+      for (const r of D.rows) {
+        if (r.group !== group) { group = r.group; body.push(h("tr", { class: "dash-group" }, h("th", { colspan: cols.length + 3, scope: "colgroup" }, group))); }
+        const V = r[mode];
+        const label = h("a", { href: pageHref(r.topic, `ind-${r.ind}`) }, r.label);
+        const marks = [mode === "mm" && r.mm_nsa ? h("sup", { title: "Not seasonally adjusted" }, "†") : null,
+          r.real ? h("span", { class: "dash-tag" }, "real") : null,
+          r.status !== "ok" ? h("span", { class: "dash-tag warn", title: r.status === "stale" ? "No new data for longer than usual" : "Last update failed; showing the last good data" }, r.status) : null];
+        const cells = cols.map((c) => {
+          if (!V) return h("td", { class: "na", title: "No seasonally adjusted series: see the 12-month view" }, "n/a");
+          const x = V.values[c];
+          if (!x) return h("td", { class: "empty" }, "");
+          const [v, z] = x;
+          const tip = `${r.label}, ${r.freq === "Q" ? QN(c) + " " + c.slice(0, 4) : MON(c) + " " + c.slice(0, 4)}: ${fmtChange(r, V.kind, v)}` +
+            (z === null ? "" : ` · ${Math.abs(z) < 0.5 ? "a usual move" : `${z > 0 ? (r.good === "none" ? "high" : "better") : (r.good === "none" ? "low" : "worse")} than usual (${Math.abs(z).toFixed(1)} s.d.)`} for this series`);
+          return h("td", { style: cellStyle(r, z), title: tip }, fmtChange(r, V.kind, v), r.freq === "Q" ? h("span", { class: "dash-q" }, QN(c)) : null);
+        });
+        const lvlDate = r.freq === "Q" ? `${QN(r.level_date)} ${r.level_date.slice(0, 4)}` : `${MON(r.level_date)} ${r.level_date.slice(0, 4)}`;
+        body.push(h("tr", {}, h("th", { class: "dash-name", scope: "row" }, label, ...marks), cells,
+          h("td", { class: "dash-level" }, fmtLevel(r), h("span", { class: "dash-date" }, lvlDate)),
+          h("td", { class: "dash-spark" }, spark(r))));
+      }
+      tableWrap.replaceChildren(h("table", { class: "dash-table" }, h("thead", {}, head), h("tbody", {}, body)));
+      // On narrow screens open on the latest months (the indicator names stay pinned on the left).
+      requestAnimationFrame(() => { tableWrap.scrollLeft = tableWrap.scrollWidth; });
+      foot.replaceChildren(
+        mode === "mm" ? "Month on month on seasonally adjusted series (quarter on quarter for quarterly data, in the quarter's last month); † not seasonally adjusted, read with care. "
+          : "Change over twelve months (four quarters) on the original series. ",
+        "Changes in rates are in percentage points; reserves in US$ billions. Color: how unusual the change is against the same change over the previous ",
+        `${D.history_years} years — green better than usual, red worse, grey large with no better or worse direction (e.g. the exchange rate); no color, a usual move. `,
+        partial ? `*${MON(D.columns[D.columns.length - 1])}: daily series averaged to ${fmtDay(partial.partial)}. ` : "",
+        "Click a name for its chart.");
+    }
+    render();
+    appendAll(wrap, h("div", { class: "dash-head" }, h("h2", {}, "The latest data at a glance"), seg), tableWrap, foot);
+    return wrap;
+  }
+
   // ---------- page ----------
   async function main() {
     const topicsEl = $("#topics");
@@ -2597,11 +2688,17 @@
     const topicsEl2 = $("#topics");
     if (PAGE === "methodology" || PAGE === "about") return;   // static pages: nothing to load
     if (PAGE === "home") {
-      // Home: latest headline readings and one card per topic; no charts to draw.
-      const heads = await Promise.all(manifest.indicators.filter((m) => m.headline)
-        .map((m) => getJSON(`${DATA}${m.id}.json`).catch((e) => { console.error(e); return null; })));
-      $("#tiles").replaceChildren(...heads.filter(Boolean).map((ind) => tile(ind, pageHref(ind.topic, `ind-${ind.id}`))).filter(Boolean));
-      topicsEl2.replaceChildren(h("div", { class: "topic-grid" }, manifest.topics.map((t) => {
+      // Home: the summary dashboard, then one card per topic.
+      let dash = null;
+      try { dash = await getJSON(`${DATA}dashboard.json`); } catch (e) { console.error(e); }
+      if (dash && dash.rows.length) { $("#tiles").className = "dash-host"; $("#tiles").replaceChildren(dashboardView(dash, pageHref)); }
+      else {
+        const heads = await Promise.all(manifest.indicators.filter((m) => m.headline)
+          .map((m) => getJSON(`${DATA}${m.id}.json`).catch((e) => { console.error(e); return null; })));
+        $("#tiles").replaceChildren(...heads.filter(Boolean).map((ind) => tile(ind, pageHref(ind.topic, `ind-${ind.id}`))).filter(Boolean));
+      }
+      redraw = () => { if (dash && dash.rows.length) $("#tiles").replaceChildren(dashboardView(dash, pageHref)); };
+      topicsEl2.replaceChildren(h("h2", { class: "home-sub" }, "Dashboards"), h("div", { class: "topic-grid" }, manifest.topics.map((t) => {
         const list = manifest.indicators.filter((m) => m.topic === t.id);
         if (!list.length) return null;
         return h("a", { class: "topic-card", href: pageHref(t.id) },

@@ -1,0 +1,49 @@
+# Home-page summary: one row per indicator, read from the exported card data
+# (pipeline/dashboard.py). Fields:
+#   ind, variant      card and series shown (sum: [variants] adds several)
+#   label             row label
+#   mm                month-on-month (q/q for quarterly) view: pct | diff | null (not shown)
+#   mm_nsa            true: no seasonally adjusted series; the m/m view says so
+#   yy                12-month change: pct | diff; yy_variant: series used (e.g. the original, not s.a.)
+#   good              up | down | none: which direction is colored as an improvement
+#   real              deflate with the card's CPI
+#   agg               daily series by month: mean (default) | last
+#   scale, unit       level display: value * scale, followed by unit (abs: true shows the absolute value)
+groups:
+  - label: Activity
+    rows:
+      - {ind: emae, variant: sa, yy_variant: original, label: "Economic activity (EMAE)", mm: pct, yy: pct, good: up, unit: " (index)"}
+      - {ind: gdp, variant: sa, yy_variant: original, label: "GDP (quarterly)", mm: pct, yy: pct, good: up, unit: " (index)"}
+      - {ind: ipi, variant: sa, yy_variant: original, label: "Industrial production (IPI)", mm: pct, yy: pct, good: up, unit: " (index)"}
+      - {ind: isac, variant: sa, yy_variant: original, label: "Construction (ISAC)", mm: pct, yy: pct, good: up, unit: " (index)"}
+      - {ind: ucii, variant: total, label: "Capacity utilization", mm: null, yy: diff, good: up, unit: "%"}
+  - label: Prices
+    rows:
+      - {ind: cpi, variant: headline, label: "CPI, headline", mm: pct, mm_nsa: true, yy: pct, good: down, unit: " (index)"}
+      - {ind: cpi, variant: core, label: "CPI, core", mm: pct, mm_nsa: true, yy: pct, good: down, unit: " (index)"}
+      - {ind: ipim, variant: total, label: "Wholesale prices", mm: pct, mm_nsa: true, yy: pct, good: down, unit: " (index)"}
+      - {ind: inflation_expectations, variant: expected, label: "Expected inflation, next 12 months (REM)", mm: diff, yy: diff, good: down, unit: "%"}
+  - label: Money and rates
+    rows:
+      - {ind: base_money, variant: avg, real: true, label: "Base money, real", mm: pct, mm_nsa: true, yy: pct, good: none, scale: 0.000001, unit: " trillion pesos"}
+      - {ind: deposits_pesos, sum: [current, savings, time, time_cer], real: true, label: "Peso deposits, real", mm: pct, mm_nsa: true, yy: pct, good: up, scale: 0.000001, unit: " trillion pesos"}
+      - {ind: loans_pesos, sum: [overdrafts, documents, mortgages, pledge, personal, cards, other], real: true, label: "Peso loans, real", mm: pct, mm_nsa: true, yy: pct, good: up, scale: 0.000001, unit: " trillion pesos"}
+      - {ind: tamar, variant: tamar, label: "TAMAR rate", mm: diff, yy: diff, good: none, unit: "%"}
+  - label: Exchange rate and reserves
+    rows:
+      - {ind: fx_official, variant: wholesale, label: "Official exchange rate", mm: pct, yy: pct, good: none, unit: " pesos per US$"}
+      - {ind: fx_gaps, variant: ccl, label: "CCL gap", mm: diff, yy: diff, good: down, unit: "%"}
+      - {ind: fx_rer, variant: m, label: "Real exchange rate (multilateral)", mm: pct, yy: pct, good: none, unit: " (index)"}
+      - {ind: reserves, variant: gross, agg: last, label: "Gross reserves", mm: diff, yy: diff, good: up, scale: 0.001, unit: " US$ bn", diff_scale: 0.001}
+      - {ind: net_reserves, variant: standard, agg: last, label: "Net reserves", mm: diff, yy: diff, good: up, scale: 0.001, unit: " US$ bn", diff_scale: 0.001}
+  - label: External, fiscal and markets
+    rows:
+      - {ind: trade_balance, variant: exports, label: "Exports", mm: null, yy: pct, good: up, scale: 0.001, unit: " US$ bn"}
+      - {ind: trade_balance, variant: imports, abs: true, label: "Imports", mm: null, yy: pct, good: none, scale: 0.001, unit: " US$ bn"}
+      - {ind: fiscal_balance, variant: primary, label: "Primary balance, % of GDP (12 months)", mm: diff, yy: diff, good: up, unit: "% of GDP"}
+      - {ind: country_risk, variant: embi, label: "Country risk (EMBI)", mm: pct, yy: pct, good: down, unit: " bp"}
+  - label: Labor
+    rows:
+      - {ind: labor_wages_real, variant: total, real: true, label: "Real wages", mm: pct, mm_nsa: true, yy: pct, good: up, unit: " (index)"}
+      - {ind: labor_registered, variant: sipa, label: "Registered private jobs", mm: pct, yy: pct, good: up, scale: 0.000001, unit: " million"}
+      - {ind: labor_rates, variant: unemployment, label: "Unemployment rate", mm: null, yy: diff, good: down, unit: "%"}

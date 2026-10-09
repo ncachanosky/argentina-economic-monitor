@@ -726,3 +726,21 @@ def test_rem_periods_paths_and_revisions():
     assert p["survey"] == "2026-09-01" and p["vars"]["cpi"]["points"][0]["med"] == 1.9
     r = rem.revisions(df)
     assert [q[1] for q in r["vars"]["cpi"]["2026"]] == [28.0, 29.0]
+
+
+def test_dashboard_changes_and_zscores(tmp_path):
+    import json as _json
+    from pipeline import dashboard
+    dates = pd.date_range("2010-01-01", "2026-08-01", freq="MS")
+    vals = [100 * 1.01 ** i for i in range(len(dates))]
+    vals[-1] = vals[-2] * 0.95                                 # an unusual 5% drop
+    (tmp_path / "x.json").write_text(_json.dumps({"topic": "t", "frequency": "M", "status": "ok", "dates": [d.strftime("%Y-%m-%d") for d in dates],
+                                                  "variants": {"sa": {"values": vals}}}), encoding="utf-8")
+    spec = tmp_path / "d.yaml"
+    spec.write_text("groups:\n  - label: G\n    rows:\n      - {ind: x, variant: sa, label: X, mm: pct, yy: pct, good: up}\n", encoding="utf-8")
+    out = dashboard.build(tmp_path, spec)
+    assert out["columns"][-1] == "2026-08-01" and len(out["columns"]) == dashboard.COLUMNS
+    v, z = out["rows"][0]["mm"]["values"]["2026-08-01"]
+    assert v == pytest.approx(-5.0, abs=0.01) and z == -3          # worse than usual, capped
+    m, partial = dashboard._calendar(pd.Series([1.0, 3.0], index=pd.to_datetime(["2026-10-01", "2026-10-08"])), "D", "mean")
+    assert m.iloc[0] == 2.0 and partial == "2026-10-08"

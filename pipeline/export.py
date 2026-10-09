@@ -404,6 +404,8 @@ def export(out: Path) -> None:
     }
     (out / "manifest.json").write_text(json.dumps(manifest, indent=2), encoding="utf-8")
     print(f"exported {len(manifest_inds)} indicators to {out}")
+    from . import dashboard
+    dashboard.write(out)
 
 
 def main(argv: list[str] | None = None) -> int:
