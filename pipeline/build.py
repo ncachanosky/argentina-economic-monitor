@@ -187,7 +187,8 @@ def build(out: Path, tag: str, with_data: bool = True) -> None:
             other = ("" if lang == "es" else "es/") + path
             hreflang = (f'  <link rel="alternate" hreflang="en" href="{base}{path}">\n'
                         f'  <link rel="alternate" hreflang="es" href="{base}es/{path}">') if page != "embed" and spanish_live else ""
-            if lang == "es" and texts.get("pending_note") and page not in ("methodology", "about"):
+            translated = page in ("methodology", "about") and (SITE / f"{page}.es.html").exists()
+            if lang == "es" and texts.get("pending_note") and (page not in ("methodology", "about") or translated):
                 t_use = {**texts, "pending_note": ""}
             else:
                 t_use = texts
