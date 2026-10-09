@@ -356,3 +356,19 @@ table.data.sched tr.total td { font-weight: 700; border-top: 2px solid var(--ink
   .dash-table { font-size: 12.5px; }
   .dash-table .dash-name { min-width: 130px; max-width: 150px; }
 }
+
+/* Embeds: one card, no site chrome */
+body[data-page="embed"] { background: var(--surface); }
+body[data-page="embed"] .site-header, body[data-page="embed"] .site-footer, body[data-page="embed"] .intro,
+body[data-page="embed"] .section-nav, body[data-page="embed"] #tiles { display: none; }
+body[data-page="embed"] main.wrap { max-width: none; padding: 0; }
+body[data-page="embed"] .cards { display: block; margin: 0; }
+body[data-page="embed"] .card { border: 0; box-shadow: none; margin: 0; }
+.embed-credit { font-family: var(--font-ui); font-size: 12px; color: var(--ink-3); margin: 8px 0 0; }
+.embed-dialog { position: fixed; inset: 0; background: rgba(0, 0, 0, .45); display: flex; align-items: center; justify-content: center; z-index: 100; padding: 16px; }
+.embed-box { background: var(--surface); color: var(--ink); border-radius: var(--radius); padding: 18px 20px; max-width: 620px; width: 100%; box-shadow: 0 10px 40px rgba(0, 0, 0, .3); font-family: var(--font-ui); }
+.embed-box h4 { margin: 0 0 6px; font-size: 17px; }
+.embed-box p { font-size: 14px; color: var(--ink-2); margin: 0 0 10px; }
+.embed-code { width: 100%; font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 12px; background: var(--surface-2); color: var(--ink); border: 1px solid var(--rule); border-radius: 6px; padding: 8px; resize: vertical; }
+.embed-actions { display: flex; gap: 8px; align-items: center; margin-top: 10px; flex-wrap: wrap; }
+.embed-actions .embed-status { color: var(--pos); font-size: 13px; margin-right: auto; }

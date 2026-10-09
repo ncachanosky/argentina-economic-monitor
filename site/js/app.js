@@ -2676,7 +2676,7 @@
     buildNav($("#nav"), manifest, pageHref);
 
     // Charts are redrawn on a theme change (set once the page has charts).
-    let redraw = () => {};
+    let redraw = () => redrawAll();
     $("#theme-toggle").addEventListener("click", () => {
       const next = isDark() ? "light" : "dark";
       document.documentElement.dataset.theme = next;
@@ -2708,14 +2708,44 @@
       return;
     }
 
+    if (PAGE === "embed") {
+      // One card, for an iframe on another site: /embed/?id=<card>[&theme=light|dark]
+      const q = new URLSearchParams(location.search), id = q.get("id");
+      if (q.get("theme") === "light" || q.get("theme") === "dark") document.documentElement.dataset.theme = q.get("theme");
+      const meta = manifest.indicators.find((m) => m.id === id);
+      if (!meta) { topicsEl2.replaceChildren(h("div", { class: "error-box" }, "Chart not found.")); return; }
+      let ind;
+      try { ind = await getJSON(`${DATA}${id}.json`); } catch (e) { topicsEl2.replaceChildren(h("div", { class: "error-box" }, "Data could not be loaded.")); return; }
+      const card = makeCard(ind);
+      const full = new URL(pageHref(meta.topic, `ind-${id}`), location.href).href;
+      card.append(h("p", { class: "embed-credit" }, h("a", { href: full, target: "_blank", rel: "noopener" }, "Argentina Economic Monitor"), " · Economic Order · ",
+        h("a", { href: full, target: "_blank", rel: "noopener" }, "Full chart and data ↗")));
+      topicsEl2.replaceChildren(h("div", { class: "cards" }, card));
+      startDrawing();
+      // Tell a parent page our height, for auto-resizing iframes.
+      const post = () => { try { parent.postMessage({ aem: "height", id, height: document.documentElement.scrollHeight }, "*"); } catch (e) {} };
+      new ResizeObserver(post).observe(document.body); post();
+      return;
+    }
+
     const topic = manifest.topics.find((t) => t.id === PAGE);
     const list = manifest.indicators.filter((m) => m.topic === PAGE);
     if (!topic || !list.length) { topicsEl2.replaceChildren(h("div", { class: "error-box" }, "Nothing to show on this page yet.")); return; }
     const inds = (await Promise.all(list.map((m) => getJSON(`${DATA}${m.id}.json`).catch((e) => { console.error(e); return null; })))).filter(Boolean);
 
     // Registry order; panels and cards flagged `wide` span the full row.
-    const cards = h("div", { class: "cards" }, inds.map((ind) =>
-      ind.kind === "panel" ? panelCard(ind)
+    const cards = h("div", { class: "cards" }, inds.map(makeCard));
+    topicsEl2.replaceChildren(h("section", { class: "topic", id: `topic-${topic.id}` }, cards));
+    addEmbedButtons(cards, topic);
+    $("#tiles").replaceChildren(...inds.filter((i) => i.headline).map((i) => tile(i)).filter(Boolean));
+    const sn = $("#section-nav");
+    sn.replaceChildren(...inds.map((i) => h("a", { href: `#ind-${i.id}` }, i.short_title)));
+    sn.hidden = false;
+    startDrawing();
+  }
+
+  function makeCard(ind) {
+    return ind.kind === "panel" ? panelCard(ind)
         : ind.kind === "contributions" ? contributionsCard(ind)
         : ind.kind === "balance_sheet" ? balanceCard(ind)
         : ind.kind === "top10" ? top10Card(ind)
@@ -2726,13 +2756,47 @@
         : ind.kind === "rem_revisions" ? remRevisionsCard(ind)
         : ind.kind === "statement" ? statementCard(ind)
         : ind.kind === "rer_calc" ? rerCalcCard(ind)
-        : variantsCard(ind, !!ind.wide)));
-    topicsEl2.replaceChildren(h("section", { class: "topic", id: `topic-${topic.id}` }, cards));
-    $("#tiles").replaceChildren(...inds.filter((i) => i.headline).map((i) => tile(i)).filter(Boolean));
-    const sn = $("#section-nav");
-    sn.replaceChildren(...inds.map((i) => h("a", { href: `#ind-${i.id}` }, i.short_title)));
-    sn.hidden = false;
+        : variantsCard(ind, !!ind.wide);
+  }
 
+  // Each card gets an "Embed" button: an iframe of /embed/?id=<card> to paste into another site.
+  function addEmbedButtons(container, topic) {
+    container.querySelectorAll(".card").forEach((card) => {
+      const id = card.id.replace(/^ind-/, ""), actions = card.querySelector(".card-foot .actions");
+      if (!actions || !id) return;
+      actions.append(h("button", { class: "btn", type: "button", title: "Embed this chart in another page", onclick: () => embedDialog(card, id) }, "Embed"));
+    });
+  }
+  function embedDialog(card, id) {
+    const base = new URL(`${ROOT}embed/`, location.href).href;
+    const src = `${base}?id=${encodeURIComponent(id)}`;
+    const height = Math.max(420, Math.min(1400, Math.round(card.offsetHeight + 40)));
+    const code = `<iframe src="${src}" width="100%" height="${height}" style="border:0;max-width:100%" loading="lazy" title="${card.querySelector("h3").textContent.replace(/"/g, "&quot;")} (Argentina Economic Monitor)"></iframe>`;
+    const ta = h("textarea", { class: "embed-code", readonly: true, rows: 4, "aria-label": "Embed code" });
+    ta.value = code;
+    const status = h("span", { class: "embed-status", role: "status" });
+    const close = () => dlg.remove();
+    const dlg = h("div", { class: "embed-dialog", role: "dialog", "aria-modal": "true", "aria-label": "Embed this chart" },
+      h("div", { class: "embed-box" },
+        h("h4", {}, "Embed this chart"),
+        h("p", {}, "Paste this code into your page. The chart stays interactive and updates with the data; it links back to the Monitor."),
+        ta,
+        h("div", { class: "embed-actions" },
+          h("button", { class: "btn btn-primary", type: "button", onclick: async () => {
+            try { await navigator.clipboard.writeText(code); status.textContent = "Copied."; } catch (e) { ta.select(); status.textContent = "Press Ctrl+C to copy."; } } }, "Copy code"),
+          h("a", { class: "btn", href: src, target: "_blank", rel: "noopener" }, "Preview"),
+          status,
+          h("button", { class: "btn", type: "button", onclick: close }, "Close"))));
+    dlg.addEventListener("click", (e) => { if (e.target === dlg) close(); });
+    document.addEventListener("keydown", function esc(e) { if (e.key === "Escape") { close(); document.removeEventListener("keydown", esc); } });
+    document.body.append(dlg);
+    ta.focus(); ta.select();
+  }
+
+  // Draw each chart when it comes near the viewport, so long pages open fast.
+  let redrawAll = () => {};
+  function startDrawing() {
+    const topicsEl2 = $("#topics");
     if (!window.Plotly) { topicsEl2.prepend(h("div", { class: "error-box" }, "The charting library could not be loaded.")); return; }
     // Draw each chart when it comes near the viewport, so long pages open fast.
     const drawn = new Set();
@@ -2746,7 +2810,7 @@
     } else all.forEach(drawCard);
     // The cards were built after load, so jump to a linked card now.
     if (location.hash) { const el = document.getElementById(location.hash.slice(1)); if (el) { drawCard(el); el.scrollIntoView(); } }
-    redraw = () => drawn.forEach((c) => c.draw());
+    redrawAll = () => drawn.forEach((c) => c.draw());
   }
 
   document.addEventListener("DOMContentLoaded", main);

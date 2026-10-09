@@ -82,9 +82,15 @@ def build(out: Path, tag: str, with_data: bool = True) -> None:
         desc="About the Argentina Economic Monitor, a project of Economic Order.", tag=tag,
         content=(SITE / "about.html").read_text(encoding="utf-8")), encoding="utf-8")
     (out / "about.html").unlink(missing_ok=True)
+    # Embeds: a bare page that renders one card (?id=<card>), for iframes on other sites.
+    d = out / "embed"
+    d.mkdir(parents=True, exist_ok=True)
+    (d / "index.html").write_text(render(
+        template, page="embed", root="../", title=f"Chart · {site_name}", h1="", lede="",
+        desc="A chart from the Argentina Economic Monitor.", tag=tag), encoding="utf-8")
     if with_data:
         export.export(out / "data")
-    print(f"built {3 + len(reg.topics)} pages in {out}")
+    print(f"built {3 + len(reg.topics)} pages (and the embed page) in {out}")
 
 
 def main(argv: list[str] | None = None) -> int:
