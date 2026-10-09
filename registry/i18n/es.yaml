@@ -397,7 +397,85 @@ ui:
   CCL rate that restores the reference: Tipo de cambio CCL que restablece la referencia
   IMF Country Report, May 2026: Informe del FMI sobre la Argentina, mayo de 2026
 
+  # Panels, contributions, tables (fixed texts)
+  average since 1997: promedio desde 1997
+  average since 2003: promedio desde 2003
+  average since 2016: promedio desde 2016
+  median since 2003: mediana desde 2003
+  this year, if flat: este año, si se mantiene
+  no quarterly data for these dates: no hay datos trimestrales para estas fechas
+  Components to compare: Componentes para comparar
+  "Compare with: year": "Comparar con: año"
+  "Compare with: weekly balance": "Comparar con: balance semanal"
+  Show only the selected balance: Mostrar solo el balance seleccionado
+  Debt maturities by type of debt: Vencimientos de deuda por tipo
+  By year: Por año
+  CSV (year): CSV (año)
+  How ratios to GDP are calculated: Cómo se calculan los cocientes sobre el PIB
+  Show each component's contribution to the total's change: Mostrar la contribución de cada componente a la variación del total
+  Weights (share of 2004 GDP at constant prices): Ponderaciones (participación en el PIB de 2004 a precios constantes)
+  Weights (CPI basket weight, recovered from the published indices): Ponderaciones (peso en la canasta del IPC, recuperado de los índices publicados)
+  "This is relative purchasing-power parity: it assumes the reference was an equilibrium and that nothing fundamental has changed since. Both are strong assumptions.": "Es la paridad relativa del poder adquisitivo: supone que la referencia fue un equilibrio y que desde entonces no cambió nada fundamental. Ambos supuestos son fuertes."
+  "The terms of trade are about 45% above their 2004 level and energy has turned from a deficit into a surplus, changes that support a stronger peso than history suggests; productivity growth relative to partners (the Balassa–Samuelson effect) works the same way. Single dates can be overshoots: the index spiked after the 2002 and December 2023 devaluations, and was at its strongest at the end of convertibility in 2001. The range across reference choices is the honest answer, not any one number.": "Los términos del intercambio están cerca de un 45% por encima de su nivel de 2004 y la energía pasó de déficit a superávit, cambios que sostienen un peso más fuerte de lo que sugiere la historia; el crecimiento de la productividad frente a los socios (el efecto Balassa–Samuelson) opera en el mismo sentido. Una fecha aislada puede ser un desborde: el índice saltó tras las devaluaciones de 2002 y de diciembre de 2023, y estuvo en su punto más fuerte al final de la convertibilidad, en 2001. La respuesta honesta es el rango entre distintas referencias, no un único número."
+  "Model-based assessments (the IMF's External Balance Assessment) estimate the real exchange rate consistent with fundamentals and desirable policies. The IMF's May 2026 staff report judges Argentina's external position \"weaker than the level implied by medium-term fundamentals and desirable policies\", a preliminary assessment subject to exceptionally high uncertainty.": "Las evaluaciones basadas en modelos (la External Balance Assessment del FMI) estiman el tipo de cambio real coherente con los fundamentos y con políticas deseables. El informe del personal técnico del FMI de mayo de 2026 juzga que la posición externa de la Argentina es \"más débil que el nivel implicado por los fundamentos de mediano plazo y políticas deseables\", una evaluación preliminar sujeta a una incertidumbre excepcionalmente alta."
+
+  "<b>Argentina Economic Monitor</b> · Economic Order": "<b>Monitor de la Economía Argentina</b> · Economic Order"
+
 patterns:
+  - ["Source: (.+)\\. Latest observation: (.+)\\.(.*)", "Fuente: $1. Último dato: $2.$3"]
+  - ["Latest Year-over-year change, % by (.+)", "Última variación interanual, %, por $1"]
+  - ["Latest Month-over-month change, % by (.+)", "Última variación mensual, %, por $1"]
+  - ["Latest level by (.+)", "Último nivel por $1"]
+  - ["(.+) and US\\$ (.+) million \\(dollar and dollar-linked\\)(.*)", "$1 y US$ $2 millones (en dólares y dollar linked)$3"]
+  - ["(.*)\\. Amounts in millions of the instrument's currency; hover an instrument for its terms\\.", "$1. Montos en millones de la moneda de cada instrumento; al pasar el cursor se ven sus condiciones."]
+  - ["Compare up to (\\d+) (.+)\\. Click a bar or a name to add or remove it\\.", "Se pueden comparar hasta $1 $2. Un clic en una barra o en un nombre agrega o quita la serie."]
+  - ["Latest (.+) by (.+)", "Último dato ($1) por $2"]
+  - ["Selected (.+) over time", "$1 seleccionados a lo largo del tiempo"]
+  - ["(.+) to compare", "$1 para comparar"]
+  - ["Contributions to (.+) growth", "Contribuciones al crecimiento de $1"]
+  - ["Year-over-year change, (.+)\\.", "Variación interanual, $1."]
+  - ["Month-over-month change, (.+)\\.", "Variación mensual, $1."]
+  - ["Quarter-over-quarter change, (.+)\\.", "Variación trimestral, $1."]
+  - ["Level, (.+)\\.", "Nivel, $1."]
+  - ["Within year, (.+) \\((.+)\\)", "En el año, $1 ($2)"]
+  - ["Within year: the year's last month vs\\. the previous December \\((.+)\\)\\.", "En el año: el último mes del año frente al diciembre anterior ($1)."]
+  - ["Within year: the year's last quarter vs\\. the previous Q4 \\((.+)\\)\\.", "En el año: el último trimestre del año frente al cuarto trimestre anterior ($1)."]
+  - ["Accumulated y/y: the months published so far in the year over the same months a year earlier \\((.+)\\), as INDEC reports it\\.", "Acumulado i.a.: los meses publicados en el año frente a los mismos meses del año anterior ($1), como lo informa el INDEC."]
+  - ["Annual growth: the quarters published so far in the year over the same quarters a year earlier \\((.+)\\), as INDEC reports it\\.", "Crecimiento anual: los trimestres publicados en el año frente a los mismos trimestres del año anterior ($1), como lo informa el INDEC."]
+  - ["Carryover \\(statistical carry-over\\): next year's growth if the level stayed at the year's last month; for the current year, this year's growth if the remaining months stayed at the latest level\\.", "Arrastre estadístico: el crecimiento del año siguiente si el nivel se mantuviera en el del último mes del año; para el año en curso, el crecimiento del año si los meses restantes se mantuvieran en el último nivel."]
+  - ["Carryover \\(statistical carry-over\\): next year's growth if the level stayed at the year's last quarter; for the current year, this year's growth if the remaining quarters stayed at the latest level\\.", "Arrastre estadístico: el crecimiento del año siguiente si el nivel se mantuviera en el del último trimestre del año; para el año en curso, el crecimiento del año si los trimestres restantes se mantuvieran en el último nivel."]
+  - ["to (\\w+)", "a $1"]
+  - ["Axis broken at (.+); the marked bar extends beyond it; its label shows the full value\\.", "Eje cortado en $1; la barra marcada lo supera y su etiqueta muestra el valor completo."]
+  - ["Cumulative change, (.+) \\(to (.+)\\):", "Variación acumulada, $1 (a $2):"]
+  - ["Cumulative change, (.+):", "Variación acumulada, $1:"]
+  - ["2004/05 weights recovered from the published indices \\(they reproduce the official index within (.+)% since (.+)\\)\\.", "Ponderaciones 2004/05 recuperadas de los índices publicados (reproducen el índice oficial con un error máximo de $1% desde $2)."]
+  - ["End-of-quarter positions; latest: (.+)\\.", "Posiciones a fin de trimestre; último dato: $1."]
+  - ["(\\d+) quarters to (.+)", "$1 trimestres a $2"]
+  - ["How each estimate is built \\((.+)\\)", "Cómo se construye cada estimación ($1)"]
+  - ["less: (.+)", "menos: $1"]
+  - ["BCRA weekly balance of (.+), at that balance's exchange rates\\.", "Balance semanal del BCRA del $1, a los tipos de cambio de ese balance."]
+  - ["China swap: CNY (.+) bn at (.+) yuan per dollar\\.", "Swap con China: CNY $1 mil millones a $2 yuanes por dólar."]
+  - ["Treasury deposits: monthly balance sheet, end of (.+)\\.", "Depósitos del Tesoro: balance mensual, fin de $1."]
+  - ["IMF-style deducts only repos with an original maturity of one year or less; the BCRA's current repos run longer\\.", "El criterio del FMI descuenta solo los pases con plazo original de un año o menos; los pases vigentes del BCRA son más largos."]
+  - ["Billions of pesos of each date\\. Exchange rate (.+): (.+) pesos per dollar\\.", "Miles de millones de pesos de cada fecha. Tipo de cambio del $1: $2 pesos por dólar."]
+  - ["Billions of pesos of each month\\.", "Miles de millones de pesos de cada mes."]
+  - ["† On (.+):", "† Al $1:"]
+  - ["Real: deflated by the (.+), in pesos of (.+)", "Real: deflactado por el $1, en pesos de $2"]
+  - ["Real terms: deflated by the (.+), in pesos of (.+); months after that have no CPI yet\\.", "Términos reales: deflactado por el $1, en pesos de $2; los meses posteriores todavía no tienen IPC."]
+  - ["(.+) vs\\. a year earlier", "$1 frente a un año antes"]
+  - ["(.+) y/y \\(original series, (.+)\\)", "$1 i.a. (serie original, $2)"]
+  - ["GDP: INDEC through (.+); from (.+) to (.+), estimated by extending it with the CPI until INDEC publishes the quarter\\.", "PIB: INDEC hasta $1; de $2 a $3, estimado extendiéndolo con el IPC hasta que el INDEC publique el trimestre."]
+  - ["GDP: INDEC through (.+)\\.", "PIB: INDEC hasta $1."]
+  - ["As of (.+), millions of US dollars at that date's exchange rates\\. Next 12 months: (.+) in all, of which (.+) in foreign-currency bonds, the IMF and other multilaterals\\.(.*)", "Al $1, millones de dólares a los tipos de cambio de esa fecha. Próximos 12 meses: $2 en total, de los cuales $3 en bonos en moneda extranjera, el FMI y otros multilaterales.$4"]
+  - [" ?Faded bars: months already past; the diamond is what was actually paid\\.", " Barras atenuadas: meses ya transcurridos; el rombo es lo efectivamente pagado."]
+  - ["· Report as of: (.+)", "· Informe al: $1"]
+  - ["(.+): (\\d+) placements?; cash raised (.+) million pesos(.*)", "$1: $2 colocaciones; efectivo obtenido $3 millones de pesos$4"]
+  - ["Percent of each institution's total assets\\. (\\d+) institutions in the system\\. Shading: higher values within each column are darker\\.", "Porcentaje del activo total de cada entidad. $1 entidades en el sistema. Sombreado: los valores más altos de cada columna son más oscuros."]
+  - ["Referencia \\((.+)\\): (.+)", "Referencia ($1): $2"]
+  - ["Precios de ajuste del (.+); official wholesale rate (.+?)\\. (.*)", "Precios de ajuste del $1; tipo de cambio oficial mayorista $2. $3"]
+  - ["(.*)The longest contract \\((.+?)\\) prices a (.+?) rise in the official rate \\((.+?) a year\\)\\.(.*)", "$1El contrato más largo ($2) descuenta una suba de $3 del tipo de cambio oficial ($4 anual).$5"]
+  - ["(.+) Squares: the monthly average expected in the BCRA's REM survey of (.+) \\(median; bars: middle half of forecasters\\); futures settle on the month's last business day, so they run slightly above a monthly average when the rate is rising\\.(.*)", "$1 Cuadrados: el promedio mensual esperado en el REM del BCRA de $2 (mediana; barras: la mitad central de los pronosticadores); los futuros vencen el último día hábil del mes, por lo que quedan algo por encima de un promedio mensual cuando el tipo de cambio sube.$3"]
+  - ["(.+) The grey dashed line extends the band's ceiling at the pace of its last three months \\((.+)% a month\\): an illustration, not an announced path\\.", "$1 La línea gris punteada extiende el techo de la banda al ritmo de sus últimos tres meses ($2% mensual): una ilustración, no una trayectoria anunciada."]
   - ["Real exchange rate, (.+)", "Tipo de cambio real, $1"]
   - ["Reference \\((.+)\\): (.+)", "Referencia ($1): $2"]
   - ["Index between (.+) \\(25th percentile\\) and (.+) \\(75th\\)", "Índice entre $1 (percentil 25) y $2 (percentil 75)"]
@@ -415,7 +493,6 @@ patterns:
   - ["(.+) data was due (.+); updating", "Los datos de $1 debían publicarse el $2; actualizando"]
   - ["As published \\((.+)\\)", "Tal como se publica ($1)"]
   - ["(.+) \\((.+) = 100\\)", "$1 ($2 = 100)"]
-  - ["Source: (.+)", "Fuente: $1"]
   - ["Index, (.+) = 100", "Índice, $1 = 100"]
   - ["Last data check: (.+)", "Última verificación de datos: $1"]
   - ["(.+) is partial: data through (.+)\\.", "$1 es parcial: datos hasta $2."]
@@ -434,7 +511,7 @@ patterns:
   - ["Next release: (.+)", "Próxima publicación: $1"]
   - ["Latest: (.+)", "Último dato: $1"]
   - ["Source: (.+) · Latest: (.+)", "Fuente: $1 · Último dato: $2"]
-  - ["(\\d+) pesos per US\\$", "$1 pesos por US$"]
+  - ["(.+) pesos per US\\$", "$1 pesos por US$"]
   - ["(.+) trillion pesos", "$1 billones de pesos"]
   - ["(.+) US\\$ bn", "$1 miles de millones de US$"]
   - ["(.+)% of GDP", "$1% del PIB"]
@@ -454,6 +531,29 @@ patterns:
   - ["REM survey, (.+) \\(monthly average, median\\)", "Encuesta REM, $1 (promedio mensual, mediana)"]
   - ["(.+) \\(colored by presidency\\)", "$1 (coloreado por presidencia)"]
   - ["(.+)'s world rank \\(bars, right axis\\)", "Ranking mundial (barras, eje derecho)"]
+
+  - ["Source: (.+)", "Fuente: $1"]
+  - ["Flows over the period, against the same period a year earlier\\. Latest quarter: (.+)\\.", "Flujos del período, frente al mismo período del año anterior. Último trimestre: $1."]
+
+nouns:
+  series: series
+  industries: sectores
+  categories: categorías
+  divisions: divisiones
+  regions: regiones
+  aggregates: agregados
+  deposits: depósitos
+  loans: préstamos
+  rates: tasas
+  components: componentes
+  sectors: sectores
+  items: rubros
+  taxes: impuestos
+  groups: grupos
+  banks: bancos
+  partners: socios
+  destinations: destinos
+  origins: orígenes
 
 hover:
   - [" expected (middle half ", " esperado (mitad central "]

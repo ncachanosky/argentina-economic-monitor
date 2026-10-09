@@ -136,6 +136,10 @@ BCRA, the Ministry of Economy and other official agencies, under their terms.
 Market quotes (informal and bond-market dollars, dollar futures) come from
 market-data services and are marked as unofficial on the site.
 
+## Spanish site
+
+Pages under `/es/` are built from the same template and data. Translations: `registry/i18n/es.yaml` (page texts, interface strings, patterns for texts with numbers or dates) and `registry/i18n/es/*.json` (chart titles, descriptions, notes and labels, English text -> Spanish). A new or edited English text shows in English on the Spanish site until its translation is added. `site.spanish: true` in the registry links the Spanish site from the header and opens it to search engines.
+
 ## Licence
 
 Code: MIT (`LICENSE`). Charts, derived series and text: CC BY 4.0 (`LICENSE-CONTENT.md`). Third-party source data keep their owners' terms.

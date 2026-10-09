@@ -23,7 +23,7 @@
     if (!I18N || typeof s !== "string") return s;
     const k = s.trim();
     if (!k) return s;
-    const hit = I18N.ui[k];
+    const hit = I18N.ui[k] !== undefined ? I18N.ui[k] : I18N.content[k];
     if (hit !== undefined) return s.replace(k, hit);
     for (const [re, out] of I18N._patterns) if (re.test(k)) return s.replace(k, k.replace(re, out));
     return s;
@@ -451,7 +451,7 @@
       h("div", { class: "actions" },
         h("button", { class: "btn", type: "button", onclick: onPNG, title: "Download this chart as a 1200×800 PNG" }, "PNG"),
         h("button", { class: "btn", type: "button", onclick: onCSV, title: "Download the data in this view as CSV" }, "CSV"),
-        h("a", { class: "btn", href: `${DATA}${ind.id}.csv`, download: `${ind.id}_all.csv`, title: "All variants, levels, as published" }, "All data")));
+        h("a", { class: "btn", href: `${DATA}${ind.id}${LANG === "es" ? ".es" : ""}.csv`, download: `${ind.id}_all.csv`, title: "All variants, levels, as published" }, "All data")));
   }
 
   function tableView(dates, cols, pct, freq) {
@@ -486,7 +486,7 @@
     const acc = ind.variants[at.accumulated], wy = ind.variants[at.within_year];
     const pos = new Map(ind.dates.map((d, i) => [d, i]));
     const val = (v, y, m) => { const i = pos.get(`${y}-${String(m).padStart(2, "0")}-01`); return i === undefined ? null : v.values[i]; };
-    const pName = (m) => (Q ? `Q${(m - 1) / 3 + 1}` : new Date(Date.UTC(2000, m - 1, 1)).toLocaleDateString(LOCALE, { month: "short", timeZone: "UTC" }));
+    const pName = (m) => (Q ? `${LANG === "es" ? "T" : "Q"}${(m - 1) / 3 + 1}` : new Date(Date.UTC(2000, m - 1, 1)).toLocaleDateString(LOCALE, { month: "short", timeZone: "UTC" }));
     const sumYear = (v, y, upto) => { let s = 0; for (const m of per) { if (m > upto) break; const x = val(v, y, m); if (x === null) return null; s += x; } return s; };
     const years = [...new Set(ind.dates.map((d) => +d.slice(0, 4)))].sort((a, b) => b - a);
     const f = (v) => (v === null ? "–" : fmtNum(v, INDEX_TRANSFORMS.yoy));
@@ -1706,7 +1706,7 @@
       outEl.replaceChildren(
         h("div", { class: "rer-grid" },
           h("div", { class: "rer-tile" }, h("div", { class: "rer-k" }, `Real exchange rate, ${fmtDay(D[i])}`), h("div", { class: "rer-v" }, fmtR(now, 1)),
-            h("div", { class: "rer-s" }, `Reference (${ref.label}): ${fmtR(ref.v, 1)}`)),
+            h("div", { class: "rer-s" }, `${tr("Reference")} (${tr(ref.label)}): ${fmtR(ref.v, 1)}`)),
           h("div", { class: "rer-tile" }, h("div", { class: "rer-k" }, "Index against the reference"), h("div", { class: "rer-v" }, ref.v ? pct(100 * (now / ref.v - 1)) : "–"),
             h("div", { class: "rer-s" }, ref.v ? (now < ref.v ? "below it: the peso is stronger in real terms" : "above it: the peso is weaker in real terms") : "")),
           h("div", { class: "rer-tile" }, h("div", { class: "rer-k" }, `${k === "m" ? "Official" : "CCL"} rate that restores the reference`), h("div", { class: "rer-v" }, fmtR(implied)),
@@ -2694,6 +2694,30 @@
     window.goatcounter.count({ path: `${b.textContent.trim().toLowerCase().replace(/\s+/g, "-")}${card ? "/" + card.id.replace(/^ind-/, "") : ""}`, title: b.textContent.trim(), event: true });
   });
 
+  // Chart texts: replace every string in a card's data that has a translation
+  // (titles, descriptions, notes, series and group labels, units, sources).
+  function localize(obj) {
+    if (!I18N || !I18N.content) return obj;
+    const C = { ...I18N.ui, ...I18N.content };
+    // Fields that hold keys, codes or data, never text.
+    const SKIP = new Set(["id", "source_id", "values", "dates", "key", "kind", "topic", "measure", "frequency", "variant", "transform", "range",
+      "default", "headline", "emphasis", "muted", "overlay_default", "composition", "anchor", "slug", "sign", "color", "style", "file", "path",
+      "source", "status", "party", "status_id", "role", "ranges", "transforms", "bar_transforms", "bar_transform", "of", "rem", "freq", "good", "ind", "unit"]);
+    const walk = (x) => {
+      if (typeof x === "string") { const k = x.trim(); return C[k] !== undefined ? C[k] : C[k.split(/\s+/).join(" ")] !== undefined ? C[k.split(/\s+/).join(" ")] : x; }
+      if (Array.isArray(x)) return x.length > 400 ? x : x.map(walk);   // long arrays are data, not text
+      if (x && typeof x === "object") {
+        for (const key of Object.keys(x)) {
+          if (SKIP.has(key)) continue;
+          x[key] = key === "component_noun" && typeof x[key] === "string" ? ((I18N.nouns || {})[x[key]] || x[key]) : walk(x[key]);
+        }
+        return x;
+      }
+      return x;
+    };
+    return walk(obj);
+  }
+
   // ---------- Spanish pages: translate the interface as it renders ----------
   // Text nodes and labels are translated when they enter the page (exact strings, then
   // patterns); charts are translated as they are drawn (trace names, hover text,
@@ -2771,6 +2795,7 @@
         I18N._patterns = (I18N.patterns || []).map(([re, out]) => [new RegExp(`^${re}$`), out]);
         // Page and group names in the menu and on the home page.
         for (const t of manifest.topics) Object.assign(t, (I18N.topics || {})[t.id] || {});
+        localize(manifest.indicators);
         installTranslation();
       } catch (e) { console.error("translations not loaded", e); }
     }
@@ -2815,9 +2840,9 @@
     if (PAGE === "home") {
       // Home: the summary dashboard, then one card per topic.
       let dash = null;
-      try { dash = await getJSON(`${DATA}dashboard.json`); } catch (e) { console.error(e); }
+      try { dash = localize(await getJSON(`${DATA}dashboard.json`)); } catch (e) { console.error(e); }
       let upd = null;
-      try { upd = await getJSON(`${DATA}updates.json`); } catch (e) { console.error(e); }
+      try { upd = localize(await getJSON(`${DATA}updates.json`)); } catch (e) { console.error(e); }
       if (dash && dash.rows.length) { $("#tiles").className = "dash-host"; $("#tiles").replaceChildren(dashboardView(dash, pageHref)); }
       if (upd) $("#tiles").after(timelineView(upd, pageHref));
       else {
@@ -2843,7 +2868,7 @@
       const meta = manifest.indicators.find((m) => m.id === id);
       if (!meta) { topicsEl2.replaceChildren(h("div", { class: "error-box" }, "Chart not found.")); return; }
       let ind;
-      try { ind = await getJSON(`${DATA}${id}.json`); } catch (e) { topicsEl2.replaceChildren(h("div", { class: "error-box" }, "Data could not be loaded.")); return; }
+      try { ind = localize(await getJSON(`${DATA}${id}.json`)); } catch (e) { topicsEl2.replaceChildren(h("div", { class: "error-box" }, "Data could not be loaded.")); return; }
       const card = makeCard(ind);
       const full = new URL(pageHref(meta.topic, `ind-${id}`), location.href).href;
       card.append(h("p", { class: "embed-credit" }, h("a", { href: full, target: "_blank", rel: "noopener" }, "Argentina Economic Monitor"), " · Economic Order · ",
@@ -2859,7 +2884,7 @@
     const topic = manifest.topics.find((t) => t.id === PAGE);
     const list = manifest.indicators.filter((m) => m.topic === PAGE);
     if (!topic || !list.length) { topicsEl2.replaceChildren(h("div", { class: "error-box" }, "Nothing to show on this page yet.")); return; }
-    const inds = (await Promise.all(list.map((m) => getJSON(`${DATA}${m.id}.json`).catch((e) => { console.error(e); return null; })))).filter(Boolean);
+    const inds = (await Promise.all(list.map((m) => getJSON(`${DATA}${m.id}.json`).then(localize).catch((e) => { console.error(e); return null; })))).filter(Boolean);
 
     // Registry order; panels and cards flagged `wide` span the full row.
     const cards = h("div", { class: "cards" }, inds.map(makeCard));

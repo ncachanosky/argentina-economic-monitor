@@ -111,13 +111,40 @@ def render(template: str, *, page: str, root: str, title: str, desc: str, h1: st
     return out
 
 
+def load_content(lang: str) -> dict:
+    """Chart texts (titles, descriptions, notes, labels): registry/i18n/<lang>/*.json, English -> translation."""
+    out = {}
+    for p in sorted((I18N_DIR / lang).glob("*.json")):
+        out.update(json.loads(p.read_text(encoding="utf-8")))
+    return out
+
+
+def translate_csv_headers(data_dir: Path, content: dict) -> int:
+    """<id>.es.csv next to each card's "all data" CSV, with the column names translated."""
+    import csv, io
+    n = 0
+    for p in data_dir.glob("*.csv"):
+        if p.name.endswith(".es.csv"):
+            continue
+        text = p.read_text(encoding="utf-8")
+        head, _, rest = text.partition("\n")
+        cols = next(csv.reader([head]))
+        cols = ["fecha" if c == "date" else content.get(c, c) for c in cols]
+        buf = io.StringIO()
+        csv.writer(buf, lineterminator="").writerow(cols)
+        (p.with_name(p.stem + ".es.csv")).write_text(buf.getvalue() + "\n" + rest, encoding="utf-8")
+        n += 1
+    return n
+
+
 def i18n_payload(i18n: dict) -> dict:
     """What the browser needs: interface strings, patterns, hover phrases, page names."""
     pats = []
     for item in i18n.get("patterns") or []:
         re.compile(item[0])          # fail the build on a bad pattern
         pats.append([item[0], item[1]])
-    return {"ui": i18n.get("ui") or {}, "patterns": pats, "hover": i18n.get("hover") or [], "topics": i18n.get("topics") or {}}
+    return {"ui": i18n.get("ui") or {}, "patterns": pats, "hover": i18n.get("hover") or [], "topics": i18n.get("topics") or {}, "nouns": i18n.get("nouns") or {},
+            "content": load_content("es")}
 
 
 def build(out: Path, tag: str, with_data: bool = True) -> None:
@@ -193,6 +220,7 @@ def build(out: Path, tag: str, with_data: bool = True) -> None:
         export.export(out / "data")
         if es:
             (out / "data" / "i18n").mkdir(parents=True, exist_ok=True)
+            print(f"spanish csv: {translate_csv_headers(out / 'data', load_content('es'))} files")
             (out / "data" / "i18n" / "es.json").write_text(json.dumps(i18n_payload(es), ensure_ascii=False, separators=(",", ":")),
                                                          encoding="utf-8")
         from . import social
