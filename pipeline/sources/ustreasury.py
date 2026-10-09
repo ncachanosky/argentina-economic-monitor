@@ -2,11 +2,17 @@
 the Treasury), one CSV per year since FIRST_YEAR.
 
 Series ids: "ust:<weeks>w" -- coupon-equivalent yield, percent, e.g. "ust:52w".
+
+Each run downloads only the current year (and the previous one in January) and
+splices it onto the stored history, since past years do not change and the
+Treasury's server is slow (about 20 seconds a file). AEM_FULL_REFRESH=1, or an
+empty store, downloads every year since FIRST_YEAR.
 """
 from __future__ import annotations
 
 import datetime as dt
 import io
+import os
 import time
 
 import pandas as pd
@@ -40,9 +46,21 @@ def parse(text: str) -> pd.DataFrame:
     return df.set_index("Date").sort_index()
 
 
+def _stored(ids) -> dict[str, pd.Series]:
+    try:
+        from .. import store
+        return {sid: store.as_of(sid) for sid in ids}
+    except Exception:
+        return {}
+
+
 def fetch(ids) -> FetchResult:
     frames_y, errors = [], {}
-    for y in range(FIRST_YEAR, dt.date.today().year + 1):
+    today = dt.date.today()
+    stored = {} if os.environ.get("AEM_FULL_REFRESH") == "1" else _stored(ids)
+    full = not stored or any(s.empty for s in stored.values())
+    first = FIRST_YEAR if full else (today.year - 1 if today.month == 1 else today.year)
+    for y in range(first, today.year + 1):
         try:
             frames_y.append(parse(_get(URL.format(y=y))))
         except Exception as exc:
@@ -61,6 +79,9 @@ def fetch(ids) -> FetchResult:
             errs[sid] = f"no column {col!r}"
             continue
         s = pd.to_numeric(df[col], errors="coerce").dropna()
+        if not full:   # keep the stored history before the downloaded years
+            old = stored[sid]
+            s = pd.concat([old[old.index < pd.Timestamp(first, 1, 1)], s]).sort_index()
         frames.append(pd.DataFrame({"date": s.index, "series_id": sid, "value": s.values}))
         meta[sid] = {"units": "percent", "time_index_end": s.index.max().strftime("%Y-%m-%d")}
     data = pd.concat(frames, ignore_index=True) if frames else pd.DataFrame(columns=["date", "series_id", "value"])
