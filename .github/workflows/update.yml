@@ -29,6 +29,11 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v7
+        with:
+          # The latest main, not the commit that triggered the run: a queued run
+          # must start from the data the previous run committed, or its own
+          # data commit conflicts when it rebases.
+          ref: main
 
       - uses: actions/setup-python@v7
         with:
@@ -55,7 +60,12 @@ jobs:
           else
             git commit -m "data: update $(date -u +%Y-%m-%d)"
             # Someone may have pushed code meanwhile: rebase the data commit on top.
-            for i in 1 2 3; do git pull --rebase -q origin main && git push && break; sleep 5; done
+            ok=0
+            for i in 1 2 3; do
+              if git pull --rebase -q origin main; then git push && { ok=1; break; }; else git rebase --abort || true; fi
+              sleep 5
+            done
+            [ "$ok" = 1 ] || { echo "::error::could not push the data commit (conflict?)"; exit 1; }
           fi
 
       - name: Alert on failing sources
