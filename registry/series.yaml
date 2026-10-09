@@ -26,6 +26,9 @@ site:
   # https://www.goatcounter.com/signup and put its code here (e.g. "aem" for aem.goatcounter.com);
   # empty: no analytics.
   goatcounter: ""
+  # Spanish site (/es/): built always; linked from the header, listed for search engines and
+  # given hreflang links only when true. Texts: registry/i18n/es.yaml.
+  spanish: false
 
 # Presidential terms, used to color charts by presidency, compute per-term
 # statistics, and rebase indices to the start of a term.

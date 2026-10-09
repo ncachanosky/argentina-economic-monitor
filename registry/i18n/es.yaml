@@ -1,0 +1,464 @@
+# Spanish version of the site (pages under /es/). pipeline/build.py renders the
+# pages with `site` and `topics`; the browser translates the interface with
+# `ui` (exact English string -> Spanish), `patterns` (regex on whole strings,
+# for texts with numbers or dates; $1, $2 ... keep the matched parts) and
+# `hover` (phrases replaced inside chart tooltips).
+# Style: impersonal, Argentine terms (tipo de cambio mayorista, brecha, riesgo
+# país, base monetaria, interanual).
+
+site:
+  home_h1: La economía argentina, actualizada todos los días
+  home_lede: >-
+    Estadísticas oficiales, verificadas cada mañana contra la fuente y graficadas
+    apenas se publican. Cada gráfico es interactivo y se puede descargar como
+    imagen o como datos.
+  home_desc: >-
+    Gráficos interactivos y actualizados a diario de la economía argentina:
+    actividad, PIB, inflación y más. De Economic Order.
+  methodology_title: Metodología
+  methodology_lede: Fuentes, controles y cada cálculo detrás de los gráficos.
+  methodology_desc: Cómo el Monitor de la Economía Argentina obtiene, verifica y transforma sus datos.
+  about_title: Acerca de
+  about_lede: Qué es el Monitor, quién está detrás y cómo citarlo o informar un error.
+  about_desc: Acerca del Monitor de la Economía Argentina, un proyecto de Economic Order.
+  embed_title: Gráfico
+  embed_desc: Un gráfico del Monitor de la Economía Argentina.
+  loading: Cargando datos…
+  by: por Economic Order
+  home_aria: Monitor de la Economía Argentina, inicio
+  topics_aria: Temas
+  subscribe: Suscribirse
+  theme: Cambiar a modo oscuro o claro
+  onpage: En esta página
+  latest: Últimos datos
+  switch_label: English
+  switch_title: View this site in English
+  pending_note: La versión en castellano de esta página está en preparación; por ahora se muestra en inglés.
+  footer: |2
+          <div>
+            <h4>Acerca del Monitor</h4>
+            <p>El Monitor de la Economía Argentina es un proyecto de <a id="eo-link" href="#">Economic Order</a>, de Nicolás Cachanosky. Los datos se descargan automáticamente de sus fuentes dos veces por día, se validan y se guardan con todo su historial de revisiones.</p>
+            <p>Fuentes: INDEC, el BCRA, el Ministerio de Economía y otros organismos oficiales; cotizaciones de mercado de servicios de datos de mercado, señaladas como no oficiales. Los gráficos y las transformaciones son nuestros, y los errores también. Las correcciones son bienvenidas en <a id="repo-link" href="#">GitHub</a>. <a href="__ROOT__about/">Más sobre el Monitor</a>.</p>
+          </div>
+          <div>
+            <h4>Datos</h4>
+            <p>Cada gráfico ofrece la serie en CSV. Los historiales completos de revisiones (cada versión publicada) están en <code>data/vintages/</code>. Cómo se calcula cada número: <a href="__ROOT__methodology/">Metodología</a>.</p>
+          </div>
+
+topics:
+  real_sector: {title: Actividad mensual, group: Actividad, description: "La actividad económica mensual: el estimador de actividad (EMAE) por sector, la industria, la construcción y la utilización de la capacidad instalada."}
+  gdp: {title: Cuentas nacionales, group: Actividad, description: "El PIB trimestral a precios constantes de 2004 y su crecimiento por componente del gasto y por sector."}
+  trade: {title: Comercio exterior, group: Sector externo, description: "Exportaciones e importaciones de bienes: la balanza comercial desde 1910, qué vende y qué compra la Argentina, el balance energético, precios y cantidades, los términos del intercambio, los socios comerciales y los bienes embarcados frente a los dólares liquidados en el mercado de cambios. Del INDEC y el BCRA."}
+  bop: {title: Balanza de pagos, group: Sector externo, description: "Las transacciones de la Argentina con el resto del mundo, por trimestre: la cuenta corriente y sus componentes, cómo se financió, las rentas de la inversión y la posición de inversión internacional (lo que los residentes tienen en el exterior y lo que deben a no residentes). Del INDEC."}
+  prices: {title: Precios, group: Precios y dinero, description: "Precios al consumidor (nivel general, núcleo, regulados, estacionales; por división y región), la inflación desde 1943 corregida por la intervención del INDEC de 2007-2015 y los precios mayoristas."}
+  money: {title: Dinero y Banco Central, group: Precios y dinero, description: "La base monetaria y sus factores de explicación, los agregados monetarios, depósitos y préstamos, tasas de interés, el tipo de cambio oficial, las reservas y el balance del Banco Central. Del BCRA. Los montos en pesos pueden verse en términos reales."}
+  fx: {title: Tipo de cambio, group: Precios y dinero, description: "Los tipos de cambio oficiales y de mercado y las brechas entre ellos, el rendimiento en dólares del carry trade, las estimaciones de devaluación de mercado y de encuesta, las compras de divisas del BCRA y los flujos del mercado de cambios (balance cambiario)."}
+  banks: {title: Bancos, group: Precios y dinero, description: "El sistema financiero: exposición al sector público, liquidez y encajes, depósitos en dólares, calidad de la cartera, capital y rentabilidad, concentración y los mayores bancos. Del Informe sobre Bancos del BCRA y sus datos mensuales por entidad."}
+  labor: {title: Trabajo y pobreza, group: Trabajo y sociedad, description: "El mercado de trabajo, los salarios y las condiciones de vida: empleo y desempleo, empleo registrado, salarios reales y en dólares, el salario mínimo desde 1965, pobreza e indigencia, qué compran los ingresos y la distribución del ingreso. Del INDEC, el Ministerio de Trabajo y la ANSES."}
+  fiscal: {title: Finanzas públicas y deuda, group: Sector público, description: "Las cuentas del gobierno nacional y su deuda: el resultado primario y financiero, ingresos y gastos, los intereses pagados y los capitalizados fuera del presupuesto, el stock de deuda, el perfil de vencimientos, los pagos y las colocaciones y licitaciones del Tesoro."}
+  institutions: {title: Instituciones, group: Instituciones, description: "El marco institucional: la confianza en el gobierno y la confianza del consumidor, cuánto duran los presidentes del Banco Central y los ministros de Economía, la libertad económica, y la democracia y el Estado de derecho, con países de comparación. De la UTDT, el Fraser Institute y V-Dem."}
+
+ui:
+  # Navigation and page
+  Dashboards: Tableros
+  Methodology: Metodología
+  About: Acerca de
+  Nothing to show on this page yet.: Todavía no hay nada para mostrar en esta página.
+  Data could not be loaded. Please try again later.: No se pudieron cargar los datos. Intente de nuevo más tarde.
+  Data could not be loaded.: No se pudieron cargar los datos.
+  The charting library could not be loaded.: No se pudo cargar la biblioteca de gráficos.
+  Chart not found.: Gráfico no encontrado.
+  # Card controls
+  Level: Nivel
+  y/y %: i.a. %
+  m/m %: mensual %
+  q/q %: trim. %
+  YTD %: acum. año %
+  Composition: Composición
+  Accum. y/y %: acum. i.a. %
+  y/y (pp): i.a. (pp)
+  m/m (pp): mensual (pp)
+  q/q (pp): trim. (pp)
+  Year-over-year change, %: Variación interanual, %
+  Month-over-month change, %: Variación mensual, %
+  Quarter-over-quarter change, %: Variación trimestral, %
+  "Year to date: change since December of the previous year, %": "Acumulado del año: variación desde diciembre del año anterior, %"
+  Share of each component in the total, %: Participación de cada componente en el total, %
+  "Accumulated: year to date vs. the same months a year earlier, %": "Acumulado: lo que va del año frente a los mismos meses del año anterior, %"
+  Year-over-year change, percentage points: Variación interanual, puntos porcentuales
+  Month-over-month change, percentage points: Variación mensual, puntos porcentuales
+  Quarter-over-quarter change, percentage points: Variación trimestral, puntos porcentuales
+  2Y: 2A
+  5Y: 5A
+  10Y: 10A
+  25Y: 25A
+  50Y: 50A
+  Max: Máx.
+  Time range: Período
+  Transformation: Transformación
+  Series: Serie
+  Frequency: Frecuencia
+  Monthly: Mensual
+  Daily: Diaria
+  Quarterly: Trimestral
+  Yearly: Anual
+  By presidency: Por presidencia
+  Episodes: Episodios
+  "Base = 100:": "Base = 100:"
+  Start of presidential term: Inicio de la presidencia
+  Custom month…: Otro mes…
+  Custom base month: Mes base elegido
+  Index base (month = 100): Base del índice (mes = 100)
+  Nominal: Nominal
+  Real: Real
+  Nominal or real terms: Términos nominales o reales
+  Show data table: Ver tabla de datos
+  Show:: "Mostrar:"
+  Series shown: Series que se muestran
+  Show yearly change: Ver variación anual
+  Mark dated shocks on the chart and show presidency averages without them: Marcar shocks fechados en el gráfico y mostrar los promedios por presidencia sin ellos
+  "Log scale: equal distances are equal percentage changes.": "Escala logarítmica: distancias iguales son variaciones porcentuales iguales."
+  Log scale.: Escala logarítmica.
+  Changes in a rate are shown in percentage points.: Las variaciones de una tasa se muestran en puntos porcentuales.
+  Rebasing applies to levels only; percent changes are unaffected.: El cambio de base se aplica solo a los niveles; las variaciones porcentuales no cambian.
+  No data for that base month; showing the series as published.: No hay datos para ese mes base; se muestra la serie tal como se publica.
+  Statistics use each full term regardless of the time range shown. Start is the base month (the last one before the term); change is latest/end vs. start.: "Las estadísticas usan cada mandato completo, sin importar el período que se muestre. Inicio es el mes base (el último antes del mandato); la variación compara el último dato o el final con el inicio."
+  " *Series begins after the term started.": " *La serie empieza después del inicio del mandato."
+  Presidency: Presidencia
+  Period: Período
+  Start: Inicio
+  Latest / end: Último / final
+  Change: Variación
+  Average: Promedio
+  Min: Mín.
+  Max.: Máx.
+  Annualized over term: Anualizada en el mandato
+  Average (geometric): Promedio (geométrico)
+  Excl. episodes: Sin episodios
+  # Footers and buttons
+  "Source: ": "Fuente: "
+  Source:: "Fuente:"
+  Latest:: "Último dato:"
+  Next release: Próxima publicación
+  PNG: PNG
+  CSV: CSV
+  All data: Todos los datos
+  Share: Compartir
+  Embed: Insertar
+  Link copied: Enlace copiado
+  Download this chart as a 1200×800 PNG: Descargar este gráfico como PNG de 1200×800
+  Download the data in this view as CSV: Descargar los datos de esta vista en CSV
+  All variants, levels, as published: Todas las series, en niveles, tal como se publican
+  Copy a link to this chart (with a preview for social media): Copiar un enlace a este gráfico (con vista previa para redes sociales)
+  Embed this chart in another page: Insertar este gráfico en otra página
+  Embed this chart: Insertar este gráfico
+  "Paste this code into your page. The chart stays interactive and updates with the data; it links back to the Monitor.": "Pegue este código en su página. El gráfico sigue siendo interactivo, se actualiza con los datos y enlaza al Monitor."
+  Copy code: Copiar código
+  Preview: Vista previa
+  Close: Cerrar
+  Copied.: Copiado.
+  Press Ctrl+C to copy.: Presione Ctrl+C para copiar.
+  Copy this link:: "Copie este enlace:"
+  Embed code: Código para insertar
+  Full chart and data ↗: Gráfico completo y datos ↗
+  Argentina Economic Monitor: Monitor de la Economía Argentina
+  Update failed — showing last good data: La actualización falló; se muestran los últimos datos válidos
+  The last update attempt failed; showing the last validated data.: El último intento de actualización falló; se muestran los últimos datos validados.
+  Stale: Desactualizado
+  No new observation for longer than usual.: Sin datos nuevos desde hace más de lo habitual.
+  # Home: dashboard
+  The latest data at a glance: Los últimos datos de un vistazo
+  Summary of the latest data: Resumen de los últimos datos
+  Month on month (s.a.): Mensual (desest.)
+  12-month change: Variación interanual
+  Change shown: Variación que se muestra
+  Indicator: Indicador
+  Latest: Último
+  3 years: 3 años
+  real: real
+  stale: desactualizado
+  error: error
+  n/a: s/d
+  Not seasonally adjusted: Sin desestacionalizar
+  "No seasonally adjusted series: see the 12-month view": "No hay serie desestacionalizada: ver la variación interanual"
+  No new data for longer than usual: Sin datos nuevos desde hace más de lo habitual
+  Last update failed; showing the last good data: La última actualización falló; se muestran los últimos datos válidos
+  "Month on month on seasonally adjusted series (quarter on quarter for quarterly data, in the quarter's last month); † not seasonally adjusted, read with care.": "Variación mensual sobre series desestacionalizadas (trimestral para los datos trimestrales, en el último mes del trimestre); † sin desestacionalizar, leer con cuidado."
+  Change over twelve months (four quarters) on the original series.: Variación en doce meses (cuatro trimestres) sobre la serie original.
+  "Changes in rates are in percentage points; reserves in US$ billions. Color: how unusual the change is against the same change over the previous": "Las variaciones de tasas están en puntos porcentuales; las reservas, en miles de millones de US$. Color: qué tan inusual es la variación frente a la misma variación en los"
+  Click a name for its chart.: Haga clic en un nombre para ver su gráfico.
+  Dashboards: Tableros
+  # Dashboard groups and rows
+  Activity: Actividad
+  Prices: Precios
+  Money and rates: Dinero y tasas
+  Exchange rate and reserves: Tipo de cambio y reservas
+  External, fiscal and markets: Sector externo, fiscal y mercados
+  Labor: Trabajo
+  Economic activity (EMAE): Actividad económica (EMAE)
+  GDP (quarterly): PIB (trimestral)
+  Industrial production (IPI): Producción industrial (IPI)
+  Construction (ISAC): Construcción (ISAC)
+  Capacity utilization: Utilización de la capacidad instalada
+  CPI, headline: IPC, nivel general
+  CPI, core: IPC, núcleo
+  Wholesale prices: Precios mayoristas
+  Expected inflation, next 12 months (REM): Inflación esperada, próximos 12 meses (REM)
+  Base money, real: Base monetaria, real
+  Peso deposits, real: Depósitos en pesos, reales
+  Peso loans, real: Préstamos en pesos, reales
+  TAMAR rate: Tasa TAMAR
+  Official exchange rate: Tipo de cambio oficial
+  CCL gap: Brecha CCL
+  Real exchange rate (multilateral): Tipo de cambio real multilateral
+  Gross reserves: Reservas brutas
+  Net reserves: Reservas netas
+  Exports: Exportaciones
+  Imports: Importaciones
+  Primary balance, % of GDP (12 months): Resultado primario, % del PIB (12 meses)
+  Country risk (EMBI): Riesgo país (EMBI)
+  Real wages: Salarios reales
+  Registered private jobs: Asalariados privados registrados
+  Unemployment rate: Tasa de desocupación
+  # Home: timeline
+  Recent and upcoming releases: Publicaciones recientes y próximas
+  New data: Datos nuevos
+  Coming up (INDEC calendar): Próximas publicaciones (calendario del INDEC)
+  No new monthly or quarterly releases in the last three weeks.: No hubo publicaciones mensuales o trimestrales nuevas en las últimas tres semanas.
+  No scheduled INDEC releases in the next three weeks.: No hay publicaciones del INDEC programadas en las próximas tres semanas.
+  Consumer prices (CPI): Precios al consumidor (IPC)
+  International trade: Comercio exterior (ICA)
+  GDP: PIB
+  Wages (INDEC index): Índice de salarios (INDEC)
+  Poverty and indigence: Pobreza e indigencia
+  Balance of payments: Balanza de pagos
+  Labor market (EPH): Mercado de trabajo (EPH)
+  Labor share of income: Distribución funcional del ingreso
+  Income distribution (EPH): Distribución del ingreso (EPH)
+  Dashboards ▾: Tableros ▾
+  # Tenure cards
+  Since 1983: Desde 1983
+  All: Todos
+  Appointed under: Designado bajo
+  Appointed: Designados
+  Average tenure, days: Permanencia promedio, días
+  Longest: El más largo
+  Before December 1983: Antes de diciembre de 1983
+  Interim presidents (December 2001): Presidentes interinos (diciembre de 2001)
+  In office (to today): En funciones (hasta hoy)
+  Days in office: Días en el cargo
+  Download the full list as CSV: Descargar la lista completa en CSV
+  The list of officials could not be loaded.: No se pudo cargar la lista de funcionarios.
+  # REM revisions
+  Inflation (Dec/Dec): Inflación (dic./dic.)
+  GDP growth: Crecimiento del PIB
+  Exchange rate (Dec): Tipo de cambio (dic.)
+  Primary balance: Resultado primario
+  Last 5 years: Últimos 5 años
+  Variable: Variable
+  Years: Años
+  Download every survey's forecasts for this variable as CSV: Descargar en CSV los pronósticos de cada encuesta para esta variable
+  The survey data could not be loaded.: No se pudieron cargar los datos de la encuesta.
+  Pesos per US dollar, December average: Pesos por dólar, promedio de diciembre
+  Billions of pesos: Miles de millones de pesos
+  # Futures curve
+  Today: Hoy
+  A month ago: Hace un mes
+  Three months ago: Hace tres meses
+  Band ceiling, projected: Techo de la banda, proyectado
+  Contract (expiry): Contrato (vencimiento)
+  Price: Precio
+  vs official rate: vs. tipo de cambio oficial
+  Annualized: Anualizado
+  Projected ceiling above price: Techo proyectado sobre el precio
+  Open interest, US$ m: Interés abierto, millones de US$
+  Download the curves as CSV: Descargar las curvas en CSV
+  The futures curve could not be loaded.: No se pudo cargar la curva de futuros.
+  Dollar futures curve: Curva de futuros de dólar
+  # Other tables and cards
+  Download this table as CSV: Descargar esta tabla en CSV
+  Download this view as CSV: Descargar esta vista en CSV
+  The table could not be loaded.: No se pudo cargar la tabla.
+  The balance sheet could not be loaded.: No se pudo cargar el balance.
+  The maturity profile could not be loaded.: No se pudo cargar el perfil de vencimientos.
+  The placements could not be loaded.: No se pudieron cargar las colocaciones.
+  Download the balance sheet in this view as CSV: Descargar el balance de esta vista en CSV
+  Download the year's placements as CSV: Descargar en CSV las colocaciones del año
+  Quarter: Trimestre
+  Last 4 quarters: Últimos 4 trimestres
+  Year to date: Acumulado del año
+  Calendar year: Año calendario
+  Year: Año
+  Month: Mes
+  Date: Fecha
+  Date:: "Fecha:"
+  Year:: "Año:"
+  Group:: "Grupo:"
+  Group: Grupo
+  Type: Tipo
+  Total: Total
+  Summary: Resumen
+  Weight: Ponderación
+  Division: División
+  Institution: Entidad
+  Instrument: Instrumento
+  Maturity: Vencimiento
+  Units: Unidades
+  View: Vista
+  Assets: Activo
+  Liabilities and net equity: Pasivo y patrimonio neto
+  Net equity: Patrimonio neto
+  Compare with:: "Comparar con:"
+  No comparison: Sin comparación
+  ✕ Remove comparison: ✕ Quitar comparación
+  Weekly balance: Balance semanal
+  How to read this balance sheet: Cómo leer este balance
+  BCRA's notes to these balances: Notas del BCRA a estos balances
+  Pesos: Pesos
+  US dollars: Dólares
+  Percent of total assets on each date: Porcentaje del activo total en cada fecha
+  Share of system assets: Participación en el activo del sistema
+  Capital and interest: Capital e intereses
+  Capital + interest: Capital + intereses
+  Capital: Capital
+  Interest: Intereses
+  Payments: Pagos
+  Next 18 months: Próximos 18 meses
+  Actually paid (all debt): Efectivamente pagado (toda la deuda)
+  Face value: Valor nominal
+  Cash value: Valor efectivo
+  Settlement date: Fecha de liquidación
+  "Settlement date:": "Fecha de liquidación:"
+  Life, yrs: Vida, años
+  Real yield %: Rendimiento real %
+  TEA %: TEA %
+  TEM %: TEM %
+  Show basket weights: Ver ponderaciones de la canasta
+  Incidence (pp): Incidencia (pp)
+  "Calendar years: the December value of the twelve-month series.": "Años calendario: el valor de diciembre de la serie de doce meses."
+  Calendar-year totals.: Totales por año calendario.
+  Accumulated y/y: Acumulado i.a.
+  Annual growth: Crecimiento anual
+  Read with care.: Leer con cuidado.
+  # Real exchange rate calculator
+  Real exchange rate: Tipo de cambio real
+  Reference date: Fecha de referencia
+  A date of your choice…: Una fecha a elección…
+  Official rate: Tipo de cambio oficial
+  CCL rate: Tipo de cambio CCL
+  Two equilibrium dates: Dos fechas de equilibrio
+  First equilibrium date: Primera fecha de equilibrio
+  Second equilibrium date: Segunda fecha de equilibrio
+  Weight of non-tradables (alpha): Ponderación de los no transables (alfa)
+  Weight of non-tradables in the price index: Ponderación de los no transables en el índice de precios
+  Required change in relative productivity, total: Cambio requerido en la productividad relativa, total
+  Required change, per year: Cambio requerido, por año
+  Terms of trade over the same span: Términos del intercambio en el mismo período
+  real appreciation: apreciación real
+  real depreciation: depreciación real
+  "above it: the peso is weaker in real terms": "por encima: el peso está más débil en términos reales"
+  "below it: the peso is stronger in real terms": "por debajo: el peso está más fuerte en términos reales"
+  Index against the reference: Índice frente a la referencia
+  Reference: Referencia
+  Restore a reference: Volver a una referencia
+  Equilibrium dates: Fechas de equilibrio
+  Average since 1997: Promedio desde 1997
+  Average since 2003 (after convertibility): Promedio desde 2003 (después de la convertibilidad)
+  Average since 2016: Promedio desde 2016
+  Median since 2003: Mediana desde 2003
+  17 Dec 2015 (exchange-rate unification): 17 dic. 2015 (unificación cambiaria)
+  # Statements (BoP, IIP)
+  Change, quarter: Variación, trimestre
+  Change, year: Variación, año
+  Funding: Financiamiento
+
+  # Presidencies and parties
+  Raúl Alfonsín: Raúl Alfonsín
+  Carlos Menem (1st term): Carlos Menem (1.er mandato)
+  Carlos Menem (2nd term): Carlos Menem (2.º mandato)
+  Cristina Fernández de Kirchner (1st term): Cristina Fernández de Kirchner (1.er mandato)
+  Cristina Fernández de Kirchner (2nd term): Cristina Fernández de Kirchner (2.º mandato)
+  Menem I: Menem I
+  "Peronism (PJ / FpV / FdT)": "Peronismo (PJ / FpV / FdT)"
+  "UCR / Alianza": "UCR / Alianza"
+  "PRO / Cambiemos": "PRO / Cambiemos"
+  La Libertad Avanza: La Libertad Avanza
+
+  # Real exchange rate calculator (more)
+  CCL (market) rate: Tipo de cambio CCL (mercado)
+  Exchange rate: Tipo de cambio
+  Question: Pregunta
+  Pick two different dates with data.: Elija dos fechas distintas con datos.
+  "Reference:": "Referencia:"
+  "Range: middle half of the index since 2003": "Rango: mitad central del índice desde 2003"
+  "Restore a reference: shaded is the middle half of the index since 2003 (25th to 75th percentile), dashed is the reference. Two dates: A and B are marked.": "Volver a una referencia: el sombreado es la mitad central del índice desde 2003 (percentiles 25 a 75) y la línea punteada, la referencia. Dos fechas: se marcan A y B."
+  Real exchange rate and the reference: El tipo de cambio real y la referencia
+  Official rate that restores the reference: Tipo de cambio oficial que restablece la referencia
+  CCL rate that restores the reference: Tipo de cambio CCL que restablece la referencia
+  IMF Country Report, May 2026: Informe del FMI sobre la Argentina, mayo de 2026
+
+patterns:
+  - ["Real exchange rate, (.+)", "Tipo de cambio real, $1"]
+  - ["Reference \\((.+)\\): (.+)", "Referencia ($1): $2"]
+  - ["Index between (.+) \\(25th percentile\\) and (.+) \\(75th\\)", "Índice entre $1 (percentil 25) y $2 (percentil 75)"]
+  - ["Actual official \\(wholesale\\) rate (.+) on (.+): (.+) away", "Tipo de cambio oficial (mayorista) efectivo: $1 el $2; $3 de distancia"]
+  - ["Actual CCL rate (.+) on (.+): (.+) away", "Tipo de cambio CCL efectivo: $1 el $2; $3 de distancia"]
+  - ["Today's official \\(wholesale\\) rate × reference index / today's index\\. ?", "Tipo de cambio oficial (mayorista) de hoy × índice de referencia / índice de hoy."]
+  - ["Today's CCL rate × reference index / today's index\\. CCL mode: (.+)", "Tipo de cambio CCL de hoy × índice de referencia / índice de hoy. Modo CCL: el índice al tipo de cambio CCL (el índice oficial antes de noviembre de 2011, cuando no había controles), aplicado al CCL de hoy."]
+  - ["(.+) to (.+): (.+) \\(real appreciation\\)", "$1 a $2: $3 (apreciación real)"]
+  - ["(.+) to (.+): (.+) \\(real depreciation\\)", "$1 a $2: $3 (depreciación real)"]
+  - ["over (.+) years, with α = (.+)", "en $1 años, con α = $2"]
+  - ["(.+) to (.+) \\(INDEC\\); a rise also supports a stronger peso", "$1 a $2 (INDEC); una suba también sostiene un peso más fuerte"]
+  - ["Next release: (.+) \\((.+) data\\)", "Próxima publicación: $1 (datos de $2)"]
+  - ["· Latest: (.+) ·", "· Último dato: $1 ·"]
+  - ["· Latest: (.+)", "· Último dato: $1"]
+  - ["(.+) data was due (.+); updating", "Los datos de $1 debían publicarse el $2; actualizando"]
+  - ["As published \\((.+)\\)", "Tal como se publica ($1)"]
+  - ["(.+) \\((.+) = 100\\)", "$1 ($2 = 100)"]
+  - ["Source: (.+)", "Fuente: $1"]
+  - ["Index, (.+) = 100", "Índice, $1 = 100"]
+  - ["Last data check: (.+)", "Última verificación de datos: $1"]
+  - ["(.+) is partial: data through (.+)\\.", "$1 es parcial: datos hasta $2."]
+  - ["Since (\\d{4})", "Desde $1"]
+  - ["Dashed: expected in the BCRA's REM survey of (.+) \\(median; band: middle half of forecasters\\)\\.", "Línea punteada: lo esperado en la encuesta REM del BCRA de $1 (mediana; banda: la mitad central de los pronosticadores)."]
+  - ["By presidency shows the (.+) series\\.", "La vista por presidencia muestra la serie $1."]
+  - ["(\\d+)\\* ?", "$1*"]
+  - ["\\*(\\w+): daily series averaged to (.+)\\.", "*$1: series diarias promediadas hasta el $2."]
+  - ["years — green better than usual, red worse, grey large with no better or worse direction \\(e\\.g\\. the exchange rate\\); no color, a usual move\\.", "años anteriores — verde, mejor que lo habitual; rojo, peor; gris, grande pero sin una dirección mejor o peor (por ejemplo, el tipo de cambio); sin color, un movimiento habitual."]
+  - ["(\\d+) years — green better than usual, red worse, grey large with no better or worse direction \\(e\\.g\\. the exchange rate\\); no color, a usual move\\.", "$1 años anteriores — verde, mejor que lo habitual; rojo, peor; gris, grande pero sin una dirección mejor o peor (por ejemplo, el tipo de cambio); sin color, un movimiento habitual."]
+  - ["(.+), (.+): (.+) · a usual move for this series", "$1, $2: $3 · un movimiento habitual para esta serie"]
+  - ["(.+), (.+): (.+) · better than usual \\((.+) s\\.d\\.\\) for this series", "$1, $2: $3 · mejor que lo habitual ($4 d.e.) para esta serie"]
+  - ["(.+), (.+): (.+) · worse than usual \\((.+) s\\.d\\.\\) for this series", "$1, $2: $3 · peor que lo habitual ($4 d.e.) para esta serie"]
+  - ["(.+), (.+): (.+) · high than usual \\((.+) s\\.d\\.\\) for this series", "$1, $2: $3 · más alto que lo habitual ($4 d.e.)"]
+  - ["(.+), (.+): (.+) · low than usual \\((.+) s\\.d\\.\\) for this series", "$1, $2: $3 · más bajo que lo habitual ($4 d.e.)"]
+  - ["Next release: (.+)", "Próxima publicación: $1"]
+  - ["Latest: (.+)", "Último dato: $1"]
+  - ["Source: (.+) · Latest: (.+)", "Fuente: $1 · Último dato: $2"]
+  - ["(\\d+) pesos per US\\$", "$1 pesos por US$"]
+  - ["(.+) trillion pesos", "$1 billones de pesos"]
+  - ["(.+) US\\$ bn", "$1 miles de millones de US$"]
+  - ["(.+)% of GDP", "$1% del PIB"]
+  - ["Average of completed tenures: (.+) days \\((.+) years\\)", "Promedio de las gestiones terminadas: $1 días ($2 años)"]
+  - ["Since December 1983: (\\d+) presidents of the BCRA; completed tenures average (.+) days \\((.+) years\\), median (.+)\\. President of the BCRA in office: (.+), (.+) days so far, longer than (\\d+) of the (\\d+) completed tenures shown\\.", "Desde diciembre de 1983: $1 presidentes del BCRA; las gestiones terminadas duran en promedio $2 días ($3 años), mediana $4. En funciones: $5, $6 días hasta hoy, más que $7 de las $8 gestiones terminadas."]
+  - ["Since December 1983: (\\d+) ministers of the economy; completed tenures average (.+) days \\((.+) years\\), median (.+)\\. Minister of the Economy in office: (.+), (.+) days so far, longer than (\\d+) of the (\\d+) completed tenures shown\\.", "Desde diciembre de 1983: $1 ministros de Economía; las gestiones terminadas duran en promedio $2 días ($3 años), mediana $4. En funciones: $5, $6 días hasta hoy, más que $7 de las $8 gestiones terminadas."]
+  - ["Since (\\d{4}): (\\d+) presidents of the BCRA; completed tenures average (.+) days \\((.+) years\\), median (.+)\\. President of the BCRA in office: (.+), (.+) days so far, longer than (\\d+) of the (\\d+) completed tenures shown\\.", "Desde $1: $2 presidentes del BCRA; las gestiones terminadas duran en promedio $3 días ($4 años), mediana $5. En funciones: $6, $7 días hasta hoy, más que $8 de las $9 gestiones terminadas."]
+  - ["Since (\\d{4}): (\\d+) ministers of the economy; completed tenures average (.+) days \\((.+) years\\), median (.+)\\. Minister of the Economy in office: (.+), (.+) days so far, longer than (\\d+) of the (\\d+) completed tenures shown\\.", "Desde $1: $2 ministros de Economía; las gestiones terminadas duran en promedio $3 días ($4 años), mediana $5. En funciones: $6, $7 días hasta hoy, más que $8 de las $9 gestiones terminadas."]
+  - ["(.+), in office\\)", "$1, en funciones)"]
+  - ["Each line is one year's forecast as it evolved; stars and dotted lines mark the outcome\\. Latest survey: (.+?)\\.(.*)", "Cada línea es el pronóstico de un año y cómo fue cambiando; las estrellas y las líneas punteadas marcan el resultado. Última encuesta: $1.$2"]
+  - [" For (\\d{4}), the first survey \\((.+)\\) expected (.+); the outcome was (.+)\\.", " Para $1, la primera encuesta ($2) esperaba $3; el resultado fue $4."]
+  - ["Settlement prices on (.+?)(;.*|\\.)$", "Precios de ajuste del $1$2"]
+  - ["Official rate \\((.+)\\)", "Tipo de cambio oficial ($1)"]
+  - ["Today \\((.+)\\)", "Hoy ($1)"]
+  - ["A month ago \\((.+)\\)", "Hace un mes ($1)"]
+  - ["Three months ago \\((.+)\\)", "Hace tres meses ($1)"]
+  - ["REM survey, (.+) \\(monthly average, median\\)", "Encuesta REM, $1 (promedio mensual, mediana)"]
+  - ["(.+) \\(colored by presidency\\)", "$1 (coloreado por presidencia)"]
+  - ["(.+)'s world rank \\(bars, right axis\\)", "Ranking mundial (barras, eje derecho)"]
+
+hover:
+  - [" expected (middle half ", " esperado (mitad central "]
+  - ["Survey of ", "Encuesta de "]
+  - ["Actual ", "Resultado "]
+  - [" days (", " días ("]
+  - [" years)", " años)"]
+  - ["in office", "en funciones"]

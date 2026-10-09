@@ -11,7 +11,23 @@
   // carries the page id ("home" or a topic id) and the path back to the root.
   const ROOT = (document.body && document.body.dataset.root) || "";
   const PAGE = (document.body && document.body.dataset.page) || "home";
-  const DATA = ROOT + "data/";
+  // Spanish pages live under /es/ and read the same data; body data-data points at it.
+  const DATA = (document.body && document.body.dataset.data) || ROOT + "data/";
+  const LANG = document.documentElement.lang === "es" ? "es" : "en";
+  const LOCALE = LANG === "es" ? "es-AR" : "en-US";
+  const fx = (v, d) => (LANG === "es" ? Number(v).toFixed(d).replace(".", ",") : Number(v).toFixed(d));   // fixed decimals, local separator
+  // Translations (Spanish pages): data/i18n/es.json, loaded in main(). `ui` maps English
+  // interface strings to Spanish; `patterns` are [regex, replacement] for strings with values.
+  let I18N = null;
+  const tr = (s) => {
+    if (!I18N || typeof s !== "string") return s;
+    const k = s.trim();
+    if (!k) return s;
+    const hit = I18N.ui[k];
+    if (hit !== undefined) return s.replace(k, hit);
+    for (const [re, out] of I18N._patterns) if (re.test(k)) return s.replace(k, k.replace(re, out));
+    return s;
+  };
   const MAX_PANEL_SERIES = 4;              // fixed palette has four distinguishable slots
   const SERIES_VARS = ["--series-1", "--series-2", "--series-3", "--series-4", "--series-5", "--series-6", "--series-7", "--series-8"];
   const EXPORT = { width: 1200, height: 800 }; // EO figure standard
@@ -66,24 +82,24 @@
     const t = document.documentElement.dataset.theme;
     return t ? t === "dark" : window.matchMedia("(prefers-color-scheme: dark)").matches;
   };
-  const fmtMonth = (iso) => new Date(iso + "T00:00:00Z").toLocaleDateString("en-US", { month: "long", year: "numeric", timeZone: "UTC" });
-  const fmtShortMonth = (iso) => new Date(iso + "T00:00:00Z").toLocaleDateString("en-US", { month: "short", year: "numeric", timeZone: "UTC" });
+  const fmtMonth = (iso) => new Date(iso + "T00:00:00Z").toLocaleDateString(LOCALE, { month: "long", year: "numeric", timeZone: "UTC" });
+  const fmtShortMonth = (iso) => new Date(iso + "T00:00:00Z").toLocaleDateString(LOCALE, { month: "short", year: "numeric", timeZone: "UTC" });
   // Period label: "Jul 2026" for monthly data, "Q3 2026" for quarterly.
-  const fmtDay = (iso) => new Date(iso + "T00:00:00Z").toLocaleDateString("en-US", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" });
+  const fmtDay = (iso) => new Date(iso + "T00:00:00Z").toLocaleDateString(LOCALE, { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" });
   const fmtPeriod = (iso, freq) => {
     if (freq === "Y") return iso.length > 4 ? iso.slice(0, 4) : iso;
-    if (freq === "S") return `${Number(iso.slice(5, 7)) < 7 ? "H1" : "H2"} ${iso.slice(0, 4)}`;
+    if (freq === "S") return `${Number(iso.slice(5, 7)) < 7 ? (LANG === "es" ? "S1" : "H1") : (LANG === "es" ? "S2" : "H2")} ${iso.slice(0, 4)}`;
     if (freq === "D") return fmtDay(iso);
     if (freq !== "Q") return fmtShortMonth(iso);
     const [y, m] = iso.split("-").map(Number);
-    return `Q${Math.floor((m - 1) / 3) + 1} ${y}`;
+    return `${LANG === "es" ? "T" : "Q"}${Math.floor((m - 1) / 3) + 1} ${y}`;
   };
   const specOf = (p) => (p && typeof p === "object" ? p : p ? INDEX_TRANSFORMS.yoy : INDEX_TRANSFORMS.level);
   const fmtNum = (v, p) => {
     if (v === null || v === undefined || Number.isNaN(v)) return "–";
     const s = specOf(p);
-    return s.signed ? (v > 0 ? "+" : "") + v.toFixed(1) + s.suffix
-      : v.toLocaleString("en-US", { maximumFractionDigits: 1, minimumFractionDigits: 1 }) + s.suffix;
+    return s.signed ? (v > 0 ? "+" : "") + (LANG === "es" ? v.toFixed(1).replace(".", ",") : v.toFixed(1)) + s.suffix
+      : v.toLocaleString(LOCALE, { maximumFractionDigits: 1, minimumFractionDigits: 1 }) + s.suffix;
   };
   // Category axis of years: label every k-th year when there are many, unrotated.
   const yearAxis = (n) => ({ type: "category", tickangle: 0, ...(n > 16 ? { tickmode: "linear", tick0: 0, dtick: Math.ceil(n / 12) } : {}) });
@@ -417,7 +433,7 @@
     const nr = ind.next_release;
     if (!nr) return null;
     const today = new Date().toLocaleDateString("en-CA", { timeZone: "America/Argentina/Buenos_Aires" });
-    const day = new Date(nr.date + "T12:00:00Z").toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", year: "numeric", timeZone: "UTC" });
+    const day = new Date(nr.date + "T12:00:00Z").toLocaleDateString(LOCALE, { weekday: "short", month: "short", day: "numeric", year: "numeric", timeZone: "UTC" });
     const period = fmtPeriod(nr.period + "-01", nr.frequency || ind.frequency);
     const text = nr.date > today ? `Next release: ${day} (${period} data)`
       : nr.date === today ? `Next release: today (${period} data)`
@@ -470,7 +486,7 @@
     const acc = ind.variants[at.accumulated], wy = ind.variants[at.within_year];
     const pos = new Map(ind.dates.map((d, i) => [d, i]));
     const val = (v, y, m) => { const i = pos.get(`${y}-${String(m).padStart(2, "0")}-01`); return i === undefined ? null : v.values[i]; };
-    const pName = (m) => (Q ? `Q${(m - 1) / 3 + 1}` : new Date(Date.UTC(2000, m - 1, 1)).toLocaleDateString("en-US", { month: "short", timeZone: "UTC" }));
+    const pName = (m) => (Q ? `Q${(m - 1) / 3 + 1}` : new Date(Date.UTC(2000, m - 1, 1)).toLocaleDateString(LOCALE, { month: "short", timeZone: "UTC" }));
     const sumYear = (v, y, upto) => { let s = 0; for (const m of per) { if (m > upto) break; const x = val(v, y, m); if (x === null) return null; s += x; } return s; };
     const years = [...new Set(ind.dates.map((d) => +d.slice(0, 4)))].sort((a, b) => b - a);
     const f = (v) => (v === null ? "–" : fmtNum(v, INDEX_TRANSFORMS.yoy));
@@ -527,7 +543,7 @@
     const w = ind.derived && ind.derived.weights;
     if (!w) return null;
     const keys = Object.keys(w.labels).sort((a, b) => w.new[b] - w.new[a]);
-    const f = (v) => v.toFixed(1) + "%";
+    const f = (v) => fx(v, 1) + "%";
     const tbody = h("tbody", {}, keys.map((k) => {
       const d = Math.round((w.new[k] - w.old_at_link[k]) * 10) / 10 || 0;
       return h("tr", {}, h("td", { class: "pres" }, w.labels[k]), h("td", {}, f(w.old_at_link[k])), h("td", {}, f(w.new[k])), h("td", {}, (d > 0 ? "+" : "") + d.toFixed(1) + " pp"));
@@ -543,7 +559,7 @@
   function breakdownTable(ind) {
     const b = ind.derived && ind.derived.breakdown;
     if (!b) return null;
-    const f = (v) => (v === null || v === undefined ? "–" : (v < 0 ? "−" : "") + Math.abs(Math.round(v)).toLocaleString("en-US"));
+    const f = (v) => (v === null || v === undefined ? "–" : (v < 0 ? "−" : "") + Math.abs(Math.round(v)).toLocaleString(LOCALE));
     const neg = (v) => (v === null || v === undefined ? "–" : Math.round(v) === 0 ? "0" : f(-v));
     const head = h("tr", {}, h("th", {}, "USD millions"), b.columns.map((c) => h("th", {}, c.label)));
     const body = b.rows.map((r) => h("tr", {}, h("td", { class: "pres" }, r.sign < 0 ? `less: ${r.label}` : r.label),
@@ -551,7 +567,7 @@
     const total = h("tr", { class: "total" }, h("td", { class: "pres" }, h("b", {}, "Net reserves")),
       b.columns.map((c) => h("td", {}, h("b", {}, f(b.total[c.key])))));
     const notes = [`BCRA weekly balance of ${fmtDay(b.date)}, at that balance's exchange rates.`];
-    if (b.swap_cny_bn && b.cny_usd) notes.push(` China swap: CNY ${b.swap_cny_bn.toFixed(0)} bn at ${(1 / b.cny_usd).toFixed(2)} yuan per dollar.`);
+    if (b.swap_cny_bn && b.cny_usd) notes.push(` China swap: CNY ${fx(b.swap_cny_bn, 0)} bn at ${fx((1 / b.cny_usd), 2)} yuan per dollar.`);
     if (b.treasury_as_of) notes.push(` Treasury deposits: monthly balance sheet, end of ${fmtMonth(b.treasury_as_of.slice(0, 7) + "-01")}.`);
     if (b.notes && b.notes.imf_repos) notes.push(` ${b.notes.imf_repos}`);
     return h("div", { class: "breakdown" },
@@ -1273,9 +1289,9 @@
         return v / 1000;                                                    // billions of pesos
       };
       const fmt = (v) => (v === null ? "–" : (v = +v.toFixed(state.units === "usd" ? 0 : 1), state.units === "pct") ? (v < 0 ? "−" : "") + Math.abs(v).toFixed(1) + "%"
-        : (v < 0 ? "−" : "") + Math.abs(v).toLocaleString("en-US", { maximumFractionDigits: state.units === "usd" ? 0 : 1, minimumFractionDigits: state.units === "usd" ? 0 : 1 }));
+        : (v < 0 ? "−" : "") + Math.abs(v).toLocaleString(LOCALE, { maximumFractionDigits: state.units === "usd" ? 0 : 1, minimumFractionDigits: state.units === "usd" ? 0 : 1 }));
       const fmtChg = (v) => (v === null ? "–" : (v = +v.toFixed(state.units === "usd" ? 0 : 1), v > 0 ? "+" : v < 0 ? "−" : "") + (state.units === "pct" ? Math.abs(v).toFixed(1) + " pp"
-        : Math.abs(v).toLocaleString("en-US", { maximumFractionDigits: state.units === "usd" ? 0 : 1, minimumFractionDigits: state.units === "usd" ? 0 : 1 })));
+        : Math.abs(v).toLocaleString(LOCALE, { maximumFractionDigits: state.units === "usd" ? 0 : 1, minimumFractionDigits: state.units === "usd" ? 0 : 1 })));
       const cmap = new Map();
       if (ct) { const ks = keyed(ct); ct.rows.forEach((r, j) => cmap.set(ks[j], r)); }
       const ks = keyed(t);
@@ -1303,8 +1319,8 @@
       grid.replaceChildren(side("A", "Assets"), side("L", "Liabilities and net equity"));
       const unitText = state.units === "usd" ? "Millions of US dollars, at each balance's exchange rate"
         : state.units === "pct" ? "Percent of total assets on each date" : `Billions of pesos of each ${T.monthly ? "month" : "date"}`;
-      const rateText = [fx ? `${fD(state.date)}: ${fx.toLocaleString("en-US", { maximumFractionDigits: 2 })} pesos per dollar` : null,
-        ct && cfx ? `${fD(state.cdate)}: ${cfx.toLocaleString("en-US", { maximumFractionDigits: 2 })}` : null].filter(Boolean).join("; ");
+      const rateText = [fx ? `${fD(state.date)}: ${fx.toLocaleString(LOCALE, { maximumFractionDigits: 2 })} pesos per dollar` : null,
+        ct && cfx ? `${fD(state.cdate)}: ${cfx.toLocaleString(LOCALE, { maximumFractionDigits: 2 })}` : null].filter(Boolean).join("; ");
       unitsNote.textContent = `${unitText}.${rateText ? " Exchange rate " + rateText + "." : ""}${ct ? " Lines are matched by name; a line renamed or regrouped between the two dates shows no change." : ""}`;
       const vn = [valuationAt(state.date), ct ? valuationAt(state.cdate) : null];
       const notes = [];
@@ -1343,7 +1359,7 @@
     const sSeg = segmented([["assets", "Assets"], ["funding", "Funding"], ["summary", "Summary"]], state.side, (k) => { state.side = k; sSeg.update(k); render(); }, "View");
     const tableEl = h("div", { class: "table-scroll top10" });
     const hint = h("p", { class: "hint" });
-    const pct = (v) => (v === null || v === undefined ? "–" : (v < 0 ? "−" : "") + Math.abs(v).toFixed(1));
+    const pct = (v) => (v === null || v === undefined ? "–" : (v < 0 ? "−" : "") + fx(Math.abs(v), 1));
     const SUMMARY = [["public_total", "Public sector (Treasury, provinces, BCRA notes and repos)"], ["loans_private", "Loans to the private sector"],
       ["liquid", "Cash and BCRA current accounts"], ["fx_share_dep", "Dollar share of deposits"], ["loans_to_dep", "Loans / deposits"], ["equity", "Net equity"]];
     let view = null;
@@ -1396,7 +1412,7 @@
     const chartEl = h("div", { class: "chart tall-ish", role: "img", "aria-label": "Debt maturities by type of debt" });
     const hint = h("p", { class: "hint" });
     const sumEl = h("div", { class: "table-scroll" });
-    const fmt = (v) => (v === null || v === undefined ? "–" : Math.round(v).toLocaleString("en-US"));
+    const fmt = (v) => (v === null || v === undefined ? "–" : Math.round(v).toLocaleString(LOCALE));
     const LAST_YEAR = 2040;
     let view = null;
 
@@ -1489,7 +1505,7 @@
     const topics = manifest.topics.filter((t) => manifest.indicators.some((m) => m.topic === t.id));
     const groups = [];
     for (const t of topics) {
-      const name = t.group || "Dashboards";
+      const name = t.group || tr("Dashboards");
       let g = groups.find((x) => x.name === name);
       if (!g) { g = { name, topics: [] }; groups.push(g); }
       g.topics.push(t);
@@ -1499,7 +1515,7 @@
       groups.map((g) => h("div", { class: "nav-group" }, h("div", { class: "nav-group-title" }, g.name),
         g.topics.map((t) => h("a", { href: pageHref(t.id), "aria-current": t.id === PAGE ? "page" : null }, t.title)))));
     const trigger = h("button", { class: "nav-trigger" + (current ? " is-current" : ""), type: "button", "aria-expanded": "false", "aria-controls": "nav-panel" },
-      current ? current.title : "Dashboards", h("span", { class: "caret", "aria-hidden": "true" }, "▾"));
+      current ? current.title : tr("Dashboards"), h("span", { class: "caret", "aria-hidden": "true" }, "▾"));
     const menu = h("div", { class: "nav-menu" }, trigger, panel);
     const links = () => [...panel.querySelectorAll("a")];
     const open = (focusFirst) => {
@@ -1521,8 +1537,8 @@
     document.addEventListener("click", (e) => { if (!menu.contains(e.target)) close(false); });
     menu.addEventListener("focusout", (e) => { if (e.relatedTarget && !menu.contains(e.relatedTarget)) close(false); });
     nav.append(menu,
-      h("a", { href: `${ROOT}methodology/`, "aria-current": PAGE === "methodology" ? "page" : null }, "Methodology"),
-      h("a", { href: `${ROOT}about/`, "aria-current": PAGE === "about" ? "page" : null }, "About"));
+      h("a", { href: `${ROOT}methodology/`, "aria-current": PAGE === "methodology" ? "page" : null }, tr("Methodology")),
+      h("a", { href: `${ROOT}about/`, "aria-current": PAGE === "about" ? "page" : null }, tr("About")));
   }
 
   // ---------- card: a statement (balance of payments, investment position) as a table ----------
@@ -1536,8 +1552,8 @@
     const last = (() => { for (let i = D.length - 1; i >= 0; i--) if (V(S.rows.find((r) => r.key).key)[i] !== null) return i; return D.length - 1; })();
     const qLabel = (i) => fmtPeriod(D[i], "Q");
     const state = { mode: S.stock ? "stock" : "q", end: last };
-    const fmt = (v) => (v === null || v === undefined || Number.isNaN(v) ? "–" : (v < 0 ? "−" : "") + Math.abs(Math.round(v)).toLocaleString("en-US"));
-    const fmtD = (v) => (v === null || v === undefined || Number.isNaN(v) ? "–" : (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(Math.round(v)).toLocaleString("en-US"));
+    const fmt = (v) => (v === null || v === undefined || Number.isNaN(v) ? "–" : (v < 0 ? "−" : "") + Math.abs(Math.round(v)).toLocaleString(LOCALE));
+    const fmtD = (v) => (v === null || v === undefined || Number.isNaN(v) ? "–" : (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(Math.round(v)).toLocaleString(LOCALE));
     // Sum of quarters i0..i1 (inclusive) of a row; null if any is missing.
     const sum = (k, i0, i1) => { if (i0 < 0) return null; let a = 0; for (let i = i0; i <= i1; i++) { const v = V(k)[i]; if (v === null || v === undefined) return null; a += v; } return a; };
     const quarterNo = (i) => Math.floor((Number(D[i].slice(5, 7)) - 1) / 3) + 1;
@@ -1634,13 +1650,13 @@
     const inB = h("input", { type: "date", value: state.dB, min: D[0], max: D[D.length - 1], "aria-label": "Second equilibrium date" });
     inA.addEventListener("change", () => { if (inA.value) { state.dA = inA.value; draw(); } });
     inB.addEventListener("change", () => { if (inB.value) { state.dB = inB.value; draw(); } });
-    const aOut = h("b", {}, state.alpha.toFixed(2));
+    const aOut = h("b", {}, fx(state.alpha, 2));
     const aIn = h("input", { type: "range", min: "0.3", max: "0.7", step: "0.05", value: String(state.alpha), "aria-label": "Weight of non-tradables (alpha)" });
-    aIn.addEventListener("input", () => { state.alpha = Number(aIn.value); aOut.textContent = state.alpha.toFixed(2); draw(); });
+    aIn.addEventListener("input", () => { state.alpha = Number(aIn.value); aOut.textContent = fx(state.alpha, 2); draw(); });
     const outEl = h("div", { class: "rer-out" });
     const chartEl = h("div", { class: "chart", role: "img", "aria-label": "Real exchange rate and the reference" });
-    const fmtR = (v, d = 0) => (v === null || v === undefined || isNaN(v) ? "–" : Number(v).toLocaleString("en-US", { minimumFractionDigits: d, maximumFractionDigits: d }));
-    const pct = (v) => (v === null || isNaN(v) ? "–" : `${v > 0 ? "+" : v < 0 ? "−" : ""}${Math.abs(v).toFixed(1)}%`);
+    const fmtR = (v, d = 0) => (v === null || v === undefined || isNaN(v) ? "–" : Number(v).toLocaleString(LOCALE, { minimumFractionDigits: d, maximumFractionDigits: d }));
+    const pct = (v) => (v === null || isNaN(v) ? "–" : `${v > 0 ? "+" : v < 0 ? "−" : ""}${fx(Math.abs(v), 1)}%`);
     const sample = (k, from) => V(k).map((v, i) => [D[i], v]).filter(([d, v], i) => v !== null && weekday[i] && d >= from).map(([, v]) => v);
     const mean = (a) => a.reduce((x, y) => x + y, 0) / a.length;
     const quant = (a, q) => { const b = [...a].sort((x, y) => x - y); const p = (b.length - 1) * q, lo = Math.floor(p); return b[lo] + (b[Math.min(lo + 1, b.length - 1)] - b[lo]) * (p - lo); };
@@ -1659,7 +1675,7 @@
           h("div", { class: "rer-tile" }, h("div", { class: "rer-k" }, "Real exchange rate"), h("div", { class: "rer-v" }, `${fmtR(rA, 1)} → ${fmtR(rB, 1)}`),
             h("div", { class: "rer-s" }, `${fmtDay(D[a])} to ${fmtDay(D[b])}: ${pct(rer)} (${rer < 0 ? "real appreciation" : "real depreciation"})`)),
           h("div", { class: "rer-tile" }, h("div", { class: "rer-k" }, "Required change in relative productivity, total"), h("div", { class: "rer-v" }, pct(total)),
-            h("div", { class: "rer-s" }, `over ${years.toFixed(1)} years, with α = ${al.toFixed(2)}`)),
+            h("div", { class: "rer-s" }, `over ${fx(years, 1)} years, with α = ${fx(al, 2)}`)),
           h("div", { class: "rer-tile" }, h("div", { class: "rer-k" }, "Required change, per year"), h("div", { class: "rer-v" }, pct(perYear)),
             h("div", { class: "rer-s" }, "compounded annual rate")),
           h("div", { class: "rer-tile" }, h("div", { class: "rer-k" }, "Terms of trade over the same span"), h("div", { class: "rer-v" }, totCh === null ? "–" : pct(totCh)),
@@ -1758,8 +1774,8 @@
     const chartEl = h("div", { class: "chart tall-ish", role: "img", "aria-label": "Dollar futures curve" });
     const hint = h("p", { class: "hint" });
     const sumEl = h("div", { class: "table-scroll flat" });
-    const fmt = (v, d = 0) => (v === null || v === undefined || isNaN(v) ? "–" : Number(v).toLocaleString("en-US", { minimumFractionDigits: d, maximumFractionDigits: d }));
-    const pct = (v) => (v === null || v === undefined || isNaN(v) ? "–" : `${v >= 0 ? "" : "−"}${Math.abs(v).toFixed(1)}%`);
+    const fmt = (v, d = 0) => (v === null || v === undefined || isNaN(v) ? "–" : Number(v).toLocaleString(LOCALE, { minimumFractionDigits: d, maximumFractionDigits: d }));
+    const pct = (v) => (v === null || v === undefined || isNaN(v) ? "–" : `${v >= 0 ? "" : "−"}${fx(Math.abs(v), 1)}%`);
     const NAMES = ["Today", "A month ago", "Three months ago"];
     const DASH = ["solid", "dash", "dot"];
 
@@ -1819,7 +1835,7 @@
       hint.textContent = `Settlement prices on ${fmtDay(C.date)}` + (spot ? `; official wholesale rate ${fmt(spot, 2)}.` : ".") +
         (last && last.dev !== null ? ` The longest contract (${fmtShortMonth(last.k.expiry)}) prices a ${pct(last.dev)} rise in the official rate (${pct(last.ann)} a year).` : "") +
         (ind.forecast ? ` Squares: the monthly average expected in the BCRA's REM survey of ${fmtMonth(ind.forecast.survey)} (median; bars: middle half of forecasters); futures settle on the month's last business day, so they run slightly above a monthly average when the rate is rising.` : "") +
-        ((data.band || {}).ceiling ? ` The grey dashed line extends the band's ceiling at the pace of its last three months (${(100 * data.band.ceiling.monthly_pace).toFixed(2)}% a month): an illustration, not an announced path.` : "");
+        ((data.band || {}).ceiling ? ` The grey dashed line extends the band's ceiling at the pace of its last three months (${fx((100 * data.band.ceiling.monthly_pace), 2)}% a month): an illustration, not an announced path.` : "");
       view = { header: ["curve_date", "symbol", "expiry", "settlement", "open_interest_contracts"],
         rows: data.curves.flatMap((c) => c.contracts.map((k) => [c.date, k.symbol, k.expiry, k.settlement, k.oi])) };
     }
@@ -1857,8 +1873,8 @@
     const DAY = 864e5;
     const today = new Date().toISOString().slice(0, 10);
     const daysBetween = (a, b) => Math.round((Date.parse(b) - Date.parse(a)) / DAY);
-    const fmtInt = (v) => Math.round(v).toLocaleString("en-US");
-    const yrs = (d) => (d / 365.25).toFixed(1);
+    const fmtInt = (v) => Math.round(v).toLocaleString(LOCALE);
+    const yrs = (d) => fx((d / 365.25), 1);
     const START_1983 = "1983-12-10";
 
     function rows() {
@@ -2014,7 +2030,7 @@
       const msg = [`Each line is one year's forecast as it evolved; stars and dotted lines mark the outcome. Latest survey: ${fmtMonth(data.latest)}.`];
       if (done.length) {
         const y = done[done.length - 1], first = D[y][0];
-        msg.push(` For ${y}, the first survey (${fmtShortMonth(first[0])}) expected ${first[1].toLocaleString("en-US", { maximumFractionDigits: 1 })}${V.sfx}; the outcome was ${O[y].toLocaleString("en-US", { maximumFractionDigits: 1 })}${V.sfx}.`);
+        msg.push(` For ${y}, the first survey (${fmtShortMonth(first[0])}) expected ${first[1].toLocaleString(LOCALE, { maximumFractionDigits: 1 })}${V.sfx}; the outcome was ${O[y].toLocaleString(LOCALE, { maximumFractionDigits: 1 })}${V.sfx}.`);
       }
       if (V.log) msg.push(" Log scale.");
       hint.textContent = msg.join("");
@@ -2055,8 +2071,8 @@
     dSel.addEventListener("change", () => { state.date = dSel.value; render(); });
     const tableEl = h("div", { class: "table-scroll" });
     const hint = h("p", { class: "hint" });
-    const n0 = (v) => (v === null || v === undefined ? "–" : Math.round(v).toLocaleString("en-US"));
-    const n1 = (v, d = 1) => (v === null || v === undefined ? "–" : v.toLocaleString("en-US", { minimumFractionDigits: d, maximumFractionDigits: d }));
+    const n0 = (v) => (v === null || v === undefined ? "–" : Math.round(v).toLocaleString(LOCALE));
+    const n1 = (v, d = 1) => (v === null || v === undefined ? "–" : v.toLocaleString(LOCALE, { minimumFractionDigits: d, maximumFractionDigits: d }));
     const KCOL = { fixed: "copper", cer: "gold", floating: "sage", dual: "lavender", dlinked: "teal", usd: "sky" };
     let view = null;
     function fillDates() {
@@ -2186,7 +2202,7 @@
       acc: ["Accumulated change (year to date vs. same months a year earlier)", "accumulated"], level: ["Level", ""] };
     const ytdNote = () => (bstate.kind === "ytd" ? ` (since Dec ${Number(refDate.slice(0, 4)) - 1})` : "");
     const barTitleFor = () => isRate ? `${ind.units}, ${fmtRef(refDate)}`
-      : bstate.inc ? `Incidence (contribution to total ${WORDS[bstate.kind][1]} change${ytdNote()}), ${fmtRef(refDate)}; total ${(totalInc() > 0 ? "+" : "") + totalInc().toFixed(2)} pp`
+      : bstate.inc ? `Incidence (contribution to total ${WORDS[bstate.kind][1]} change${ytdNote()}), ${fmtRef(refDate)}; total ${(totalInc() > 0 ? "+" : "") + fx(totalInc(), 2)} pp`
       : `${WORDS[bstate.kind][0]}${ytdNote()}, ${fmtRef(refDate)}`;
     let barTitle = barTitleFor();
     const barTitleEl = h("span", {}, `${barTitle}. `);
@@ -2228,7 +2244,7 @@
         x: shown,
         marker: { color: colors },
         customdata: order.map((k, i) => [k, actual[i], W && W[k] !== undefined ? W[k] : null]),
-        text: actual.map((v) => (bstate.inc ? (v > 0 ? "+" : "") + v.toFixed(2) + " pp" : fmtNum(v, barSpec))),
+        text: actual.map((v) => (bstate.inc ? (v > 0 ? "+" : "") + fx(v, 2) + " pp" : fmtNum(v, barSpec))),
         textposition: clipped.map((c) => (c ? "inside" : "outside")),
         insidetextanchor: "end",
         textfont: { family: cssVar("--font-ui") || "Calibri, Arial, sans-serif", size: forExport ? 15 : 12, color: clipped.map((c, i) => (c && slots.has(order[i]) ? "#FFFFFF" : inkColor)) },
@@ -2551,10 +2567,10 @@
     let mode = "mm";
     try { mode = localStorage.getItem("aem-dash-mode") || "mm"; } catch (e) {}
     const wrap = h("section", { class: "dash", "aria-label": "Summary of the latest data" });
-    const MON = (iso) => new Date(iso + "T00:00:00Z").toLocaleString("en-US", { month: "short", timeZone: "UTC" });
+    const MON = (iso) => new Date(iso + "T00:00:00Z").toLocaleString(LOCALE, { month: "short", timeZone: "UTC" });
     const YR = (iso) => iso.slice(2, 4);
-    const QN = (iso) => `Q${Math.floor((Number(iso.slice(5, 7)) - 1) / 3) + 1}`;
-    const nf = (v, d) => Number(v).toLocaleString("en-US", { minimumFractionDigits: d, maximumFractionDigits: d });
+    const QN = (iso) => `${LANG === "es" ? "T" : "Q"}${Math.floor((Number(iso.slice(5, 7)) - 1) / 3) + 1}`;
+    const nf = (v, d) => Number(v).toLocaleString(LOCALE, { minimumFractionDigits: d, maximumFractionDigits: d });
     const signed = (v, d) => { const r = Number(v.toFixed(d)); return `${r > 0 ? "+" : r < 0 ? "−" : ""}${nf(Math.abs(r), d)}`; };
     const isPctUnit = (u) => /^%/.test(u.trim());
     function fmtChange(r, kind, v) {
@@ -2613,7 +2629,7 @@
           if (!x) return h("td", { class: "empty" }, "");
           const [v, z] = x;
           const tip = `${r.label}, ${r.freq === "Q" ? QN(c) + " " + c.slice(0, 4) : MON(c) + " " + c.slice(0, 4)}: ${fmtChange(r, V.kind, v)}` +
-            (z === null ? "" : ` · ${Math.abs(z) < 0.5 ? "a usual move" : `${z > 0 ? (r.good === "none" ? "high" : "better") : (r.good === "none" ? "low" : "worse")} than usual (${Math.abs(z).toFixed(1)} s.d.)`} for this series`);
+            (z === null ? "" : ` · ${Math.abs(z) < 0.5 ? "a usual move" : `${z > 0 ? (r.good === "none" ? "high" : "better") : (r.good === "none" ? "low" : "worse")} than usual (${fx(Math.abs(z), 1)} s.d.)`} for this series`);
           return h("td", { style: cellStyle(r, z), title: tip }, fmtChange(r, V.kind, v), r.freq === "Q" ? h("span", { class: "dash-q" }, QN(c)) : null);
         });
         const lvlDate = r.freq === "Q" ? `${QN(r.level_date)} ${r.level_date.slice(0, 4)}` : `${MON(r.level_date)} ${r.level_date.slice(0, 4)}`;
@@ -2639,7 +2655,7 @@
 
   // ---------- home: what's new and what's coming (data/updates.json) ----------
   function timelineView(U, pageHref) {
-    const day = (iso) => new Date(iso + "T12:00:00Z").toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", timeZone: "UTC" });
+    const day = (iso) => new Date(iso + "T12:00:00Z").toLocaleDateString(LOCALE, { weekday: "short", month: "short", day: "numeric", timeZone: "UTC" });
     const per = (iso, f) => (f === "Q" ? fmtPeriod(iso.slice(0, 7) + "-01", "Q") : f === "S" ? fmtPeriod(iso.slice(0, 7) + "-01", "S") : fmtMonth(iso.slice(0, 7) + "-01"));
     const recent = U.recent.length ? h("ul", { class: "tl-list" }, U.recent.map((r) => h("li", {},
       h("span", { class: "tl-date" }, day(r.seen)),
@@ -2678,6 +2694,65 @@
     window.goatcounter.count({ path: `${b.textContent.trim().toLowerCase().replace(/\s+/g, "-")}${card ? "/" + card.id.replace(/^ind-/, "") : ""}`, title: b.textContent.trim(), event: true });
   });
 
+  // ---------- Spanish pages: translate the interface as it renders ----------
+  // Text nodes and labels are translated when they enter the page (exact strings, then
+  // patterns); charts are translated as they are drawn (trace names, hover text,
+  // annotations), with Spanish number separators and month names.
+  function installTranslation() {
+    const ATTRS = ["title", "aria-label", "placeholder"];
+    const skip = (n) => n.closest && n.closest("svg, script, style, textarea, code, .no-tr");
+    const doText = (t) => { const v = t.nodeValue; if (v && /[A-Za-z]/.test(v)) { const x = tr(v); if (x !== v) t.nodeValue = x; } };
+    const doEl = (el) => {
+      if (el.nodeType !== 1 || skip(el)) return;
+      for (const a of ATTRS) if (el.hasAttribute(a)) { const v = el.getAttribute(a), x = tr(v); if (x !== v) el.setAttribute(a, x); }
+      const w = document.createTreeWalker(el, NodeFilter.SHOW_TEXT | NodeFilter.SHOW_ELEMENT, {
+        acceptNode: (n) => (n.nodeType === 1 && n.matches("svg, script, style, textarea, code, .no-tr") ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT) });
+      for (let n = w.nextNode(); n; n = w.nextNode()) {
+        if (n.nodeType === 3) doText(n);
+        else for (const a of ATTRS) if (n.hasAttribute(a)) { const v = n.getAttribute(a), x = tr(v); if (x !== v) n.setAttribute(a, x); }
+      }
+    };
+    doEl(document.body);
+    new MutationObserver((recs) => {
+      for (const r of recs) {
+        if (r.type === "characterData") { if (!skip(r.target.parentElement || document.body)) doText(r.target); }
+        else if (r.type === "attributes") { if (ATTRS.includes(r.attributeName)) { const v = r.target.getAttribute(r.attributeName), x = tr(v); if (v && x !== v && !skip(r.target)) r.target.setAttribute(r.attributeName, x); } }
+        else r.addedNodes.forEach((n) => (n.nodeType === 3 ? (!skip(n.parentElement || document.body) && doText(n)) : doEl(n)));
+      }
+    }).observe(document.body, { subtree: true, childList: true, characterData: true, attributes: true, attributeFilter: ATTRS });
+    // Charts.
+    const hov = I18N.hover || [];
+    const trHover = (t) => {
+      if (typeof t !== "string") return t;
+      let o = t.replace(/Q%q/g, "T%q").replace(/<extra>([^<%]*)<\/extra>/g, (m, x) => `<extra>${tr(x)}</extra>`);
+      for (const [a, b] of hov) o = o.split(a).join(b);
+      return o;
+    };
+    const trTrace = (t) => ({ ...t, ...(t.name ? { name: tr(t.name) } : {}), ...(t.hovertemplate ? { hovertemplate: trHover(t.hovertemplate) } : {}),
+      ...(Array.isArray(t.text) ? { text: t.text.map((x) => tr(x)) } : typeof t.text === "string" ? { text: tr(t.text) } : {}) });
+    const trAxis = (a) => (a && a.title ? { ...a, title: typeof a.title === "string" ? tr(a.title) : { ...a.title, text: tr(a.title.text) } } : a);
+    const trLayout = (l) => {
+      if (!l) return l;
+      const o = { ...l, separators: ",.", ...(l.annotations ? { annotations: l.annotations.map((a) => ({ ...a, text: tr(a.text) })) } : {}) };
+      for (const k of Object.keys(o)) if (/^[xy]axis\d*$/.test(k)) o[k] = trAxis(o[k]);
+      if (o.title && o.title.text) o.title = { ...o.title, text: o.title.text.replace(/>([^<>]+)</g, (m, x) => `>${tr(x)}<`) };
+      return o;
+    };
+    const cfg = (c) => ({ ...(c || {}), locale: "es" });
+    if (!window.Plotly) return;
+    window.Plotly.register({ moduleType: "locale", name: "es", dictionary: { "Zoom in": "Ampliar", "Zoom out": "Reducir", "Pan": "Desplazar", "Zoom": "Zoom",
+      "Reset axes": "Restablecer ejes", "Autoscale": "Escala automática", "Download plot as a png": "Descargar como PNG", "Double-click to zoom back out": "Doble clic para volver" },
+      format: { days: ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"], shortDays: ["dom", "lun", "mar", "mié", "jue", "vie", "sáb"],
+        months: ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"],
+        shortMonths: ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"], date: "%d/%m/%Y", decimal: ",", thousands: "." } });
+    for (const f of ["react", "newPlot"]) {
+      const orig = window.Plotly[f].bind(window.Plotly);
+      window.Plotly[f] = (el, data, layout, config) => orig(el, (data || []).map(trTrace), trLayout(layout), cfg(config));
+    }
+    const toImg = window.Plotly.toImage.bind(window.Plotly);
+    window.Plotly.toImage = (fig, opts) => toImg({ ...fig, data: (fig.data || []).map(trTrace), layout: trLayout(fig.layout), config: cfg(fig.config) }, opts);
+  }
+
   // ---------- page ----------
   async function main() {
     const topicsEl = $("#topics");
@@ -2690,6 +2765,15 @@
       return;
     }
 
+    if (LANG === "es") {
+      try {
+        I18N = await getJSON(`${DATA}i18n/es.json`);
+        I18N._patterns = (I18N.patterns || []).map(([re, out]) => [new RegExp(`^${re}$`), out]);
+        // Page and group names in the menu and on the home page.
+        for (const t of manifest.topics) Object.assign(t, (I18N.topics || {})[t.id] || {});
+        installTranslation();
+      } catch (e) { console.error("translations not loaded", e); }
+    }
     PRESIDENCIES = manifest.presidencies || [];
     PARTY_COLORS = manifest.party_colors || {};
     const site = manifest.site || {};
@@ -2699,7 +2783,7 @@
     }
     if (site.repo_url) $("#repo-link").href = site.repo_url;
     const built = new Date(manifest.built_at);
-    $("#build-meta").textContent = `Last data check: ${built.toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" })}`;
+    $("#build-meta").textContent = `Last data check: ${built.toLocaleString(LOCALE, { dateStyle: "medium", timeStyle: "short" })}`;
 
     const topicOf = new Map(manifest.indicators.map((m) => [m.id, m.topic]));
     const slugOf = new Map(manifest.topics.map((t) => [t.id, t.slug]));

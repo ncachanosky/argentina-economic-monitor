@@ -756,3 +756,19 @@ def test_alert_report_needs_two_failed_runs():
     ids, body = alerts.report(status, now)
     assert ids == ["a", "c"] and "boom" in body and "blip" not in body and "<!-- ids: a,c -->" in body
     assert alerts.report({"d": {"status": "ok"}}, now)[0] == []
+
+
+def test_spanish_translations_load_and_patterns_compile():
+    import re as _re
+    from pipeline import build
+    es = build.load_i18n("es")
+    payload = build.i18n_payload(es)
+    assert payload["ui"]["Level"] == "Nivel" and payload["topics"]["prices"]["title"] == "Precios"
+    for pat, out in payload["patterns"]:
+        _re.compile(f"^{pat}$")
+    # JS-style group references ($1) must point to existing groups.
+    for pat, out in payload["patterns"]:
+        groups = _re.compile(pat).groups
+        assert all(int(n) <= groups for n in _re.findall(r"\$(\d)", out)), pat
+    reg = registry.load()
+    assert set(es["topics"]) == {t["id"] for t in reg.topics}
