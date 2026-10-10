@@ -1738,7 +1738,7 @@
     const pctSpec = { suffix: "%", signed: true };
     const lvlSpec = { suffix: "", signed: false };
 
-    const modeSeg = segmented([["level", "Level path"], ["growth", "Growth vs. target"]], state.mode, (k) => { state.mode = k; modeSeg.update(k); draw(); }, "View");
+    const modeSeg = segmented([["level", "Level path"], ["growth", "Growth vs. target"], ["money", "Money and velocity"]], state.mode, (k) => { state.mode = k; modeSeg.update(k); draw(); }, "View");
     const rateSeg = segmented([["rem", "REM expectations"], ["norm", "Productivity norm"], ["free", "Your rate"]], state.rate, (k) => { state.rate = k; rateSeg.update(k); freeIn.hidden = k !== "free"; draw(); }, "Target rate");
     const freeIn = h("input", { type: "number", step: "0.5", min: "-20", max: "300", value: String(state.free), "aria-label": "Target rate, % a year", style: "width:5.5em", hidden: true });
     freeIn.addEventListener("change", () => { const v = parseFloat(freeIn.value); if (Number.isFinite(v)) { state.free = v; draw(); } });
@@ -1752,6 +1752,8 @@
     const chartEl = h("div", { class: "chart tall-ish", role: "img", "aria-label": `${ind.title} chart` });
     const gapEl = h("div", { class: "chart", role: "img", "aria-label": "Gap to the path", style: "height:220px" });
     const gapTitle = h("p", { class: "hint", style: "margin-top:12px" }, "Gap: nominal GDP over the path, %");
+    const velTitle = h("p", { class: "hint", style: "margin-top:12px" }, "Velocity: nominal GDP (annual rate) over private M2. M2 is not seasonally adjusted, so velocity dips around June and December, when the aguinaldo raises cash holdings.");
+    const rateRow = h("div", { class: "controls" });
 
     const rateName = () => (state.rate === "rem" ? "REM-implied" : state.rate === "norm" ? `productivity norm, ${fx(N.norm, 1)}%` : `${fx(state.free, 1)}% a year`);
     // Split a series at the first proxy month so the proxy draws dashed.
@@ -1781,8 +1783,25 @@
       const tg = D.map((d) => (state.rate === "rem" ? remAt(addMonths(d, -12)) : rateAt(d)));
       return { n, r, p, tg };
     }
+    function moneyData() {
+      const n = D.map((d, i) => yoy(N.ngdp, i)), m = D.map((d, i) => yoy(N.m2, i));
+      const v = n.map((x, i) => (x === null || m[i] === null ? null : ((1 + x / 100) / (1 + m[i] / 100) - 1) * 100));
+      const vl = D.map((d, i) => (N.ngdp[i] !== null && N.m2[i] ? N.ngdp[i] / N.m2[i] : null));
+      return { n, m, v, vl };
+    }
+    const startOf = () => (state.range === "Max" ? "0000" : addMonths(D[D.length - 1], state.range === "3Y" ? -36 : -120));
     function traces() {
       const ink = cssVar("--ink");
+      if (state.mode === "money") {
+        const { n, m, v } = moneyData();
+        const idx = D.map((d, i) => i).filter((i) => D[i] >= startOf() && n[i] !== null);
+        const x = idx.map((i) => D[i]);
+        return [
+          ...splitTraces(x, idx.map((i) => n[i]), "Nominal GDP growth", ink, "#36454F", "%{y:.1f}%"),
+          { type: "scatter", mode: "lines", name: "Private M2", x, y: idx.map((i) => m[i]), line: { color: cssVar(SERIES_VARS[1]), width: 1.8 }, _slot: 1, hovertemplate: "%{y:.1f}%<extra>Private M2</extra>" },
+          { type: "scatter", mode: "lines", name: "Velocity", x, y: idx.map((i) => v[i]), line: { color: cssVar(SERIES_VARS[0]), width: 1.8 }, _slot: 0, hovertemplate: "%{y:+.1f}%<extra>Velocity</extra>" },
+        ];
+      }
       if (state.mode === "level") {
         const { path, b } = levelData();
         const idx = D.map((d, i) => i).filter((i) => i >= Math.max(0, b - 6));
@@ -1794,8 +1813,7 @@
         ];
       }
       const { n, r, p, tg } = growthData();
-      const start = state.range === "Max" ? "0000" : addMonths(D[D.length - 1], state.range === "3Y" ? -36 : -120);
-      const idx = D.map((d, i) => i).filter((i) => D[i] >= start && n[i] !== null);
+      const idx = D.map((d, i) => i).filter((i) => D[i] >= startOf() && n[i] !== null);
       const x = idx.map((i) => D[i]);
       return [
         ...splitTraces(x, idx.map((i) => n[i]), "Nominal GDP growth", ink, "#36454F", "%{y:.1f}%"),
@@ -1812,9 +1830,15 @@
       return [{ type: "bar", name: "Gap", x: idx.map((i) => D[i]), y: g, marker: { color: g.map((v) => (v >= 0 ? cssVar("--neg") : cssVar(SERIES_VARS[1]))) },
         _lightColors: g.map((v) => (v >= 0 ? "#C0504D" : "#5B9BD5")), hovertemplate: "%{x|%b %Y}: <b>%{y:+.1f}%</b><extra>Gap</extra>" }];
     }
+    function velTrace() {
+      const { vl } = moneyData();
+      const idx = D.map((d, i) => i).filter((i) => D[i] >= startOf() && vl[i] !== null);
+      return [{ type: "scatter", mode: "lines", name: "Velocity", x: idx.map((i) => D[i]), y: idx.map((i) => vl[i]),
+        line: { color: cssVar(SERIES_VARS[0]), width: 2 }, _slot: 0, hovertemplate: "%{x|%b %Y}: <b>%{y:.2f}</b><extra>Velocity</extra>" }];
+    }
     function draw() {
-      const level = state.mode === "level";
-      baseWrap.hidden = !level; rSeg.hidden = level; gapEl.hidden = !level; gapTitle.hidden = !level;
+      const level = state.mode === "level", money = state.mode === "money";
+      baseWrap.hidden = !level; rSeg.hidden = level; gapEl.hidden = !level && !money; gapTitle.hidden = !level; velTitle.hidden = !money; rateRow.hidden = money;
       const last = D.length - 1, proxyNote = N.proxy_from ? ` Dotted: proxy from ${fmtShortMonth(N.proxy_from)} (EMAE × CPI) until INDEC publishes the quarter.` : "";
       if (level) {
         const { path, b } = levelData();
@@ -1823,6 +1847,13 @@
           ? `${fmtShortMonth(D[last])}: el PIB nominal está ${fx(Math.abs(gap), 1)}% ${gap >= 0 ? "por encima" : "por debajo"} de una trayectoria que crece a ${state.rate === "rem" ? "la tasa implícita en el REM" : fx(rateAt(D[last]), 1) + "% anual"} desde el ${fmtPeriod(state.base, "Q")}.`
           : `${fmtShortMonth(D[last])}: nominal GDP is ${fx(Math.abs(gap), 1)}% ${gap >= 0 ? "above" : "below"} a path growing at ${state.rate === "rem" ? "the REM-implied rate" : fx(rateAt(D[last]), 1) + "% a year"} from ${fmtPeriod(state.base, "Q")}.`;
         hintEl.textContent = tr(`Seasonally adjusted, trillions of pesos at annual rates; log scale.${proxyNote}`);
+      } else if (money) {
+        const { n, m, v } = moneyData();
+        const k = (() => { for (let i = D.length - 1; i >= 0; i--) if (v[i] !== null) return i; return -1; })();
+        sumEl.textContent = k < 0 ? "" : es
+          ? `${fmtShortMonth(D[k])}: PIB nominal ${fx(n[k], 1)}% interanual = M2 privado ${fx(m[k], 1)}% y velocidad ${v[k] >= 0 ? "+" : ""}${fx(v[k], 1)}%.`
+          : `${fmtShortMonth(D[k])}: nominal GDP ${fx(n[k], 1)}% y/y = private M2 ${fx(m[k], 1)}% and velocity ${v[k] >= 0 ? "+" : ""}${fx(v[k], 1)}%.`;
+        hintEl.textContent = tr(`Year-over-year change, %. Velocity is nominal over money growth: positive when people hold less money for the same spending.${proxyNote}`);
       } else {
         const { n, tg } = growthData();
         sumEl.textContent = n[last] === null ? "" : es
@@ -1835,21 +1866,22 @@
         yaxis: level ? { type: "log", ticksuffix: "", tickformat: ",~r" } : {},
         extra: { showlegend: true, legend, margin: { l: 56, r: 16, t: 40, b: 36 } } }), PLOT_CONFIG);
       if (level) Plotly.react(gapEl, gapTrace(), baseLayout({ pct: pctSpec, xaxis: { hoverformat: "%b %Y" }, extra: { bargap: 0.15 } }), PLOT_CONFIG);
+      if (money) Plotly.react(gapEl, velTrace(), baseLayout({ pct: lvlSpec, xaxis: { hoverformat: "%b %Y" } }), PLOT_CONFIG);
     }
-    const onPNG = () => exportPNG(ind, traces(), state.mode === "level"
+    const onPNG = () => state.mode === "money" ? exportPNG(ind, traces(), "Nominal GDP, private M2 and velocity, y/y %", pctSpec, `${ind.id}_money.png`) : exportPNG(ind, traces(), state.mode === "level"
       ? `Nominal GDP and a path at ${rateName()} from ${fmtPeriod(state.base, "Q")} · trillions of pesos, s.a., annual rates`
       : `Nominal GDP growth, y/y %, and target (${rateName()})`, state.mode === "level" ? lvlSpec : pctSpec, `${ind.id}_${state.mode}.png`, state.mode === "level" ? { ylog: true } : {});
     const onCSV = () => {
-      const { path } = levelData(), { n, r, p, tg } = growthData();
+      const { path } = levelData(), { n, r, p, tg } = growthData(), { m, v, vl } = moneyData();
       const f = (v, d = 4) => (v === null || v === undefined ? "" : +v.toFixed(d));
-      downloadBlob(toCSV(["month", "ngdp_trillions_sa_ar", "real_gdp_billions_2004_sa_ar", "proxy", "ngdp_yoy", "real_yoy", "deflator_yoy", "target_rate", "path", "gap_pct"],
-        D.map((d, i) => [d, f(N.ngdp[i]), f(N.real[i], 2), i >= proxyI ? 1 : 0, f(n[i], 2), f(r[i], 2), f(p[i], 2), f(tg[i], 2), f(path[i]), path[i] ? f((N.ngdp[i] / path[i] - 1) * 100, 2) : ""])),
+      downloadBlob(toCSV(["month", "ngdp_trillions_sa_ar", "real_gdp_billions_2004_sa_ar", "proxy", "ngdp_yoy", "real_yoy", "deflator_yoy", "target_rate", "path", "gap_pct", "m2_private_trillions", "m2_yoy", "velocity", "velocity_yoy"],
+        D.map((d, i) => [d, f(N.ngdp[i]), f(N.real[i], 2), i >= proxyI ? 1 : 0, f(n[i], 2), f(r[i], 2), f(p[i], 2), f(tg[i], 2), f(path[i]), path[i] ? f((N.ngdp[i] / path[i] - 1) * 100, 2) : "", f(N.m2[i]), f(m[i], 2), f(vl[i], 3), f(v[i], 2)])),
         `${ind.id}_${state.mode}.csv`, "text/csv");
     };
     appendAll(card, sumEl,
       h("div", { class: "controls" }, modeSeg, h("span", { class: "spacer" }), rSeg),
-      h("div", { class: "controls" }, h("span", { class: "hint" }, "Target rate:"), rateSeg, freeIn, baseWrap),
-      hintEl, methodLine(ind), chartEl, gapTitle, gapEl,
+      appendAll(rateRow, h("span", { class: "hint" }, "Target rate:"), rateSeg, freeIn, baseWrap) || rateRow,
+      hintEl, methodLine(ind), chartEl, gapTitle, velTitle, gapEl,
       ind.note ? h("p", { class: "chips-note" }, ind.note) : null,
       h("div", { class: "card-foot" }, h("span", {}, `Source: ${ind.source_label} · Latest: ${fmtShortMonth(D[D.length - 1])}${N.proxy_from ? " (proxy)" : ""}`),
         h("div", { class: "actions" }, h("button", { class: "btn", type: "button", onclick: onPNG }, "PNG"), h("button", { class: "btn", type: "button", onclick: onCSV }, "CSV"))));

@@ -467,6 +467,9 @@ ui:
   As published: Según el informe
 
   # NGDP card
+  Money and velocity: Dinero y velocidad
+  Velocity: Velocidad
+  "Velocity: nominal GDP (annual rate) over private M2. M2 is not seasonally adjusted, so velocity dips around June and December, when the aguinaldo raises cash holdings.": "Velocidad: PIB nominal (tasa anual) sobre M2 privado. El M2 no está desestacionalizado, por lo que la velocidad cae alrededor de junio y diciembre, cuando el aguinaldo aumenta las tenencias de efectivo."
   Level path: Trayectoria en nivel
   Growth vs. target: Crecimiento frente al objetivo
   REM expectations: Expectativas del REM
@@ -486,6 +489,8 @@ ui:
   "Gap to the path": "Brecha con la trayectoria"
 
 patterns:
+  - ["Year-over-year change, %\\. Velocity is nominal over money growth: positive when people hold less money for the same spending\\. Dotted: proxy from (.+) \\(EMAE × CPI\\) until INDEC publishes the quarter\\.", "Variación interanual, %. La velocidad es el crecimiento nominal sobre el del dinero: positiva cuando la gente mantiene menos dinero para el mismo gasto. Punteado: estimación desde $1 (EMAE × IPC) hasta que el INDEC publique el trimestre."]
+  - ["Year-over-year change, %\\. Velocity is nominal over money growth: positive when people hold less money for the same spending\\.", "Variación interanual, %. La velocidad es el crecimiento nominal sobre el del dinero: positiva cuando la gente mantiene menos dinero para el mismo gasto."]
   - ["Source: (.+) · Latest: (.+) \\(proxy\\)", "Fuente: $1 · Último dato: $2 (estimación)"]
   - ["Seasonally adjusted, trillions of pesos at annual rates; log scale\\. Dotted: proxy from (.+) \\(EMAE × CPI\\) until INDEC publishes the quarter\\.", "Desestacionalizado, billones de pesos a tasa anual; escala logarítmica. Punteado: estimación desde $1 (EMAE × IPC) hasta que el INDEC publique el trimestre."]
   - ["Seasonally adjusted, trillions of pesos at annual rates; log scale\\.", "Desestacionalizado, billones de pesos a tasa anual; escala logarítmica."]

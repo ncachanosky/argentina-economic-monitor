@@ -1278,6 +1278,7 @@ indicators:
       compared with a target rate, or its level compared with a path that
       grows at that rate from a base quarter. The target can be what the
       market expected (REM), a productivity norm, or a rate of your choice.
+      A third view splits its growth into money (private M2) and velocity.
     source: manual
     source_label: INDEC (GDP, EMAE, CPI); BCRA (REM); monitor's calculations
     frequency: M
@@ -1295,6 +1296,10 @@ indicators:
       with factor inputs, so prices fall as productivity rises; about 2% a
       year. Level path: misses are not forgiven, so after a shortfall nominal
       spending must grow faster than the target to return to the path.
+      Money and velocity: nominal GDP growth is private M2 growth (currency
+      and private current and savings accounts in pesos, monthly average)
+      times velocity growth; velocity rises when people hold less money for
+      the same spending.
 
   - id: cpi
     topic: prices

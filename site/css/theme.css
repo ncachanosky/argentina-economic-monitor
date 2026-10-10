@@ -435,3 +435,4 @@ table.data.turns th, table.data.turns td { padding-left: 8px; padding-right: 8px
 
 /* NGDP card: controls and charts shown per view */
 .seg[hidden], .chart[hidden], .hint[hidden], input[hidden] { display: none; }
+.controls[hidden] { display: none; }

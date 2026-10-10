@@ -17,6 +17,10 @@ REM-implied NGDP growth, next twelve months, for each survey:
   expected real growth over the next twelve months weighs the survey's forecasts for
   the current and the next calendar year by the months of each it covers.
 
+Private M2 (currency held by the public + private current and savings accounts in
+pesos), monthly average of daily data, for the money-and-velocity view: velocity is
+nominal GDP (annual rate) over private M2.
+
 Target paths and gaps are computed in the browser (site/js/app.js, ngdpCard), so the
 reader can choose the base quarter and the rate.
 """
@@ -32,6 +36,7 @@ from .registry import ROOT
 
 REAL_SA, REAL, NOM = "3.2_OGP_D_2004_T_17", "4.2_OGP_2004_T_17", "4.4_OGP_2004_T_17"
 EMAE_SA = "143.3_NO_PR_2004_A_31"
+M2_PRIVATE = ("bcra:17", "bcra:94", "bcra:95")
 REM_TABLE = ROOT / "data" / "tables" / "rem" / "revisions.json"
 
 
@@ -93,11 +98,16 @@ def build() -> dict:
     real_m, _ = _monthly(real_q, emae, last_q)
     idx = ngdp_m.index
     rr = rem_rate()
+    # Private M2, monthly average of days with all three components.
+    m2d = pd.concat([store.as_of(k) for k in M2_PRIVATE], axis=1).dropna()
+    m2 = m2d.sum(axis=1).resample("MS").mean()
+    m2 = m2[m2.index <= m2d.index.max().replace(day=1) - pd.DateOffset(days=1)]   # complete months only
     r = lambda s, d=1: [None if pd.isna(v) else round(float(v), d) for v in s]
     return {
         "dates": [d.strftime("%Y-%m-%d") for d in idx],
         "ngdp": r(ngdp_m.reindex(idx) / 1e6, 4),            # trillions of pesos, annual rate
         "real": r(real_m.reindex(idx) / 1e3, 2),            # billions of 2004 pesos, annual rate
+        "m2": r(m2.reindex(idx) / 1e6, 4),                 # trillions of pesos, monthly average
         "proxy_from": p0.strftime("%Y-%m-%d") if p0 is not None else None,
         "last_quarter": last_q.strftime("%Y-%m-%d"),
         "quarters": [d.strftime("%Y-%m-%d") for d in defl.index],
