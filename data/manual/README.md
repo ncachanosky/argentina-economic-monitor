@@ -15,3 +15,14 @@ Format: `date,value` first (extra columns allowed: sources, notes, other
 values read as `<file>#<column>`). Monthly files use month-start dates; the
 net reserves files are dated by event. Changes are
 picked up by the next pipeline run and recorded in `data/vintages/`.
+
+## EMAE vintages (emae_vintages/, emae_trend_vintages.csv)
+
+`emae_vintages/` holds INDEC's EMAE informes técnicos as published, one PDF per
+monthly release from August 2016 (the September 2018 release is missing).
+`emae_trend_vintages.csv` is Cuadro 2 of each release (original, seasonally
+adjusted and trend-cycle indices, 2004 = 100, and their changes), one row per
+release and month, written by `python -m pipeline.emae_vintages
+data/manual/emae_vintages data/manual/emae_trend_vintages.csv`. From October
+2026 the daily update stores each new release itself (data/vintages).
+
