@@ -12,6 +12,11 @@ history; a jump of more than MAX_JUMP from the previous close in the newest
 observation is reported as a warning, since changes in the bonds included in
 the index produce one-day breaks (June 2005, September 2020) worth marking.
 
+Corrections: data/manual/riesgo_corrections.csv (date, value, note) holds
+hand-checked fixes to the source's history; a row with an empty value drops
+that day, a row with a value replaces it. Checked and kept as published: 30 July
+2014 (560, a one-day rally on hopes of a deal before the default).
+
 Series id: "riesgo:embi".
 """
 from __future__ import annotations
@@ -21,6 +26,8 @@ import time
 import pandas as pd
 import requests
 
+from ..registry import ROOT
+
 from . import FetchResult
 
 HISTORY = "https://api.argentinadatos.com/v1/finanzas/indices/riesgo-pais"
@@ -28,6 +35,7 @@ LATEST = HISTORY + "/ultimo"
 TIMEOUT = 60
 USER_AGENT = "argentina-economic-monitor (+https://github.com/ncachanosky/argentina-economic-monitor)"
 MAX_JUMP = 0.40
+CORRECTIONS = ROOT / "data" / "manual" / "riesgo_corrections.csv"
 
 
 def _get(url: str, retries: int = 3):
@@ -51,7 +59,22 @@ def clean(rows: list[dict], latest: dict | None = None) -> pd.Series:
         if d not in s.index:
             s = pd.concat([s, pd.Series({d: float(latest["valor"])})]).sort_index()
     s = s[~s.index.duplicated(keep="last")]
-    return s[s.index.dayofweek < 5]
+    return correct(s[s.index.dayofweek < 5])
+
+
+def correct(s: pd.Series, path=CORRECTIONS) -> pd.Series:
+    """Apply the hand-checked corrections: an empty value drops the day, a value replaces it."""
+    try:
+        c = pd.read_csv(path, parse_dates=["date"])
+    except FileNotFoundError:
+        return s
+    s = s.copy()
+    for _, r in c.iterrows():
+        if pd.isna(r["value"]):
+            s = s.drop(r["date"], errors="ignore")
+        elif r["date"] in s.index:
+            s[r["date"]] = float(r["value"])
+    return s
 
 
 def fetch(ids) -> FetchResult:

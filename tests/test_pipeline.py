@@ -803,3 +803,16 @@ def test_emae_turning_points_merge_short_phases():
     s = pd.Series(lvl, index=pd.date_range("2020-01-01", periods=len(lvl), freq="MS"))
     tps = turning_points(s)
     assert tps == [("peak", pd.Timestamp("2020-12-01"))]
+
+
+def test_riesgo_corrections(tmp_path):
+    import pandas as pd
+    from pipeline.sources import riesgo
+    f = tmp_path / "c.csv"
+    f.write_text('date,value,note\n2023-05-25,,"stale"\n2023-05-26,2601,"fixed"\n')
+    s = pd.Series([2590.0, 2590.0, 2590.0], index=pd.to_datetime(["2023-05-24", "2023-05-25", "2023-05-26"]))
+    out = riesgo.correct(s, f)
+    assert list(out.index.strftime("%Y-%m-%d")) == ["2023-05-24", "2023-05-26"] and out.iloc[-1] == 2601
+    # the shipped file only drops days, and each row says why
+    c = pd.read_csv(riesgo.CORRECTIONS)
+    assert c["note"].notna().all()

@@ -427,7 +427,13 @@ inputs:
   - {id: 150.1_LA_POBREZA_0_D_13, source: datos_gob, frequency: M, measure: index, label: "Poverty line, typical household (2 adults, 2 children), pesos"}
   - {id: 150.1_LA_INDICIA_0_D_16, source: datos_gob, frequency: M, measure: index, label: "Indigence line, typical household, pesos"}
   - {id: 65.1_CGI_0_0_21, source: datos_gob, frequency: Q, measure: flow, allow_gaps: true, label: "Gini coefficient, per capita household income (EPH)"}
-  - {id: 155.2_TLTAL_S_0_0_5, source: datos_gob, frequency: Q, measure: index, stale_days: 480, label: "Registered private wage earners (SIPA), seasonally adjusted"}
+  - {id: 151.1_AARIADOTAC_2012_M_26, source: datos_gob, frequency: M, measure: index, stale_days: 200, label: "Registered workers (SIPA): private wage earners, seasonally adjusted, thousands"}
+  - {id: 151.1_AARIADOTAC_2012_M_25, source: datos_gob, frequency: M, measure: index, stale_days: 200, label: "Registered workers (SIPA): public wage earners, seasonally adjusted, thousands"}
+  - {id: 151.1_AARIADOTAC_2012_M_40, source: datos_gob, frequency: M, measure: index, stale_days: 200, label: "Registered workers (SIPA): domestic workers, seasonally adjusted, thousands"}
+  - {id: 151.1_IPENDIETAC_2012_M_34, source: datos_gob, frequency: M, measure: index, stale_days: 200, label: "Registered workers (SIPA): self-employed (autónomos), seasonally adjusted, thousands"}
+  - {id: 151.1_IPENDIETAC_2012_M_36, source: datos_gob, frequency: M, measure: index, stale_days: 200, label: "Registered workers (SIPA): monotributo, seasonally adjusted, thousands"}
+  - {id: 151.1_IPENDIETAC_2012_M_43, source: datos_gob, frequency: M, measure: index, stale_days: 200, label: "Registered workers (SIPA): social monotributo, seasonally adjusted, thousands"}
+  - {id: 151.1_TL_SIN_TAC_2012_M_15, source: datos_gob, frequency: M, measure: index, stale_days: 200, label: "Registered workers (SIPA): total, seasonally adjusted, thousands"}
   - {id: 53.1_TRTA_0_0_37, source: datos_gob, frequency: Q, measure: flow, label: "Employee compensation, share of GDP at factor cost"}
   - {id: 53.1_TIMB_0_0_25, source: datos_gob, frequency: Q, measure: flow, label: "Mixed income, share of GDP at factor cost"}
   - {id: 53.1_EBE_0_0_27, source: datos_gob, frequency: Q, measure: flow, label: "Operating surplus, share of GDP at factor cost"}
@@ -4151,25 +4157,36 @@ indicators:
   - id: labor_registered
     topic: labor
     kind: variants
-    title: Registered Private Employment
+    overlay: true
+    overlay_default: [private]
+    title: Registered Employment
     short_title: Registered jobs
     description: >-
-      Private-sector wage earners registered in the social security system
-      (SIPA), seasonally adjusted, quarterly since 1996.
+      Workers registered in the social security system (SIPA), by type:
+      private and public wage earners, domestic workers, the self-employed
+      (autónomos) and monotributistas. Seasonally adjusted, monthly since
+      2012.
     source: datos_gob
-    source_label: Ministerio de Capital Humano (SIPA, EIL), via datos.gob.ar
-    frequency: Q
-    units: Workers
-    transforms: [level, yoy]
-    ranges: [10Y, Max]
+    source_label: Ministerio de Capital Humano (SIPA), via datos.gob.ar
+    frequency: M
+    units: Thousands of workers
+    transforms: [level, yoy, mom]
+    ranges: [5Y, Max]
     note: >-
-      Registered (formal) private wage earners only: public employees, the
-      self-employed (monotributistas) and informal workers are not included.
-      The series on datos.gob.ar lags the Ministry's own releases by about
-      two quarters.
+      Registered (formal) workers only: informal workers are not included.
+      Each worker is counted once, so the categories add up to the total.
+      The monthly series starts in 2012; it
+      replaces the quarterly series of private wage earners since 1996, which
+      datos.gob.ar publishes about two quarters later.
     variants:
-      sipa: {label: Registered private wage earners (SIPA), id: 155.2_TLTAL_S_0_0_5}
-    default: {variant: sipa, transform: level, range: Max}
+      private:   {label: Private wage earners,       id: 151.1_AARIADOTAC_2012_M_26}
+      public:    {label: Public wage earners,        id: 151.1_AARIADOTAC_2012_M_25}
+      domestic:  {label: Domestic workers,           id: 151.1_AARIADOTAC_2012_M_40}
+      autonomos: {label: Self-employed (autónomos),  id: 151.1_IPENDIETAC_2012_M_34}
+      mono:      {label: Monotributo,                id: 151.1_IPENDIETAC_2012_M_36}
+      mono_soc:  {label: Social monotributo,         id: 151.1_IPENDIETAC_2012_M_43}
+      total:     {label: All registered workers,     id: 151.1_TL_SIN_TAC_2012_M_15}
+    default: {variant: private, transform: level, range: Max}
 
   - id: labor_wages_real
     topic: labor
@@ -4927,7 +4944,9 @@ indicators:
       overstates what is owed outside the public sector; TAMAR-linked
       BONCAP are taken at the fixed-rate average; and the interest on the
       LEFI (July 2024 - July 2025) and on letters sold at a discount is
-      left out, which understates it.
+      left out, which understates it. An independent check from the debt
+      bulletin's flows by instrument gives a similar or somewhat higher
+      figure (see the methodology), so read the estimate as a floor.
     contributions:
       precomputed: true
       total_label: Accrual-adjusted interest

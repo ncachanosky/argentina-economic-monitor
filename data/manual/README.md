@@ -26,3 +26,12 @@ release and month, written by `python -m pipeline.emae_vintages
 data/manual/emae_vintages data/manual/emae_trend_vintages.csv`. From October
 2026 the daily update stores each new release itself (data/vintages).
 
+
+## Country-risk corrections (riesgo_corrections.csv)
+
+Hand-checked fixes to the EMBI history that ArgentinaDatos compiles from Ámbito
+(adapter `pipeline/sources/riesgo.py`). One row per day: `date`, `value`, `note`.
+An empty `value` drops the day (the source has no real quote for it); a value
+replaces the source's. Every row needs a note saying what was wrong and how it
+was checked. Large one-day moves the source got right stay as published (for
+example 30 July 2014).
