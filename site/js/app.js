@@ -3154,6 +3154,7 @@
     }
 
     buildNav($("#nav"), manifest, pageHref);
+    setupSearch(manifest, pageHref);
 
     // Charts are redrawn on a theme change (set once the page has charts).
     let redraw = () => redrawAll();
@@ -3305,6 +3306,87 @@
         : ind.kind === "turns" ? turnsCard(ind)
         : ind.kind === "ngdp" ? ngdpCard(ind)
         : variantsCard(ind, !ind.half);
+  }
+
+  // ---------- site search: card titles, short titles, descriptions and page names ----------
+  // Runs in the browser over the manifest; accent- and case-insensitive; "/" focuses the box.
+  function setupSearch(manifest, pageHref) {
+    const box = $("#site-search");
+    if (!box) return;
+    const norm = (s) => String(s || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+    const topics = new Map(manifest.topics.map((t) => [t.id, t]));
+    const items = [
+      ...manifest.topics.map((t) => ({ title: t.title, where: tr("Page"), href: pageHref(t.id), text: norm(`${t.title} ${t.description || ""}`), tn: norm(t.title) })),
+      ...manifest.indicators.filter((m) => topics.has(m.topic)).map((m) => {
+        const title = tr(m.title), short = tr(m.short_title || ""), desc = tr(m.description || "");
+        return { title, where: topics.get(m.topic).title, href: pageHref(m.topic, `ind-${m.id}`), id: m.id,
+          text: norm(`${title} ${short} ${desc} ${m.id.replace(/_/g, " ")}`), tn: norm(`${title} ${short}`) };
+      }),
+      { title: tr("Methodology"), where: tr("Page"), href: `${ROOT}methodology/`, text: norm(`${tr("Methodology")} methodology metodologia sources fuentes`), tn: norm(tr("Methodology")) },
+      { title: tr("About"), where: tr("Page"), href: `${ROOT}about/`, text: norm(`${tr("About")} about acerca cite citar`), tn: norm(tr("About")) },
+    ];
+    const label = tr("Search charts");
+    const input = h("input", { type: "search", class: "search-input", placeholder: `${label}…`, "aria-label": label, autocomplete: "off", spellcheck: "false",
+      role: "combobox", "aria-expanded": "false", "aria-controls": "search-results", "aria-autocomplete": "list" });
+    const list = h("ul", { class: "search-results", id: "search-results", role: "listbox", hidden: true });
+    const toggle = h("button", { class: "btn icon-btn search-toggle", type: "button", "aria-label": label, title: label },
+      (() => { const s = document.createElementNS("http://www.w3.org/2000/svg", "svg"); s.setAttribute("width", "16"); s.setAttribute("height", "16"); s.setAttribute("viewBox", "0 0 16 16"); s.setAttribute("aria-hidden", "true");
+        s.innerHTML = '<circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="m10.5 10.5 3.5 3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>'; return s; })());
+    const panel = h("div", { class: "search-panel" }, input, list);
+    box.append(toggle, panel);
+    let results = [], sel = -1;
+    const close = () => { list.hidden = true; input.setAttribute("aria-expanded", "false"); sel = -1; };
+    const go = (r) => {
+      if (!r) return;
+      close(); box.classList.remove("open"); input.blur();
+      const u = new URL(r.href, location.href);
+      if (u.pathname === location.pathname && u.hash) {
+        const el = document.getElementById(u.hash.slice(1));
+        if (el) { history.replaceState(null, "", u.hash); el.scrollIntoView({ behavior: "smooth", block: "start" }); return; }
+      }
+      location.href = r.href;
+    };
+    const render = () => {
+      list.replaceChildren(...results.map((r, k) => {
+        const li = h("li", { role: "option", id: `sr-${k}`, "aria-selected": String(k === sel), class: k === sel ? "active" : null },
+          h("span", { class: "sr-title" }, r.title), h("span", { class: "sr-where" }, r.where));
+        li.addEventListener("mousedown", (e) => { e.preventDefault(); go(r); });
+        return li;
+      }));
+      if (!results.length && input.value.trim()) list.append(h("li", { class: "sr-empty" }, tr("No charts match.")));
+      list.hidden = !input.value.trim();
+      input.setAttribute("aria-expanded", String(!list.hidden));
+      input.setAttribute("aria-activedescendant", sel >= 0 ? `sr-${sel}` : "");
+    };
+    input.addEventListener("input", () => {
+      const terms = norm(input.value).split(/\s+/).filter(Boolean);
+      sel = -1;
+      if (!terms.length) { results = []; render(); return; }
+      results = items.map((it) => {
+        if (!terms.every((w) => it.text.includes(w))) return null;
+        let score = 0;
+        for (const w of terms) score += it.tn.includes(w) ? (it.tn.split(/\W+/).some((x) => x.startsWith(w)) ? 3 : 2) : 1;
+        if (it.where === tr("Page")) score += 0.5;
+        return { ...it, score };
+      }).filter(Boolean).sort((a, b) => b.score - a.score || a.title.length - b.title.length).slice(0, 8);
+      if (window.goatcounter && window.goatcounter.count && terms.join(" ").length > 2) {
+        clearTimeout(input._gc); input._gc = setTimeout(() => window.goatcounter.count({ path: `search/${terms.join("-")}`, title: "search", event: true }), 1500);
+      }
+      render();
+    });
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowDown") { e.preventDefault(); sel = Math.min(results.length - 1, sel + 1); render(); }
+      else if (e.key === "ArrowUp") { e.preventDefault(); sel = Math.max(-1, sel - 1); render(); }
+      else if (e.key === "Enter") { e.preventDefault(); go(results[Math.max(0, sel)]); }
+      else if (e.key === "Escape") { input.value = ""; results = []; close(); box.classList.remove("open"); input.blur(); }
+    });
+    input.addEventListener("blur", () => setTimeout(close, 150));
+    input.addEventListener("focus", () => { if (input.value.trim()) render(); });
+    const place = () => box.style.setProperty("--search-top", `${Math.round(toggle.getBoundingClientRect().bottom + 8)}px`);
+    toggle.addEventListener("click", () => { place(); box.classList.toggle("open"); if (box.classList.contains("open")) input.focus(); });
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "/" && !/^(INPUT|TEXTAREA|SELECT)$/.test((document.activeElement || {}).tagName || "")) { e.preventDefault(); place(); box.classList.add("open"); input.focus(); }
+    });
   }
 
   // Each card gets an "Embed" button: an iframe of /embed/?id=<card> to paste into another site.

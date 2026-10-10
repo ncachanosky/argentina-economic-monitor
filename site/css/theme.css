@@ -449,3 +449,28 @@ main:focus { outline: none; }
 /* Beta tag and note */
 .beta-tag { display: inline-block; margin-left: 6px; padding: 1px 6px; border: 1px solid var(--accent); border-radius: 4px; color: var(--accent-ink); font-family: var(--font-ui); font-size: 10px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; vertical-align: 2px; }
 .beta-note { margin-top: 6px; font-family: var(--font-ui); font-size: 13px; color: var(--ink-3); }
+
+/* Site search */
+.site-search { position: relative; }
+.search-input { width: 210px; font: inherit; font-family: var(--font-ui); font-size: 14px; padding: 6px 10px; border: 1px solid var(--rule); border-radius: 6px; background: var(--surface); color: var(--ink); }
+.search-input:focus { outline: 2px solid var(--accent); outline-offset: 0; border-color: var(--accent); }
+.search-toggle { display: none; }
+.search-results { position: absolute; right: 0; top: calc(100% + 6px); z-index: 60; width: 340px; max-width: calc(100vw - 24px); margin: 0; padding: 4px 0; list-style: none;
+  background: var(--surface); border: 1px solid var(--rule); border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,.12); font-family: var(--font-ui); }
+.search-results[hidden] { display: none; }
+.search-results li { display: flex; flex-direction: column; gap: 1px; padding: 7px 12px; cursor: pointer; }
+.search-results li.active, .search-results li:hover { background: var(--grid); }
+.sr-title { font-size: 14px; color: var(--ink); }
+.sr-where { font-size: 12px; color: var(--ink-3); }
+.sr-empty { font-size: 13px; color: var(--ink-3); cursor: default !important; }
+@media (max-width: 900px) {
+  .search-toggle { display: inline-flex; }
+  .search-panel { display: none; position: fixed; left: 12px; right: 12px; top: var(--search-top, 64px); z-index: 60; }
+  .site-search.open .search-panel { display: block; }
+  .search-input { width: 100%; box-shadow: 0 8px 24px rgba(0,0,0,.12); }
+  .search-results { position: static; width: 100%; margin-top: 4px; }
+}
+
+.how-list { padding-left: 1.2em; }
+.how-list li { margin-bottom: .5em; }
+kbd { font-family: var(--font-ui); font-size: .85em; padding: 1px 5px; border: 1px solid var(--rule); border-radius: 4px; background: var(--surface); }

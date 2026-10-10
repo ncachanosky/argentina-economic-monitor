@@ -523,6 +523,10 @@ def export(out: Path) -> None:
             "headline": bool(ind.headline),
         })
 
+    # Each card's description, for the site search (site/js/app.js, setupSearch).
+    desc = {ind.id: " ".join((ind.description or "").split()) for ind in reg.indicators}
+    for e in manifest_inds:
+        e.setdefault("description", desc.get(e["id"], ""))
     manifest = {
         "site": reg.site,
         "topics": reg.topics,

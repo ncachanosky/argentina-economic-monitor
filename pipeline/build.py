@@ -38,7 +38,7 @@ EN = {
     "methodology_lede": "Sources, checks and every calculation behind the charts.",
     "methodology_desc": "How the Argentina Economic Monitor gets, checks and transforms its data.",
     "about_title": "About",
-    "about_lede": "What the Monitor is, who is behind it, and how to cite it or report an error.",
+    "about_lede": "What the Monitor is, how to use it, who is behind it, and how to cite it or report an error.",
     "about_desc": "About the Argentina Economic Monitor, a project of Economic Order.",
     "embed_title": "Chart",
     "embed_desc": "A chart from the Argentina Economic Monitor.",
@@ -56,7 +56,8 @@ EN = {
     "pending_note": "",
     "skip": "Skip to content",
     "beta_note": ('The Monitor is in beta: charts and methods may still change. Corrections and suggestions are welcome '
-                  '<a href="__REPO__/issues" target="_blank" rel="noopener">on GitHub</a>.'),
+                  '<a href="__REPO__/issues" target="_blank" rel="noopener">on GitHub</a>. '
+                  'New here? See <a href="about/#how">how to use the Monitor</a>.'),
     "notfound_title": "Page not found",
     "notfound_text": "This page does not exist, or it moved. Try one of these:",
     "footer": """      <div>
