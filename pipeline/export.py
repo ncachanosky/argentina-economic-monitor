@@ -246,6 +246,37 @@ def rem_outcomes() -> dict:
     return {k: {y: float(v) for y, v in d.items()} for k, d in out.items()}
 
 
+def export_turns(ind, out: Path) -> dict | None:
+    """The EMAE trend-cycle in real time (pipeline/emae_turns.py)."""
+    from . import emae_turns
+    try:
+        res = emae_turns.build()
+    except Exception as exc:
+        print(f"skip {ind.id}: {exc}")
+        return None
+    last = res["releases"][-1]["data_to"]
+    payload = {"id": ind.id, "topic": ind.topic, "kind": ind.kind, "title": ind.title, "short_title": ind.short_title,
+               "description": ind.description, "note": ind.note, "source_label": ind.source_label, "wide": True,
+               "frequency": "M", "units": ind.units, "method_links": ind.method_links, "status": "ok", "last_obs": last,
+               "turns": res}
+    (out / f"{ind.id}.json").write_text(json.dumps(payload, separators=(",", ":")), encoding="utf-8")
+    return {"id": ind.id, "topic": ind.topic, "kind": ind.kind, "title": ind.title, "short_title": ind.short_title,
+            "status": "ok", "last_obs": last, "headline": False}
+
+
+def trend_note() -> str | None:
+    """One line for the EMAE card's trend-cycle view."""
+    from . import emae_turns
+    try:
+        s = emae_turns.build()["summary"]
+    except Exception:
+        return None
+    f = lambda x: f"{x:g}"
+    return (f"In real time, the trend-cycle has needed a median of {f(s['median_first_data_lag'])} months of data "
+            f"(about {f(s['median_first_lag'])} months after the turn, counting the release lag) to signal a reversal since 2016; "
+            f"{s['n_reversed']} single signals later turned back. See \"How Fast the Trend-Cycle Calls a Turn\" below.")
+
+
 def export_table(ind, out: Path, status: dict) -> dict | None:
     """Copy a full table (data/tables/<source>/*.json) next to the site data and write the card's payload."""
     import shutil
@@ -338,7 +369,7 @@ def export(out: Path) -> None:
         if ind.hidden:
             continue
         if ind.kind in registry.TABLE_KINDS:
-            entry = export_table(ind, out, status)
+            entry = export_turns(ind, out) if ind.kind == "turns" else export_table(ind, out, status)
             if entry:
                 manifest_inds.append(entry)
             continue
@@ -441,6 +472,10 @@ def export(out: Path) -> None:
             payload["weights"] = sector_weights(ind, reg)
         if ind.display:
             payload.update(ind.display)
+        if ind.id == "emae":
+            tn = trend_note()
+            if tn:
+                payload["variant_notes"] = {"trend": tn, "trend_link": "ind-emae_turns"}
         (out / f"{ind.id}.json").write_text(json.dumps(payload, separators=(",", ":")), encoding="utf-8")
 
         # The downloadable "all data" CSV keeps the source units (e.g. millions of 2004 pesos).

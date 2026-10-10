@@ -765,6 +765,32 @@ indicators:
     # year earlier (original series, as INDEC reports it) and Dec-to-Dec (SA).
     annual_table: {accumulated: original, within_year: sa, carryover: true}
 
+  - id: emae_turns
+    topic: real_sector
+    kind: turns
+    title: How Fast the Trend-Cycle Calls a Turn
+    short_title: Trend-cycle in real time
+    description: >-
+      The EMAE trend-cycle as INDEC published it at each release since
+      August 2016, against the series as it stands today: how many months
+      it took to signal each peak and trough, and when it signalled a turn
+      that later disappeared.
+    source: manual
+    source_label: INDEC (EMAE informes técnicos, Cuadro 2, each release); monitor's calculations
+    frequency: M
+    units: "% change in the trend-cycle, month on month"
+    table: {source: emae_turns}
+    method_links: [{anchor: emae-turns, label: "How turns and signals are defined"}]
+    note: >-
+      Turning points are dated on today's trend-cycle. A release signals a
+      turn when the change in its latest month has the new sign; a turn is
+      confirmed by three releases in a row with that sign. Months of data:
+      from the turning month to the latest month in the release; months
+      after the turn: to the release date, which comes about two months
+      after the data. Releases since October 2026 are stored by the daily
+      update; earlier ones come from INDEC's PDF reports (the September 2018
+      report is missing).
+
   - id: emae_sectors
     topic: real_sector
     kind: panel

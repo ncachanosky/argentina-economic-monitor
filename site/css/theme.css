@@ -427,3 +427,8 @@ body[data-page="embed"] .card { border: 0; box-shadow: none; margin: 0; }
 .dash-table td.dash-fb { font-style: italic; }
 /* Chips in panel and component cards use the interface font */
 .chips { font-family: var(--font-ui); font-size: 13px; }
+
+/* EMAE trend-cycle in real time: second line in release cells */
+table.data .muted { color: var(--ink-3); font-size: 0.85em; }
+table.data.turns th { white-space: normal; vertical-align: bottom; line-height: 1.25; }
+table.data.turns th, table.data.turns td { padding-left: 8px; padding-right: 8px; }

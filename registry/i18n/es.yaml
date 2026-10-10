@@ -448,7 +448,27 @@ ui:
 
   "<b>Argentina Economic Monitor</b> · Economic Order": "<b>Monitor de la Economía Argentina</b> · Economic Order"
 
+  # EMAE trend-cycle in real time
+  Peak: Pico
+  Trough: Valle
+  Turn: Giro
+  "Month (today's dating)": "Mes (fechado actual)"
+  First signal: Primera señal
+  Months of data: Meses de datos
+  "Confirmed (3 in a row)": "Confirmado (3 seguidos)"
+  That release dated the turn at: Ese informe fechó el giro en
+  Not before the next turn: No antes del giro siguiente
+  No turn nearby: Sin giro cercano
+  "Latest month of each release against today's trend-cycle.": "Último mes de cada informe frente a la tendencia-ciclo actual."
+  "Today's trend-cycle": "Tendencia-ciclo actual"
+  "As published at each release (latest month)": "Según cada informe (último mes)"
+  Signal that turned back: Señal revertida
+  As published: Según el informe
+
 patterns:
+  - ["Source: (.+) · Latest release: (.+)", "Fuente: $1 · Último informe: $2"]
+  - ["In real time, the trend-cycle has needed a median of (\\S+) months of data \\(about (\\S+) months after the turn, counting the release lag\\) to signal a reversal since 2016; (\\d+) single signals later turned back\\. See \"How Fast the Trend-Cycle Calls a Turn\" below\\.", "En tiempo real, la tendencia-ciclo necesitó una mediana de $1 meses de datos (unos $2 meses después del giro, contando el rezago de publicación) para señalar un cambio de dirección desde 2016; $3 señales aisladas se revirtieron después. Véase \"Qué tan rápido la tendencia-ciclo marca un giro\" más abajo."]
+  - ["Change in the trend-cycle, % m/m: latest month of each release vs\\. today's series · P/T: peaks and troughs", "Variación de la tendencia-ciclo, % mensual: último mes de cada informe frente a la serie actual · P/V: picos y valles"]
   - ["Flows over the period, against the same period a year earlier\\. Latest month: (.+)\\. Real change: each month deflated by the CPI\\.", "Flujos del período, frente al mismo período del año anterior. Último mes: $1. Variación real: cada mes deflactado por el IPC."]
   - ["Flows over the period, against the same period a year earlier\\. Latest month: (.+)\\.", "Flujos del período, frente al mismo período del año anterior. Último mes: $1."]
   - ["12 months to (.+)", "12 meses a $1"]
@@ -594,3 +614,4 @@ hover:
   - [" days (", " días ("]
   - [" years)", " años)"]
   - ["in office", "en funciones"]
+  - [" in the release of ", " en el informe del "]

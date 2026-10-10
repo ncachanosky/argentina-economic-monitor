@@ -10,6 +10,7 @@
   <a href="#episodes">Episodes</a>
   <a href="#weights">Weights and incidence</a>
   <a href="#gdp">GDP</a>
+  <a href="#emae-turns">EMAE in real time</a>
   <a href="#cpi-long">CPI since 1943</a>
   <a href="#cpi-basket">CPI with the 2017/18 basket</a>
   <a href="#rem">Market expectations (REM)</a>
@@ -75,6 +76,14 @@
 <p><b>Real GDP since 1993</b> chain-links INDEC's accounts at 1993 prices (quarterly growth through the first quarter of 2004) with the accounts at 2004 prices (from the second quarter of 2004). Growth rates are kept from each base; the level is that of the 2004 base. INDEC's 2004 rebasing raised the measured level of GDP and changed growth in the overlapping years; the splice does not revise the 1993–2003 figures.</p>
 <p><b>Quarter tracker</b>: the seasonally adjusted EMAE averaged over each quarter, next to seasonally adjusted quarterly GDP. INDEC reconciles the two, so for published quarters their q/q changes coincide (within 0.03 percentage points since 2004). For the quarter in progress the tracker uses the months published so far: their average against the previous quarter's (q/q), what the quarter would show if the remaining months stayed at the latest month's level, and the y/y change of the same months in the original series.</p>
 <p><b>Investment rate</b>: gross fixed capital formation over GDP, both at current prices, summed over the last four quarters to remove seasonality.</p>
+
+<h2 id="emae-turns">EMAE trend-cycle in real time</h2>
+<p>INDEC publishes three versions of the EMAE: the original series, the seasonally adjusted series and the trend-cycle, a smoothed version of the seasonally adjusted series. The trend-cycle is easier to read, but its last months are revised as new data arrive, because the smoothing filter needs data on both sides of each month. <b>How Fast the Trend-Cycle Calls a Turn</b> measures that delay with the trend-cycle as each release published it.</p>
+<p><b>Data.</b> The m/m change of the trend-cycle in the latest month of each release, from INDEC's technical reports (Cuadro 2) from August 2016 onwards; the September 2018 report is missing. Later releases come from the copies of the series the monitor stores at each update. Changes are rounded to one decimal, as published.</p>
+<p><b>Turning point.</b> Dated on today's trend-cycle: the last month of a phase of rising months (a peak) or of falling months (a trough). Phases shorter than four months are merged into their neighbours, and a zero change continues the phase in course. Today's dating can move as the latest months are revised.</p>
+<p><b>First signal.</b> The first release after the turning point whose latest month changes with the sign of the new phase. <b>Confirmed</b>: the first release that starts a run of three releases in a row, all with that sign. Delays are counted two ways: months of data (from the turning point to the last month in the release) and calendar months (from the turning point to the release date, which adds INDEC's publication lag of about two months).</p>
+<p><b>Reversed signal.</b> A release whose latest month changes sign while today's trend-cycle shows the opposite sign for that same month: a turn the real-time series called and later took back.</p>
+<p><b>That release dated the turn at.</b> In the confirming release, the month of the highest (peak) or lowest (trough) trend-cycle level within six months of today's date for the turn; left blank when that release shows no turn near the month.</p>
 
 <h2 id="cpi-long">CPI since 1943</h2>
 <p>From January 2007, INDEC was intervened by the national government, under Secretary of Domestic Trade Guillermo Moreno, and its CPI understated inflation. In February 2013 the IMF issued a declaration of censure against Argentina over the quality of its CPI and GDP data (<a href="https://www.imf.org/en/news/articles/2015/09/14/01/49/pr1333">IMF Press Release 13/33</a>). After the change of government, Decree 55/2016 declared an administrative emergency of the national statistical system in January 2016 (<a href="https://servicios.infoleg.gob.ar/infolegInternet/anexos/310000-314999/311627/norma.htm">InfoLEG</a>), and INDEC suspended the CPI while it was rebuilt. A new CPI for Greater Buenos Aires started with May 2016 and the national CPI with December 2016; the IMF removed the censure in November 2016 (<a href="https://www.imf.org/en/news/articles/2016/11/09/pr16497-argentina-imf-executive-board-removes-declaration-of-censure">IMF Press Release 16/497</a>).</p>

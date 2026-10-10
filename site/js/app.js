@@ -1187,6 +1187,7 @@
       if (isLog()) msgs.push("Log scale: equal distances are equal percentage changes.");
       if (ind._real) msgs.push(`Real terms: deflated by the ${ind.deflator.label}, in pesos of ${fmtMonth(ind.deflator.latest)}; months after that have no CPI yet.`);
       if (state._fcNote) { msgs.push(state._fcNote); state._fcNote = null; }
+      if (ind.variant_notes && ind.variant_notes[state.variant]) msgs.push(tr(ind.variant_notes[state.variant]));
       if (partialNote(ind)) msgs.push(partialNote(ind));
       hint.textContent = msgs.join(" ");
 
@@ -1715,6 +1716,79 @@
         h("div", { class: "actions" },
           h("button", { class: "btn", type: "button", onclick: onCSV, title: "Download this view as CSV" }, "CSV"))));
     card.draw = () => draw();
+    return card;
+  }
+
+  // ---------- card: the EMAE trend-cycle in real time (pipeline/emae_turns.py) ----------
+  function turnsCard(ind) {
+    const R = ind.turns, S = R.summary;
+    const card = cardFrame(ind, true);
+    const spec = { suffix: "%", signed: true };
+    const kindName = (k) => (k === "peak" ? "Peak" : "Trough");
+    const mon = (iso) => (iso ? fmtShortMonth(iso) : "–");
+    const nConf = fx(S.median_confirmed_data_lag, 1).replace(/[.,]0$/, "");
+    const sumEl = LANG === "es"
+      ? h("p", { class: "summary-line no-tr" },
+        `${S.n_releases} informes, de ${mon(S.first_release)} a ${mon(S.last_release)}. La primera señal de un giro llegó tras una mediana de `,
+        h("b", {}, `${fx(S.median_first_data_lag, 0)} meses de datos`),
+        ` (rango ${S.range_first_data_lag[0]}–${S.range_first_data_lag[1]}), unos ${fx(S.median_first_lag, 0)} meses después del giro; la confirmación por ${S.confirm} informes seguidos, tras una mediana de `,
+        h("b", {}, `${nConf} meses de datos`),
+        `. ${S.n_reversed} señales se revirtieron.`)
+      : h("p", { class: "summary-line" },
+        `${S.n_releases} releases, ${mon(S.first_release)} to ${mon(S.last_release)}. First signal of a turn after a median of `,
+        h("b", {}, `${fx(S.median_first_data_lag, 0)} months of data`),
+        ` (range ${S.range_first_data_lag[0]}–${S.range_first_data_lag[1]}), about ${fx(S.median_first_lag, 0)} months after the turn; confirmed by ${S.confirm} releases in a row after a median of `,
+        h("b", {}, `${nConf} months of data`),
+        `. ${S.n_reversed} signals turned back.`);
+    const head = h("tr", {}, ["Turn", "Month (today's dating)", "First signal", "Months of data", "Confirmed (3 in a row)", "Months of data", "That release dated the turn at"].map((x) => h("th", {}, x)));
+    const relCell = (x) => [fmtDay(x.release), h("br"), h("span", { class: "muted no-tr" }, `${LANG === "es" ? "datos a" : "data to"} ${mon(x.data_to)}`)];
+    const body = R.turns.slice().reverse().map((t) => h("tr", {},
+      h("td", { class: "pres" }, kindName(t.kind)), h("td", {}, mon(t.month)),
+      h("td", {}, t.first ? relCell(t.first) : "–"),
+      h("td", {}, t.first ? String(t.first.data_lag) : "–"),
+      h("td", {}, t.confirmed ? relCell(t.confirmed) : "Not before the next turn"),
+      h("td", {}, t.confirmed ? String(t.confirmed.data_lag) : "–"),
+      h("td", {}, t.dated_then ? mon(t.dated_then) : t.confirmed ? "No turn nearby" : "–")));
+    const tableEl = h("div", { class: "table-scroll" }, h("table", { class: "data turns" }, h("thead", {}, head), h("tbody", {}, body)));
+    const chartEl = h("div", { class: "chart tall-ish", role: "img", "aria-label": `${ind.title} chart` });
+    const rSeg = segmented([["5Y", "5Y"], ["Max", "Max"]], "Max", (k) => { range = k; rSeg.update(k); draw(); }, "Time range");
+    let range = "Max";
+    function traces() {
+      const start = range === "5Y" ? addMonths(R.releases[R.releases.length - 1].data_to, -60) : null;
+      const rel = R.releases.filter((r) => !start || r.data_to >= start);
+      const rev = new Set(R.reversed.map((r) => r.release));
+      const fin = rel.filter((r) => r.final !== null);
+      return [
+        { type: "scatter", mode: "lines", name: "Today's trend-cycle", x: fin.map((r) => r.data_to), y: fin.map((r) => r.final),
+          line: { color: cssVar("--ink"), width: 2.4 }, _light: "#36454F", hovertemplate: "%{x|%b %Y}: <b>%{y:.1f}%</b><extra>Today</extra>" },
+        { type: "scatter", mode: "lines+markers", name: "As published at each release (latest month)", x: rel.map((r) => r.data_to), y: rel.map((r) => r.mom),
+          customdata: rel.map((r) => fmtDay(r.release)), line: { color: cssVar(SERIES_VARS[0]), width: 1.4 }, marker: { size: 5, color: cssVar(SERIES_VARS[0]) }, _slot: 0,
+          hovertemplate: "%{x|%b %Y}: <b>%{y:.1f}%</b> in the release of %{customdata}<extra>As published</extra>" },
+        { type: "scatter", mode: "markers", name: "Signal that turned back", x: rel.filter((r) => rev.has(r.release)).map((r) => r.data_to), y: rel.filter((r) => rev.has(r.release)).map((r) => r.mom),
+          marker: { size: 12, color: "rgba(0,0,0,0)", line: { color: cssVar("--neg"), width: 2 } }, _light: "#C0504D", hoverinfo: "skip" },
+      ];
+    }
+    function shapes() {
+      const start = range === "5Y" ? addMonths(R.releases[R.releases.length - 1].data_to, -60) : "0000";
+      const sh = [], an = [];
+      R.turns.filter((t) => t.month >= start).forEach((t) => {
+        sh.push({ type: "line", xref: "x", yref: "paper", x0: t.month, x1: t.month, y0: 0, y1: 1, line: { color: cssVar("--ink-3"), width: 1, dash: "dot", _light: "#85909A" } });
+        an.push({ xref: "x", yref: "paper", x: t.month, y: 1, yanchor: "bottom", showarrow: false, text: t.kind === "peak" ? "P" : LANG === "es" ? "V" : "T", font: { size: 11, color: cssVar("--ink-3") } });
+      });
+      return { sh, an };
+    }
+    function draw() {
+      const { sh, an } = shapes();
+      Plotly.react(chartEl, traces(), baseLayout({ pct: spec, xaxis: { hoverformat: "%b %Y" },
+        extra: { shapes: sh, annotations: an, showlegend: true, legend: { orientation: "h", x: 0, y: 1.08, yanchor: "bottom", font: { color: cssVar("--ink") } }, margin: { l: 52, r: 16, t: 36, b: 36 } } }), PLOT_CONFIG);
+    }
+    const onPNG = () => { const { sh, an } = shapes(); exportPNG(ind, traces(), "Change in the trend-cycle, % m/m: latest month of each release vs. today's series · P/T: peaks and troughs", spec, `${ind.id}.png`, { shapes: sh, annotations: an }); };
+    const onCSV = () => downloadBlob(toCSV(["release", "latest_month", "trend_mom_as_published", "trend_mom_today"], R.releases.map((r) => [r.release, r.data_to, r.mom, r.final ?? ""])), `${ind.id}_releases.csv`, "text/csv");
+    appendAll(card, sumEl, tableEl, h("div", { class: "controls", style: "margin-top:14px" }, h("span", { class: "hint" }, "Latest month of each release against today's trend-cycle."), h("span", { class: "spacer" }), rSeg),
+      chartEl, ind.note ? h("p", { class: "chips-note" }, ind.note) : null, methodLine(ind),
+      h("div", { class: "card-foot" }, h("span", {}, `Source: ${ind.source_label} · Latest release: ${fmtDay(S.last_release)}`),
+        h("div", { class: "actions" }, h("button", { class: "btn", type: "button", onclick: onPNG }, "PNG"), h("button", { class: "btn", type: "button", onclick: onCSV }, "CSV"))));
+    card.draw = draw;
     return card;
   }
 
@@ -3097,6 +3171,7 @@
         : ind.kind === "rem_revisions" ? remRevisionsCard(ind)
         : ind.kind === "statement" ? statementCard(ind)
         : ind.kind === "rer_calc" ? rerCalcCard(ind)
+        : ind.kind === "turns" ? turnsCard(ind)
         : variantsCard(ind, !ind.half);
   }
 

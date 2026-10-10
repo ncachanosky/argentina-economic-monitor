@@ -790,3 +790,16 @@ def test_display_options_and_unlisted_cards():
     assert set(groups[("trade", "partners")]) == {"trade_partners_exports", "trade_partners_imports", "trade_partners_balance"}
     halves = [i.id for i in reg.indicators if (i.display or {}).get("half") and not i.unlisted]
     assert len(halves) % 2 == 0, halves   # half-width cards come in pairs
+
+
+def test_emae_turning_points_merge_short_phases():
+    import pandas as pd
+    from pipeline.emae_turns import turning_points
+    # up 6 months, down 2 (too short: merged), up 3, down 6
+    ch = [1] * 6 + [-1] * 2 + [1] * 3 + [-1] * 6
+    lvl = [100.0]
+    for c in ch:
+        lvl.append(lvl[-1] * (1 + c / 100))
+    s = pd.Series(lvl, index=pd.date_range("2020-01-01", periods=len(lvl), freq="MS"))
+    tps = turning_points(s)
+    assert tps == [("peak", pd.Timestamp("2020-12-01"))]
