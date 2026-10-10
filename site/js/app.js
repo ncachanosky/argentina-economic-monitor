@@ -3286,6 +3286,11 @@
   }
 
   function makeCard(ind) {
+    const el = makeCardInner(ind);
+    if (el) el._ind = ind;
+    return el;
+  }
+  function makeCardInner(ind) {
     return ind.kind === "panel" ? panelCard(ind)
         : ind.kind === "contributions" ? contributionsCard(ind)
         : ind.kind === "balance_sheet" ? balanceCard(ind)
@@ -3309,8 +3314,22 @@
       if (!id) return;
       card.querySelectorAll(".card-foot .actions").forEach((actions) => actions.append(
         h("button", { class: "btn", type: "button", title: "Copy a link to this chart (with a preview for social media)", onclick: (e) => shareCard(card, id, e.currentTarget) }, "Share"),
-        h("button", { class: "btn", type: "button", title: "Embed this chart in another page", onclick: () => embedDialog(card, id) }, "Embed")));
+        h("button", { class: "btn", type: "button", title: "Embed this chart in another page", onclick: () => embedDialog(card, id) }, "Embed"),
+        h("button", { class: "btn", type: "button", title: "Copy a citation for this chart", onclick: (e) => citeCard(card, id, e.currentTarget) }, "Cite")));
     });
+  }
+  // Cite: a reference for the chart (author, title, Monitor, link to the card, its sources, access date).
+  async function citeCard(card, id, btn) {
+    const ind = card._ind || {};
+    const title = (card.querySelector("h3") || {}).textContent || id;
+    const url = new URL(`${location.pathname}#ind-${id}`, location.href).href;
+    const today = new Date().toLocaleDateString(LOCALE, { day: "numeric", month: "long", year: "numeric" });
+    const text = LANG === "es"
+      ? `Cachanosky, Nicolás. «${title}». Monitor de la Economía Argentina, Economic Order. ${url}. Datos: ${ind.source_label || "véase el gráfico"}. Consultado el ${today}.`
+      : `Cachanosky, Nicolás. "${title}." Argentina Economic Monitor, Economic Order. ${url}. Data: ${ind.source_label || "see the chart"}. Accessed ${today}.`;
+    const old = btn.textContent;
+    try { await navigator.clipboard.writeText(text); btn.textContent = tr("Citation copied"); } catch (e) { window.prompt(tr("Copy this citation:"), text); }
+    setTimeout(() => { btn.textContent = old; }, 1800);
   }
   // Share: the card's share page (title, description and preview image for social media) redirects to the card.
   async function shareCard(card, id, btn) {

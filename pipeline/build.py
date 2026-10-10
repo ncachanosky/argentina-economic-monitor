@@ -30,7 +30,7 @@ I18N_DIR = ROOT / "registry" / "i18n"
 # English page texts; registry/i18n/<lang>.yaml `site:` overrides them for other languages.
 EN = {
     "home_h1": "Argentina's economy, updated daily",
-    "home_lede": ("Official statistics, checked every morning against the source and charted as soon "
+    "home_lede": ("Official statistics, checked twice a day against the source and charted as soon "
                   "as a new release lands. Every chart is interactive and exportable as an image or data file."),
     "home_desc": ("Interactive, daily-updated charts of Argentina's economy: activity, GDP, inflation and more. "
                   "From Economic Order."),
@@ -54,6 +54,9 @@ EN = {
     "switch_label": "Español",
     "switch_title": "Ver este sitio en español",
     "pending_note": "",
+    "skip": "Skip to content",
+    "notfound_title": "Page not found",
+    "notfound_text": "This page does not exist, or it moved. Try one of these:",
     "footer": """      <div>
         <h4>About</h4>
         <p>The Argentina Economic Monitor is a project of <a id="eo-link" href="#">Economic Order</a>, by Nicolás Cachanosky. Data are pulled automatically from their sources twice a day, validated, and stored with their full revision history.</p>
@@ -85,7 +88,7 @@ def load_i18n(lang: str) -> dict:
 def render(template: str, *, page: str, root: str, title: str, desc: str, h1: str, lede: str, tag: str,
            content: str | None = None, url: str = "", image: str = "", lang: str = "en", assets: str | None = None,
            data: str | None = None, texts: dict | None = None, alt_url: str = "", hreflang: str = "",
-           switch: bool = False) -> str:
+           switch: bool = False, jsonld: str = "") -> str:
     T = {**EN, **(texts or {})}
     esc = lambda s: html.escape(" ".join(str(s).split()), quote=True)
     assets = root if assets is None else assets
@@ -101,7 +104,7 @@ def render(template: str, *, page: str, root: str, title: str, desc: str, h1: st
         "__HREFLANG__": hreflang, "__LANGSWITCH__": switch_html,
         "__T_HOME_ARIA__": esc(T["home_aria"]), "__T_BY__": esc(T["by"]), "__T_TOPICS__": esc(T["topics_aria"]),
         "__T_SUBSCRIBE__": esc(T["subscribe"]), "__T_THEME__": esc(T["theme"]), "__T_SHARE__": esc(T["share"]), "__T_ONPAGE__": esc(T["onpage"]),
-        "__T_LATEST__": esc(T["latest"]), "__FOOTER__": T["footer"],
+        "__T_LATEST__": esc(T["latest"]), "__T_SKIP__": esc(T["skip"]), "__JSONLD__": jsonld, "__FOOTER__": T["footer"],
         "__CONTENT__": content,
     }
     out = template
@@ -201,7 +204,10 @@ def build(out: Path, tag: str, with_data: bool = True) -> None:
                 template, page=page, root=root, assets=assets, title=title, h1=h1, lede=lede, desc=desc, tag=tag,
                 content=content, url=f"{base}{prefix}{path}" if page != "embed" else "", image=image, lang=lang,
                 data=f"{assets}data/", texts=t_use, alt_url=f"{root}{'../' if lang == 'es' else ''}{other}" if lang == "es" else f"{root}{other}",
-                hreflang=hreflang, switch=spanish_live)
+                hreflang=hreflang, switch=spanish_live,
+                jsonld=dataset_jsonld(reg, base, lang, site_name if lang == "en" else (texts.get("site_name") or site_name), desc) if page == "home" else "")
+            if page == "embed":   # chart embeds are for other sites, not for search results
+                html_text = html_text.replace("<head>", '<head>\n  <meta name="robots" content="noindex">', 1)
             if lang == "es" and not spanish_live:   # in preparation: keep it out of search engines
                 html_text = html_text.replace("<head>", '<head>\n  <meta name="robots" content="noindex">', 1)
             (d / "index.html").write_text(html_text, encoding="utf-8")
@@ -220,6 +226,8 @@ def build(out: Path, tag: str, with_data: bool = True) -> None:
     for key in ("methodology", "about"):
         for f in (f"{key}.html", f"{key}.es.html"):
             (out / f).unlink(missing_ok=True)
+    write_crawl_files(out, reg, base, spanish_live)
+    write_404(out, reg, base, tag, es)
     if with_data:
         export.export(out / "data")
         if es:
@@ -231,6 +239,81 @@ def build(out: Path, tag: str, with_data: bool = True) -> None:
         print(f"social: {social.build(out, reg, base)} preview images")
     print(f"built {4 + len(reg.topics)} pages per language in {out}")
 
+
+
+def dataset_jsonld(reg, base: str, lang: str, name: str, desc: str) -> str:
+    """schema.org Dataset markup for the home page (Google Dataset Search)."""
+    if not base:
+        return ""
+    url = base + ("es/" if lang == "es" else "")
+    d = {
+        "@context": "https://schema.org", "@type": "Dataset", "name": name, "description": " ".join(desc.split()),
+        "url": url, "sameAs": reg.site.get("repo_url"), "inLanguage": lang, "isAccessibleForFree": True,
+        "creator": {"@type": "Person", "name": "Nicolás Cachanosky", "url": "https://www.ncachanosky.com/"},
+        "publisher": {"@type": "Organization", "name": reg.site.get("publisher", "Economic Order"), "url": reg.site.get("publisher_url")},
+        "spatialCoverage": {"@type": "Place", "name": "Argentina"},
+        "temporalCoverage": "1910/..",
+        "keywords": ["Argentina", "economy", "inflation", "GDP", "exchange rate", "central bank", "fiscal", "INDEC", "BCRA"],
+        "dateModified": datetime.now(timezone.utc).strftime("%Y-%m-%d"),
+        "distribution": [{"@type": "DataDownload", "encodingFormat": "text/csv", "contentUrl": base + "data/"}],
+    }
+    return '  <script type="application/ld+json">' + json.dumps(d, ensure_ascii=False) + "</script>"
+
+
+def site_paths(reg) -> list[str]:
+    return [""] + [f"{t['slug']}/" for t in reg.topics] + ["methodology/", "about/"]
+
+
+def write_crawl_files(out: Path, reg, base: str, spanish: bool) -> None:
+    """robots.txt and sitemap.xml, with the English and Spanish version of each page linked."""
+    if not base:
+        return
+    (out / "robots.txt").write_text(f"User-agent: *\nAllow: /\nDisallow: /embed/\nSitemap: {base}sitemap.xml\n", encoding="utf-8")
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    rows = []
+    for path in site_paths(reg):
+        for lang in (("en", "es") if spanish else ("en",)):
+            loc = base + ("es/" if lang == "es" else "") + path
+            alts = "".join(f'<xhtml:link rel="alternate" hreflang="{l}" href="{base}{"es/" if l == "es" else ""}{path}"/>'
+                           for l in ("en", "es")) if spanish else ""
+            rows.append(f"  <url><loc>{loc}</loc><lastmod>{today}</lastmod>{alts}</url>")
+    (out / "sitemap.xml").write_text(
+        '<?xml version="1.0" encoding="UTF-8"?>\n'
+        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n'
+        + "\n".join(rows) + "\n</urlset>\n", encoding="utf-8")
+
+
+def write_404(out: Path, reg, base: str, tag: str, es: dict) -> None:
+    """GitHub Pages serves /404.html for any missing path, so links use the site's absolute base path."""
+    from urllib.parse import urlparse
+    root = urlparse(base).path if base else "/"
+    S = (es.get("site") or {})
+    tops_es = es.get("topics") or {}
+    links_en = "".join(f'<li><a href="{root}{t["slug"]}/">{html.escape(t["title"])}</a></li>' for t in reg.topics)
+    links_es = "".join(f'<li><a href="{root}es/{t["slug"]}/">{html.escape(tops_es.get(t["id"], {}).get("title", t["title"]))}</a></li>' for t in reg.topics)
+    page = f"""<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>{EN["notfound_title"]} · Argentina Economic Monitor</title>
+  <link rel="stylesheet" href="{root}css/theme.css?v={tag}">
+</head>
+<body>
+  <header class="site-header"><div class="wrap"><a class="brand" href="{root}"><span class="brand-name">Argentina Economic Monitor</span><span class="brand-by">{EN["by"]}</span></a></div></header>
+  <main class="wrap notfound">
+    <h1>{EN["notfound_title"]}</h1>
+    <p>{EN["notfound_text"]}</p>
+    <ul><li><a href="{root}">Home</a></li>{links_en}<li><a href="{root}methodology/">Methodology</a></li></ul>
+    <h2 lang="es">{html.escape(S.get("notfound_title", "Página no encontrada"))}</h2>
+    <p lang="es">{html.escape(S.get("notfound_text", "Esta página no existe o cambió de lugar. Pruebe con alguna de estas:"))}</p>
+    <ul lang="es"><li><a href="{root}es/">Inicio</a></li>{links_es}<li><a href="{root}es/methodology/">Metodología</a></li></ul>
+  </main>
+</body>
+</html>
+"""
+    (out / "404.html").write_text(page, encoding="utf-8")
 
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__)

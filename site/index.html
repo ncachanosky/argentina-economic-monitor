@@ -19,6 +19,7 @@
   <meta name="twitter:description" content="__DESC__">
   <meta name="twitter:image" content="__OGIMAGE__">
   <link rel="canonical" href="__URL__">
+  <meta name="theme-color" content="#B87333">
 __HREFLANG__
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect x='2' y='2' width='12' height='12' rx='3' fill='%23B87333'/%3E%3C/svg%3E">
   <script>
@@ -31,8 +32,10 @@ __HREFLANG__
   <script src="https://cdn.jsdelivr.net/npm/plotly.js-basic-dist-min@3.7.0/plotly-basic.min.js" defer></script>
   <script src="__ASSETS__js/app.js?v=__BUILD__" defer></script>
 __ANALYTICS__
+__JSONLD__
 </head>
 <body data-page="__PAGE__" data-root="__ROOT__" data-data="__DATA__">
+  <a class="skip-link" href="#main">__T_SKIP__</a>
   <header class="site-header">
     <div class="wrap">
       <a class="brand" href="__ROOT__" aria-label="__T_HOME_ARIA__">
@@ -52,7 +55,7 @@ __LANGSWITCH__        <a class="btn btn-primary" id="subscribe" href="#" hidden>
     </div>
   </header>
 
-  <main class="wrap">
+  <main class="wrap" id="main" tabindex="-1">
     <section class="intro">
       <h1>__H1__</h1>
       <p>__LEDE__</p>

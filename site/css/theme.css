@@ -436,3 +436,12 @@ table.data.turns th, table.data.turns td { padding-left: 8px; padding-right: 8px
 /* NGDP card: controls and charts shown per view */
 .seg[hidden], .chart[hidden], .hint[hidden], input[hidden] { display: none; }
 .controls[hidden] { display: none; }
+
+/* Skip link: hidden until focused from the keyboard */
+.skip-link { position: absolute; left: 8px; top: -48px; z-index: 100; padding: 8px 12px; background: var(--surface); color: var(--ink); border: 1px solid var(--rule); border-radius: 6px; font-family: var(--font-ui); font-size: 14px; }
+.skip-link:focus { top: 8px; }
+main:focus { outline: none; }
+/* 404 page */
+.notfound { max-width: 640px; margin: 64px auto; font-family: var(--font-ui); }
+.notfound h1 { font-family: var(--font-serif, inherit); }
+.notfound ul { line-height: 1.9; }

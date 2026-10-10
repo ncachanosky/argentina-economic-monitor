@@ -10,7 +10,7 @@ site:
   site_name: Monitor de la Economía Argentina
   home_h1: La economía argentina, actualizada todos los días
   home_lede: >-
-    Estadísticas oficiales, verificadas cada mañana contra la fuente y graficadas
+    Estadísticas oficiales, verificadas dos veces por día contra la fuente y graficadas
     apenas se publican. Cada gráfico es interactivo y se puede descargar como
     imagen o como datos.
   home_desc: >-
@@ -34,6 +34,9 @@ site:
   onpage: En esta página
   latest: Últimos datos
   switch_label: English
+  skip: Ir al contenido
+  notfound_title: Página no encontrada
+  notfound_text: "Esta página no existe o cambió de lugar. Pruebe con alguna de estas:"
   switch_title: View this site in English
   pending_note: La versión en castellano de esta página está en preparación; por ahora se muestra en inglés.
   footer: |2
@@ -172,6 +175,10 @@ ui:
   Embed: Insertar
   Link copied: Enlace copiado
   Copy link: Copiar enlace
+  Cite: Citar
+  Citation copied: Cita copiada
+  "Copy this citation:": "Copie esta cita:"
+  Copy a citation for this chart: Copiar una cita de este gráfico
   Email: Correo electrónico
   Download this chart as a 1200×800 PNG: Descargar este gráfico como PNG de 1200×800
   Download the data in this view as CSV: Descargar los datos de esta vista en CSV
