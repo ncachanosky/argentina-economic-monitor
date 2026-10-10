@@ -442,10 +442,13 @@
       ? h("a", { href: nr.calendar_url, target: "_blank", rel: "noopener", title: `INDEC release calendar: ${nr.name || ""}` }, text) : text);
   }
 
-  function chartActions(onPNG, onCSV) {
-    return h("div", { class: "chart-actions" },
-      h("button", { class: "btn", type: "button", onclick: onPNG, title: "Download this chart as a 1200×800 PNG" }, "PNG"),
-      onCSV ? h("button", { class: "btn", type: "button", onclick: onCSV, title: "Download the data in this chart as CSV" }, "CSV") : null);
+  // The upper chart of a two-chart card: the same buttons as the card's footer, under that chart.
+  function chartActions(ind, onPNG, onCSV) {
+    return h("div", { class: "card-foot chart-actions" }, h("span", {}),
+      h("div", { class: "actions" },
+        h("button", { class: "btn", type: "button", onclick: onPNG, title: "Download this chart as a 1200×800 PNG" }, "PNG"),
+        onCSV ? h("button", { class: "btn", type: "button", onclick: onCSV, title: "Download the data in this chart as CSV" }, "CSV") : null,
+        h("a", { class: "btn", href: `${DATA}${ind.id}${LANG === "es" ? ".es" : ""}.csv`, download: `${ind.id}_all.csv`, title: "All variants, levels, as published" }, "All data")));
   }
 
   function footer(ind, onPNG, onCSV) {
@@ -2433,7 +2436,7 @@
       bSeg || incBtn || realSeg ? h("div", { class: "controls" }, bSeg, incBtn, realSeg) : null,
       partialNote(ind) || realSeg ? (() => { const p = h("p", { class: "hint" }); card._realHint = p; p.textContent = partialNote(ind); return p; })() : null,
       h("p", { class: "hint" }, barTitleEl, barNote),
-      barEl, chartActions(onBarPNG, onBarCSV), weightsTable,
+      barEl, chartActions(ind, onBarPNG, onBarCSV), weightsTable,
       h("div", { class: "controls", style: "margin-top:14px" }, tSeg, h("span", { class: "spacer" }), rSeg),
       chipsEl, chipsNote, lineEl);
     table = tableView([], [], T[state.transform], ind.frequency);
@@ -2627,8 +2630,8 @@
       h("p", { class: "hint" }, C.hide_total ? `${fP(C.dates[latestI])}: ${parts}` : `${fP(C.dates[latestI])}: ${C.total.label} ${fmtNum(C.total.values[latestI], PC ? pp : pct)}${yoyWord} — ${parts}`),
       h("div", { class: "controls" }, ySeg, h("span", { class: "spacer" }), rSeg),
       hintEl, methodLine(ind), barEl,
-      lineKeys.length ? chartActions(onPNG, onCSV) : null,
-      lineKeys.length ? h("p", { class: "hint", style: "margin-top:14px" }, `${C.lines_title || "Components, year-over-year change"}.`) : null,
+      lineKeys.length ? chartActions(ind, onPNG, onCSV) : null,
+      lineKeys.length ? h("p", { class: "hint", style: "margin-top:14px" }, C.lines_title || "Components, year-over-year change") : null,
       lineKeys.length ? chipsEl : null, lineKeys.length ? lineEl : null);
     table = tableView([], [], pp, ind.frequency);
     const onLineCSV = () => {
@@ -3090,10 +3093,11 @@
   // Each card gets an "Embed" button: an iframe of /embed/?id=<card> to paste into another site.
   function addEmbedButtons(container, topic) {
     container.querySelectorAll(".card").forEach((card) => {
-      const id = card.id.replace(/^ind-/, ""), actions = card.querySelector(".card-foot .actions");
-      if (!actions || !id) return;
-      actions.append(h("button", { class: "btn", type: "button", title: "Copy a link to this chart (with a preview for social media)", onclick: (e) => shareCard(card, id, e.currentTarget) }, "Share"),
-        h("button", { class: "btn", type: "button", title: "Embed this chart in another page", onclick: () => embedDialog(card, id) }, "Embed"));
+      const id = card.id.replace(/^ind-/, "");
+      if (!id) return;
+      card.querySelectorAll(".card-foot .actions").forEach((actions) => actions.append(
+        h("button", { class: "btn", type: "button", title: "Copy a link to this chart (with a preview for social media)", onclick: (e) => shareCard(card, id, e.currentTarget) }, "Share"),
+        h("button", { class: "btn", type: "button", title: "Embed this chart in another page", onclick: () => embedDialog(card, id) }, "Embed")));
     });
   }
   // Share: the card's share page (title, description and preview image for social media) redirects to the card.

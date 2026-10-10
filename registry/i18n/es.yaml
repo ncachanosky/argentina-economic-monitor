@@ -62,6 +62,7 @@ topics:
   institutions: {title: Instituciones, group: Instituciones, description: "El marco institucional: la confianza en el gobierno y la confianza del consumidor, cuánto duran los presidentes del Banco Central y los ministros de Economía, la libertad económica, y la democracia y el Estado de derecho, con países de comparación. De la UTDT, el Fraser Institute y V-Dem."}
 
 ui:
+  PIB growth: Crecimiento del PIB
   "Annual growth: the year's average over the previous year's, %.": "Crecimiento anual: el promedio del año sobre el del año anterior, %."
   Calendar-year averages.: Promedios por año calendario.
   Calendar years.: Años calendario.
