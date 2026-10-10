@@ -1,4 +1,4 @@
-"""Nominal GDP against target paths (an NGDP-targeting benchmark).
+"""Monthly nominal GDP from two sides: prices and output, money and velocity.
 
 Monthly nominal GDP, seasonally adjusted, at annual rates:
   quarters   INDEC's real GDP, seasonally adjusted (3.2_OGP_D_2004_T_17), times the
@@ -21,8 +21,7 @@ Private M2 (currency held by the public + private current and savings accounts i
 pesos), monthly average of daily data, for the money-and-velocity view: velocity is
 nominal GDP (annual rate) over private M2.
 
-Target paths and gaps are computed in the browser (site/js/app.js, ngdpCard), so the
-reader can choose the base quarter and the rate.
+Growth rates and the velocity are computed in the browser (site/js/app.js, ngdpCard).
 """
 from __future__ import annotations
 
