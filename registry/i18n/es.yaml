@@ -467,6 +467,8 @@ ui:
   As published: Según el informe
 
   # NGDP card
+  "Components, year-over-year change": "Componentes, variación interanual"
+  Target rate: Tasa objetivo
   Money and velocity: Dinero y velocidad
   Velocity: Velocidad
   "Velocity: nominal GDP (annual rate) over private M2. M2 is not seasonally adjusted, so velocity dips around June and December, when the aguinaldo raises cash holdings.": "Velocidad: PIB nominal (tasa anual) sobre M2 privado. El M2 no está desestacionalizado, por lo que la velocidad cae alrededor de junio y diciembre, cuando el aguinaldo aumenta las tenencias de efectivo."
@@ -489,6 +491,7 @@ ui:
   "Gap to the path": "Brecha con la trayectoria"
 
 patterns:
+  - ["(.+) chart", "Gráfico: $1"]
   - ["Year-over-year change, %\\. Velocity is nominal over money growth: positive when people hold less money for the same spending\\. Dotted: proxy from (.+) \\(EMAE × CPI\\) until INDEC publishes the quarter\\.", "Variación interanual, %. La velocidad es el crecimiento nominal sobre el del dinero: positiva cuando la gente mantiene menos dinero para el mismo gasto. Punteado: estimación desde $1 (EMAE × IPC) hasta que el INDEC publique el trimestre."]
   - ["Year-over-year change, %\\. Velocity is nominal over money growth: positive when people hold less money for the same spending\\.", "Variación interanual, %. La velocidad es el crecimiento nominal sobre el del dinero: positiva cuando la gente mantiene menos dinero para el mismo gasto."]
   - ["Source: (.+) · Latest: (.+) \\(proxy\\)", "Fuente: $1 · Último dato: $2 (estimación)"]
@@ -520,6 +523,7 @@ patterns:
   - ["(.*)\\. Amounts in millions of the instrument's currency; hover an instrument for its terms\\.", "$1. Montos en millones de la moneda de cada instrumento; al pasar el cursor se ven sus condiciones."]
   - ["Compare up to (\\d+) (.+)\\. Click a bar or a name to add or remove it\\.", "Se pueden comparar hasta $1 $2. Un clic en una barra o en un nombre agrega o quita la serie."]
   - ["Latest (.+) by (.+)", "Último dato ($1) por $2"]
+  - ["Selected (series|categorías|divisiones|regiones|tasas) over time", "$1 seleccionadas a lo largo del tiempo"]
   - ["Selected (.+) over time", "$1 seleccionados a lo largo del tiempo"]
   - ["(.+) to compare", "$1 para comparar"]
   - ["Contributions to (.+) growth", "Contribuciones al crecimiento de $1"]

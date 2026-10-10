@@ -4960,30 +4960,18 @@ indicators:
     units: "% of GDP, last 12 months"
     ranges: [5Y, Max]
     note: >-
-      The budget is on a cash basis. A capitalizing letter (LECAP, BONCAP)
-      pays its accrued interest at maturity together with the principal, and
-      that payment is recorded as amortization, below the line, so it never
-      appears as interest. Capitalized interest, estimated: the stock of
-      LECAP and BONCAP at the end of the previous month (monthly debt
-      bulletin), in pesos, times the average monthly yield (TEM) at which
-      fixed-rate LECAP and BONCAP were placed in the last six months
-      (implied by their issue prices, weighted by cash raised). The
-      Finance Secretariat's own "capitalization" line is not used: it also
-      books the interest already accrued on securities sold in reopenings,
-      which the buyer paid for in cash (large in 2025, with the end of the
-      LEFI). See Inflation Adjustment of CER-Linked Debt for the indexed debt.
-      Biases: it covers gross debt, including securities
-      held by the BCRA, the pension fund (FGS) and Banco Nación, which
-      overstates what is owed outside the public sector; TAMAR-linked
-      BONCAP are taken at the fixed-rate average; and the interest on the
-      LEFI (July 2024 - July 2025) and on letters sold at a discount is
-      left out, which understates it. An independent check from the debt
-      bulletin's flows by instrument gives a similar or somewhat higher
-      figure (see the methodology), so read the estimate as a floor. The
-      dotted line is the real component: the same interest less the month's
-      CPI inflation on the stock (for 2025, 1.1% of GDP; the IMF's May 2026
-      staff report puts it at about 1%). It is a memo item, not added to the
-      bars.
+      The budget is on a cash basis: a capitalizing letter (LECAP, BONCAP)
+      pays its interest at maturity with the principal, recorded as
+      amortization below the line, so it never appears as interest.
+      Capitalized interest is our estimate: the previous month's stock of
+      LECAP and BONCAP times the average yield of fixed-rate placements over
+      the last six months. It counts gross debt, including securities held by
+      public agencies (which overstates it), and leaves out the LEFI (which
+      understates it); an independent check from the debt bulletin gives a
+      similar or higher figure, so read it as a floor. The dotted line is the
+      real component, net of the month's inflation on the stock: 1.1% of GDP
+      in 2025, close to the IMF's estimate of about 1%. For CER-linked debt,
+      see Inflation Adjustment of CER-Linked Debt.
     contributions:
       precomputed: true
       total_label: Accrual-adjusted interest
@@ -5109,8 +5097,8 @@ indicators:
       temporary advances); the CER adjustment of indexed debt is left out of
       both, as compensation for inflation. In high inflation the operational
       balance can show a surplus while the cash balance shows a deficit: the
-      difference is the inflation tax paid by holders of peso debt, not
-      fiscal effort.
+      difference is a transfer from holders of peso debt to the Treasury
+      through inflation, not fiscal effort.
     method_links: [{anchor: capitalized-interest, label: "How capitalized interest is estimated"}, {anchor: operational-balance, label: "The operational balance"}]
     default: {variant: official, transform: level, range: Max}
     derive:
@@ -5120,7 +5108,7 @@ indicators:
       vars: *interest
       variants:
         official: {label: Official (cash),                expr: "100 * sum12(fin) / gdp12(gdp, cpi)"}
-        adjusted: {label: Minus capitalized interest,     expr: "100 * (sum12(fin) - sum12(lag((nz(cap) + nz(bcap)) * fx, 1) * nz(tem) / 100)) / gdp12(gdp, cpi)"}
+        adjusted: {label: Accrual (minus capitalized interest),     expr: "100 * (sum12(fin) - sum12(lag((nz(cap) + nz(bcap)) * fx, 1) * nz(tem) / 100)) / gdp12(gdp, cpi)"}
         operational: {label: "Operational (inflation-corrected)", expr: "100 * (sum12(fin) - sum12(lag((nz(cap) + nz(bcap)) * fx, 1) * nz(tem) / 100) + sum12(lag((po - nz(adv)) * fx, 1) * (cpi / lag(cpi, 1) - 1))) / gdp12(gdp, cpi)"}
 
   - id: fiscal_cer_adjustment
