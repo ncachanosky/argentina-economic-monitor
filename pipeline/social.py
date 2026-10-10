@@ -65,8 +65,15 @@ def image(path: Path, title: str, desc: str, chart: tuple[pd.Series, str] | None
     import matplotlib.pyplot as plt
     font = _font()
     fig = plt.figure(figsize=(W, H), dpi=DPI, facecolor=BG)
-    fig.text(0.05, 0.88, site.upper(), fontsize=15, color=COPPER, family=font, weight="bold")
-    fig.text(0.05, 0.84, "by Economic Order", fontsize=13, color=INK3, family=font, va="top")
+    logo = Path(__file__).resolve().parents[1] / "site" / "img" / "icon-192.png"
+    x0 = 0.05
+    if logo.exists():   # the Economic Order mark beside the site name
+        lw = 0.066
+        ax_l = fig.add_axes([x0, 0.835, lw, lw * W / H])
+        ax_l.imshow(plt.imread(str(logo))); ax_l.axis("off")
+        x0 += lw + 0.012
+    fig.text(x0, 0.88, site.upper(), fontsize=15, color=COPPER, family=font, weight="bold")
+    fig.text(x0, 0.84, "by Economic Order", fontsize=13, color=INK3, family=font, va="top")
     tl = textwrap.wrap(title, 22)[:3]
     fig.text(0.05, 0.72, "\n".join(tl), fontsize=40, color=INK, family=font, weight="bold", va="top", linespacing=1.05)
     dl = textwrap.wrap(desc, 46)

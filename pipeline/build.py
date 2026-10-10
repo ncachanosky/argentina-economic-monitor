@@ -302,6 +302,8 @@ def write_404(out: Path, reg, base: str, tag: str, es: dict) -> None:
   <meta name="robots" content="noindex">
   <title>{EN["notfound_title"]} · Argentina Economic Monitor</title>
   <link rel="stylesheet" href="{root}css/theme.css?v={tag}">
+  <link rel="icon" href="{root}img/logo.svg" type="image/svg+xml">
+  <link rel="icon" href="{root}img/favicon-32.png" sizes="32x32" type="image/png">
 </head>
 <body>
   <header class="site-header"><div class="wrap"><a class="brand" href="{root}"><span class="brand-name">Argentina Economic Monitor <span class="beta-tag">Beta</span></span><span class="brand-by">{EN["by"]}</span></a></div></header>
