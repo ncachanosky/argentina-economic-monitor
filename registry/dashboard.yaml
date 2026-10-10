@@ -45,5 +45,5 @@ groups:
   - label: Labor
     rows:
       - {ind: labor_wages_real, variant: total, real: true, label: "Real wages", mm: pct, mm_nsa: true, yy: pct, good: up, unit: " (index)"}
-      - {ind: labor_registered, variant: sipa, label: "Registered private jobs", mm: pct, yy: pct, good: up, scale: 0.000001, unit: " million"}
+      - {ind: labor_rates, variant: employment, label: "Employment rate", mm: null, yy: diff, good: up, unit: "%"}
       - {ind: labor_rates, variant: unemployment, label: "Unemployment rate", mm: null, yy: diff, good: down, unit: "%"}

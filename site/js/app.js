@@ -442,6 +442,12 @@
       ? h("a", { href: nr.calendar_url, target: "_blank", rel: "noopener", title: `INDEC release calendar: ${nr.name || ""}` }, text) : text);
   }
 
+  function chartActions(onPNG, onCSV) {
+    return h("div", { class: "chart-actions" },
+      h("button", { class: "btn", type: "button", onclick: onPNG, title: "Download this chart as a 1200×800 PNG" }, "PNG"),
+      onCSV ? h("button", { class: "btn", type: "button", onclick: onCSV, title: "Download the data in this chart as CSV" }, "CSV") : null);
+  }
+
   function footer(ind, onPNG, onCSV) {
     const src = Object.values(ind.variants)[0].source_url;
     const nr = nextReleaseNote(ind);
@@ -613,17 +619,37 @@
     ys.forEach((y, n) => {
       const ms = by.get(y), last = ms[ms.length - 1];
       const nMonths = new Set(ms.map((m) => m[0])).size;
-      const complete = how === "sum" ? nMonths === full : last[0] === lastM;
+      const complete = how === "sum" || how === "mean" ? nMonths === full : last[0] === lastM;
       if (!complete && n < ys.length - 1) return;           // incomplete early years are skipped
-      if (!complete && how === "sum" && n === 0) return;
+      if (!complete && (how === "sum" || how === "mean") && n === 0) return;
       const dec = ms.filter((m) => m[0] === lastM);
-      const v = how === "sum" ? ms.reduce((a, m) => a + m[1], 0) : (dec.length ? dec[dec.length - 1] : last)[1];
+      const v = how === "sum" ? ms.reduce((a, m) => a + m[1], 0) : how === "mean" ? ms.reduce((a, m) => a + m[1], 0) / ms.length : (dec.length ? dec[dec.length - 1] : last)[1];
       years.push(complete ? y : `${y}*`); vals.push(v);
       if (!complete) partial = { year: y, first: ms[0][2], last: last[2], quarterly };
     });
     return { years, values: vals, partial };
   }
-  const yearlyNote = (how, partial) => (!partial ? "" : how === "sum"
+  // Annual growth of the yearly average; the year in progress compares its periods so far
+  // with the same periods a year earlier (marked with an asterisk).
+  function annualGrowth(dates, values) {
+    const by = new Map();
+    dates.forEach((d, i) => { const v = values[i]; if (v === null || v === undefined) return; const y = d.slice(0, 4); if (!by.has(y)) by.set(y, new Map()); by.get(y).set(d.slice(5, 7), v); });
+    const quarterly = dates.length > 1 && dates.every((d) => [1, 4, 7, 10].includes(Number(d.slice(5, 7))));
+    const full = quarterly ? 4 : 12, ys = [...by.keys()].sort();
+    const years = [], vals = []; let partial = null;
+    ys.forEach((y, n) => {
+      const cur = by.get(y), prev = by.get(String(+y - 1));
+      if (!prev) return;
+      const ms = [...cur.keys()].filter((m) => prev.has(m));
+      if (!ms.length || (cur.size < full && n < ys.length - 1)) return;
+      const a = ms.reduce((s, m) => s + cur.get(m), 0), b = ms.reduce((s, m) => s + prev.get(m), 0);
+      const complete = cur.size === full && ms.length === full;
+      years.push(complete ? y : `${y}*`); vals.push(b ? (a / b - 1) * 100 : null);
+      if (!complete) partial = { year: y, quarterly };
+    });
+    return { years, values: vals, partial };
+  }
+  const yearlyNote = (how, partial) => (!partial ? "" : how === "mean" ? `*${partial.year}: average of the ${partial.quarterly ? "quarters" : "months"} so far.` : how === "sum"
     ? (partial.quarterly ? `*${partial.year}: ${fmtPeriod(partial.first, "Q").split(" ")[0]}–${fmtPeriod(partial.last, "Q")}, year to date.`
       : `*${partial.year}: ${fmtShortMonth(partial.first).split(" ")[0]}–${fmtShortMonth(partial.last)}, year to date.`)
     : `*${partial.year}: twelve months to ${fmtShortMonth(partial.last)}.`);
@@ -676,7 +702,7 @@
     }
     const card = cardFrame(ind, !!wide);
     const Y = ind.yearly;
-    const ySeg = Y ? segmented([["monthly", ind.frequency === "D" ? "Daily" : "Monthly"], ["yearly", "Yearly"]], "monthly", (k) => { state.yearly = k === "yearly"; ySeg.update(k); draw(); }, "Frequency") : null;
+    const ySeg = Y ? segmented([["monthly", ind.frequency === "D" ? "Daily" : ind.frequency === "Q" ? "Quarterly" : "Monthly"], ["yearly", "Yearly"]], "monthly", (k) => { state.yearly = k === "yearly"; ySeg.update(k); draw(); }, "Frequency") : null;
     const chartEl = h("div", { class: "chart" + (wide ? " tall-ish" : ""), role: "img", "aria-label": `${ind.title} chart` });
     const hint = h("p", { class: "hint" });
     const statsEl = h("div", { class: "term-stats", hidden: true });
@@ -921,7 +947,7 @@
                 ...(marks ? { marker: { size: ind.frequency === "Y" ? 4 : 5, color: emph ? cssVar("--ink") : muted ? cssVar("--ink-3") : color } } : {}),
                 ...(emph ? { legendrank: 1 } : {}),
                 line: emph ? { color: cssVar("--ink"), width: 3.2 } : muted ? { color: cssVar("--ink-3"), width: 2, dash: "dot" }
-                  : LS ? { color, width: 2, dash: LS.dash || "solid" }
+                  : LS ? { color, width: LS.width || 2, dash: LS.dash || "solid" }
                   : cslot >= SERIES_VARS.length ? { color, width: lighter ? 1.4 : 1.8, dash: "dashdot" } : slot && !ind.emphasis && !ind.overlay_default ? { color, width: 1.8, dash: "dash" } : { color, width: lighter ? 1.5 : 2 },
                 ...(lighter ? { opacity: 0.65 } : {}),
                 ...(emph ? { _light: "#36454F" } : muted ? { _light: "#85909A" } : {}), hovertemplate: hover, _slot: emph || muted ? undefined : Math.max(0, LS && LS.slot !== undefined ? LS.slot : cslot) % SERIES_VARS.length });
@@ -1060,13 +1086,13 @@
 
     // Yearly view: grouped bars of each variant's yearly value.
     function buildYearly() {
-      const t = T.level || Object.values(T)[0];
+      const t = Y.growth ? (T.yoy || INDEX_TRANSFORMS.yoy) : T.level || Object.values(T)[0];
       const keys = Y.variants || (ind.overlay ? [state.variant, ...variantKeys.filter((k) => k !== state.variant && state.shown.has(k))] : [state.variant]);
       const start = viewStart(ind, state.range);
       let partial = null, labels = null;
       const traces = keys.map((k, slot) => {
         const v = ind.variants[k];
-        const a = yearlyAgg(ind.dates, v.values, Y.how);
+        const a = Y.growth ? annualGrowth(ind.dates, v.values) : yearlyAgg(ind.dates, v.values, Y.how);
         const ii = a.years.map((y, i) => i).filter((i) => !start || `${a.years[i].slice(0, 4)}-12-31` >= start);
         partial = partial || a.partial; labels = labels || ii.map((i) => a.years[i]);
         return { type: "bar", name: v.label, x: ii.map((i) => a.years[i]), y: ii.map((i) => a.values[i]), _slot: slot,
@@ -1080,8 +1106,9 @@
 
     function drawYearly() {
       const { traces, shapes, t, keys, labels, partial } = buildYearly();
-      const msgs = [Y.how === "sum" ? "Calendar-year totals." : "Calendar years: the December value of the twelve-month series."];
-      if (partial) msgs.push(yearlyNote(Y.how, partial));
+      const msgs = [Y.growth ? `Annual growth: the year's average over the previous year's, %.${partial ? ` *${partial.year}: the ${partial.quarterly ? "quarters" : "months"} published so far against the same ${partial.quarterly ? "quarters" : "months"} of ${+partial.year - 1}.` : ""}`
+        : Y.how === "sum" ? "Calendar-year totals." : Y.how === "mean" ? "Calendar-year averages." : "Calendar years: the December value of the twelve-month series."];
+      if (partial && !Y.growth) msgs.push(yearlyNote(Y.how, partial));
       if (ind._real) msgs.push(`Real terms: pesos of ${fmtMonth(ind.deflator.latest)}.`);
       hint.textContent = msgs.join(" ");
       statsEl.hidden = true;
@@ -1163,7 +1190,8 @@
       Plotly.react(chartEl, traces, baseLayout({
         pct: t,
         // Plain numbers on log axes unless the values are tiny (long-run price indices).
-        yaxis: isLog() ? { type: "log", ticksuffix: "", exponentformat: Math.min(...y.filter((q) => q > 0)) < 0.01 ? "power" : "none", tickformat: Math.min(...y.filter((q) => q > 0)) < 0.01 ? undefined : ",~r" } : { type: "linear" },
+        yaxis: isLog() ? { type: "log", ticksuffix: "", exponentformat: Math.min(...y.filter((q) => q > 0)) < 0.01 ? "power" : "none", tickformat: Math.min(...y.filter((q) => q > 0)) < 0.01 ? undefined : ",~r" }
+          : { type: "linear", ...(ind.y_tickformat ? { tickformat: ind.y_tickformat } : {}) },
         extra: {
           bargap: 0.2, shapes, annotations, barmode: state.transform === "share" ? "stack" : "group",
           showlegend: (state.byPres && state.transform !== "mom") || (ind.overlay && !state.byPres),
@@ -2382,6 +2410,11 @@
         barSpec, `${ind.id}_latest_${bstate.kind}${bstate.inc ? "_incidence" : ""}.png`,
         { shapes: b.shapes, xrange: b.range, xsuffix: barSpec.suffix });
     };
+    const onBarCSV = () => {
+      const tr0 = bars(true).traces[0];
+      downloadBlob(toCSV([noun, `${barTitle}${barSpec.suffix ? ` (${barSpec.suffix.trim()})` : ""}`], tr0.y.map((lab, i) => [lab, +(+tr0.customdata[i][1]).toFixed(4)])),
+        `${ind.id}_latest_${bstate.kind}${bstate.inc ? "_incidence" : ""}.csv`, "text/csv");
+    };
     const onCSV = () => {
       const t = T[state.transform];
       const tr = lineTraces();
@@ -2399,9 +2432,8 @@
     appendAll(card, 
       bSeg || incBtn || realSeg ? h("div", { class: "controls" }, bSeg, incBtn, realSeg) : null,
       partialNote(ind) || realSeg ? (() => { const p = h("p", { class: "hint" }); card._realHint = p; p.textContent = partialNote(ind); return p; })() : null,
-      h("p", { class: "hint" }, barTitleEl,
-        h("button", { class: "btn", type: "button", onclick: onBarPNG, style: "padding:1px 8px;font-size:12px" }, "PNG"), barNote),
-      barEl, weightsTable,
+      h("p", { class: "hint" }, barTitleEl, barNote),
+      barEl, chartActions(onBarPNG, onBarCSV), weightsTable,
       h("div", { class: "controls", style: "margin-top:14px" }, tSeg, h("span", { class: "spacer" }), rSeg),
       chipsEl, chipsNote, lineEl);
     table = tableView([], [], T[state.transform], ind.frequency);
@@ -2542,7 +2574,7 @@
       }
       hintEl.hidden = true;
       Plotly.react(barEl, barTraces(), baseLayout({
-        pct: pp, xaxis: { hoverformat: DF },
+        pct: pp, xaxis: { hoverformat: DF }, ...(C.axis_title ? { yaxis: { title: { text: C.axis_title, font: { size: 12, color: cssVar("--ink-3") } } } } : {}),
         extra: { barmode: "relative", bargap: 0.25, showlegend: true, legend, margin: { l: 56, r: 16, t: 40, b: 36 } },
       }), PLOT_CONFIG);
       chipsEl.replaceChildren(...lineKeys.map((k) => {
@@ -2595,11 +2627,15 @@
       h("p", { class: "hint" }, C.hide_total ? `${fP(C.dates[latestI])}: ${parts}` : `${fP(C.dates[latestI])}: ${C.total.label} ${fmtNum(C.total.values[latestI], PC ? pp : pct)}${yoyWord} — ${parts}`),
       h("div", { class: "controls" }, ySeg, h("span", { class: "spacer" }), rSeg),
       hintEl, methodLine(ind), barEl,
-      lineKeys.length ? h("p", { class: "hint", style: "margin-top:14px" }, `${C.lines_title || "Components, year-over-year change"}. `,
-        h("button", { class: "btn", type: "button", onclick: onLinePNG, style: "padding:1px 8px;font-size:12px" }, "PNG")) : null,
+      lineKeys.length ? chartActions(onPNG, onCSV) : null,
+      lineKeys.length ? h("p", { class: "hint", style: "margin-top:14px" }, `${C.lines_title || "Components, year-over-year change"}.`) : null,
       lineKeys.length ? chipsEl : null, lineKeys.length ? lineEl : null);
     table = tableView([], [], pp, ind.frequency);
-    appendAll(card, table, ind.note ? h("p", { class: "chips-note" }, ind.note) : null, footer(ind, onPNG, onCSV));
+    const onLineCSV = () => {
+      const lt = lineTraces(), all = [...new Set(lt.flatMap((t) => t.x))].sort(), maps = lt.map((t) => new Map(t.x.map((d, i) => [d, t.y[i]])));
+      downloadBlob(toCSV(["date", ...lt.map((t) => `${t.name} y/y %`)], all.map((d) => [d, ...maps.map((m) => (m.has(d) && m.get(d) !== null ? +m.get(d).toFixed(4) : ""))])), `${ind.id}_lines_yoy.csv`, "text/csv");
+    };
+    appendAll(card, table, ind.note ? h("p", { class: "chips-note" }, ind.note) : null, lineKeys.length ? footer(ind, onLinePNG, onLineCSV) : footer(ind, onPNG, onCSV));
     card.draw = drawAll;
     return card;
   }
@@ -2687,12 +2723,15 @@
         cols.map((c, i) => h("th", { scope: "col" }, `${MON(c)} ${YR(c)}`, partial && i === cols.length - 1 ? "*" : "")),
         h("th", { scope: "col", class: "dash-level" }, "Latest"), h("th", { scope: "col" }, "3 years"));
       const body = [];
-      let group = null;
+      let group = null, anyFb = false;
       for (const r of D.rows) {
         if (r.group !== group) { group = r.group; body.push(h("tr", { class: "dash-group" }, h("th", { colspan: cols.length + 3, scope: "colgroup" }, group))); }
-        const V = r[mode];
+        const fb = mode === "mm" && !r.mm && !!r.yy;   // no s.a. series: the 12-month change stands in
+        const V = fb ? r.yy : r[mode];
+        if (fb) anyFb = true;
         const label = h("a", { href: pageHref(r.topic, `ind-${r.ind}`) }, r.label);
         const marks = [mode === "mm" && r.mm_nsa ? h("sup", { title: "Not seasonally adjusted" }, "†") : null,
+          fb ? h("sup", { title: "No seasonally adjusted series: 12-month change shown" }, "‡") : null,
           r.real ? h("span", { class: "dash-tag" }, "real") : null,
           r.status !== "ok" ? h("span", { class: "dash-tag warn", title: r.status === "stale" ? "No new data for longer than usual" : "Last update failed; showing the last good data" }, r.status) : null];
         const cells = cols.map((c) => {
@@ -2702,7 +2741,7 @@
           const [v, z] = x;
           const tip = `${r.label}, ${r.freq === "Q" ? QN(c) + " " + c.slice(0, 4) : MON(c) + " " + c.slice(0, 4)}: ${fmtChange(r, V.kind, v)}` +
             (z === null ? "" : ` · ${Math.abs(z) < 0.5 ? "a usual move" : `${z > 0 ? (r.good === "none" ? "high" : "better") : (r.good === "none" ? "low" : "worse")} than usual (${fx(Math.abs(z), 1)} s.d.)`} for this series`);
-          return h("td", { style: cellStyle(r, z), title: tip }, fmtChange(r, V.kind, v), r.freq === "Q" ? h("span", { class: "dash-q" }, QN(c)) : null);
+          return h("td", { class: fb ? "dash-fb" : null, style: cellStyle(r, z), title: tip }, fmtChange(r, V.kind, v), r.freq === "Q" ? h("span", { class: "dash-q" }, QN(c)) : null);
         });
         const lvlDate = r.freq === "Q" ? `${QN(r.level_date)} ${r.level_date.slice(0, 4)}` : `${MON(r.level_date)} ${r.level_date.slice(0, 4)}`;
         body.push(h("tr", {}, h("th", { class: "dash-name", scope: "row" }, label, ...marks), cells,
@@ -2713,7 +2752,9 @@
       // On narrow screens open on the latest months (the indicator names stay pinned on the left).
       requestAnimationFrame(() => { tableWrap.scrollLeft = tableWrap.scrollWidth; });
       foot.replaceChildren(
-        mode === "mm" ? "Month on month on seasonally adjusted series (quarter on quarter for quarterly data, in the quarter's last month); † not seasonally adjusted, read with care. "
+        mode === "mm" ? "Month on month on seasonally adjusted series (quarter on quarter for quarterly data, in the quarter's last month); † not seasonally adjusted, read with care. " : "",
+        mode === "mm" && anyFb ? "‡ No seasonally adjusted series: the 12-month change is shown, in italics. " : "",
+        mode === "mm" ? ""
           : "Change over twelve months (four quarters) on the original series. ",
         "Changes in rates are in percentage points; reserves in US$ billions. Color: how unusual the change is against the same change over the previous ",
         `${D.history_years} years — green better than usual, red worse, grey large with no better or worse direction (e.g. the exchange rate); no color, a usual move. `,

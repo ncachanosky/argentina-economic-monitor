@@ -421,3 +421,9 @@ body[data-page="embed"] .card { border: 0; box-shadow: none; margin: 0; }
 .base-pick { max-width: 100%; }
 .base-pick select, .inline-select select { min-width: 0; max-width: min(100%, calc(100vw - 150px)); text-overflow: ellipsis; }
 .inline-select { max-width: 100%; }
+/* A chart's own buttons when a card has two charts */
+.chart-actions { display: flex; justify-content: flex-end; gap: 6px; margin: 4px 0 10px; }
+/* Dashboard: 12-month change standing in for a missing seasonally adjusted change */
+.dash-table td.dash-fb { font-style: italic; }
+/* Chips in panel and component cards use the interface font */
+.chips { font-family: var(--font-ui); font-size: 13px; }

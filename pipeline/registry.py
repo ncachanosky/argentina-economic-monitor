@@ -36,7 +36,8 @@ class Variant:
 #   good          direction that counts as an improvement for the headline box: up, down, none
 #   line_styles   overlay lines {variant: {slot, dash}}: shared colors, dashed pairs
 #   switch        {group, label}: cards of one group share a card with a switch between them
-DISPLAY_KEYS = ("half", "tiles", "line_styles", "switch")
+#   y_tickformat  Plotly tick format for the left axis (e.g. ".1f")
+DISPLAY_KEYS = ("half", "tiles", "line_styles", "switch", "y_tickformat")
 
 
 @dataclass

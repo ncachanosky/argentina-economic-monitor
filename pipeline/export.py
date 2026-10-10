@@ -60,7 +60,7 @@ def contributions(ind, raw: pd.DataFrame) -> dict:
                 "total": {"label": spec.get("total_label", "Total"), "values": _clean(tot.reindex(valid).tolist())},
                 "groups": groups, "lines": {}, "default_lines": [], "lines_title": spec.get("lines_title"),
                 "units": spec.get("units", "pp"), "suffix": spec.get("suffix"), "precomputed": True,
-                "hide_total": bool(spec.get("hide_total")), "style": spec.get("style", "bars")}
+                "hide_total": bool(spec.get("hide_total")), "style": spec.get("style", "bars"), "axis_title": spec.get("axis_title")}
     lag = 4 if ind.frequency == "Q" else 12
     total = raw[sid[spec["total"]]]
     base = total.shift(lag)
@@ -77,6 +77,27 @@ def contributions(ind, raw: pd.DataFrame) -> dict:
         if g.get("residual"):
             groups.append({"key": g["key"], "label": g["label"], "color": g.get("color"), "values": total_yoy - explained})
     valid = total_yoy.dropna().index
+    yearly = None
+    if ind.yearly and ind.yearly.get("how") == "levels" and ind.frequency == "Q":
+        # Contributions to annual growth, from calendar-year sums of the levels (complete years only).
+        def annual(s):
+            q = s.dropna()
+            n = q.groupby(q.index.year).count()
+            return q.groupby(q.index.year).sum()[n == 4]
+        at = annual(total)
+        ayears = [y for y in at.index if y - 1 in at.index]
+        ag = []
+        for g in spec.get("groups", []):
+            if g.get("residual"):
+                continue
+            lvl = sum(raw[sid[k]].fillna(0).where(total.notna()) for k in g.get("add", [])) - sum(raw[sid[k]].fillna(0).where(total.notna()) for k in g.get("subtract", []))
+            a = annual(lvl)
+            ag.append([round(float((a[y] - a[y - 1]) / at[y - 1] * 100), 4) for y in ayears])
+        tg = [round(float((at[y] / at[y - 1] - 1) * 100), 4) for y in ayears]
+        if any(g.get("residual") for g in spec.get("groups", [])):
+            ag.append([round(t - sum(c[i] for c in ag), 4) for i, t in enumerate(tg)])
+        yearly = {"how": "december", "dates": [f"{y}-10-01" for y in ayears], "groups": ag, "total": tg,
+                  "total_label": ind.yearly.get("total_label")}
     lines = {}
     yoy = lambda s: _clean(((s / s.shift(lag) - 1) * 100).reindex(valid).tolist())
     if spec.get("lines") == "groups":
@@ -97,6 +118,8 @@ def contributions(ind, raw: pd.DataFrame) -> dict:
         "lines": lines,
         "default_lines": spec.get("default_lines") or list(lines)[:3],
         "lines_title": spec.get("lines_title", "Components, year-over-year change"),
+        "yearly": yearly,
+        "axis_title": spec.get("axis_title"),
     }
 
 

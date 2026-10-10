@@ -62,5 +62,9 @@
  "CPI, core": "IPC, núcleo",
  "m/m": "mensual",
  "Index, corrected series: Dec 2016 = 100": "Índice, serie corregida: dic. 2016 = 100",
- "Index (real exchange rates) or pesos per US dollar (nominal rates)": "Índice (tipos de cambio reales) o pesos por dólar (tipos de cambio nominales)"
+ "Index (real exchange rates) or pesos per US dollar (nominal rates)": "Índice (tipos de cambio reales) o pesos por dólar (tipos de cambio nominales)",
+ "Net: standard (market)": "Netas: estándar (mercado)",
+ "Net: liquid": "Netas: líquidas",
+ "Net: IMF-style (approx.)": "Netas: criterio FMI (aprox.)",
+ "Pesos, monthly": "Pesos, mensual"
 }

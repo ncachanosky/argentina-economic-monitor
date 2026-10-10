@@ -980,6 +980,7 @@ indicators:
     index_base: "2004"
     transforms: [yoy, level]
     ranges: [10Y, 25Y, Max]
+    yearly: {how: mean, growth: true}
     note: >-
       Growth through Q1 2004 comes from the 1993-base accounts and from Q2
       2004 from the 2004-base accounts; the level is that of the 2004 base.
@@ -1000,6 +1001,7 @@ indicators:
   - id: gdp_demand
     topic: gdp
     kind: contributions
+    yearly: {how: levels, total_label: "GDP growth"}
     tiles:
       - {variant: c, transform: yoy, label: "Private consumption", sub: "y/y, constant prices"}
       - {variant: i, transform: yoy, label: "Investment", sub: "y/y, constant prices"}
@@ -1353,6 +1355,7 @@ indicators:
     topic: prices
     wide: true
     kind: variants
+    y_tickformat: ".1f"
     secondary_bar: {ratio: [reweighted, official], base: "2025-12-01", label: "Cumulative gap: 2017/18 over 2004/05 basket", axis: "Gap, % (dotted)", fmt: ".2f", suffix: "%", line: true}
     overlay: true
     title: CPI with the 2017/18 Basket (Estimate)
@@ -1979,9 +1982,9 @@ indicators:
         treasury_fx: "bcrabal:fx"
         imf_purchases: imf_purchases
       variants:
-        standard: {label: Standard (market)}
-        liquid:   {label: Liquid}
-        imf:      {label: IMF-style (approx.)}
+        standard: {label: "Net: standard (market)"}
+        liquid:   {label: "Net: liquid"}
+        imf:      {label: "Net: IMF-style (approx.)"}
         gross:    {label: Gross reserves}
 
   - id: bcra_assets
@@ -4371,6 +4374,7 @@ indicators:
     topic: fiscal
     wide: true
     kind: variants
+    switch: {group: balance, label: "% of GDP, last 12 months"}
     overlay: true
     measure: rate
     validate_as: flow
@@ -4417,6 +4421,7 @@ indicators:
   - id: fiscal_balance_monthly
     topic: fiscal
     kind: variants
+    switch: {group: balance, label: "Pesos, monthly"}
     overlay: true
     measure: flow
     title: Monthly Primary and Financial Balance
@@ -4447,6 +4452,11 @@ indicators:
   - id: fiscal_revenue_spending
     topic: fiscal
     kind: variants
+    line_styles:
+      revenue:  {slot: 0, width: 3.2}
+      tax:      {slot: 0, dash: dot}
+      spending: {slot: 1, dash: dash}
+      total:    {slot: 1, width: 3.2}
     tiles:
       - {variant: revenue, transform: level, label: "Revenue", good: none}
       - {variant: spending, transform: level, label: "Primary spending", good: none}
@@ -4469,7 +4479,7 @@ indicators:
       national share, after automatic transfers to the provinces
       (coparticipación).
     yearly: {how: december}
-    default: {variant: spending, transform: level, range: Max}
+    default: {variant: revenue, transform: level, range: Max}
     derive:
       method: formula
       anchor: rev
@@ -4644,7 +4654,8 @@ indicators:
       precomputed: true
       total_label: Total subsidies
       units: "% of GDP"
-      suffix: "% GDP"
+      suffix: "%"
+      axis_title: "% of GDP"
       groups:
         - {key: energy,    label: Energy,    add: [energy],    color: gold}
         - {key: transport, label: Transport, add: [transport], color: sky}
@@ -4705,7 +4716,8 @@ indicators:
       precomputed: true
       total_label: Accrual-adjusted interest
       units: "% of GDP"
-      suffix: "% GDP"
+      suffix: "%"
+      axis_title: "% of GDP"
       groups:
         - {key: cash,        label: Paid (in the budget),   add: [cash],        color: slate}
         - {key: capitalized, label: Capitalized interest (estimate), add: [capitalized], color: copper}
@@ -4932,7 +4944,8 @@ indicators:
       precomputed: true
       total_label: Gross debt
       units: "% of GDP"
-      suffix: "% GDP"
+      suffix: "%"
+      axis_title: "% of GDP"
       groups:
         - {key: pesos_other, label: "Pesos, not indexed", add: [pesos_other], color: copper}
         - {key: pesos_cer,   label: "Pesos, CER-linked",  add: [pesos_cer],   color: gold}
@@ -4994,7 +5007,8 @@ indicators:
       precomputed: true
       total_label: Gross debt
       units: "% of GDP"
-      suffix: "% GDP"
+      suffix: "%"
+      axis_title: "% of GDP"
       groups:
         - {key: public,  label: Public-sector agencies,          add: [public],  color: slate}
         - {key: private, label: Private sector,                  add: [private], color: copper}
