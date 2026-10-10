@@ -91,6 +91,10 @@ def get_adapter(name: str):
         from . import riesgo
 
         return riesgo
+    if name == "aif":
+        from . import aif
+
+        return aif
     if name == "manual":
         from . import manual
 

@@ -275,6 +275,42 @@ inputs:
   - {id: "dolar:tarjeta", source: dolar, frequency: D, measure: index, allow_gaps: true, stale_days: 7, label: "Card (tarjeta) dollar"}
   - {id: "dolar:cripto", source: dolar, frequency: D, measure: index, allow_gaps: true, stale_days: 7, label: "Crypto dollar (stablecoins)"}
   - {id: "riesgo:embi", source: riesgo, frequency: D, measure: index, allow_gaps: true, stale_days: 7, label: "Country risk: JP Morgan EMBI spread for Argentina, basis points (Ámbito via ArgentinaDatos)"}
+  # National public sector, monthly cash accounts (AIF, metodología 2017): Secretaría de Hacienda, full file on datos.gob.ar.
+  - {id: "aif:ing_antes_figurativos_2017", source: aif, frequency: M, measure: flow, allow_gaps: true, label: "AIF (base caja): Total revenue"}
+  - {id: "aif:ing_corr_2017", source: aif, frequency: M, measure: flow, allow_gaps: true, label: "AIF (base caja): Current revenue"}
+  - {id: "aif:ing_corr_ing_tributarios_2017", source: aif, frequency: M, measure: flow, allow_gaps: true, label: "AIF (base caja): Tax revenue"}
+  - {id: "aif:ing_corr_aportes_contrib_seg_soc_2017", source: aif, frequency: M, measure: flow, allow_gaps: true, label: "AIF (base caja): Social security contributions"}
+  - {id: "aif:ing_corr_ing_no_tributarios_2017", source: aif, frequency: M, measure: flow, allow_gaps: true, label: "AIF (base caja): Non-tax revenue"}
+  - {id: "aif:ing_corr_ventas_bs_ser_adm_pub_2017", source: aif, frequency: M, measure: flow, allow_gaps: true, label: "AIF (base caja): Sales of goods and services"}
+  - {id: "aif:ing_corr_ing_operacion_2017", source: aif, frequency: M, measure: flow, allow_gaps: true, label: "AIF (base caja): Operating revenue"}
+  - {id: "aif:ing_corr_ren_prop_ren_percidas_bcra_2017", source: aif, frequency: M, measure: flow, allow_gaps: true, label: "AIF (base caja): Property income from the BCRA"}
+  - {id: "aif:ing_corr_ren_prop_ren_prop_netas_2017", source: aif, frequency: M, measure: flow, allow_gaps: true, label: "AIF (base caja): Property income, net"}
+  - {id: "aif:ing_corr_transf_corr_2017", source: aif, frequency: M, measure: flow, allow_gaps: true, label: "AIF (base caja): Current transfers received"}
+  - {id: "aif:recursos_cap_total_recursos_cap_2017", source: aif, frequency: M, measure: flow, allow_gaps: true, label: "AIF (base caja): Capital revenue"}
+  - {id: "aif:gtos_primario_antes_figurativos_2017", source: aif, frequency: M, measure: flow, allow_gaps: true, label: "AIF (base caja): Primary spending"}
+  - {id: "aif:gtos_corr_gtos_cons_operacion_remuneraciones_2017", source: aif, frequency: M, measure: flow, allow_gaps: true, label: "AIF (base caja): Wages"}
+  - {id: "aif:gtos_corr_gtos_cons_operacion_bienes_servicios_2017", source: aif, frequency: M, measure: flow, allow_gaps: true, label: "AIF (base caja): Goods and services"}
+  - {id: "aif:gtos_corr_gtos_cons_operacion_ots_gtos_2017", source: aif, frequency: M, measure: flow, allow_gaps: true, label: "AIF (base caja): Other operating spending"}
+  - {id: "aif:gtos_corr_prestaciones_seg_soc_2017", source: aif, frequency: M, measure: flow, allow_gaps: true, label: "AIF (base caja): Social security benefits"}
+  - {id: "aif:gtos_corr_transf_corr_sec_priv_total_sec_priv_2017", source: aif, frequency: M, measure: flow, allow_gaps: true, label: "AIF (base caja): Current transfers to the private sector"}
+  - {id: "aif:gtos_corr_transf_corr_sect_pub_caba_total_caba_2017", source: aif, frequency: M, measure: flow, allow_gaps: true, label: "AIF (base caja): Current transfers to provinces and CABA"}
+  - {id: "aif:gtos_corr_transf_corr_sec_pub_uni_2017", source: aif, frequency: M, measure: flow, allow_gaps: true, label: "AIF (base caja): Current transfers to universities"}
+  - {id: "aif:gtos_corr_transf_corr_sec_pub_ot_2017", source: aif, frequency: M, measure: flow, allow_gaps: true, label: "AIF (base caja): Other current transfers to the public sector"}
+  - {id: "aif:gtos_corr_transf_corr_sec_ext_2017", source: aif, frequency: M, measure: flow, allow_gaps: true, label: "AIF (base caja): Current transfers abroad"}
+  - {id: "aif:gtos_corr_ots_gtos_corr_2017", source: aif, frequency: M, measure: flow, allow_gaps: true, label: "AIF (base caja): Other current spending"}
+  - {id: "aif:gtos_corr_ots_gtos_2017", source: aif, frequency: M, measure: flow, allow_gaps: true, label: "AIF (base caja): Other spending"}
+  - {id: "aif:gtos_corr_deficit_operativo_empresas_pub_2017", source: aif, frequency: M, measure: flow, allow_gaps: true, label: "AIF (base caja): Operating deficit of public enterprises"}
+  - {id: "aif:gtos_cap_2017", source: aif, frequency: M, measure: flow, allow_gaps: true, label: "AIF (base caja): Capital spending"}
+  - {id: "aif:gtos_cap_inversion_real_directa_2017", source: aif, frequency: M, measure: flow, allow_gaps: true, label: "AIF (base caja): Direct investment"}
+  - {id: "aif:gtos_cap_transf_cap_prov_caba_total_prov_caba_2017", source: aif, frequency: M, measure: flow, allow_gaps: true, label: "AIF (base caja): Capital transfers to provinces and CABA"}
+  - {id: "aif:gtos_cap_transf_cap_ot_2017", source: aif, frequency: M, measure: flow, allow_gaps: true, label: "AIF (base caja): Other capital transfers"}
+  - {id: "aif:gtos_cap_resto_2017", source: aif, frequency: M, measure: flow, allow_gaps: true, label: "AIF (base caja): Other capital spending"}
+  - {id: "aif:superavit_primario_2017", source: aif, frequency: M, measure: flow, allow_gaps: true, label: "AIF (base caja): Primary balance"}
+  - {id: "aif:gtos_corr_int_ot_ren_prop_int_netos_2017", source: aif, frequency: M, measure: flow, allow_gaps: true, label: "AIF (base caja): Net interest"}
+  - {id: "aif:gtos_corr_int_ot_ren_prop_ot_ren_2017", source: aif, frequency: M, measure: flow, allow_gaps: true, label: "AIF (base caja): Other property rents paid"}
+  - {id: "aif:resultado_fin_2017", source: aif, frequency: M, measure: flow, allow_gaps: true, label: "AIF (base caja): Financial balance"}
+  - {id: "aif:resultados_primarios_sin_rentas", source: aif, frequency: M, measure: flow, allow_gaps: true, label: "AIF (base caja): Primary balance excluding property income"}
+  - {id: "aif:gtos_corr_int_ot_ren_prop_int_pag_intra_stor_pub_2017", source: aif, frequency: M, measure: flow, allow_gaps: true, label: "AIF (base caja): Interest paid within the public sector"}
   # Real exchange rate (BCRA ITCRM workbook), daily since 1997, 17-Dec-2015 = 100; a rise is a real depreciation.
   - {id: "itcrm:m",  source: itcrm, frequency: D, measure: index, allow_gaps: true, stale_days: 10, label: "Multilateral real exchange rate index (ITCRM)"}
   - {id: "itcrm:us", source: itcrm, frequency: D, measure: index, allow_gaps: true, stale_days: 10, label: "Bilateral real exchange rate index: United States"}
@@ -4448,6 +4484,160 @@ indicators:
       financial: {label: Financial balance, id: 379.9_RESULTADO_017__18_38}
     yearly: {how: sum}
     default: {variant: primary, transform: level, range: 5Y}
+
+  - id: fiscal_budget
+    topic: fiscal
+    wide: true
+    kind: statement
+    measure: flow
+    title: The National Budget, Month by Month
+    short_title: Budget table
+    description: >-
+      Revenue, spending and the balance of the national non-financial public
+      sector, cash basis, line by line as the Secretaría de Hacienda publishes
+      it: a month, the year to date, the last twelve months or a calendar
+      year, against the same period a year earlier, in nominal and real
+      terms. Millions of pesos.
+    source: derived
+    source_label: Secretaría de Hacienda (Esquema Ahorro-Inversión-Financiamiento, base caja), via datos.gob.ar; Secretaría de Finanzas; BCRA
+    frequency: M
+    units: Millions of pesos
+    deflate_with: {indicator: cpi_long, variant: corrected, label: CPI}
+    note: >-
+      The table above the line is as reported, with no accounting
+      corrections; the lines below it are the monitor's, each a single,
+      visible adjustment rather than one "true" balance. Property income
+      includes the returns of the pension fund's assets (FGS); "primary
+      balance excluding property income" is Hacienda's own figure. Since
+      the 2017 methodology, profits the BCRA transfers to the Treasury are
+      recorded as financing, not revenue; the memo line shows them, and the
+      next line counts them as revenue, as the accounts did under the
+      earlier methodology. Net interest leaves out
+      interest paid to other parts of the national public sector (mostly
+      the BCRA and the FGS); the memo line shows it. Capitalized interest is
+      the monitor's estimate for fixed-rate peso letters and bonds (LECAP,
+      BONCAP), which pay interest at maturity and so never appear as
+      interest in the cash accounts; from December 2021. Other current
+      spending includes small property rents other than interest, which
+      Hacienda deducts before the primary balance.
+    method_links: [{anchor: capitalized-interest, label: "How capitalized interest is estimated"}]
+    statement:
+      pct_change: true
+      rows:
+        - {key: rev, bold: true}
+        - {key: tax, indent: 1}
+        - {key: ss, indent: 1}
+        - {key: ntax, indent: 1}
+        - {key: prop, indent: 1}
+        - {key: sales, indent: 1}
+        - {key: trc, indent: 1}
+        - {key: orev, indent: 1}
+        - {key: capr, indent: 1}
+        - {key: psp, bold: true}
+        - {key: cur, indent: 1}
+        - {key: pen, indent: 2}
+        - {key: tpriv, indent: 2}
+        - {key: wag, indent: 2}
+        - {key: gs, indent: 2}
+        - {key: tprov, indent: 2}
+        - {key: tuni, indent: 2}
+        - {key: tpub, indent: 2}
+        - {key: deps, indent: 2}
+        - {key: ocurr, indent: 2}
+        - {key: capx, indent: 1}
+        - {key: ird, indent: 2}
+        - {key: tcprov, indent: 2}
+        - {key: tcot, indent: 2}
+        - {key: prim, bold: true, rule: true}
+        - {key: intn, indent: 1}
+        - {key: fin, bold: true, rule: true}
+        - {heading: "Adjustments by the monitor (not in the official accounts)", rule: true}
+        - {key: psr}
+        - {key: bcra}
+        - {key: prim_bcra}
+        - {key: intra}
+        - {key: fin_intra}
+        - {key: capi}
+        - {key: fin_capi}
+    default: {variant: rev}
+    derive:
+      method: formula
+      anchor: rev
+      vars:
+        rev: "aif:ing_antes_figurativos_2017"
+        icor: "aif:ing_corr_2017"
+        tax: "aif:ing_corr_ing_tributarios_2017"
+        ss: "aif:ing_corr_aportes_contrib_seg_soc_2017"
+        ntax: "aif:ing_corr_ing_no_tributarios_2017"
+        sales: "aif:ing_corr_ventas_bs_ser_adm_pub_2017"
+        oper: "aif:ing_corr_ing_operacion_2017"
+        bcra: "aif:ing_corr_ren_prop_ren_percidas_bcra_2017"
+        prop: "aif:ing_corr_ren_prop_ren_prop_netas_2017"
+        trc: "aif:ing_corr_transf_corr_2017"
+        capr: "aif:recursos_cap_total_recursos_cap_2017"
+        psp: "aif:gtos_primario_antes_figurativos_2017"
+        wag: "aif:gtos_corr_gtos_cons_operacion_remuneraciones_2017"
+        gs: "aif:gtos_corr_gtos_cons_operacion_bienes_servicios_2017"
+        oop: "aif:gtos_corr_gtos_cons_operacion_ots_gtos_2017"
+        pen: "aif:gtos_corr_prestaciones_seg_soc_2017"
+        tpriv: "aif:gtos_corr_transf_corr_sec_priv_total_sec_priv_2017"
+        tprov: "aif:gtos_corr_transf_corr_sect_pub_caba_total_caba_2017"
+        tuni: "aif:gtos_corr_transf_corr_sec_pub_uni_2017"
+        tpub: "aif:gtos_corr_transf_corr_sec_pub_ot_2017"
+        text: "aif:gtos_corr_transf_corr_sec_ext_2017"
+        ocur: "aif:gtos_corr_ots_gtos_corr_2017"
+        ocur2: "aif:gtos_corr_ots_gtos_2017"
+        deps: "aif:gtos_corr_deficit_operativo_empresas_pub_2017"
+        capx: "aif:gtos_cap_2017"
+        ird: "aif:gtos_cap_inversion_real_directa_2017"
+        tcprov: "aif:gtos_cap_transf_cap_prov_caba_total_prov_caba_2017"
+        tcot: "aif:gtos_cap_transf_cap_ot_2017"
+        crest: "aif:gtos_cap_resto_2017"
+        prim: "aif:superavit_primario_2017"
+        intn: "aif:gtos_corr_int_ot_ren_prop_int_netos_2017"
+        orent: "aif:gtos_corr_int_ot_ren_prop_ot_ren_2017"
+        fin: "aif:resultado_fin_2017"
+        psr: "aif:resultados_primarios_sin_rentas"
+        intra: "aif:gtos_corr_int_ot_ren_prop_int_pag_intra_stor_pub_2017"
+        cap: fin:a1|lecap
+        bcap: fin:a1|boncap
+        tem: fin:col|tem_fixed
+        fx: bcra:5
+      variants:
+        rev:    {label: Total revenue, expr: "rev"}
+        tax:    {label: Tax revenue, expr: "tax"}
+        ss:     {label: Social security contributions, expr: "ss"}
+        ntax:   {label: Non-tax revenue, expr: "ntax"}
+        prop:   {label: "Property income (incl. FGS returns)", expr: "prop"}
+        bcra:   {label: "Memo: BCRA profits transferred to the Treasury (recorded as financing)", expr: "bcra"}
+        sales:  {label: Sales of goods and services, expr: "sales"}
+        trc:    {label: Current transfers received, expr: "trc"}
+        orev:   {label: Other current revenue, expr: "icor - tax - ss - ntax - prop - sales - trc - nz(oper)"}
+        capr:   {label: Capital revenue, expr: "capr"}
+        psp:    {label: Primary spending, expr: "psp + nz(orent)"}
+        cur:    {label: Current primary spending, expr: "psp + nz(orent) - capx"}
+        pen:    {label: Pensions and social security benefits, expr: "pen"}
+        tpriv:  {label: "Transfers to the private sector (subsidies, social programs)", expr: "tpriv"}
+        wag:    {label: Wages, expr: "wag"}
+        gs:     {label: Goods and services, expr: "gs + nz(oop)"}
+        tprov:  {label: Transfers to provinces and CABA, expr: "tprov"}
+        tuni:   {label: Transfers to universities, expr: "tuni"}
+        tpub:   {label: Other transfers to the public sector, expr: "tpub"}
+        deps:   {label: Operating deficit of public enterprises, expr: "deps"}
+        ocurr:  {label: Other current spending, expr: "nz(ocur) + nz(ocur2) + nz(text) + nz(orent)"}
+        capx:   {label: Capital spending, expr: "capx"}
+        ird:    {label: Direct investment (public works), expr: "ird"}
+        tcprov: {label: Capital transfers to provinces and CABA, expr: "tcprov"}
+        tcot:   {label: Other capital spending, expr: "tcot + nz(crest)"}
+        prim:   {label: Primary balance, expr: "prim"}
+        intn:   {label: Net interest, expr: "intn"}
+        fin:    {label: Financial balance, expr: "fin"}
+        psr:    {label: "Primary balance excluding property income (Hacienda)", expr: "psr"}
+        prim_bcra: {label: Primary balance counting BCRA profit transfers as revenue, expr: "prim + nz(bcra)"}
+        intra:  {label: "Memo: interest paid within the public sector", expr: "intra"}
+        fin_intra: {label: Financial balance including interest within the public sector, expr: "fin - nz(intra)"}
+        capi:   {label: "Memo: interest capitalized on LECAP and BONCAP (estimate)", expr: "lag((nz(cap) + nz(bcap)) * fx, 1) * nz(tem) / 100"}
+        fin_capi: {label: Financial balance including capitalized interest, expr: "fin - lag((nz(cap) + nz(bcap)) * fx, 1) * nz(tem) / 100"}
 
   - id: fiscal_revenue_spending
     topic: fiscal

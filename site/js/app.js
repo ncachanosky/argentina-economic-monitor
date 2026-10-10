@@ -1609,22 +1609,25 @@
     const D = ind.dates;
     const V = (k) => (ind.variants[k] ? ind.variants[k].values : []);
     const last = (() => { for (let i = D.length - 1; i >= 0; i--) if (V(S.rows.find((r) => r.key).key)[i] !== null) return i; return D.length - 1; })();
-    const qLabel = (i) => fmtPeriod(D[i], "Q");
+    // Quarterly statements (balance of payments) or monthly ones (the budget).
+    const MQ = ind.frequency === "M", N = MQ ? 12 : 4;
+    const qLabel = (i) => fmtPeriod(D[i], MQ ? "M" : "Q");
     const state = { mode: S.stock ? "stock" : "q", end: last };
     const fmt = (v) => (v === null || v === undefined || Number.isNaN(v) ? "–" : (v < 0 ? "−" : "") + Math.abs(Math.round(v)).toLocaleString(LOCALE));
+    const fmtP = (v) => (v === null || v === undefined || Number.isNaN(v) ? "–" : (v > 0 ? "+" : v < 0 ? "−" : "") + fx(Math.abs(v), 1) + "%");
     const fmtD = (v) => (v === null || v === undefined || Number.isNaN(v) ? "–" : (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(Math.round(v)).toLocaleString(LOCALE));
     // Sum of quarters i0..i1 (inclusive) of a row; null if any is missing.
     const sum = (k, i0, i1) => { if (i0 < 0) return null; let a = 0; for (let i = i0; i <= i1; i++) { const v = V(k)[i]; if (v === null || v === undefined) return null; a += v; } return a; };
-    const quarterNo = (i) => Math.floor((Number(D[i].slice(5, 7)) - 1) / 3) + 1;
+    const quarterNo = (i) => (MQ ? Number(D[i].slice(5, 7)) : Math.floor((Number(D[i].slice(5, 7)) - 1) / 3) + 1);
     // Period [i0, i1] for the mode and its end quarter; and its label.
     function period(end) {
       if (state.mode === "q" || state.mode === "stock") return [end, end, qLabel(end)];
-      if (state.mode === "l4") return [end - 3, end, `4 quarters to ${qLabel(end)}`];
-      if (state.mode === "ytd") { const n = quarterNo(end); return [end - n + 1, end, n === 4 ? D[end].slice(0, 4) : `${D[end].slice(0, 4)} to Q${n}`]; }
-      return [end - 3, end, D[end].slice(0, 4)];   // calendar year: end is a Q4
+      if (state.mode === "l4") return [end - N + 1, end, MQ ? `12 months to ${qLabel(end)}` : `4 quarters to ${qLabel(end)}`];
+      if (state.mode === "ytd") { const n = quarterNo(end); return [end - n + 1, end, n === N ? D[end].slice(0, 4) : MQ ? `${D[end].slice(0, 4)}, ${fmtShortMonth(D[end - n + 1]).split(" ")[0]}–${fmtShortMonth(D[end]).split(" ")[0]}` : `${D[end].slice(0, 4)} to Q${n}`]; }
+      return [end - N + 1, end, D[end].slice(0, 4)];   // calendar year: end is the year's last period
     }
-    const endChoices = () => D.map((d, i) => i).filter((i) => i <= last && (state.mode !== "year" || quarterNo(i) === 4) && (state.mode === "q" || state.mode === "stock" || i >= 3));
-    const modeSeg = S.stock ? null : segmented([["q", "Quarter"], ["l4", "Last 4 quarters"], ["ytd", "Year to date"], ["year", "Calendar year"]], state.mode, (k) => {
+    const endChoices = () => D.map((d, i) => i).filter((i) => i <= last && (state.mode !== "year" || quarterNo(i) === N) && (state.mode === "q" || state.mode === "stock" || i >= N - 1));
+    const modeSeg = S.stock ? null : segmented([["q", MQ ? "Month" : "Quarter"], ["l4", MQ ? "Last 12 months" : "Last 4 quarters"], ["ytd", "Year to date"], ["year", "Calendar year"]], state.mode, (k) => {
       state.mode = k; modeSeg.update(k);
       const ok = endChoices(); if (!ok.includes(state.end)) state.end = ok[ok.length - 1];
       fillSel(); draw();
@@ -1668,12 +1671,19 @@
         cols.push({ label: "Change, quarter", delta: true, get: (k) => (cols[0].get(k) !== null && cols[1].get(k) !== null && cols[1].get(k) !== undefined ? cols[0].get(k) - cols[1].get(k) : null) });
         cols.push({ label: "Change, year", delta: true, get: (k) => (cols[0].get(k) !== null && cols[2].get(k) !== null && cols[2].get(k) !== undefined ? cols[0].get(k) - cols[2].get(k) : null) });
       } else {
-        const prevLab = period(state.end - 4)[2];
+        const prevLab = period(state.end - N)[2];
         cols = [
           { label: lab, get: (k) => sum(k, i0, i1) },
-          { label: state.end >= 4 ? prevLab : "–", get: (k) => sum(k, i0 - 4, i1 - 4) },
+          { label: state.end >= N ? prevLab : "–", get: (k) => sum(k, i0 - N, i1 - N) },
         ];
-        cols.push({ label: "Change", delta: true, get: (k) => { const a = cols[0].get(k), b = cols[1].get(k); return a !== null && b !== null ? a - b : null; } });
+        if (S.pct_change) {
+          // Percent changes, nominal and deflated by the CPI month by month; only where both periods are positive.
+          const DF = ind.deflator ? ind.deflator.values : null;
+          const rsum = (k, a, b) => { if (!DF || a < 0) return null; let s = 0; for (let i = a; i <= b; i++) { const v = V(k)[i]; if (v === null || v === undefined || !DF[i]) return null; s += v / DF[i]; } return s; };
+          const pc = (a, b) => (a !== null && b !== null && a > 0 && b > 0 ? (a / b - 1) * 100 : null);
+          cols.push({ label: "Change, %", pct: true, get: (k) => pc(cols[0].get(k), cols[1].get(k)) });
+          if (DF) cols.push({ label: "Real change, %", pct: true, get: (k) => pc(rsum(k, i0, i1), rsum(k, i0 - N, i1 - N)) });
+        } else cols.push({ label: "Change", delta: true, get: (k) => { const a = cols[0].get(k), b = cols[1].get(k); return a !== null && b !== null ? a - b : null; } });
       }
       const rows = S.rows.map((r, n) => {
         if (!r.key) return h("tr", { class: "st-head" + (r.rule ? " rule" : "") }, h("td", { class: "pres", colspan: cols.length + 1 }, r.heading));
@@ -1686,13 +1696,13 @@
         const cls = [r.bold ? "st-bold" : "", r.rule ? "rule" : ""].join(" ").trim();
         return h("tr", { class: cls || null },
           h("td", { class: "pres", style: `padding-left:${10 + 18 * (r.indent || 0)}px` }, label),
-          ...cols.map((c) => { const v = c.get(r.key); return h("td", { class: c.delta ? "st-delta" : null }, c.delta ? fmtD(v) : fmt(v)); }));
+          ...cols.map((c) => { const v = c.get(r.key); return h("td", { class: c.delta || c.pct ? "st-delta" : null }, c.pct ? fmtP(v) : c.delta ? fmtD(v) : fmt(v)); }));
       });
       tableEl.replaceChildren(h("table", { class: "data statement" },
         h("thead", {}, h("tr", {}, h("th", {}, ind.units), ...cols.map((c) => h("th", {}, c.label)))), h("tbody", {}, rows.filter(Boolean))));
       foldAll.textContent = collapsed.size ? "Expand all" : "Collapse all";
       hint.textContent = S.stock ? `End-of-quarter positions; latest: ${qLabel(last)}.`
-        : `Flows over the period, against the same period a year earlier. Latest quarter: ${qLabel(last)}.`;
+        : `Flows over the period, against the same period a year earlier. Latest ${MQ ? "month" : "quarter"}: ${qLabel(last)}.${S.pct_change && ind.deflator ? " Real change: each month deflated by the CPI." : ""}`;
       view = { header: ["item", ...cols.map((c) => c.label)],
         rows: S.rows.filter((r) => r.key).map((r) => [ind.variants[r.key].label, ...cols.map((c) => { const v = c.get(r.key); return v === null || v === undefined ? "" : +v.toFixed(1); })]) };
     }

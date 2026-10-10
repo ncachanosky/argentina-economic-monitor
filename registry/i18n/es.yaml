@@ -62,6 +62,10 @@ topics:
   institutions: {title: Instituciones, group: Instituciones, description: "El marco institucional: la confianza en el gobierno y la confianza del consumidor, cuánto duran los presidentes del Banco Central y los ministros de Economía, la libertad económica, y la democracia y el Estado de derecho, con países de comparación. De la UTDT, el Fraser Institute y V-Dem."}
 
 ui:
+  Last 12 months: Últimos 12 meses
+  "Change, %": "Variación, %"
+  "Real change, %": "Variación real, %"
+  " Real change: each month deflated by the CPI.": " Variación real: cada mes deflactado por el IPC."
   PIB growth: Crecimiento del PIB
   "Annual growth: the year's average over the previous year's, %.": "Crecimiento anual: el promedio del año sobre el del año anterior, %."
   Calendar-year averages.: Promedios por año calendario.
@@ -445,6 +449,9 @@ ui:
   "<b>Argentina Economic Monitor</b> · Economic Order": "<b>Monitor de la Economía Argentina</b> · Economic Order"
 
 patterns:
+  - ["Flows over the period, against the same period a year earlier\\. Latest month: (.+)\\. Real change: each month deflated by the CPI\\.", "Flujos del período, frente al mismo período del año anterior. Último mes: $1. Variación real: cada mes deflactado por el IPC."]
+  - ["Flows over the period, against the same period a year earlier\\. Latest month: (.+)\\.", "Flujos del período, frente al mismo período del año anterior. Último mes: $1."]
+  - ["12 months to (.+)", "12 meses a $1"]
   - ["Annual growth: the year's average over the previous year's, %\\. \\*(\\d{4}): the quarters published so far against the same quarters of (\\d{4})\\.", "Crecimiento anual: el promedio del año sobre el del año anterior, %. *$1: los trimestres publicados hasta ahora frente a los mismos trimestres de $2."]
   - ["Annual growth: the year's average over the previous year's, %\\. \\*(\\d{4}): the months published so far against the same months of (\\d{4})\\.", "Crecimiento anual: el promedio del año sobre el del año anterior, %. *$1: los meses publicados hasta ahora frente a los mismos meses de $2."]
   - ["Source: (.+)\\. Latest observation: (.+)\\.(.*)", "Fuente: $1. Último dato: $2.$3"]
