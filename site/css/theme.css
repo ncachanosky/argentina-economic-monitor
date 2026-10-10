@@ -445,3 +445,7 @@ main:focus { outline: none; }
 .notfound { max-width: 640px; margin: 64px auto; font-family: var(--font-ui); }
 .notfound h1 { font-family: var(--font-serif, inherit); }
 .notfound ul { line-height: 1.9; }
+
+/* Beta tag and note */
+.beta-tag { display: inline-block; margin-left: 6px; padding: 1px 6px; border: 1px solid var(--accent); border-radius: 4px; color: var(--accent-ink); font-family: var(--font-ui); font-size: 10px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; vertical-align: 2px; }
+.beta-note { margin-top: 6px; font-family: var(--font-ui); font-size: 13px; color: var(--ink-3); }

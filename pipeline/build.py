@@ -55,6 +55,8 @@ EN = {
     "switch_title": "Ver este sitio en español",
     "pending_note": "",
     "skip": "Skip to content",
+    "beta_note": ('The Monitor is in beta: charts and methods may still change. Corrections and suggestions are welcome '
+                  '<a href="__REPO__/issues" target="_blank" rel="noopener">on GitHub</a>.'),
     "notfound_title": "Page not found",
     "notfound_text": "This page does not exist, or it moved. Try one of these:",
     "footer": """      <div>
@@ -88,7 +90,7 @@ def load_i18n(lang: str) -> dict:
 def render(template: str, *, page: str, root: str, title: str, desc: str, h1: str, lede: str, tag: str,
            content: str | None = None, url: str = "", image: str = "", lang: str = "en", assets: str | None = None,
            data: str | None = None, texts: dict | None = None, alt_url: str = "", hreflang: str = "",
-           switch: bool = False, jsonld: str = "") -> str:
+           switch: bool = False, jsonld: str = "", repo: str = "") -> str:
     T = {**EN, **(texts or {})}
     esc = lambda s: html.escape(" ".join(str(s).split()), quote=True)
     assets = root if assets is None else assets
@@ -104,7 +106,7 @@ def render(template: str, *, page: str, root: str, title: str, desc: str, h1: st
         "__HREFLANG__": hreflang, "__LANGSWITCH__": switch_html,
         "__T_HOME_ARIA__": esc(T["home_aria"]), "__T_BY__": esc(T["by"]), "__T_TOPICS__": esc(T["topics_aria"]),
         "__T_SUBSCRIBE__": esc(T["subscribe"]), "__T_THEME__": esc(T["theme"]), "__T_SHARE__": esc(T["share"]), "__T_ONPAGE__": esc(T["onpage"]),
-        "__T_LATEST__": esc(T["latest"]), "__T_SKIP__": esc(T["skip"]), "__JSONLD__": jsonld, "__FOOTER__": T["footer"],
+        "__T_LATEST__": esc(T["latest"]), "__T_SKIP__": esc(T["skip"]), "__BETA__": (f'      <p class="beta-note">{T["beta_note"].replace("__REPO__", repo)}</p>' if page == "home" else ""), "__JSONLD__": jsonld, "__FOOTER__": T["footer"],
         "__CONTENT__": content,
     }
     out = template
@@ -204,7 +206,7 @@ def build(out: Path, tag: str, with_data: bool = True) -> None:
                 template, page=page, root=root, assets=assets, title=title, h1=h1, lede=lede, desc=desc, tag=tag,
                 content=content, url=f"{base}{prefix}{path}" if page != "embed" else "", image=image, lang=lang,
                 data=f"{assets}data/", texts=t_use, alt_url=f"{root}{'../' if lang == 'es' else ''}{other}" if lang == "es" else f"{root}{other}",
-                hreflang=hreflang, switch=spanish_live,
+                hreflang=hreflang, switch=spanish_live, repo=str(reg.site.get("repo_url", "")).rstrip("/"),
                 jsonld=dataset_jsonld(reg, base, lang, site_name if lang == "en" else (texts.get("site_name") or site_name), desc) if page == "home" else "")
             if page == "embed":   # chart embeds are for other sites, not for search results
                 html_text = html_text.replace("<head>", '<head>\n  <meta name="robots" content="noindex">', 1)
@@ -301,7 +303,7 @@ def write_404(out: Path, reg, base: str, tag: str, es: dict) -> None:
   <link rel="stylesheet" href="{root}css/theme.css?v={tag}">
 </head>
 <body>
-  <header class="site-header"><div class="wrap"><a class="brand" href="{root}"><span class="brand-name">Argentina Economic Monitor</span><span class="brand-by">{EN["by"]}</span></a></div></header>
+  <header class="site-header"><div class="wrap"><a class="brand" href="{root}"><span class="brand-name">Argentina Economic Monitor <span class="beta-tag">Beta</span></span><span class="brand-by">{EN["by"]}</span></a></div></header>
   <main class="wrap notfound">
     <h1>{EN["notfound_title"]}</h1>
     <p>{EN["notfound_text"]}</p>

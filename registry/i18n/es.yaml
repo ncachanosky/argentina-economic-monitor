@@ -35,6 +35,7 @@ site:
   latest: Últimos datos
   switch_label: English
   skip: Ir al contenido
+  beta_note: 'El Monitor está en versión beta: los gráficos y los métodos todavía pueden cambiar. Las correcciones y sugerencias son bienvenidas <a href="__REPO__/issues" target="_blank" rel="noopener">en GitHub</a>.'
   notfound_title: Página no encontrada
   notfound_text: "Esta página no existe o cambió de lugar. Pruebe con alguna de estas:"
   switch_title: View this site in English
