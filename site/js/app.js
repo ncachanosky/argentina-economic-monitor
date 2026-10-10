@@ -2564,6 +2564,11 @@
     const lineColor = (k) => (lc(k) === "neutral" ? cssVar("--ink-2") : groupColor(lc(k)));
     const lineLight = (k) => (lc(k) === "neutral" ? "#5A6872" : GROUP_LIGHT[lc(k)]);
     const shown = new Set(C.default_lines || lineKeys.slice(0, 3));
+    // Overlays: memo lines drawn over the bars, not part of the stack.
+    const OV = C.overlays || [];
+    const ovTrace = (o, x, y) => ({ type: "scatter", mode: "lines", name: o.label, x, y, connectgaps: false,
+      line: { color: groupColor(o.color), width: 2.2, dash: o.dash || "dash" }, _light: GROUP_LIGHT[o.color] || "#5A6872",
+      hovertemplate: `${o.label}: <b>%{y:,.1f}${sfx}</b><extra></extra>` });
 
     const card = cardFrame(ind, true);
     const barEl = h("div", { class: "chart tall-ish", role: "img", "aria-label": `Contributions to ${C.total.label} growth` });
@@ -2593,6 +2598,7 @@
       if (!C.hide_total) tr.push({ type: "scatter", mode: "markers+lines", name: tl, x, y: keep.map((i) => tot.values[i]),
         line: { color: ink, width: 1 }, marker: { color: ink, size: 8, symbol: "diamond", line: { color: cssVar("--surface"), width: 1 } }, _light: "#36454F",
         hovertemplate: `<b>${tl}: %{y:,.1f}${PC && !CY.total_label ? sfx : "%"}</b><extra></extra>` });
+      OV.forEach((o, n) => { if (CY.overlays && CY.overlays[n]) tr.push(ovTrace(o, x, pick(agg(CY.overlays[n])))); });
       return { tr, x, partial: tot.partial };
     }
 
@@ -2624,6 +2630,7 @@
         line: { color: ink, width: 1 }, marker: { color: ink, size: 7, symbol: "diamond", line: { color: cssVar("--surface"), width: 1 } },
         _light: "#36454F", hovertemplate: `<b>${C.total.label}: %{y:,.1f}${PC ? sfx : "%"}</b><extra></extra>`,
       });
+      OV.forEach((o) => tr.push(ovTrace(o, x, idx.map((i) => o.values[i]))));
       return tr;
     }
 
@@ -2689,6 +2696,7 @@
       table && table.refresh(idx.map((i) => C.dates[i]), [
         ...(C.hide_total ? [] : [{ label: `${C.total.label} (${PC ? sfx.trim() : "y/y %"})`, values: idx.map((i) => C.total.values[i]) }]),
         ...C.groups.map((g) => ({ label: `${g.label} (${sfx.trim()})`, values: idx.map((i) => g.values[i]) })),
+        ...OV.map((o) => ({ label: `${o.label} (${sfx.trim()})`, values: idx.map((i) => o.values[i]) })),
       ], pp, ind.frequency);
     }
 
@@ -2702,8 +2710,9 @@
         const yt = yearlyTraces();
         return downloadBlob(toCSV(["year", ...yt.tr.map((t) => t.name)], yt.x.map((l, i) => [l, ...yt.tr.map((t) => (t.y[i] === null ? "" : +t.y[i].toFixed(4)))])), `${ind.id}_yearly.csv`, "text/csv");
       }
-      const header = ["date", `${C.total.label} y/y %`, ...C.groups.map((g) => `${g.label} contribution (pp)`), ...lineKeys.map((k) => `${C.lines[k].label} y/y %`)];
-      const rows = C.dates.map((d, i) => [d, C.total.values[i], ...C.groups.map((g) => g.values[i]), ...lineKeys.map((k) => C.lines[k].values[i])]
+      const header = PC ? ["date", `${C.total.label} (${sfx.trim()})`, ...C.groups.map((g) => `${g.label} (${sfx.trim()})`), ...OV.map((o) => `${o.label} (${sfx.trim()})`)]
+        : ["date", `${C.total.label} y/y %`, ...C.groups.map((g) => `${g.label} contribution (pp)`), ...lineKeys.map((k) => `${C.lines[k].label} y/y %`)];
+      const rows = C.dates.map((d, i) => [d, C.total.values[i], ...C.groups.map((g) => g.values[i]), ...(PC ? OV.map((o) => o.values[i]) : lineKeys.map((k) => C.lines[k].values[i]))]
         .map((v, j) => (j === 0 || v === null ? v : +v.toFixed(4))));
       downloadBlob(toCSV(header, rows), `${ind.id}_contributions.csv`, "text/csv");
     };

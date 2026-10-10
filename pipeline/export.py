@@ -55,8 +55,12 @@ def contributions(ind, raw: pd.DataFrame) -> dict:
             ytot = raw[sid[spec["total"] + sfx]] if spec.get("total") else raw[[sid[g["add"][0] + sfx] for g in spec["groups"]]].sum(axis=1)
             yearly = {"how": ind.yearly.get("how", "december"), "dates": [d.strftime("%Y-%m-%d") for d in yv.index],
                       "groups": [_clean(raw[sid[g["add"][0] + sfx]].reindex(yv.index).tolist()) for g in spec["groups"]],
-                      "total": _clean(ytot.reindex(yv.index).tolist()), "total_label": ind.yearly.get("total_label")}
-        return {"dates": [d.strftime("%Y-%m-%d") for d in valid], "yearly": yearly,
+                      "total": _clean(ytot.reindex(yv.index).tolist()), "total_label": ind.yearly.get("total_label"),
+                      "overlays": [_clean(raw[sid[o["key"] + sfx]].reindex(yv.index).tolist()) for o in spec.get("overlays", [])]}
+        # Overlays: lines drawn over the bars that are not part of the stack (e.g. a memo item).
+        overlays = [{"key": o["key"], "label": o["label"], "color": o.get("color"), "dash": o.get("dash", "dash"),
+                     "values": _clean(raw[sid[o["key"]]].reindex(valid).tolist())} for o in spec.get("overlays", [])]
+        return {"dates": [d.strftime("%Y-%m-%d") for d in valid], "yearly": yearly, "overlays": overlays,
                 "total": {"label": spec.get("total_label", "Total"), "values": _clean(tot.reindex(valid).tolist())},
                 "groups": groups, "lines": {}, "default_lines": [], "lines_title": spec.get("lines_title"),
                 "units": spec.get("units", "pp"), "suffix": spec.get("suffix"), "precomputed": True,

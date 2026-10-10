@@ -4946,7 +4946,11 @@ indicators:
       LEFI (July 2024 - July 2025) and on letters sold at a discount is
       left out, which understates it. An independent check from the debt
       bulletin's flows by instrument gives a similar or somewhat higher
-      figure (see the methodology), so read the estimate as a floor.
+      figure (see the methodology), so read the estimate as a floor. The
+      dotted line is the real component: the same interest less the month's
+      CPI inflation on the stock (for 2025, 1.1% of GDP; the IMF's May 2026
+      staff report puts it at about 1%). It is a memo item, not added to the
+      bars.
     contributions:
       precomputed: true
       total_label: Accrual-adjusted interest
@@ -4956,6 +4960,8 @@ indicators:
       groups:
         - {key: cash,        label: Paid (in the budget),   add: [cash],        color: slate}
         - {key: capitalized, label: Capitalized interest (estimate), add: [capitalized], color: copper}
+      overlays:
+        - {key: capitalized_real, label: "Capitalized interest, real component (memo)", color: copper, dash: dot}
     yearly: {how: december}
     method_links: [{anchor: capitalized-interest, label: "How capitalized interest is estimated"}]
     default: {variant: cash, transform: level, range: Max}
@@ -4979,6 +4985,7 @@ indicators:
       variants:
         cash:        {label: Paid,           expr: "100 * sum12(intr) / gdp12(gdp, cpi)"}
         capitalized: {label: Capitalized,    expr: "100 * sum12(lag((nz(cap) + nz(bcap)) * fx, 1) * nz(tem) / 100) / gdp12(gdp, cpi)"}
+        capitalized_real: {label: "Capitalized, real component", expr: "100 * sum12(lag((nz(cap) + nz(bcap)) * fx, 1) * ((1 + nz(tem) / 100) * lag(cpi, 1) / cpi - 1)) / gdp12(gdp, cpi)"}
 
   - id: fiscal_balance_adjusted
     topic: fiscal
