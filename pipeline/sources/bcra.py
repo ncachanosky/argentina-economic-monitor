@@ -11,8 +11,7 @@ back newest first, paged (`limit` up to 3000, `offset`).
 from __future__ import annotations
 
 import time
-from datetime import date, datetime
-from zoneinfo import ZoneInfo
+from datetime import date
 
 import pandas as pd
 import requests
@@ -54,7 +53,7 @@ def _fetch_one(session: requests.Session, sid: str) -> pd.DataFrame:
     url = f"{BASE_URL}/{bcra_id(sid)}"
     rows, offset = [], 0
     while True:
-        payload = _get(session, url, {"desde": START, "hasta": datetime.now(ZoneInfo("America/Argentina/Buenos_Aires")).date().isoformat(),
+        payload = _get(session, url, {"desde": START, "hasta": date.today().isoformat(),
                                       "limit": PAGE_SIZE, "offset": offset})
         detail = [d for res in payload.get("results", []) for d in res.get("detalle", [])]
         rows.extend(detail)
