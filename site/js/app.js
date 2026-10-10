@@ -1720,6 +1720,143 @@
     return card;
   }
 
+  // ---------- card: nominal GDP against a target path (pipeline/ngdp.py) ----------
+  // Growth view: NGDP y/y (with real growth and the deflator) against a target rate.
+  // Level view: NGDP against a path that grows at the target rate from a base quarter.
+  function ngdpCard(ind) {
+    const N = ind.ngdp, D = N.dates;
+    const card = cardFrame(ind, true);
+    const es = LANG === "es";
+    const state = { mode: "level", rate: "rem", free: N.free, base: N.base, range: "3Y" };
+    const iOf = (d) => D.indexOf(d);
+    const mid = (q) => addMonths(q, 1);                         // quarters sit at their middle month
+    const proxyI = N.proxy_from ? iOf(N.proxy_from) : D.length;
+    // REM-implied rate in force at month d: the latest survey on or before d.
+    const remAt = (d) => { let v = null; for (let k = 0; k < N.rem.dates.length && N.rem.dates[k] <= d; k++) v = N.rem.rate[k]; return v; };
+    const rateAt = (d) => (state.rate === "rem" ? remAt(d) : state.rate === "norm" ? N.norm : state.free);
+    const yoy = (a, i) => (i >= 12 && a[i] !== null && a[i - 12] !== null ? (a[i] / a[i - 12] - 1) * 100 : null);
+    const pctSpec = { suffix: "%", signed: true };
+    const lvlSpec = { suffix: "", signed: false };
+
+    const modeSeg = segmented([["level", "Level path"], ["growth", "Growth vs. target"]], state.mode, (k) => { state.mode = k; modeSeg.update(k); draw(); }, "View");
+    const rateSeg = segmented([["rem", "REM expectations"], ["norm", "Productivity norm"], ["free", "Your rate"]], state.rate, (k) => { state.rate = k; rateSeg.update(k); freeIn.hidden = k !== "free"; draw(); }, "Target rate");
+    const freeIn = h("input", { type: "number", step: "0.5", min: "-20", max: "300", value: String(state.free), "aria-label": "Target rate, % a year", style: "width:5.5em", hidden: true });
+    freeIn.addEventListener("change", () => { const v = parseFloat(freeIn.value); if (Number.isFinite(v)) { state.free = v; draw(); } });
+    const baseSel = h("select", { "aria-label": "Base quarter" }, N.quarters.filter((q) => q >= "2016-07-01").slice().reverse()
+      .map((q) => h("option", { value: q, selected: q === state.base ? true : null }, fmtPeriod(q, "Q"))));
+    baseSel.addEventListener("change", () => { state.base = baseSel.value; draw(); });
+    const baseWrap = h("label", { class: "inline-select" }, "Base: ", baseSel);
+    const rSeg = segmented([["3Y", "3Y"], ["10Y", "10Y"], ["Max", "Max"]], state.range, (k) => { state.range = k; rSeg.update(k); draw(); }, "Time range");
+    const sumEl = h("p", { class: "summary-line" });
+    const hintEl = h("p", { class: "hint" });
+    const chartEl = h("div", { class: "chart tall-ish", role: "img", "aria-label": `${ind.title} chart` });
+    const gapEl = h("div", { class: "chart", role: "img", "aria-label": "Gap to the path", style: "height:220px" });
+    const gapTitle = h("p", { class: "hint", style: "margin-top:12px" }, "Gap: nominal GDP over the path, %");
+
+    const rateName = () => (state.rate === "rem" ? "REM-implied" : state.rate === "norm" ? `productivity norm, ${fx(N.norm, 1)}%` : `${fx(state.free, 1)}% a year`);
+    // Split a series at the first proxy month so the proxy draws dashed.
+    function splitTraces(x, y, name, color, light, fmt) {
+      const solid = { type: "scatter", mode: "lines", name, x: x.filter((d) => iOf(d) < proxyI), y: y.filter((v, k) => iOf(x[k]) < proxyI),
+        line: { color, width: 2.4 }, _light: light, hovertemplate: `%{x|%b %Y}: <b>${fmt}</b><extra>${name}</extra>` };
+      const px = x.filter((d) => iOf(d) >= proxyI - 1), py = y.filter((v, k) => iOf(x[k]) >= proxyI - 1);
+      const dashed = { type: "scatter", mode: "lines", name: `${name} (proxy)`, x: px, y: py, showlegend: false,
+        line: { color, width: 2.4, dash: "dot" }, _light: light, hovertemplate: `%{x|%b %Y}: <b>${fmt}</b> (proxy)<extra>${name}</extra>` };
+      return px.length > 1 ? [solid, dashed] : [solid];
+    }
+    function levelData() {
+      const b = iOf(mid(state.base));
+      const path = D.map(() => null);
+      if (b < 0) return { path, b };
+      path[b] = N.ngdp[b];
+      for (let i = b + 1; i < D.length; i++) {
+        const g = rateAt(D[i - 1]);
+        path[i] = g === null ? null : path[i - 1] === null ? null : path[i - 1] * Math.pow(1 + g / 100, 1 / 12);
+      }
+      return { path, b };
+    }
+    function growthData() {
+      const n = D.map((d, i) => yoy(N.ngdp, i)), r = D.map((d, i) => yoy(N.real, i));
+      const p = n.map((v, i) => (v === null || r[i] === null ? null : ((1 + v / 100) / (1 + r[i] / 100) - 1) * 100));
+      // Target: for REM, the rate expected twelve months earlier; otherwise constant.
+      const tg = D.map((d) => (state.rate === "rem" ? remAt(addMonths(d, -12)) : rateAt(d)));
+      return { n, r, p, tg };
+    }
+    function traces() {
+      const ink = cssVar("--ink");
+      if (state.mode === "level") {
+        const { path, b } = levelData();
+        const idx = D.map((d, i) => i).filter((i) => i >= Math.max(0, b - 6));
+        const x = idx.map((i) => D[i]);
+        return [
+          ...splitTraces(x, idx.map((i) => N.ngdp[i]), "Nominal GDP", ink, "#36454F", "$%{y:,.1f} trillion"),
+          { type: "scatter", mode: "lines", name: `Target path (${rateName()})`, x, y: idx.map((i) => path[i]),
+            line: { color: cssVar(SERIES_VARS[5]), width: 2, dash: "dash" }, _light: "#C96B7E", hovertemplate: `%{x|%b %Y}: <b>$%{y:,.1f} trillion</b><extra>Path</extra>` },
+        ];
+      }
+      const { n, r, p, tg } = growthData();
+      const start = state.range === "Max" ? "0000" : addMonths(D[D.length - 1], state.range === "3Y" ? -36 : -120);
+      const idx = D.map((d, i) => i).filter((i) => D[i] >= start && n[i] !== null);
+      const x = idx.map((i) => D[i]);
+      return [
+        ...splitTraces(x, idx.map((i) => n[i]), "Nominal GDP growth", ink, "#36454F", "%{y:.1f}%"),
+        { type: "scatter", mode: "lines", name: "Real growth", x, y: idx.map((i) => r[i]), line: { color: cssVar(SERIES_VARS[2]), width: 1.6 }, _slot: 2, hovertemplate: "%{y:.1f}%<extra>Real growth</extra>" },
+        { type: "scatter", mode: "lines", name: "GDP deflator", x, y: idx.map((i) => p[i]), line: { color: cssVar(SERIES_VARS[0]), width: 1.6 }, _slot: 0, hovertemplate: "%{y:.1f}%<extra>GDP deflator</extra>" },
+        { type: "scatter", mode: "lines", name: state.rate === "rem" ? "Target: REM, expected 12 months earlier" : `Target: ${rateName()}`, x, y: idx.map((i) => tg[i]),
+          line: { color: cssVar(SERIES_VARS[5]), width: 2, dash: "dash" }, _light: "#C96B7E", hovertemplate: "%{y:.1f}%<extra>Target</extra>" },
+      ];
+    }
+    function gapTrace() {
+      const { path, b } = levelData();
+      const idx = D.map((d, i) => i).filter((i) => i >= b && path[i] !== null);
+      const g = idx.map((i) => (N.ngdp[i] / path[i] - 1) * 100);
+      return [{ type: "bar", name: "Gap", x: idx.map((i) => D[i]), y: g, marker: { color: g.map((v) => (v >= 0 ? cssVar("--neg") : cssVar(SERIES_VARS[1]))) },
+        _lightColors: g.map((v) => (v >= 0 ? "#C0504D" : "#5B9BD5")), hovertemplate: "%{x|%b %Y}: <b>%{y:+.1f}%</b><extra>Gap</extra>" }];
+    }
+    function draw() {
+      const level = state.mode === "level";
+      baseWrap.hidden = !level; rSeg.hidden = level; gapEl.hidden = !level; gapTitle.hidden = !level;
+      const last = D.length - 1, proxyNote = N.proxy_from ? ` Dotted: proxy from ${fmtShortMonth(N.proxy_from)} (EMAE × CPI) until INDEC publishes the quarter.` : "";
+      if (level) {
+        const { path, b } = levelData();
+        const gap = path[last] ? (N.ngdp[last] / path[last] - 1) * 100 : null;
+        sumEl.textContent = gap === null ? "" : es
+          ? `${fmtShortMonth(D[last])}: el PIB nominal está ${fx(Math.abs(gap), 1)}% ${gap >= 0 ? "por encima" : "por debajo"} de una trayectoria que crece a ${state.rate === "rem" ? "la tasa implícita en el REM" : fx(rateAt(D[last]), 1) + "% anual"} desde el ${fmtPeriod(state.base, "Q")}.`
+          : `${fmtShortMonth(D[last])}: nominal GDP is ${fx(Math.abs(gap), 1)}% ${gap >= 0 ? "above" : "below"} a path growing at ${state.rate === "rem" ? "the REM-implied rate" : fx(rateAt(D[last]), 1) + "% a year"} from ${fmtPeriod(state.base, "Q")}.`;
+        hintEl.textContent = tr(`Seasonally adjusted, trillions of pesos at annual rates; log scale.${proxyNote}`);
+      } else {
+        const { n, tg } = growthData();
+        sumEl.textContent = n[last] === null ? "" : es
+          ? `${fmtShortMonth(D[last])}: el PIB nominal creció ${fx(n[last], 1)}% interanual; objetivo: ${tg[last] === null ? "–" : fx(tg[last], 1) + "%"}.`
+          : `${fmtShortMonth(D[last])}: nominal GDP grew ${fx(n[last], 1)}% y/y; target: ${tg[last] === null ? "–" : fx(tg[last], 1) + "%"}.`;
+        hintEl.textContent = tr(`Year-over-year change, %. The deflator is nominal over real growth.${proxyNote}`);
+      }
+      const legend = { orientation: "h", x: 0, y: 1.02, yanchor: "bottom", font: { color: cssVar("--ink") } };
+      Plotly.react(chartEl, traces(), baseLayout({ pct: level ? lvlSpec : pctSpec, xaxis: { hoverformat: "%b %Y" },
+        yaxis: level ? { type: "log", ticksuffix: "", tickformat: ",~r" } : {},
+        extra: { showlegend: true, legend, margin: { l: 56, r: 16, t: 40, b: 36 } } }), PLOT_CONFIG);
+      if (level) Plotly.react(gapEl, gapTrace(), baseLayout({ pct: pctSpec, xaxis: { hoverformat: "%b %Y" }, extra: { bargap: 0.15 } }), PLOT_CONFIG);
+    }
+    const onPNG = () => exportPNG(ind, traces(), state.mode === "level"
+      ? `Nominal GDP and a path at ${rateName()} from ${fmtPeriod(state.base, "Q")} · trillions of pesos, s.a., annual rates`
+      : `Nominal GDP growth, y/y %, and target (${rateName()})`, state.mode === "level" ? lvlSpec : pctSpec, `${ind.id}_${state.mode}.png`, state.mode === "level" ? { ylog: true } : {});
+    const onCSV = () => {
+      const { path } = levelData(), { n, r, p, tg } = growthData();
+      const f = (v, d = 4) => (v === null || v === undefined ? "" : +v.toFixed(d));
+      downloadBlob(toCSV(["month", "ngdp_trillions_sa_ar", "real_gdp_billions_2004_sa_ar", "proxy", "ngdp_yoy", "real_yoy", "deflator_yoy", "target_rate", "path", "gap_pct"],
+        D.map((d, i) => [d, f(N.ngdp[i]), f(N.real[i], 2), i >= proxyI ? 1 : 0, f(n[i], 2), f(r[i], 2), f(p[i], 2), f(tg[i], 2), f(path[i]), path[i] ? f((N.ngdp[i] / path[i] - 1) * 100, 2) : ""])),
+        `${ind.id}_${state.mode}.csv`, "text/csv");
+    };
+    appendAll(card, sumEl,
+      h("div", { class: "controls" }, modeSeg, h("span", { class: "spacer" }), rSeg),
+      h("div", { class: "controls" }, h("span", { class: "hint" }, "Target rate:"), rateSeg, freeIn, baseWrap),
+      hintEl, methodLine(ind), chartEl, gapTitle, gapEl,
+      ind.note ? h("p", { class: "chips-note" }, ind.note) : null,
+      h("div", { class: "card-foot" }, h("span", {}, `Source: ${ind.source_label} · Latest: ${fmtShortMonth(D[D.length - 1])}${N.proxy_from ? " (proxy)" : ""}`),
+        h("div", { class: "actions" }, h("button", { class: "btn", type: "button", onclick: onPNG }, "PNG"), h("button", { class: "btn", type: "button", onclick: onCSV }, "CSV"))));
+    card.draw = draw;
+    return card;
+  }
+
   // ---------- card: the EMAE trend-cycle in real time (pipeline/emae_turns.py) ----------
   function turnsCard(ind) {
     const R = ind.turns, S = R.summary;
@@ -3182,6 +3319,7 @@
         : ind.kind === "statement" ? statementCard(ind)
         : ind.kind === "rer_calc" ? rerCalcCard(ind)
         : ind.kind === "turns" ? turnsCard(ind)
+        : ind.kind === "ngdp" ? ngdpCard(ind)
         : variantsCard(ind, !ind.half);
   }
 

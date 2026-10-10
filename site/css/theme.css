@@ -432,3 +432,6 @@ body[data-page="embed"] .card { border: 0; box-shadow: none; margin: 0; }
 table.data .muted { color: var(--ink-3); font-size: 0.85em; }
 table.data.turns th { white-space: normal; vertical-align: bottom; line-height: 1.25; }
 table.data.turns th, table.data.turns td { padding-left: 8px; padding-right: 8px; }
+
+/* NGDP card: controls and charts shown per view */
+.seg[hidden], .chart[hidden], .hint[hidden], input[hidden] { display: none; }

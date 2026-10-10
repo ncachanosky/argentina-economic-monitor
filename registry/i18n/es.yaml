@@ -466,7 +466,38 @@ ui:
   Signal that turned back: Señal revertida
   As published: Según el informe
 
+  # NGDP card
+  Level path: Trayectoria en nivel
+  Growth vs. target: Crecimiento frente al objetivo
+  REM expectations: Expectativas del REM
+  Productivity norm: Norma de productividad
+  Your rate: Su tasa
+  "Target rate:": "Tasa objetivo:"
+  "Base:": "Base:"
+  "Gap: nominal GDP over the path, %": "Brecha: PIB nominal sobre la trayectoria, %"
+  Real growth: Crecimiento real
+  "Nominal GDP growth": "Crecimiento del PIB nominal"
+  "Target: REM, expected 12 months earlier": "Objetivo: REM, esperado doce meses antes"
+  Gap: Brecha
+  Path: Trayectoria
+  Target: Objetivo
+  "Target rate, % a year": "Tasa objetivo, % anual"
+  Base quarter: Trimestre base
+  "Gap to the path": "Brecha con la trayectoria"
+
 patterns:
+  - ["Source: (.+) · Latest: (.+) \\(proxy\\)", "Fuente: $1 · Último dato: $2 (estimación)"]
+  - ["Seasonally adjusted, trillions of pesos at annual rates; log scale\\. Dotted: proxy from (.+) \\(EMAE × CPI\\) until INDEC publishes the quarter\\.", "Desestacionalizado, billones de pesos a tasa anual; escala logarítmica. Punteado: estimación desde $1 (EMAE × IPC) hasta que el INDEC publique el trimestre."]
+  - ["Seasonally adjusted, trillions of pesos at annual rates; log scale\\.", "Desestacionalizado, billones de pesos a tasa anual; escala logarítmica."]
+  - ["Year-over-year change, %\\. The deflator is nominal over real growth\\. Dotted: proxy from (.+) \\(EMAE × CPI\\) until INDEC publishes the quarter\\.", "Variación interanual, %. El deflactor es el crecimiento nominal sobre el real. Punteado: estimación desde $1 (EMAE × IPC) hasta que el INDEC publique el trimestre."]
+  - ["Year-over-year change, %\\. The deflator is nominal over real growth\\.", "Variación interanual, %. El deflactor es el crecimiento nominal sobre el real."]
+  - ["Target path \\(REM-implied\\)", "Trayectoria objetivo (implícita en el REM)"]
+  - ["Target path \\(productivity norm, (.+)%\\)", "Trayectoria objetivo (norma de productividad, $1%)"]
+  - ["Target path \\((.+)% a year\\)", "Trayectoria objetivo ($1% anual)"]
+  - ["Target: productivity norm, (.+)%", "Objetivo: norma de productividad, $1%"]
+  - ["Target: (.+)% a year", "Objetivo: $1% anual"]
+  - ["Nominal GDP \\(proxy\\)", "PIB nominal (estimación)"]
+  - ["Nominal GDP growth \\(proxy\\)", "Crecimiento del PIB nominal (estimación)"]
   - ["\\*(\\d{4}): twelve months to (.+)\\.", "*$1: doce meses a $2."]
   - ["Source: (.+) · Latest release: (.+)", "Fuente: $1 · Último informe: $2"]
   - ["In real time, the trend-cycle has needed a median of (\\S+) months of data \\(about (\\S+) months after the turn, counting the release lag\\) to signal a reversal since 2016; (\\d+) single signals later turned back\\. See \"How Fast the Trend-Cycle Calls a Turn\" below\\.", "En tiempo real, la tendencia-ciclo necesitó una mediana de $1 meses de datos (unos $2 meses después del giro, contando el rezago de publicación) para señalar un cambio de dirección desde 2016; $3 señales aisladas se revirtieron después. Véase \"Qué tan rápido la tendencia-ciclo marca un giro\" más abajo."]
@@ -617,3 +648,4 @@ hover:
   - [" years)", " años)"]
   - ["in office", "en funciones"]
   - [" in the release of ", " en el informe del "]
+  - [" (proxy)<", " (estimación)<"]

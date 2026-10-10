@@ -268,6 +268,24 @@ def export_turns(ind, out: Path) -> dict | None:
             "status": "ok", "last_obs": last, "headline": False}
 
 
+def export_ngdp(ind, out: Path) -> dict | None:
+    """Nominal GDP and its target paths (pipeline/ngdp.py)."""
+    from . import ngdp
+    try:
+        res = ngdp.build()
+    except Exception as exc:
+        print(f"skip {ind.id}: {exc}")
+        return None
+    last = res["dates"][-1]
+    payload = {"id": ind.id, "topic": ind.topic, "kind": ind.kind, "title": ind.title, "short_title": ind.short_title,
+               "description": ind.description, "note": ind.note, "source_label": ind.source_label, "wide": True,
+               "frequency": "M", "units": ind.units, "method_links": ind.method_links, "status": "ok", "last_obs": last,
+               "ngdp": {**res, **(ind.table.get("params") or {})}}
+    (out / f"{ind.id}.json").write_text(json.dumps(payload, separators=(",", ":")), encoding="utf-8")
+    return {"id": ind.id, "topic": ind.topic, "kind": ind.kind, "title": ind.title, "short_title": ind.short_title,
+            "status": "ok", "last_obs": last, "headline": False}
+
+
 def trend_note() -> str | None:
     """One line for the EMAE card's trend-cycle view."""
     from . import emae_turns
@@ -373,7 +391,7 @@ def export(out: Path) -> None:
         if ind.hidden:
             continue
         if ind.kind in registry.TABLE_KINDS:
-            entry = export_turns(ind, out) if ind.kind == "turns" else export_table(ind, out, status)
+            entry = export_turns(ind, out) if ind.kind == "turns" else export_ngdp(ind, out) if ind.kind == "ngdp" else export_table(ind, out, status)
             if entry:
                 manifest_inds.append(entry)
             continue

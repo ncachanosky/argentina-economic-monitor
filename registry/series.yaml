@@ -1268,6 +1268,34 @@ indicators:
     default: {variant: deflator, transform: yoy, start: "2016-01"}
 
   # ======================= PRICES & MONEY =======================
+  - id: ngdp_target
+    topic: gdp
+    kind: ngdp
+    title: Nominal GDP Against a Target Path
+    short_title: NGDP target
+    description: >-
+      Nominal GDP (spending in pesos) against a benchmark: its growth
+      compared with a target rate, or its level compared with a path that
+      grows at that rate from a base quarter. The target can be what the
+      market expected (REM), a productivity norm, or a rate of your choice.
+    source: manual
+    source_label: INDEC (GDP, EMAE, CPI); BCRA (REM); monitor's calculations
+    frequency: M
+    units: "Trillions of pesos at annual rates, seasonally adjusted"
+    table: {source: ngdp, params: {norm: 2.0, base: "2024-01-01", free: 15}}
+    method_links: [{anchor: ngdp-target, label: "How the paths are built"}]
+    note: >-
+      A benchmark, not a judgment on policy: the BCRA has never targeted
+      nominal GDP. Quarters: INDEC's real GDP, seasonally adjusted, times the
+      GDP deflator; months after the last quarter (dotted) are a proxy, the
+      EMAE times the CPI, replaced when INDEC publishes the quarter. REM:
+      expected inflation plus expected real growth over the next twelve
+      months, as surveyed at the time (in the growth view, the expectation
+      formed twelve months earlier). Productivity norm: nominal GDP grows
+      with factor inputs, so prices fall as productivity rises; about 2% a
+      year. Level path: misses are not forgiven, so after a shortfall nominal
+      spending must grow faster than the target to return to the path.
+
   - id: cpi
     topic: prices
     wide: true

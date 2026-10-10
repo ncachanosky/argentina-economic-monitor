@@ -816,3 +816,14 @@ def test_riesgo_corrections(tmp_path):
     # the shipped file only drops days, and each row says why
     c = pd.read_csv(riesgo.CORRECTIONS)
     assert c["note"].notna().all()
+
+
+def test_ngdp_monthly_chain():
+    import pandas as pd
+    from pipeline.ngdp import _monthly
+    q = pd.Series([100.0, 110.0], index=pd.to_datetime(["2025-02-01", "2025-05-01"]))   # quarter mid-months
+    x = pd.Series([1.0, 1.0, 1.0, 1.02, 1.04], index=pd.date_range("2025-04-01", periods=5, freq="MS"))
+    m, p0 = _monthly(q, x, pd.Timestamp("2025-04-01"))
+    assert p0 == pd.Timestamp("2025-06-01")
+    assert abs(m[pd.Timestamp("2025-03-01")] - 100 * 1.1 ** (1 / 3)) < 1e-9          # log-linear between quarters
+    assert abs(m[pd.Timestamp("2025-08-01")] - 110 * 1.04) < 1e-9                   # chained to the last quarter's average
