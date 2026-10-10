@@ -102,7 +102,8 @@
       : v.toLocaleString(LOCALE, { maximumFractionDigits: 1, minimumFractionDigits: 1 }) + s.suffix;
   };
   // Category axis of years: label every k-th year when there are many, unrotated.
-  const yearAxis = (n) => ({ type: "category", tickangle: 0, ...(n > 16 ? { tickmode: "linear", tick0: 0, dtick: Math.ceil(n / 12) } : {}) });
+  // Year labels: at most about 12 on a wide chart, 6 on a phone.
+  const yearAxis = (n) => { const max = window.innerWidth < 600 ? 6 : 12; return { type: "category", tickangle: 0, ...(n > max + 4 ? { tickmode: "linear", tick0: 0, dtick: Math.ceil(n / max) } : {}) }; };
   // Daily lines: a gap of more than a month in the data breaks the line instead of bridging it.
   function breakGaps(x, y, days = 31) {
     const X = [], Y = [];
@@ -2557,7 +2558,7 @@
     // and the total is a change in the stock, not y/y growth.
     const PC = !!C.precomputed;
     const yoyWord = PC ? "" : " y/y";
-    const state = { range: rangeFromDefault(ind) };
+    const state = { range: rangeFromDefault(ind), yearly: !!(C.yearly && ind.default && ind.default.yearly) };
     const lineKeys = Object.keys(C.lines);
     // Lines keep the same color as their bar component (color follows the entity).
     const lc = (k) => C.lines[k].color || "neutral";
@@ -2576,7 +2577,7 @@
     const chipsEl = h("div", { class: "chips", role: "group", "aria-label": "Components to compare" });
     const rSeg = segmented(rangeKeys(ind).map((k) => [k, k]), state.range, (k) => { state.range = k; drawAll(); }, "Time range");
     const CY = C.yearly;
-    const ySeg = CY ? segmented([["monthly", ind.frequency === "Q" ? "Quarterly" : "Monthly"], ["yearly", "Yearly"]], "monthly", (k) => { state.yearly = k === "yearly"; ySeg.update(k); drawAll(); }, "Frequency") : null;
+    const ySeg = CY ? segmented([["monthly", ind.frequency === "Q" ? "Quarterly" : "Monthly"], ["yearly", "Yearly"]], state.yearly ? "yearly" : "monthly", (k) => { state.yearly = k === "yearly"; ySeg.update(k); drawAll(); }, "Frequency") : null;
     const hintEl = h("p", { class: "hint" });
     let table;
 
@@ -2656,14 +2657,14 @@
       rSeg.update(state.range);
       const legend = { orientation: "h", x: 0, y: 1.02, yanchor: "bottom", font: { color: cssVar("--ink") } };
       if (state.yearly) {
-        const { tr, x, partial } = yearlyTraces();
-        hintEl.textContent = `Calendar years${CY.how === "sum" ? ": totals" : ""}. ${yearlyNote(CY.how, partial)}`;
+        const { tr: ytr, x, partial } = yearlyTraces();
+        hintEl.textContent = [tr(`Calendar years${CY.how === "sum" ? ": totals" : ""}.`), tr(yearlyNote(CY.how, partial))].filter(Boolean).join(" ");
         hintEl.hidden = false;
-        Plotly.react(barEl, tr, baseLayout({
+        Plotly.react(barEl, ytr, baseLayout({
           pct: pp, xaxis: yearAxis(x.length),
           extra: { barmode: C.style === "area" ? "stack" : "relative", bargap: 0.25, showlegend: true, legend, margin: { l: 56, r: 16, t: 40, b: 36 } },
         }), PLOT_CONFIG);
-        table && table.refresh(x, tr.map((t) => ({ label: `${t.name} (${t.type === "bar" ? sfx.trim() : "%"})`, values: t.y })), pp, "Y");
+        table && table.refresh(x, ytr.map((t) => ({ label: `${t.name} (${t.type === "bar" ? sfx.trim() : "%"})`, values: t.y })), pp, "Y");
         return;
       }
       hintEl.hidden = true;

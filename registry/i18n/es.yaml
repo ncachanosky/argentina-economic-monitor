@@ -70,6 +70,7 @@ ui:
   "Annual growth: the year's average over the previous year's, %.": "Crecimiento anual: el promedio del año sobre el del año anterior, %."
   Calendar-year averages.: Promedios por año calendario.
   Calendar years.: Años calendario.
+  "Calendar years: totals.": "Años calendario: totales."
   Download the data in this chart as CSV: Descargar los datos de este gráfico en CSV
   "No seasonally adjusted series: 12-month change shown": "Sin serie desestacionalizada: se muestra la variación de 12 meses"
   "‡ No seasonally adjusted series: the 12-month change is shown, in italics.": "‡ Sin serie desestacionalizada: se muestra la variación de 12 meses, en cursiva."
@@ -466,6 +467,7 @@ ui:
   As published: Según el informe
 
 patterns:
+  - ["\\*(\\d{4}): twelve months to (.+)\\.", "*$1: doce meses a $2."]
   - ["Source: (.+) · Latest release: (.+)", "Fuente: $1 · Último informe: $2"]
   - ["In real time, the trend-cycle has needed a median of (\\S+) months of data \\(about (\\S+) months after the turn, counting the release lag\\) to signal a reversal since 2016; (\\d+) single signals later turned back\\. See \"How Fast the Trend-Cycle Calls a Turn\" below\\.", "En tiempo real, la tendencia-ciclo necesitó una mediana de $1 meses de datos (unos $2 meses después del giro, contando el rezago de publicación) para señalar un cambio de dirección desde 2016; $3 señales aisladas se revirtieron después. Véase \"Qué tan rápido la tendencia-ciclo marca un giro\" más abajo."]
   - ["Change in the trend-cycle, % m/m: latest month of each release vs\\. today's series · P/T: peaks and troughs", "Variación de la tendencia-ciclo, % mensual: último mes de cada informe frente a la serie actual · P/V: picos y valles"]
