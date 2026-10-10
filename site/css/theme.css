@@ -208,7 +208,7 @@ a:hover { color: var(--accent-ink); }
 .summary-line { font-family: var(--font-ui); font-size: 14px; color: var(--ink-2); margin: 2px 0 6px; }
 .summary-line b { color: var(--ink); font-weight: 600; }
 .summary-line .sw { display: inline-block; width: 14px; height: 3px; vertical-align: middle; margin: 0 5px 2px 0; border-radius: 2px; }
-.summary-line .sw.dash { background: none !important; border-top: 2px dashed currentColor; height: 0; }
+.summary-line .sw.dashed { background: none !important; border-top: 2px dashed currentColor; height: 0; }
 .episode-key { font-family: var(--font-ui); font-size: 12.5px; color: var(--ink-2); margin: 0 0 6px; padding-left: 20px; }
 .episode-key li::marker { color: var(--highlight); font-weight: 700; }
 .band-key { display: flex; flex-wrap: wrap; gap: 4px 18px; font-family: var(--font-ui); font-size: 12.5px; color: var(--ink-2); margin: 0 0 4px; }
@@ -410,3 +410,20 @@ body[data-page="embed"] .card { border: 0; box-shadow: none; margin: 0; }
   .header-tools .btn:not(.icon-btn) { padding-left: 8px; padding-right: 8px; font-size: 13px; }
   .header-tools .icon-btn { width: 30px; height: 30px; }
 }
+
+/* Statement tables: sections fold under their heading */
+.st-fold { background: none; border: 0; padding: 0; font: inherit; color: inherit; cursor: pointer; text-align: left; }
+.st-fold:hover { color: var(--accent-ink); }
+.st-caret { display: inline-block; width: 1em; color: var(--ink-3); }
+/* Switch between related cards (e.g. exports, imports, balance) */
+.card-switch { margin: 0 0 10px; }
+/* Long option texts never push a select past the screen edge */
+.base-pick { max-width: 100%; }
+.base-pick select, .inline-select select { min-width: 0; max-width: min(100%, calc(100vw - 150px)); text-overflow: ellipsis; }
+.inline-select { max-width: 100%; }
+/* A chart's own buttons when a card has two charts */
+.card-foot.chart-actions { border-top: 0; margin: 2px 0 12px; padding-top: 0; }
+/* Dashboard: 12-month change standing in for a missing seasonally adjusted change */
+.dash-table td.dash-fb { font-style: italic; }
+/* Chips in panel and component cards use the interface font */
+.chips { font-family: var(--font-ui); font-size: 13px; }

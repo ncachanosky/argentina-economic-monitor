@@ -10,7 +10,8 @@ at most 1000 rows and rejects end dates after today).
 from __future__ import annotations
 
 import time
-from datetime import date
+from datetime import date, datetime
+from zoneinfo import ZoneInfo
 
 import pandas as pd
 import requests
@@ -23,8 +24,13 @@ USER_AGENT = "argentina-economic-monitor (+https://github.com/ncachanosky/argent
 FIRST_YEAR = {"CNY": 2014}
 
 
+def _today() -> date:
+    """Today in Buenos Aires: the API rejects end dates after its own today (CI runs on UTC)."""
+    return datetime.now(ZoneInfo("America/Argentina/Buenos_Aires")).date()
+
+
 def _year(session: requests.Session, code: str, year: int) -> list[tuple]:
-    end = min(date(year, 12, 31), date.today())
+    end = min(date(year, 12, 31), _today())
     params = {"fechadesde": f"{year}-01-01", "fechahasta": end.isoformat()}
     last = None
     for attempt in range(3):
@@ -51,7 +57,7 @@ def fetch(ids) -> FetchResult:
             code = sid.split(":", 1)[1]
             try:
                 rows = []
-                for y in range(FIRST_YEAR.get(code, 2002), date.today().year + 1):
+                for y in range(FIRST_YEAR.get(code, 2002), _today().year + 1):
                     rows += _year(session, code, y)
                     time.sleep(0.2)
                 if not rows:

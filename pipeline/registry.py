@@ -30,6 +30,16 @@ class Variant:
     source_id: str
 
 
+# Display-only card options, passed to the site unchanged:
+#   half          variants card drawn at half width (pairs of related cards)
+#   tiles         extra summary boxes [{variant, transform, label, good, orig, sub}]
+#   good          direction that counts as an improvement for the headline box: up, down, none
+#   line_styles   overlay lines {variant: {slot, dash}}: shared colors, dashed pairs
+#   switch        {group, label}: cards of one group share a card with a switch between them
+#   y_tickformat  Plotly tick format for the left axis (e.g. ".1f")
+DISPLAY_KEYS = ("half", "tiles", "line_styles", "switch", "y_tickformat")
+
+
 @dataclass
 class Indicator:
     id: str
@@ -82,6 +92,8 @@ class Indicator:
     muted: list | None = None          # overlay cards: variants drawn as thin grey reference lines (e.g. a regional median)
     term_shading: bool = False         # shade presidential terms behind the chart (annual series)
     term_colored: bool = False         # overlay cards: the emphasis variant drawn in presidency colors
+    unlisted: bool = False             # exported (for the dashboard and links) but not shown on a topic page
+    display: dict | None = None        # display-only options passed to the site as is (DISPLAY_KEYS)
     secondary_bar: dict | None = None  # overlay cards: {variant, of, label, axis}: bars on a right axis (e.g. a rank)
     forecast: list | None = None       # [{variant, rem, transform}]: the latest REM path drawn after the data (see export)
     fan: dict | None = None            # overlay cards: {lo, hi, label}: a shaded band between two variants
@@ -283,8 +295,12 @@ def load(path: Path = REGISTRY_PATH, releases_path: Path = RELEASES_PATH) -> Reg
         if fan and not {fan.get("lo"), fan.get("hi")} <= set(variants):
             raise RegistryError(f"{where}: fan names unknown variants")
         sb = item.get("secondary_bar")
-        if sb and not ({sb.get("variant")} | ({sb["of"]} if sb.get("of") else set())) <= set(variants):
+        sb_vars = set(sb.get("ratio") or []) if sb and sb.get("ratio") else ({sb.get("variant")} | ({sb["of"]} if sb.get("of") else set())) if sb else set()
+        if sb and not sb_vars <= set(variants):
             raise RegistryError(f"{where}: secondary_bar names unknown variants")
+        for t in item.get("tiles") or []:
+            if t.get("variant") not in variants or (t.get("orig") and t["orig"] not in variants):
+                raise RegistryError(f"{where}: tile names unknown variants")
         for fld in ("overlay_default", "muted"):
             if item.get(fld) and not set(item[fld]) <= set(variants):
                 raise RegistryError(f"{where}: {fld} names unknown variants")
@@ -342,6 +358,8 @@ def load(path: Path = REGISTRY_PATH, releases_path: Path = RELEASES_PATH) -> Reg
                 term_shading=bool(item.get("term_shading", False)),
                 term_colored=bool(item.get("term_colored", False)),
                 secondary_bar=item.get("secondary_bar"),
+                unlisted=bool(item.get("unlisted", False)),
+                display={k: item[k] for k in DISPLAY_KEYS if k in item} or None,
                 forecast=item.get("forecast"),
                 fan=item.get("fan"),
                 view_start=str(item["view_start"]) + ("-01" if len(str(item["view_start"])) == 7 else "") if item.get("view_start") else None,

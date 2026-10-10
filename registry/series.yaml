@@ -25,7 +25,7 @@ site:
   # Privacy-friendly page counts (GoatCounter: no cookies, no personal data). Create a site at
   # https://www.goatcounter.com/signup and put its code here (e.g. "aem" for aem.goatcounter.com);
   # empty: no analytics.
-  goatcounter: ""
+  goatcounter: "ncachanosky"
   # Spanish site (/es/): built always; linked from the header, listed for search engines and
   # given hreflang links only when true. Texts: registry/i18n/es.yaml.
   spanish: true
@@ -275,6 +275,42 @@ inputs:
   - {id: "dolar:tarjeta", source: dolar, frequency: D, measure: index, allow_gaps: true, stale_days: 7, label: "Card (tarjeta) dollar"}
   - {id: "dolar:cripto", source: dolar, frequency: D, measure: index, allow_gaps: true, stale_days: 7, label: "Crypto dollar (stablecoins)"}
   - {id: "riesgo:embi", source: riesgo, frequency: D, measure: index, allow_gaps: true, stale_days: 7, label: "Country risk: JP Morgan EMBI spread for Argentina, basis points (Ámbito via ArgentinaDatos)"}
+  # National public sector, monthly cash accounts (AIF, metodología 2017): Secretaría de Hacienda, full file on datos.gob.ar.
+  - {id: "aif:ing_antes_figurativos_2017", source: aif, frequency: M, measure: flow, allow_gaps: true, label: "AIF (base caja): Total revenue"}
+  - {id: "aif:ing_corr_2017", source: aif, frequency: M, measure: flow, allow_gaps: true, label: "AIF (base caja): Current revenue"}
+  - {id: "aif:ing_corr_ing_tributarios_2017", source: aif, frequency: M, measure: flow, allow_gaps: true, label: "AIF (base caja): Tax revenue"}
+  - {id: "aif:ing_corr_aportes_contrib_seg_soc_2017", source: aif, frequency: M, measure: flow, allow_gaps: true, label: "AIF (base caja): Social security contributions"}
+  - {id: "aif:ing_corr_ing_no_tributarios_2017", source: aif, frequency: M, measure: flow, allow_gaps: true, label: "AIF (base caja): Non-tax revenue"}
+  - {id: "aif:ing_corr_ventas_bs_ser_adm_pub_2017", source: aif, frequency: M, measure: flow, allow_gaps: true, label: "AIF (base caja): Sales of goods and services"}
+  - {id: "aif:ing_corr_ing_operacion_2017", source: aif, frequency: M, measure: flow, allow_gaps: true, label: "AIF (base caja): Operating revenue"}
+  - {id: "aif:ing_corr_ren_prop_ren_percidas_bcra_2017", source: aif, frequency: M, measure: flow, allow_gaps: true, label: "AIF (base caja): Property income from the BCRA"}
+  - {id: "aif:ing_corr_ren_prop_ren_prop_netas_2017", source: aif, frequency: M, measure: flow, allow_gaps: true, label: "AIF (base caja): Property income, net"}
+  - {id: "aif:ing_corr_transf_corr_2017", source: aif, frequency: M, measure: flow, allow_gaps: true, label: "AIF (base caja): Current transfers received"}
+  - {id: "aif:recursos_cap_total_recursos_cap_2017", source: aif, frequency: M, measure: flow, allow_gaps: true, label: "AIF (base caja): Capital revenue"}
+  - {id: "aif:gtos_primario_antes_figurativos_2017", source: aif, frequency: M, measure: flow, allow_gaps: true, label: "AIF (base caja): Primary spending"}
+  - {id: "aif:gtos_corr_gtos_cons_operacion_remuneraciones_2017", source: aif, frequency: M, measure: flow, allow_gaps: true, label: "AIF (base caja): Wages"}
+  - {id: "aif:gtos_corr_gtos_cons_operacion_bienes_servicios_2017", source: aif, frequency: M, measure: flow, allow_gaps: true, label: "AIF (base caja): Goods and services"}
+  - {id: "aif:gtos_corr_gtos_cons_operacion_ots_gtos_2017", source: aif, frequency: M, measure: flow, allow_gaps: true, label: "AIF (base caja): Other operating spending"}
+  - {id: "aif:gtos_corr_prestaciones_seg_soc_2017", source: aif, frequency: M, measure: flow, allow_gaps: true, label: "AIF (base caja): Social security benefits"}
+  - {id: "aif:gtos_corr_transf_corr_sec_priv_total_sec_priv_2017", source: aif, frequency: M, measure: flow, allow_gaps: true, label: "AIF (base caja): Current transfers to the private sector"}
+  - {id: "aif:gtos_corr_transf_corr_sect_pub_caba_total_caba_2017", source: aif, frequency: M, measure: flow, allow_gaps: true, label: "AIF (base caja): Current transfers to provinces and CABA"}
+  - {id: "aif:gtos_corr_transf_corr_sec_pub_uni_2017", source: aif, frequency: M, measure: flow, allow_gaps: true, label: "AIF (base caja): Current transfers to universities"}
+  - {id: "aif:gtos_corr_transf_corr_sec_pub_ot_2017", source: aif, frequency: M, measure: flow, allow_gaps: true, label: "AIF (base caja): Other current transfers to the public sector"}
+  - {id: "aif:gtos_corr_transf_corr_sec_ext_2017", source: aif, frequency: M, measure: flow, allow_gaps: true, label: "AIF (base caja): Current transfers abroad"}
+  - {id: "aif:gtos_corr_ots_gtos_corr_2017", source: aif, frequency: M, measure: flow, allow_gaps: true, label: "AIF (base caja): Other current spending"}
+  - {id: "aif:gtos_corr_ots_gtos_2017", source: aif, frequency: M, measure: flow, allow_gaps: true, label: "AIF (base caja): Other spending"}
+  - {id: "aif:gtos_corr_deficit_operativo_empresas_pub_2017", source: aif, frequency: M, measure: flow, allow_gaps: true, label: "AIF (base caja): Operating deficit of public enterprises"}
+  - {id: "aif:gtos_cap_2017", source: aif, frequency: M, measure: flow, allow_gaps: true, label: "AIF (base caja): Capital spending"}
+  - {id: "aif:gtos_cap_inversion_real_directa_2017", source: aif, frequency: M, measure: flow, allow_gaps: true, label: "AIF (base caja): Direct investment"}
+  - {id: "aif:gtos_cap_transf_cap_prov_caba_total_prov_caba_2017", source: aif, frequency: M, measure: flow, allow_gaps: true, label: "AIF (base caja): Capital transfers to provinces and CABA"}
+  - {id: "aif:gtos_cap_transf_cap_ot_2017", source: aif, frequency: M, measure: flow, allow_gaps: true, label: "AIF (base caja): Other capital transfers"}
+  - {id: "aif:gtos_cap_resto_2017", source: aif, frequency: M, measure: flow, allow_gaps: true, label: "AIF (base caja): Other capital spending"}
+  - {id: "aif:superavit_primario_2017", source: aif, frequency: M, measure: flow, allow_gaps: true, label: "AIF (base caja): Primary balance"}
+  - {id: "aif:gtos_corr_int_ot_ren_prop_int_netos_2017", source: aif, frequency: M, measure: flow, allow_gaps: true, label: "AIF (base caja): Net interest"}
+  - {id: "aif:gtos_corr_int_ot_ren_prop_ot_ren_2017", source: aif, frequency: M, measure: flow, allow_gaps: true, label: "AIF (base caja): Other property rents paid"}
+  - {id: "aif:resultado_fin_2017", source: aif, frequency: M, measure: flow, allow_gaps: true, label: "AIF (base caja): Financial balance"}
+  - {id: "aif:resultados_primarios_sin_rentas", source: aif, frequency: M, measure: flow, allow_gaps: true, label: "AIF (base caja): Primary balance excluding property income"}
+  - {id: "aif:gtos_corr_int_ot_ren_prop_int_pag_intra_stor_pub_2017", source: aif, frequency: M, measure: flow, allow_gaps: true, label: "AIF (base caja): Interest paid within the public sector"}
   # Real exchange rate (BCRA ITCRM workbook), daily since 1997, 17-Dec-2015 = 100; a rise is a real depreciation.
   - {id: "itcrm:m",  source: itcrm, frequency: D, measure: index, allow_gaps: true, stale_days: 10, label: "Multilateral real exchange rate index (ITCRM)"}
   - {id: "itcrm:us", source: itcrm, frequency: D, measure: index, allow_gaps: true, stale_days: 10, label: "Bilateral real exchange rate index: United States"}
@@ -581,13 +617,13 @@ presidencies:
 # and optionally left out of the presidency averages. Neutral descriptions;
 # interpretation belongs in Economic Order posts, not here.
 episodes:
-  - {id: deval_2023, start: "2023-08-01", end: "2023-09-01", indicators: [cpi, cpi_long],
+  - {id: deval_2023, start: "2023-08-01", end: "2023-09-01", indicators: [cpi_long],
      label: "Post-primary devaluation",
      description: "The official exchange rate was raised about 22% the day after the August 2023 primaries"}
-  - {id: platita, start: "2023-11-01", end: "2023-12-01", indicators: [cpi, cpi_long],
+  - {id: platita, start: "2023-11-01", end: "2023-12-01", indicators: [cpi_long],
      label: "Plan Platita and the December devaluation",
      description: "Pre-election fiscal and monetary expansion; the official exchange rate then more than doubled on 13 December 2023"}
-  - {id: correction_2024, start: "2024-01-01", end: "2024-04-01", indicators: [cpi, cpi_long],
+  - {id: correction_2024, start: "2024-01-01", end: "2024-04-01", indicators: [cpi_long],
      label: "Correction of relative prices",
      description: "Pass-through of the December devaluation and the adjustment of regulated prices"}
 
@@ -724,6 +760,7 @@ indicators:
       trend:    {label: Trend-cycle,         id: 143.3_NO_PR_2004_A_28}
     default: {variant: sa, transform: level, start: "2016-01"}
     headline: {variant: sa, transform: mom}
+    tiles: [{variant: trend, transform: mom, label: "EMAE trend-cycle", orig: original}]
     # Yearly table: cumulative change of the year to date vs. the same months a
     # year earlier (original series, as INDEC reports it) and Dec-to-Dec (SA).
     annual_table: {accumulated: original, within_year: sa, carryover: true}
@@ -776,9 +813,38 @@ indicators:
             public_admin: public_admin, education: education, health: health,
             other_services: other_services}
 
+  - id: industry_construction
+    topic: real_sector
+    kind: variants
+    overlay: true
+    title: Manufacturing and Construction
+    short_title: Industry and construction
+    description: >-
+      INDEC's monthly indices of manufacturing production (IPI
+      manufacturero) and construction activity (ISAC), both 2004 = 100, so
+      their levels compare directly. Seasonally adjusted by default; the
+      original series and the construction trend-cycle can be added below
+      the chart.
+    source: datos_gob
+    source_label: INDEC, via datos.gob.ar
+    release: ipi_manufacturero
+    frequency: M
+    units: Index, 2004 = 100
+    variants:
+      ipi_sa:     {label: "Manufacturing (IPI), seasonally adjusted", id: 453.1_SERIE_DESEADA_0_0_24_58}
+      isac_sa:    {label: "Construction (ISAC), seasonally adjusted", id: 33.2_ISAC_SIN_EDAD_0_M_23_56}
+      ipi_orig:   {label: "Manufacturing (IPI), original", id: 453.1_SERIE_ORIGNAL_0_0_14_46}
+      isac_orig:  {label: "Construction (ISAC), original", id: 33.2_ISAC_NIVELRAL_0_M_18_63}
+      isac_trend: {label: "Construction (ISAC), trend-cycle", id: 33.2_ISAC_CICLOCIA_0_M_20_62}
+    overlay_default: [ipi_sa, isac_sa]
+    default: {variant: ipi_sa, transform: level, start: 2016-01}
+    headline: {variant: ipi_sa, transform: mom, label: "IPI manufacturing", orig: ipi_orig, sub: "m/m, seasonally adjusted"}
+    tiles: [{variant: isac_sa, transform: mom, label: "ISAC construction", orig: isac_orig, sub: "m/m, seasonally adjusted"}]
+
   - id: ipi
     topic: real_sector
     kind: variants
+    unlisted: true
     title: Manufacturing Production Index (IPI)
     short_title: IPI manufacturing
     description: >-
@@ -787,7 +853,7 @@ indicators:
     source: datos_gob
     source_label: INDEC, via datos.gob.ar
     frequency: M
-    units: Index
+    units: Index, 2004 = 100
     variants:
       sa:       {label: Seasonally adjusted, id: 453.1_SERIE_DESEADA_0_0_24_58}
       original: {label: Original,            id: 453.1_SERIE_ORIGNAL_0_0_14_46}
@@ -797,6 +863,7 @@ indicators:
   - id: isac
     topic: real_sector
     kind: variants
+    unlisted: true
     title: Construction Activity Index (ISAC)
     short_title: ISAC construction
     description: >-
@@ -949,6 +1016,7 @@ indicators:
     index_base: "2004"
     transforms: [yoy, level]
     ranges: [10Y, 25Y, Max]
+    yearly: {how: mean, growth: true}
     note: >-
       Growth through Q1 2004 comes from the 1993-base accounts and from Q2
       2004 from the 2004-base accounts; the level is that of the 2004 base.
@@ -969,6 +1037,12 @@ indicators:
   - id: gdp_demand
     topic: gdp
     kind: contributions
+    yearly: {how: levels, total_label: "GDP growth"}
+    tiles:
+      - {variant: c, transform: yoy, label: "Private consumption", sub: "y/y, constant prices"}
+      - {variant: i, transform: yoy, label: "Investment", sub: "y/y, constant prices"}
+      - {variant: x, transform: yoy, label: "Exports", sub: "y/y, constant prices"}
+      - {variant: m, transform: yoy, label: "Imports", sub: "y/y, constant prices", good: none}
     measure: flow
     title: What Drives GDP Growth
     short_title: GDP contributions
@@ -1124,6 +1198,7 @@ indicators:
   - id: gdp_nominal
     topic: gdp
     kind: variants
+    half: true
     title: Nominal GDP
     short_title: Nominal GDP
     description: >-
@@ -1143,6 +1218,7 @@ indicators:
   - id: gdp_deflator
     topic: gdp
     kind: variants
+    half: true
     title: GDP Deflator
     short_title: GDP deflator
     description: >-
@@ -1184,7 +1260,10 @@ indicators:
     forecast:
       - {variant: headline, rem: cpi, transform: mom}
       - {variant: core, rem: core, transform: mom}
-    headline: {variant: headline, transform: mom}
+    headline: {variant: headline, transform: mom, good: none, label: "CPI"}
+    tiles:
+      - {variant: core, transform: mom, label: "CPI, core", good: none}
+      - {variant: headline, transform: yoy, label: "CPI, 12 months", good: none, sub: "y/y, headline"}
 
   - id: cpi_long
     topic: prices
@@ -1204,7 +1283,7 @@ indicators:
     source: derived
     source_label: "INDEC; IPC Congreso (Jan 2007 - Apr 2016)"
     frequency: M
-    units: Index, Dec 2016 = 100
+    units: "Index, corrected series: Dec 2016 = 100"
     transforms: [yoy, mom, level]
     ranges: [10Y, 25Y, 50Y, Max]
     note: >-
@@ -1312,6 +1391,8 @@ indicators:
     topic: prices
     wide: true
     kind: variants
+    y_tickformat: ".1f"
+    secondary_bar: {ratio: [reweighted, official], base: "2025-12-01", label: "Cumulative gap: 2017/18 over 2004/05 basket", axis: "Gap, % (dotted)", fmt: ".2f", suffix: "%", line: true}
     overlay: true
     title: CPI with the 2017/18 Basket (Estimate)
     short_title: CPI, new basket
@@ -1352,6 +1433,7 @@ indicators:
     topic: prices
     wide: true
     kind: variants
+    headline: {variant: expected, transform: level, label: "Expected inflation", good: none, sub: "next 12 months, REM median"}
     overlay: true
     measure: rate
     title: Expected vs. Actual Inflation
@@ -1368,8 +1450,9 @@ indicators:
     note: >-
       Each point is the month the survey was taken. "Realized" is CPI
       inflation over the 12 months after that month, so it ends a year before
-      the latest survey. "Past 12 months" is the y/y CPI inflation known when
-      the survey was taken.
+      the latest survey. "Inflation at survey time" is the y/y CPI inflation
+      known when the survey was taken: when the expected line hugs it,
+      forecasters are mostly extrapolating recent inflation.
     default: {variant: expected, transform: level, start: "2017-01"}
     derive:
       method: expectations
@@ -1378,7 +1461,7 @@ indicators:
       variants:
         expected: {label: Expected (REM median)}
         realized: {label: Realized next 12 months}
-        past:     {label: Past 12 months}
+        past:     {label: Inflation at survey time (past 12 months)}
 
   - id: inflation_expectations_range
     topic: prices
@@ -1476,6 +1559,7 @@ indicators:
     topic: prices
     wide: true
     kind: variants
+    headline: {variant: total, transform: mom, label: "Wholesale prices", good: none, sub: "m/m"}
     title: Wholesale Prices (IPIM)
     short_title: Wholesale prices
     description: >-
@@ -1492,6 +1576,42 @@ indicators:
     default: {variant: total, transform: mom, start: "2017-01"}
 
   # ======================= MONEY & BANKING =======================
+
+  - id: inflation_measures
+    topic: prices
+    release: pib
+    kind: variants
+    overlay: true
+    measure: rate
+    validate_as: flow
+    plain_level: true
+    title: Three Measures of Inflation
+    short_title: Inflation measures
+    description: >-
+      Inflation over four quarters in three price indices: consumer prices
+      (CPI), wholesale prices (IPIM) and the GDP deflator, which covers
+      everything produced in the country. Quarterly averages.
+    source: derived
+    source_label: INDEC, via datos.gob.ar
+    frequency: Q
+    units: "% vs. the same quarter a year earlier"
+    transforms: [level]
+    ranges: [10Y, Max]
+    note: >-
+      The GDP deflator is nominal over real GDP; it includes investment
+      goods and exports and leaves out imports, so it can move apart from
+      the CPI when the exchange rate or the terms of trade move. It is the
+      same series as the GDP deflator in National accounts.
+    default: {variant: cpi, transform: level, range: 10Y}
+    derive:
+      method: formula
+      anchor: d
+      vars: {c: 148.3_INIVELNAL_DICI_M_26, w: 448.1_NIVEL_GENERAL_0_0_13_46, d: 25.2_OGP_2004_T_17}
+      vars_how: {c: mean, w: mean}
+      variants:
+        cpi:      {label: "Consumer prices (CPI)", expr: "100 * (c / lag(c, 4) - 1)"}
+        ipim:     {label: "Wholesale prices (IPIM)", expr: "100 * (w / lag(w, 4) - 1)"}
+        deflator: {label: "GDP deflator", expr: "100 * (d / lag(d, 4) - 1)"}
   - id: base_money
     topic: money
     wide: true
@@ -1744,6 +1864,44 @@ indicators:
       rate: {label: Policy rate, id: "bcra:160"}
     default: {variant: rate, transform: level, range: 10Y}
 
+  - id: policy_rate_real
+    topic: money
+    kind: variants
+    overlay: true
+    overlay_default: [tamar, policy]
+    measure: rate
+    validate_as: flow
+    plain_level: true
+    title: Real Interest Rates, Ex Ante
+    short_title: Real rates
+    description: >-
+      Nominal rates against the inflation expected for the next 12 months
+      in the BCRA's survey of analysts (REM): the monetary policy rate while
+      it was set, and the TAMAR rate on large term deposits. Monthly
+      averages, as effective annual rates. Above zero, rates exceed expected
+      inflation.
+    source: derived
+    source_label: BCRA; BCRA (REM)
+    frequency: M
+    units: "% effective annual"
+    transforms: [level]
+    ranges: [5Y, 10Y, Max]
+    ref_line: 0
+    note: >-
+      Real rate = (1 + nominal rate compounded monthly) / (1 + expected
+      inflation) - 1, with the month's average nominal rate and that month's
+      REM median for inflation over the next 12 months. The BCRA stopped
+      setting a policy rate in July 2025.
+    default: {variant: tamar, transform: level, range: 10Y}
+    derive:
+      method: formula
+      anchor: rem
+      vars: {pr: "@policy_rate:rate:avg", tm: "@tamar:tamar:avg", rem: "bcra:29"}
+      variants:
+        tamar:    {label: "TAMAR, real", expr: "100 * ((1 + tm / 1200) ** 12 / (1 + rem / 100) - 1)"}
+        policy:   {label: "Policy rate, real", expr: "100 * ((1 + pr / 1200) ** 12 / (1 + rem / 100) - 1)"}
+        expected: {label: "Expected inflation, next 12 months (REM)", expr: "rem"}
+
   - id: fx_official
     topic: fx
     wide: true
@@ -1781,6 +1939,7 @@ indicators:
     topic: money
     wide: true
     kind: variants
+    unlisted: true
     title: Gross International Reserves
     short_title: Reserves
     description: >-
@@ -1802,15 +1961,18 @@ indicators:
     topic: money
     wide: true
     kind: variants
+    overlay_default: [gross, standard]
+    emphasis: gross
     overlay: true
     plain_level: true
-    title: Net International Reserves
-    short_title: Net reserves
+    title: "International Reserves: Gross and Net"
+    short_title: Reserves
     description: >-
-      Gross reserves minus the BCRA's short-term foreign-currency liabilities,
-      under three conventions: the standard market estimate, a liquid measure
-      that also leaves out gold, and an approximation of the IMF program's
-      definition. Millions of US dollars, weekly, since 2003.
+      Gross reserves (daily) and three estimates of net reserves (weekly):
+      gross minus the BCRA's short-term foreign-currency liabilities under
+      the standard market convention, a liquid measure that also leaves out
+      gold, and an approximation of the IMF program's definition. Millions
+      of US dollars, since 2003.
     caveat: >-
       Net reserves are estimates, not official statistics. There is no
       official or universal definition: analysts, the BCRA and the IMF
@@ -1836,12 +1998,13 @@ indicators:
       -11.8 bn at end-2025). Month-end balances are lower than mid-month
       ones because banks move their dollar reserve requirements around the
       turn of the month.
-    default: {variant: standard, transform: level, start: "2019-01"}
+    default: {variant: gross, transform: level, start: "2019-01"}
     derive:
       method: net_reserves
       start: "2003-01-01"
       inputs:
         gross: "bcrawk:gross"
+        gross_daily: "bcra:1"
         encaje: "bcrawk:encaje"
         intl_org: "bcrawk:intl_org"
         gold: "bcrawk:gold"
@@ -1855,10 +2018,10 @@ indicators:
         treasury_fx: "bcrabal:fx"
         imf_purchases: imf_purchases
       variants:
-        standard: {label: Standard (market)}
-        liquid:   {label: Liquid}
-        imf:      {label: IMF-style (approx.)}
-        gross:    {label: Gross}
+        standard: {label: "Net: standard (market)"}
+        liquid:   {label: "Net: liquid"}
+        imf:      {label: "Net: IMF-style (approx.)"}
+        gross:    {label: Gross reserves}
 
   - id: bcra_assets
     topic: money
@@ -2386,6 +2549,7 @@ indicators:
   - id: bank_npl
     topic: banks
     kind: variants
+    half: true
     overlay: true
     measure: rate
     title: Non-Performing Loans
@@ -2415,6 +2579,7 @@ indicators:
   - id: bank_capital
     topic: banks
     kind: variants
+    half: true
     overlay: true
     measure: rate
     title: Bank Capital
@@ -3208,6 +3373,8 @@ indicators:
     topic: trade
     wide: true
     kind: variants
+    overlay: true
+    overlay_default: [terms]
     title: Terms of Trade
     short_title: Terms of trade
     description: >-
@@ -3217,7 +3384,6 @@ indicators:
     source_label: INDEC, via datos.gob.ar
     frequency: Q
     units: Index, 2004 = 100
-    index_base: "2004"
     transforms: [level, yoy]
     ranges: [10Y, 25Y, Max]
     note: >-
@@ -3235,6 +3401,7 @@ indicators:
     release: ica
     wide: true
     kind: contributions
+    switch: {group: partners, label: "Exports"}
     measure: flow
     title: Where Exports Go
     short_title: Export destinations
@@ -3284,6 +3451,7 @@ indicators:
     release: ica
     wide: true
     kind: contributions
+    switch: {group: partners, label: "Imports"}
     measure: flow
     title: Where Imports Come From
     short_title: Import origins
@@ -3324,11 +3492,75 @@ indicators:
         rest:   {label: Rest of the world, expr: "t - me - cn - us - eu"}
         total:  {label: Total, expr: "t"}
 
+  - id: trade_partners_balance
+    topic: trade
+    release: ica
+    wide: true
+    kind: contributions
+    switch: {group: partners, label: "Balance"}
+    measure: flow
+    title: Trade Balance by Partner
+    short_title: Balance by partner
+    description: >-
+      Exports minus imports of goods with each main partner, millions of US
+      dollars a month: where Argentina earns its trade surplus and where it
+      runs deficits.
+    source: derived
+    source_label: INDEC (Intercambio comercial argentino), via datos.gob.ar
+    frequency: M
+    units: Millions of US dollars
+    ranges: [2Y, 5Y, 10Y, Max]
+    contributions:
+      precomputed: true
+      total: total
+      total_label: Trade balance
+      units: US$ m
+      suffix: " m"
+      groups:
+        - {key: brazil, label: Brazil, add: [brazil], color: sage}
+        - {key: merco, label: Rest of Mercosur, add: [merco], color: teal}
+        - {key: china, label: China, add: [china], color: rose}
+        - {key: us, label: United States, add: [us], color: sky}
+        - {key: eu, label: European Union, add: [eu], color: lavender}
+        - {key: rest, label: Rest of the world, add: [rest], color: neutral}
+    yearly: {how: sum}
+    default: {variant: brazil, transform: level, range: 10Y}
+    derive:
+      method: formula
+      anchor: xt
+      vars:
+        xt: 77.3_IET_0_A_25
+        xbr: 77.3_IEB_0_A_24
+        xme: 77.3_IETM_0_A_32
+        xcn: 77.3_IEC_0_A_23
+        xus: 77.3_IEEU_0_A_32
+        xeu: 77.3_IERU_0_A_29_20
+        mt: 78.3_IIT_0_A_25
+        mbr: 78.3_IIB_0_A_24
+        mme: 78.3_IITM_0_A_32
+        mcn: 78.3_IIC_0_A_23
+        mus: 78.3_IIM_0_A_22_15
+        meu: 78.3_IIRU_0_A_23_52
+      variants:
+        brazil: {label: Brazil, expr: "xbr - mbr"}
+        merco:  {label: Rest of Mercosur, expr: "(xme - xbr) - (mme - mbr)"}
+        china:  {label: China, expr: "xcn - mcn"}
+        us:     {label: United States, expr: "xus - mus"}
+        eu:     {label: European Union, expr: "xeu - meu"}
+        rest:   {label: Rest of the world, expr: "(xt - xme - xcn - xus - xeu) - (mt - mme - mcn - mus - meu)"}
+        total:  {label: Total, expr: "xt - mt"}
+
   - id: trade_settlement
     topic: trade
     release: ica
     wide: true
     kind: variants
+    secondary_bar: {variant: gap, label: "Gap: FX-market balance minus customs balance", axis: "Gap, US$ m (bars)"}
+    line_styles:
+      x:  {slot: 0}
+      xr: {slot: 0, dash: dash}
+      m:  {slot: 1}
+      mp: {slot: 1, dash: dash}
     overlay: true
     measure: flow
     plain_level: true
@@ -3365,6 +3597,7 @@ indicators:
         xr: {label: Export receipts (FX market), expr: "sum12(xr)"}
         m:  {label: Imports (customs),         expr: "sum12(mc)"}
         mp: {label: Import payments (FX market), expr: "sum12(mp)"}
+        gap: {label: "Gap: FX-market balance minus customs balance", expr: "(sum12(xr) - sum12(mp)) - (sum12(xc) - sum12(mc))"}
 
   # ---------------- Fiscal & Debt ----------------
   # Fiscal flows: national non-financial public sector, cash basis (IMIG,
@@ -3906,8 +4139,8 @@ indicators:
     note: >-
       Registered (formal) private wage earners only: public employees, the
       self-employed (monotributistas) and informal workers are not included.
-      The series on datos.gob.ar lags the Ministry's own releases by a few
-      months.
+      The series on datos.gob.ar lags the Ministry's own releases by about
+      two quarters.
     variants:
       sipa: {label: Registered private wage earners (SIPA), id: 155.2_TLTAL_S_0_0_5}
     default: {variant: sipa, transform: level, range: Max}
@@ -3917,6 +4150,8 @@ indicators:
     release: salarios
     wide: true
     kind: variants
+    overlay: true
+    overlay_default: [private]
     title: Real Wages
     short_title: Real wages
     description: >-
@@ -4071,7 +4306,7 @@ indicators:
     overlay: true
     measure: flow
     plain_level: true
-    title: What Incomes Buy
+    title: How Many Poverty Lines an Income Covers
     short_title: Incomes vs. poverty line
     description: >-
       The minimum wage, the minimum pension and the average wage (RIPTE)
@@ -4175,6 +4410,7 @@ indicators:
     topic: fiscal
     wide: true
     kind: variants
+    switch: {group: balance, label: "% of GDP, last 12 months"}
     overlay: true
     measure: rate
     validate_as: flow
@@ -4200,7 +4436,8 @@ indicators:
       years, income from asset sales and debt operations.
     yearly: {how: december}
     default: {variant: financial, transform: level, range: Max}
-    headline: {variant: financial, transform: level}
+    headline: {variant: financial, transform: level, label: "Financial balance", good: up}
+    tiles: [{variant: primary, transform: level, label: "Primary balance", good: up}]
     derive:
       method: formula
       anchor: prim
@@ -4220,6 +4457,7 @@ indicators:
   - id: fiscal_balance_monthly
     topic: fiscal
     kind: variants
+    switch: {group: balance, label: "Pesos, monthly"}
     overlay: true
     measure: flow
     title: Monthly Primary and Financial Balance
@@ -4247,9 +4485,171 @@ indicators:
     yearly: {how: sum}
     default: {variant: primary, transform: level, range: 5Y}
 
+  - id: fiscal_budget
+    topic: fiscal
+    wide: true
+    kind: statement
+    measure: flow
+    title: The National Budget, Month by Month
+    short_title: Budget table
+    description: >-
+      Revenue, spending and the balance of the national non-financial public
+      sector, cash basis, line by line as the Secretaría de Hacienda publishes
+      it: a month, the year to date, the last twelve months or a calendar
+      year, against the same period a year earlier, in nominal and real
+      terms. Millions of pesos.
+    source: derived
+    source_label: Secretaría de Hacienda (Esquema Ahorro-Inversión-Financiamiento, base caja), via datos.gob.ar; Secretaría de Finanzas; BCRA
+    frequency: M
+    units: Millions of pesos
+    deflate_with: {indicator: cpi_long, variant: corrected, label: CPI}
+    note: >-
+      The table above the line is as reported, with no accounting
+      corrections; the lines below it are the monitor's, each a single,
+      visible adjustment rather than one "true" balance. Property income
+      includes the returns of the pension fund's assets (FGS); "primary
+      balance excluding property income" is Hacienda's own figure. Since
+      the 2017 methodology, profits the BCRA transfers to the Treasury are
+      recorded as financing, not revenue; the memo line shows them, and the
+      next line counts them as revenue, as the accounts did under the
+      earlier methodology. Net interest leaves out
+      interest paid to other parts of the national public sector (mostly
+      the BCRA and the FGS); the memo line shows it. Capitalized interest is
+      the monitor's estimate for fixed-rate peso letters and bonds (LECAP,
+      BONCAP), which pay interest at maturity and so never appear as
+      interest in the cash accounts; from December 2021. Other current
+      spending includes small property rents other than interest, which
+      Hacienda deducts before the primary balance.
+    method_links: [{anchor: capitalized-interest, label: "How capitalized interest is estimated"}]
+    statement:
+      pct_change: true
+      rows:
+        - {key: rev, bold: true}
+        - {key: tax, indent: 1}
+        - {key: ss, indent: 1}
+        - {key: ntax, indent: 1}
+        - {key: prop, indent: 1}
+        - {key: sales, indent: 1}
+        - {key: trc, indent: 1}
+        - {key: orev, indent: 1}
+        - {key: capr, indent: 1}
+        - {key: psp, bold: true}
+        - {key: cur, indent: 1}
+        - {key: pen, indent: 2}
+        - {key: tpriv, indent: 2}
+        - {key: wag, indent: 2}
+        - {key: gs, indent: 2}
+        - {key: tprov, indent: 2}
+        - {key: tuni, indent: 2}
+        - {key: tpub, indent: 2}
+        - {key: deps, indent: 2}
+        - {key: ocurr, indent: 2}
+        - {key: capx, indent: 1}
+        - {key: ird, indent: 2}
+        - {key: tcprov, indent: 2}
+        - {key: tcot, indent: 2}
+        - {key: prim, bold: true, rule: true}
+        - {key: intn, indent: 1}
+        - {key: fin, bold: true, rule: true}
+        - {heading: "Adjustments by the monitor (not in the official accounts)", rule: true}
+        - {key: psr}
+        - {key: bcra}
+        - {key: prim_bcra}
+        - {key: intra}
+        - {key: fin_intra}
+        - {key: capi}
+        - {key: fin_capi}
+    default: {variant: rev}
+    derive:
+      method: formula
+      anchor: rev
+      vars:
+        rev: "aif:ing_antes_figurativos_2017"
+        icor: "aif:ing_corr_2017"
+        tax: "aif:ing_corr_ing_tributarios_2017"
+        ss: "aif:ing_corr_aportes_contrib_seg_soc_2017"
+        ntax: "aif:ing_corr_ing_no_tributarios_2017"
+        sales: "aif:ing_corr_ventas_bs_ser_adm_pub_2017"
+        oper: "aif:ing_corr_ing_operacion_2017"
+        bcra: "aif:ing_corr_ren_prop_ren_percidas_bcra_2017"
+        prop: "aif:ing_corr_ren_prop_ren_prop_netas_2017"
+        trc: "aif:ing_corr_transf_corr_2017"
+        capr: "aif:recursos_cap_total_recursos_cap_2017"
+        psp: "aif:gtos_primario_antes_figurativos_2017"
+        wag: "aif:gtos_corr_gtos_cons_operacion_remuneraciones_2017"
+        gs: "aif:gtos_corr_gtos_cons_operacion_bienes_servicios_2017"
+        oop: "aif:gtos_corr_gtos_cons_operacion_ots_gtos_2017"
+        pen: "aif:gtos_corr_prestaciones_seg_soc_2017"
+        tpriv: "aif:gtos_corr_transf_corr_sec_priv_total_sec_priv_2017"
+        tprov: "aif:gtos_corr_transf_corr_sect_pub_caba_total_caba_2017"
+        tuni: "aif:gtos_corr_transf_corr_sec_pub_uni_2017"
+        tpub: "aif:gtos_corr_transf_corr_sec_pub_ot_2017"
+        text: "aif:gtos_corr_transf_corr_sec_ext_2017"
+        ocur: "aif:gtos_corr_ots_gtos_corr_2017"
+        ocur2: "aif:gtos_corr_ots_gtos_2017"
+        deps: "aif:gtos_corr_deficit_operativo_empresas_pub_2017"
+        capx: "aif:gtos_cap_2017"
+        ird: "aif:gtos_cap_inversion_real_directa_2017"
+        tcprov: "aif:gtos_cap_transf_cap_prov_caba_total_prov_caba_2017"
+        tcot: "aif:gtos_cap_transf_cap_ot_2017"
+        crest: "aif:gtos_cap_resto_2017"
+        prim: "aif:superavit_primario_2017"
+        intn: "aif:gtos_corr_int_ot_ren_prop_int_netos_2017"
+        orent: "aif:gtos_corr_int_ot_ren_prop_ot_ren_2017"
+        fin: "aif:resultado_fin_2017"
+        psr: "aif:resultados_primarios_sin_rentas"
+        intra: "aif:gtos_corr_int_ot_ren_prop_int_pag_intra_stor_pub_2017"
+        cap: fin:a1|lecap
+        bcap: fin:a1|boncap
+        tem: fin:col|tem_fixed
+        fx: bcra:5
+      variants:
+        rev:    {label: Total revenue, expr: "rev"}
+        tax:    {label: Tax revenue, expr: "tax"}
+        ss:     {label: Social security contributions, expr: "ss"}
+        ntax:   {label: Non-tax revenue, expr: "ntax"}
+        prop:   {label: "Property income (incl. FGS returns)", expr: "prop"}
+        bcra:   {label: "Memo: BCRA profits transferred to the Treasury (recorded as financing)", expr: "bcra"}
+        sales:  {label: Sales of goods and services, expr: "sales"}
+        trc:    {label: Current transfers received, expr: "trc"}
+        orev:   {label: Other current revenue, expr: "icor - tax - ss - ntax - prop - sales - trc - nz(oper)"}
+        capr:   {label: Capital revenue, expr: "capr"}
+        psp:    {label: Primary spending, expr: "psp + nz(orent)"}
+        cur:    {label: Current primary spending, expr: "psp + nz(orent) - capx"}
+        pen:    {label: Pensions and social security benefits, expr: "pen"}
+        tpriv:  {label: "Transfers to the private sector (subsidies, social programs)", expr: "tpriv"}
+        wag:    {label: Wages, expr: "wag"}
+        gs:     {label: Goods and services, expr: "gs + nz(oop)"}
+        tprov:  {label: Transfers to provinces and CABA, expr: "tprov"}
+        tuni:   {label: Transfers to universities, expr: "tuni"}
+        tpub:   {label: Other transfers to the public sector, expr: "tpub"}
+        deps:   {label: Operating deficit of public enterprises, expr: "deps"}
+        ocurr:  {label: Other current spending, expr: "nz(ocur) + nz(ocur2) + nz(text) + nz(orent)"}
+        capx:   {label: Capital spending, expr: "capx"}
+        ird:    {label: Direct investment (public works), expr: "ird"}
+        tcprov: {label: Capital transfers to provinces and CABA, expr: "tcprov"}
+        tcot:   {label: Other capital spending, expr: "tcot + nz(crest)"}
+        prim:   {label: Primary balance, expr: "prim"}
+        intn:   {label: Net interest, expr: "intn"}
+        fin:    {label: Financial balance, expr: "fin"}
+        psr:    {label: "Primary balance excluding property income (Hacienda)", expr: "psr"}
+        prim_bcra: {label: Primary balance counting BCRA profit transfers as revenue, expr: "prim + nz(bcra)"}
+        intra:  {label: "Memo: interest paid within the public sector", expr: "intra"}
+        fin_intra: {label: Financial balance including interest within the public sector, expr: "fin - nz(intra)"}
+        capi:   {label: "Memo: interest capitalized on LECAP and BONCAP (estimate)", expr: "lag((nz(cap) + nz(bcap)) * fx, 1) * nz(tem) / 100"}
+        fin_capi: {label: Financial balance including capitalized interest, expr: "fin - lag((nz(cap) + nz(bcap)) * fx, 1) * nz(tem) / 100"}
+
   - id: fiscal_revenue_spending
     topic: fiscal
     kind: variants
+    line_styles:
+      revenue:  {slot: 0, width: 3.2}
+      tax:      {slot: 0, dash: dot}
+      spending: {slot: 1, dash: dash}
+      total:    {slot: 1, width: 3.2}
+    tiles:
+      - {variant: revenue, transform: level, label: "Revenue", good: none}
+      - {variant: spending, transform: level, label: "Primary spending", good: none}
     overlay: true
     measure: rate
     validate_as: flow
@@ -4269,7 +4669,7 @@ indicators:
       national share, after automatic transfers to the provinces
       (coparticipación).
     yearly: {how: december}
-    default: {variant: spending, transform: level, range: Max}
+    default: {variant: revenue, transform: level, range: Max}
     derive:
       method: formula
       anchor: rev
@@ -4444,7 +4844,8 @@ indicators:
       precomputed: true
       total_label: Total subsidies
       units: "% of GDP"
-      suffix: "% GDP"
+      suffix: "%"
+      axis_title: "% of GDP"
       groups:
         - {key: energy,    label: Energy,    add: [energy],    color: gold}
         - {key: transport, label: Transport, add: [transport], color: sky}
@@ -4505,7 +4906,8 @@ indicators:
       precomputed: true
       total_label: Accrual-adjusted interest
       units: "% of GDP"
-      suffix: "% GDP"
+      suffix: "%"
+      axis_title: "% of GDP"
       groups:
         - {key: cash,        label: Paid (in the budget),   add: [cash],        color: slate}
         - {key: capitalized, label: Capitalized interest (estimate), add: [capitalized], color: copper}
@@ -4669,6 +5071,7 @@ indicators:
     topic: fiscal
     wide: true
     kind: variants
+    headline: {variant: embi, transform: level, good: down, sub: "basis points", digits: 0}
     title: Country Risk
     short_title: Country risk
     description: >-
@@ -4731,7 +5134,8 @@ indicators:
       precomputed: true
       total_label: Gross debt
       units: "% of GDP"
-      suffix: "% GDP"
+      suffix: "%"
+      axis_title: "% of GDP"
       groups:
         - {key: pesos_other, label: "Pesos, not indexed", add: [pesos_other], color: copper}
         - {key: pesos_cer,   label: "Pesos, CER-linked",  add: [pesos_cer],   color: gold}
@@ -4793,7 +5197,8 @@ indicators:
       precomputed: true
       total_label: Gross debt
       units: "% of GDP"
-      suffix: "% GDP"
+      suffix: "%"
+      axis_title: "% of GDP"
       groups:
         - {key: public,  label: Public-sector agencies,          add: [public],  color: slate}
         - {key: private, label: Private sector,                  add: [private], color: copper}
@@ -4898,6 +5303,7 @@ indicators:
     frequency: M
     units: Millions of US dollars
     ranges: [2Y, 5Y, Max]
+    yearly: {how: sum}
     note: >-
       Payments as recorded, including those to public agencies (interest on
       the BCRA's non-transferable letters). The big months are January and
@@ -4939,6 +5345,7 @@ indicators:
   - id: debt_rollover
     topic: fiscal
     kind: variants
+    half: true
     measure: rate
     validate_as: flow
     title: Rollover of Peso Debt
@@ -4975,6 +5382,33 @@ indicators:
         monthly: {label: Single month,           expr: "100 * iss / amo", max: "1000 + 0 * amo"}
         m3:      {label: Last three months,      expr: "100 * (iss + lag(iss, 1) + lag(iss, 2)) / (amo + lag(amo, 1) + lag(amo, 2))"}
         y12:     {label: Last twelve months,     expr: "100 * sum12(iss) / sum12(amo)"}
+
+  - id: placements_life
+    topic: fiscal
+    kind: variants
+    half: true
+    measure: flow
+    title: Average Life of New Peso Placements
+    short_title: Life of placements
+    description: >-
+      Average life of the peso bonds and letters placed each month, in
+      years, weighted by cash raised. A longer life spreads out future
+      maturities. Since January 2021.
+    source: finanzas
+    source_label: Secretaría de Finanzas (colocaciones de deuda)
+    frequency: M
+    units: Years
+    transforms: [level]
+    plain_level: true
+    ranges: [2Y, 5Y, Max]
+    note: >-
+      Peso instruments (fixed-rate, CER-linked, floating and dual); average
+      life as the Finance Secretariat reports it for amortizing bonds, time
+      to maturity for bullet bonds and letters. One long bond placed in a
+      month can move the average a lot.
+    variants:
+      life: {label: Average life, id: "fin:col|life"}
+    default: {variant: life, transform: level, range: Max}
 
   - id: placements_mix
     topic: fiscal
@@ -5032,32 +5466,6 @@ indicators:
         dual:     {label: Dual,             expr: "100 * nz(du) / (nz(fx_) + nz(cr) + nz(fl) + nz(du) + (nz(dl) + nz(hd)) * fxa + nz(dla) + nz(hda))"}
         dlinked:  {label: Dollar-linked,    expr: "100 * (nz(dl) * fxa + nz(dla)) / (nz(fx_) + nz(cr) + nz(fl) + nz(du) + (nz(dl) + nz(hd)) * fxa + nz(dla) + nz(hda))"}
         usd:      {label: Hard dollar,      expr: "100 * (nz(hd) * fxa + nz(hda)) / (nz(fx_) + nz(cr) + nz(fl) + nz(du) + (nz(dl) + nz(hd)) * fxa + nz(dla) + nz(hda))"}
-
-  - id: placements_life
-    topic: fiscal
-    kind: variants
-    measure: flow
-    title: Average Life of New Peso Placements
-    short_title: Life of placements
-    description: >-
-      Average life of the peso bonds and letters placed each month, in
-      years, weighted by cash raised. A longer life spreads out future
-      maturities. Since January 2021.
-    source: finanzas
-    source_label: Secretaría de Finanzas (colocaciones de deuda)
-    frequency: M
-    units: Years
-    transforms: [level]
-    plain_level: true
-    ranges: [2Y, 5Y, Max]
-    note: >-
-      Peso instruments (fixed-rate, CER-linked, floating and dual); average
-      life as the Finance Secretariat reports it for amortizing bonds, time
-      to maturity for bullet bonds and letters. One long bond placed in a
-      month can move the average a lot.
-    variants:
-      life: {label: Average life, id: "fin:col|life"}
-    default: {variant: life, transform: level, range: Max}
 
   - id: treasury_placements
     topic: fiscal
@@ -5144,35 +5552,39 @@ indicators:
   - id: fx_band_room
     topic: fx
     kind: variants
+    overlay: true
     measure: rate
     validate_as: flow
     plain_level: true
-    title: Room to the Band's Ceiling
-    short_title: Room to ceiling
+    title: Room to the Band's Limits
+    short_title: Room to the band
     description: >-
-      How much the official rate could rise before reaching the ceiling of
-      the band, where the BCRA must sell dollars: the ceiling over the
-      official wholesale rate, minus one, percent. Daily.
+      How far the official wholesale rate could move before reaching the
+      band: the rise to the ceiling, where the BCRA sells dollars, and the
+      fall to the floor, where it buys them, in percent of today's rate.
+      Daily.
     source: derived
     source_label: BCRA
     frequency: D
-    units: "% below the ceiling"
+    units: "% move in the official rate to reach the band"
     transforms: [level]
     ranges: [2Y, Max]
     ref_line: 0
     note: >-
-      Zero means the rate is at the ceiling. The room grows by itself as the
-      band widens; it shrinks when the peso depreciates faster than the
-      ceiling rises.
+      Rise to the ceiling: ceiling over the official rate, minus one. Fall
+      to the floor: one minus floor over the official rate. Zero means the
+      rate is at that limit. The room grows by itself as the band widens and
+      shrinks when the peso moves faster than the band.
     method_links: [{anchor: fx-band, label: "About the band"}]
     default: {variant: room, transform: level, range: Max}
     derive:
       method: formula
       anchor: ofx
-      vars: {ofx: "bcra:5", hi: "bcra:1188"}
+      vars: {ofx: "bcra:5", hi: "bcra:1188", lo: "bcra:1187"}
       start: "2025-04-14"
       variants:
-        room: {label: Room to the ceiling, expr: "100 * (hi / ofx - 1)"}
+        room:  {label: Rise to the ceiling, expr: "100 * (hi / ofx - 1)"}
+        floor: {label: Fall to the floor, expr: "100 * (1 - lo / ofx)"}
 
   - id: fx_gaps
     topic: fx
@@ -5269,7 +5681,7 @@ indicators:
     source: derived
     source_label: BCRA (ITCRM, official rate); ArgentinaDatos and DolarAPI (CCL, unofficial); INDEC (terms of trade)
     frequency: D
-    units: Pesos per US dollar
+    units: "Index (real exchange rates) or pesos per US dollar (nominal rates)"
     method_links: [{anchor: fx-rer, label: "About the real exchange rate and this calculator"}]
     default: {variant: m}
     derive:
@@ -5281,7 +5693,7 @@ indicators:
         mkt: {label: Multilateral (CCL rate),      expr: "fill(m * ccl / ofx, upto(m, \"2011-10-31\"))"}
         ofx: {label: Official rate,                expr: "ofx"}
         ccl: {label: CCL rate,                     expr: "ccl"}
-        tot: {label: Terms of trade (quarterly, 2004 = 100), expr: "tot"}
+        tot: {label: "Terms of trade (quarterly, 2004 = 100)", expr: "tot"}
 
   - id: fx_carry
     topic: fx
@@ -5326,6 +5738,7 @@ indicators:
     topic: fx
     wide: true
     kind: variants
+    emphasis: actual
     overlay: true
     measure: rate
     validate_as: flow
@@ -5404,6 +5817,7 @@ indicators:
   - id: fx_futures_implied
     topic: fx
     kind: variants
+    half: true
     overlay: true
     measure: rate
     validate_as: flow
@@ -5443,6 +5857,7 @@ indicators:
   - id: fx_futures_oi
     topic: fx
     kind: variants
+    half: true
     title: Dollar Futures Open Interest
     short_title: Futures open interest
     description: >-
