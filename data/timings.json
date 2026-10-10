@@ -1,48 +1,58 @@
 [
  {
   "source": "bcra (D)",
-  "seconds": 58.8,
+  "seconds": 73.6,
   "series": 46
  },
  {
-  "source": "finanzas (M)",
-  "seconds": 31.5,
-  "series": 39
- },
- {
   "source": "bcra_entities (M)",
-  "seconds": 30.0,
+  "seconds": 35.7,
   "series": 32
  },
  {
+  "source": "finanzas (M)",
+  "seconds": 30.0,
+  "series": 39
+ },
+ {
   "source": "ustreasury (D)",
-  "seconds": 17.8,
+  "seconds": 18.6,
   "series": 1
  },
  {
-  "source": "vdem (Y)",
-  "seconds": 7.5,
-  "series": 62
- },
- {
   "source": "bcra_fx (D)",
-  "seconds": 7.2,
+  "seconds": 10.1,
   "series": 1
  },
  {
   "source": "itcrm (D)",
-  "seconds": 5.4,
+  "seconds": 7.3,
   "series": 5
  },
  {
   "source": "bcra_cambiario (M)",
-  "seconds": 4.5,
+  "seconds": 4.9,
   "series": 14
  },
  {
   "source": "bcra_banks (M)",
-  "seconds": 3.5,
+  "seconds": 4.5,
   "series": 67
+ },
+ {
+  "source": "efw (Y)",
+  "seconds": 3.0,
+  "series": 22
+ },
+ {
+  "source": "rem (M)",
+  "seconds": 2.4,
+  "series": 6
+ },
+ {
+  "source": "dolar (D)",
+  "seconds": 2.4,
+  "series": 5
  },
  {
   "source": "datos_gob (M)",
@@ -50,24 +60,9 @@
   "series": 139
  },
  {
-  "source": "efw (Y)",
-  "seconds": 2.3,
-  "series": 22
- },
- {
-  "source": "rem (M)",
-  "seconds": 2.2,
-  "series": 6
- },
- {
   "source": "bcra_weekly (D)",
-  "seconds": 2.0,
+  "seconds": 1.8,
   "series": 6
- },
- {
-  "source": "dolar (D)",
-  "seconds": 1.7,
-  "series": 5
  },
  {
   "source": "datos_gob (Q)",
@@ -75,8 +70,13 @@
   "series": 101
  },
  {
+  "source": "vdem (Y)",
+  "seconds": 1.3,
+  "series": 62
+ },
+ {
   "source": "bcra_balance (M)",
-  "seconds": 1.5,
+  "seconds": 1.3,
   "series": 20
  },
  {
@@ -85,23 +85,23 @@
   "series": 1
  },
  {
+  "source": "datos_gob (Y)",
+  "seconds": 0.9,
+  "series": 2
+ },
+ {
   "source": "a3 (D)",
-  "seconds": 1.0,
+  "seconds": 0.7,
   "series": 3
  },
  {
   "source": "riesgo (D)",
-  "seconds": 0.8,
+  "seconds": 0.6,
   "series": 1
  },
  {
-  "source": "datos_gob (Y)",
-  "seconds": 0.3,
-  "series": 2
- },
- {
   "source": "officials (Y)",
-  "seconds": 0.2,
+  "seconds": 0.3,
   "series": 2
  },
  {
