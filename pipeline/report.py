@@ -200,8 +200,9 @@ _N = [0]
 
 
 def _save(fig, out: Path, name: str) -> str:
-    _N[0] += 1
-    name = f"{_N[0]:02d}-{name.split('-', 1)[-1]}"
+    if not name.startswith("00-"):          # 00- is the table, placed first whatever the build order
+        _N[0] += 1
+        name = f"{_N[0]:02d}-{name.split('-', 1)[-1]}"
     p = out / "img" / f"{name}.png"
     p.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(p, facecolor=BG)
@@ -212,6 +213,35 @@ def _save(fig, out: Path, name: str) -> str:
 def _end_label(ax, s: pd.Series, fmt: str, color: str):
     ax.annotate(fmt.format(s.iloc[-1]), (s.index[-1], s.iloc[-1]), xytext=(4, 0), textcoords="offset points",
                 fontsize=9, color=color, family=FONT, va="center", weight="bold")
+
+
+def table_image(rows: list, out: Path, asof: pd.Timestamp, month: str) -> str:
+    """The month-in-numbers table as an image (Substack has no tables). Three columns sized
+    for a phone: indicator with its period beneath, the latest value, and the comparison."""
+    import textwrap
+    n = len(rows)
+    rh = 0.62                                   # inches per row
+    H = 1.25 + n * rh + 0.45
+    fig = plt.figure(figsize=(7, H), dpi=220, facecolor=BG)
+    y = lambda inch: 1 - inch / H
+    fig.text(0.04, y(0.38), "The month in numbers", fontsize=17, color=INK, family=FONT, weight="bold", va="center")
+    fig.text(0.04, y(0.72), f"Argentina, {month} CPI issue · data as of {asof.day} {asof.strftime('%B %Y')}",
+             fontsize=10.5, color=INK3, family=FONT, va="center")
+    top = 1.05
+    for i, (ind, per, latest, prevv, ctx) in enumerate(rows):
+        y0 = top + i * rh
+        fig.add_artist(plt.Line2D([0.04, 0.96], [y(y0), y(y0)], color=RULE, lw=0.9))
+        fig.text(0.04, y(y0 + 0.22), ind, fontsize=11.5, color=INK, family=FONT, weight="bold", va="center")
+        fig.text(0.04, y(y0 + 0.44), per, fontsize=9.5, color=INK3, family=FONT, va="center")
+        fig.text(0.43, y(y0 + 0.31), latest, fontsize=12.5, color=COPPER, family=FONT, weight="bold", va="center")
+        detail = "; ".join(x for x in (prevv, ctx) if x)
+        fig.text(0.66, y(y0 + 0.31), "\n".join(textwrap.wrap(detail, 34)[:3]), fontsize=9.5, color=INK2,
+                 family=FONT, va="center", linespacing=1.25)
+    yb = top + n * rh
+    fig.add_artist(plt.Line2D([0.04, 0.96], [y(yb), y(yb)], color=RULE, lw=0.9))
+    fig.text(0.04, y(yb + 0.25), "Sources: INDEC, BCRA (incl. REM), Ministry of Economy, JP Morgan. Argentina Economic Monitor, Economic Order.",
+             fontsize=8, color=INK3, family=FONT, va="center")
+    return _save(fig, out, "00-table")
 
 
 # ── the issue ───────────────────────────────────────────────────────────────
@@ -597,6 +627,7 @@ def build(out: Path, cpi_month: str | None = None) -> dict:
     # Quarterly releases seen since the last issue
     quarterly = [r_ for r_ in up["recent"] if r_["frequency"] == "Q"]
 
+    charts["table"] = table_image(rows, out, today, t.strftime("%B %Y"))
     data = dict(t=t, rows=rows, charts=charts, text=T, calendar=cal, quarterly=quarterly, today=today)
     (out / "report.html").write_text(render(data))
     return data
@@ -649,6 +680,8 @@ Charts are in the <code>img/</code> folder, numbered in order.</div>
 <p class="dek">{e(T['dek'])}</p>
 
 <h2>The month in numbers</h2>
+<p class="note">For Substack: use the table image below (img/00-table.png); the HTML table under it is for reference.</p>
+{img('table', 'The month in numbers: ' + '; '.join(f'{r[0]}, {r[1]}: {r[2]}' for r in d['rows']))}
 <div class="tbl"><table><thead><tr><th>Indicator</th><th>Period</th><th>Latest</th><th>Previous</th><th>Context</th></tr></thead>
 <tbody>{rows}</tbody></table></div>
 {img('cpi_rem', 'Monthly CPI inflation with REM median expectations')}
