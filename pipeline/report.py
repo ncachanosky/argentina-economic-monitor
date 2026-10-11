@@ -1,7 +1,10 @@
 """Monthly report draft (Economic Order): data, charts, rule-based text, HTML.
 
-Run after the site export (it reads the card payloads in _site/data):
+Run after the site build (it reads the card payloads in _site/data):
+    python -m pipeline.build --out _site
     python -m pipeline.report [--out DIR] [--cpi YYYY-MM]
+A monthly Claude scheduled task runs these two steps a few days after INDEC's CPI
+release and publishes the draft as a private page; see docs in the task's prompt.
 
 Writes DIR/report.html (paste-friendly: h2, p, table, img) and DIR/img/*.png.
 The issue is keyed on a CPI month (default: the latest one published). Every other
@@ -636,7 +639,7 @@ def render(d: dict) -> str:
     cal = "".join(f"<tr><td>{e(a)}</td><td>{e(b)}</td><td>{e(c)}</td></tr>" for a, b, c in d["calendar"])
     q = d["quarterly"]
     qsec = ("<h2>Quarterly releases</h2>" + P([f"{x['title']} ({x['period'][:7]}) was published on {x['seen']}." for x in q])) if q else ""
-    return f"""<title>Argentina Monthly Report Draft</title>
+    return f"""<title>Argentina Report Draft, {t.strftime('%b %Y')}</title>
 <style>{CSS}</style>
 <main>
 <div class="draft">Draft built {d['today'].strftime('%d %b %Y')} from the Monitor's data. Rule-based text: edit freely before pasting into Substack.
