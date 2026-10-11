@@ -54,6 +54,24 @@ def real(c: str, v: str) -> pd.Series:
     return (x / f).dropna()
 
 
+def sectors() -> pd.DataFrame:
+    """EMAE sectors at the latest month: y/y change (original series) and its approximate
+    contribution to the EMAE's y/y change (2004 weights times the sector's level a year earlier)."""
+    d = _payload("emae_sectors")
+    w = d["weights"]["values"]
+    idx = pd.to_datetime(d["dates"])
+    V = {k: pd.Series(v["values"], index=idx, dtype=float) for k, v in d["variants"].items()}
+    t = idx[-1]
+    t0 = t - pd.DateOffset(months=12)
+    base = {k: w[k] * V[k][t0] for k in V}
+    tot = sum(base.values())
+    rows = [(k, d["variants"][k]["label"], (V[k][t] / V[k][t0] - 1) * 100, base[k] / tot * (V[k][t] / V[k][t0] - 1) * 100)
+            for k in V]
+    out = pd.DataFrame(rows, columns=["id", "label", "yoy", "contrib"]).set_index("id")
+    out.attrs["month"] = t
+    return out
+
+
 def rem(k: str) -> pd.Series:
     return store.as_of(f"rem:{k}").dropna()
 
@@ -102,6 +120,15 @@ def versus(actual: float, expected: float) -> str:
 
 def direction(now: float, before: float, up: str, down: str, flat: str, tol: float = 0.05) -> str:
     return flat if abs(now - before) < tol else (up if now > before else down)
+
+
+def andjoin(xs: list[str], sep: str = ", ") -> str:
+    xs = [x for x in xs if x]
+    return xs[0] if len(xs) == 1 else f"{sep.join(xs[:-1])}{sep if sep != ', ' else ' '}and {xs[-1]}"
+
+
+def num(n: int) -> str:
+    return ("zero one two three four five six seven eight nine".split()[n]) if 0 <= n < 10 else str(n)
 
 
 def came(actual: float, expected: float) -> str:
@@ -166,7 +193,12 @@ def _months(ax, every: int = 3):
     ax.xaxis.set_major_formatter(mdates.DateFormatter("%b\n%Y"))
 
 
+_N = [0]
+
+
 def _save(fig, out: Path, name: str) -> str:
+    _N[0] += 1
+    name = f"{_N[0]:02d}-{name.split('-', 1)[-1]}"
     p = out / "img" / f"{name}.png"
     p.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(p, facecolor=BG)
@@ -202,12 +234,13 @@ def build(out: Path, cpi_month: str | None = None) -> dict:
     # Activity
     sa, tr, og = card("emae", "sa"), card("emae", "trend"), card("emae", "original")
     ta = sa.index[-1]
-    e_tr, e_sa, e_yoy = mom(tr)[ta], mom(sa)[ta], yoy(og)[ta]
-    e_tr3 = mom(tr)[-4:-1].mean()
-    sa_sd = mom(sa)[-25:-1].std()
-    from . import emae_turns
-    turns = emae_turns.build()["turns"]
-    last_turn = turns[-1]
+    e_sa, e_sa1, e_yoy = mom(sa)[ta], mom(sa).iloc[-2], yoy(og)[ta]
+    e_3m = (sa[-3:].mean() / sa[-6:-3].mean() - 1) * 100            # last three months over the previous three
+    win = sa[ta - pd.DateOffset(months=24):]
+    pk_d, pk = win.idxmax(), win.max()
+    dec = sa.get(pd.Timestamp(ta.year - 1, 12, 1))
+    e_ytd = (sa[ta] / dec - 1) * 100 if dec is not None and ta.month > 1 else None
+    sec = sectors()
 
     # Wages and employment
     wr = real("labor_wages_real", "private")
@@ -231,6 +264,14 @@ def build(out: Path, cpi_month: str | None = None) -> dict:
     tc = ccl.index[-1]
     _, ccl30 = ago(ccl)
     fx12 = rem("fx12")
+    fxm = fx.resample("MS").mean()[:t]
+    cpi_i = idx["headline"][:t]
+    dec0 = pd.Timestamp(t.year - 1, 12, 1)
+    hz = []   # (label, depreciation, inflation, real change of the dollar)
+    for lab, b in ((f"{month}", prev), (f"Since December", dec0), ("Last twelve months", t - pd.DateOffset(months=12))):
+        dep = (fxm[t] / fxm[b] - 1) * 100
+        inf = (cpi_i[t] / cpi_i[b] - 1) * 100
+        hz.append((lab, dep, inf, ((1 + dep / 100) / (1 + inf / 100) - 1) * 100))
 
     # Reserves
     net = card("net_reserves", "standard")
@@ -291,12 +332,30 @@ def build(out: Path, cpi_month: str | None = None) -> dict:
 
     # 3. EMAE
     since = ta - pd.DateOffset(months=36)
-    fig, ax = _fig("Economic activity: the noisy series and the trend",
-                   "EMAE, index 2004 = 100", "INDEC")
-    ax.plot(sa[since:].index, sa[since:].values, color=INK3, lw=1.4, label="Seasonally adjusted")
-    ax.plot(tr[since:].index, tr[since:].values, color=COPPER, lw=2.4, label="Trend-cycle")
-    _months(ax, 6); _legend(ax, loc="upper left", ncol=2)
+    fig, ax = _fig("Economic activity", "EMAE, seasonally adjusted, index 2004 = 100", "INDEC")
+    ax.plot(sa[since:].index, sa[since:].values, color=INK, lw=2)
+    ax.scatter([ta], [sa[ta]], s=24, color=COPPER, zorder=3)
+    _end_label(ax, sa[since:], "{:.1f}", COPPER)
+    _months(ax, 6)
     charts["activity"] = _save(fig, out, "3-activity")
+
+    # 3b. Sectors: contributions to the y/y change, y/y as labels
+    sc = sec.drop(index="net_taxes", errors="ignore").sort_values("contrib")
+    fig, ax = _fig(f"Which sectors moved activity, {MY(sec.attrs['month'])}",
+                   "Approximate contribution to the EMAE's change on a year earlier, percentage points; labels: sector's own change",
+                   "INDEC; monitor's calculations")
+    ax.grid(axis="y", visible=False); ax.grid(axis="x", color=RULE, lw=0.8)
+    ax.barh(sc["label"], sc["contrib"], color=[COPPER if v > 0 else INK for v in sc["contrib"]], height=0.7)
+    ax.axvline(0, color=INK3, lw=0.8)
+    lo, hi = sc["contrib"].min(), sc["contrib"].max()
+    pad = (hi - lo) * 0.02
+    for i, (c_, y_) in enumerate(zip(sc["contrib"], sc["yoy"])):
+        ax.text(c_ + (pad if c_ >= 0 else -pad), i, f"{signed(y_)}", va="center", ha="left" if c_ >= 0 else "right",
+                fontsize=8, color=INK2, family=FONT)
+    ax.set_xlim(lo - (hi - lo) * 0.18, hi + (hi - lo) * 0.18)
+    ax.tick_params(axis="y", labelsize=8)
+    fig.subplots_adjust(left=0.30)
+    charts["sectors"] = _save(fig, out, "3b-sectors")
 
     # 4. FX with band and CCL
     start = pd.Timestamp("2025-04-14")
@@ -310,6 +369,20 @@ def build(out: Path, cpi_month: str | None = None) -> dict:
     ax.plot(f.index, f.values, color=INK, lw=2, label="Official (wholesale)")
     _months(ax); _legend(ax, ncol=3)
     charts["fx"] = _save(fig, out, "4-fx")
+
+    fig, ax = _fig("Depreciation against inflation",
+                   f"Official rate (monthly average) and CPI, % change to {month}", "BCRA, INDEC; monitor's calculations")
+    import numpy as np
+    xs = np.arange(len(hz))
+    ax.bar(xs - 0.19, [h_[1] for h_ in hz], width=0.36, color=INK, label="Peso depreciation")
+    ax.bar(xs + 0.19, [h_[2] for h_ in hz], width=0.36, color=COPPER, label="CPI inflation")
+    for x_, h_ in zip(xs, hz):
+        for dx, v_ in ((-0.19, h_[1]), (0.19, h_[2])):
+            ax.annotate(f"{v_:.1f}%", (x_ + dx, v_), xytext=(0, 3), textcoords="offset points", ha="center",
+                        fontsize=9, color=INK2, family=FONT)
+    ax.set_xticks(xs, [h_[0] for h_ in hz])
+    _legend(ax)
+    charts["fx_real"] = _save(fig, out, "4b-fx-real")
 
     # 5. Reserves
     start = pd.Timestamp("2024-01-01")
@@ -368,10 +441,11 @@ def build(out: Path, cpi_month: str | None = None) -> dict:
         ("CPI, core", MY(t), f"{p1(c)} m/m", f"{p1(m['core'][prev])} in {M(prev)}",
          f"{p1(y['core'][t])} y/y; REM median {p1(ec)}" if ec is not None else ""),
         ("CPI, regulated", MY(t), f"{p1(r)} m/m", f"{p1(m['regulated'][prev])} in {M(prev)}", f"{p1(y['regulated'][t])} y/y"),
-        ("EMAE (activity)", MY(ta), f"{signed(e_tr)} m/m trend-cycle", f"{signed(e_sa)} m/m s.a.", f"{signed(e_yoy)} y/y"),
+        ("EMAE (activity)", MY(ta), f"{signed(e_sa)} m/m s.a.", f"{signed(e_sa1)} in {M(ta - pd.DateOffset(months=1))}",
+         f"{signed(e_yoy)} y/y; {signed(e_3m)} 3m/3m"),
         ("Real registered private wages", MY(tw), f"{signed(w_yoy)} y/y", f"{signed(w_mom)} m/m", ""),
         ("Official exchange rate", DM(tf), f"${fx[tf]:,.1f}", f"{signed(fx_chg)} in 30 days",
-         f"{p1(room[room.index[-1]])} room to the band ceiling"),
+         f"{p1(room[room.index[-1]])} room to the band ceiling; 12m: {signed(hz[2][1])} vs CPI {p1(hz[2][2])}"),
         ("CCL gap", DM(tc), p1(ccl[tc]), f"{p1(ccl30)} a month earlier", ""),
         ("Net reserves", DM(tn), money(net[tn]), f"{money(net30)} on {DM(dn30)}",
          f"BCRA purchases: {money(buy[tb])} in {M(tb)}"),
@@ -409,19 +483,27 @@ def build(out: Path, cpi_month: str | None = None) -> dict:
     ]
 
     # Activity
-    lt = pd.Timestamp(last_turn["month"])
-    since_turn = (ta.year - lt.year) * 12 + ta.month - lt.month
-    trend_verb = (f"grew {p1(abs(e_tr))}" if e_tr >= 0.05 else f"fell {p1(abs(e_tr))}" if e_tr <= -0.05 else "was flat")
+    named = sec.drop(index="net_taxes", errors="ignore")
+    up_, dn_ = named[named["yoy"] > 0].sort_values("yoy", ascending=False), named[named["yoy"] < 0].sort_values("yoy")
+    lst = lambda df_: andjoin([f"{r_.label.lower()} ({signed(r_.yoy)})" for r_ in df_.head(3).itertuples()])
+    drag, push = named.sort_values("contrib").head(2), named.sort_values("contrib", ascending=False).head(2)
+    pts = lambda df_: " and ".join(f"{r_.label.lower()} ({abs(r_.contrib):.1f} pp)" for r_ in df_.itertuples())
+    wild = named[named["yoy"].abs() > 50]
     T["activity"] = [
-        f"In {M(ta)}, the trend-cycle of {g('EMAE')} {trend_verb}, after {signed(e_tr3)} a month on average over the previous three. "
-        f"Activity was {p1(abs(e_yoy))} {'higher' if e_yoy > 0 else 'lower'} than a year earlier.",
-        f"The seasonally adjusted series {'fell' if e_sa < 0 else 'rose'} {p1(abs(e_sa))} in the month. "
-        + (f"That is a large move against a typical monthly swing of about {sa_sd:.1f}%, and the kind INDEC often revises; "
-           "we read the trend-cycle, not the single month." if abs(e_sa) > 1.5 * sa_sd else
-           "That is within the series' usual month-to-month noise."),
-        f"The last turning point was a {last_turn['kind']} in {MY(lt)}, {since_turn} months ago; "
-        + ("the trend-cycle has not signalled a reversal since." if e_tr > 0 else
-           "a falling trend-cycle is the first sign of a possible turn, though in our record single signals often reverse."),
+        f"Economic activity, as measured by {g('EMAE')}, {'fell' if e_sa < 0 else 'rose'} {p1(abs(e_sa))} in {M(ta)}, "
+        f"seasonally adjusted, after {signed(e_sa1)} in {M(ta - pd.DateOffset(months=1))}. "
+        f"The last three months were {p1(abs(e_3m))} {'below' if e_3m < 0 else 'above'} the previous three"
+        + (f", and the index is {p1(abs((sa[ta] / pk - 1) * 100))} below its {MY(pk_d)} peak" if pk_d != ta else ", and the index is at a two-year high")
+        + (f" ({signed(e_ytd)} since December)." if e_ytd is not None else ".")
+        + f" Activity was {p1(abs(e_yoy))} {'higher' if e_yoy > 0 else 'lower'} than a year earlier.",
+        f"Sector data come without seasonal adjustment, so we compare each with the same month a year earlier. "
+        f"{num(len(dn_)).capitalize()} of {len(named)} sectors were below their {MY(ta - pd.DateOffset(months=12))} level. "
+        + (f"The largest declines were in {lst(dn_)}; " if len(dn_) else "")
+        + (f"the largest increases, in {lst(up_)}." if len(up_) else "no sector grew."),
+        f"Weighted by size, {pts(drag)} subtracted the most from the year-on-year change; "
+        f"{pts(push)} added the most."
+        + (f" {' and '.join(wild['label'])} {'moves' if len(wild) == 1 else 'move'} by large amounts from year to year "
+           f"on a small weight; read {'it' if len(wild) == 1 else 'them'} with care." if len(wild) else ""),
     ]
 
     # Exchange rate
@@ -434,6 +516,15 @@ def build(out: Path, cpi_month: str | None = None) -> dict:
            "; the gap narrowed." if ccl[tc] < ccl30 - 0.5 else "; little change.")
         + f" The REM median expects ${fx12[fx12.index[-1]]:,.0f} per dollar twelve months ahead ({MY(fx12.index[-1])} survey), "
         f"{p1(abs((fx12[fx12.index[-1]] / fx[tf] - 1) * 100))} {'above' if fx12[fx12.index[-1]] > fx[tf] else 'below'} today's rate.",
+        "Against prices, using monthly averages to match the CPI: "
+        + andjoin([f"{w_}, the peso {'depreciated' if d_ >= 0 else 'appreciated'} {p1(abs(d_))} while prices rose {p1(i__)}"
+                   for w_, (_, d_, i__, _) in zip((f"in {month}", "since December", "over the last twelve months"), hz)], "; ")
+        + ". " + (f"The peso has appreciated in real terms: by {andjoin([p1(abs(h_[3])) for h_ in hz])} over the three horizons."
+                  if all(h_[3] < 0 for h_ in hz) else
+                  f"The peso has depreciated in real terms: by {andjoin([p1(h_[3]) for h_ in hz])} over the three horizons."
+                  if all(h_[3] > 0 for h_ in hz) else
+                  "In real terms, the peso " + andjoin([f"{'appreciated' if h_[3] < 0 else 'depreciated'} {p1(abs(h_[3]))} {w_}"
+                                                        for h_, w_ in zip(hz, ("in the month", "since December", "over twelve months"))]) + "."),
     ]
 
     # Reserves
@@ -565,8 +656,8 @@ Charts are in the <code>img/</code> folder, numbered in order.</div>
 <hr class="paywall"><div class="paylabel">Paywall break: insert Substack's paywall here</div>
 
 <h2>Prices</h2>{P(T['prices'])}{img('prices', 'Headline, core and regulated CPI, monthly change')}
-<h2>Activity</h2>{P(T['activity'])}{img('activity', 'EMAE seasonally adjusted and trend-cycle')}
-<h2>Exchange rate</h2>{P(T['fx'])}{img('fx', 'Official exchange rate, band ceiling and CCL')}
+<h2>Activity</h2>{P(T['activity'][:1])}{img('activity', 'EMAE seasonally adjusted')}{P(T['activity'][1:])}{img('sectors', 'EMAE sectors, contributions to the year-on-year change')}
+<h2>Exchange rate</h2>{P(T['fx'][:2])}{img('fx', 'Official exchange rate, band ceiling and CCL')}{P(T['fx'][2:])}{img('fx_real', 'Peso depreciation against CPI inflation')}
 <h2>Reserves and the BCRA</h2>{P(T['reserves'])}{img('reserves', 'Gross and net reserves')}
 <h2>Fiscal</h2>{P(T['fiscal'])}{img('fiscal', 'Primary, financial and accrual fiscal balances')}
 <h2>Rates and money</h2>{P(T['rates'])}{img('rates', 'Real TAMAR')}
