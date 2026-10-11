@@ -4204,13 +4204,15 @@ indicators:
       Real terms: deflated by the CPI (corrected for 2007-2016, see the
       long-run CPI). Use "Base = 100" to compare from the start of a
       presidency. The unregistered (informal) wage index is published with a
-      five-month lag and moves in steps, as INDEC estimates it from the
-      household survey. RIPTE is the average taxable wage of workers employed
+      five-month lag: datos.gob.ar dates each value at the release month, and
+      the Monitor places it at the month it measures (five months earlier),
+      so it is deflated by that month's CPI. It moves in steps, as INDEC
+      estimates it from the household survey. RIPTE is the average taxable wage of workers employed
       by the same firm for 13 months, before deductions, since 1994.
     variants:
       private:  {label: Registered private (index), id: 149.1_SOR_PRIADO_OCTU_0_25}
       public:   {label: Public (index),             id: 149.1_SOR_PUBICO_OCTU_0_14}
-      informal: {label: Unregistered (index),       id: 149.1_SOR_PRIADO_OCTU_0_28}
+      informal: {label: Unregistered (index),       id: 149.1_SOR_PRIADO_OCTU_0_28, lag: 5}
       total:    {label: All workers (index),        id: 149.1_TL_INDIIOS_OCTU_0_21}
       ripte:    {label: RIPTE (pesos),              id: 158.1_REPTE_0_0_5}
     default: {variant: private, transform: level, range: 10Y, real: true, base: "2023-11-01"}

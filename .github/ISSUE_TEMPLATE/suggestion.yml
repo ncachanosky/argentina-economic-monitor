@@ -1,0 +1,19 @@
+name: Suggestion / Sugerencia
+description: A chart that is unclear, a series worth adding, or an idea for the site or the monthly report. / Un gráfico poco claro, una serie para agregar o una idea para el sitio o el informe mensual.
+labels: ["suggestion"]
+body:
+  - type: dropdown
+    id: where
+    attributes:
+      label: About / Sobre
+      options:
+        - The Monitor (site) / El Monitor (sitio)
+        - The monthly report (Economic Order) / El informe mensual (Economic Order)
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: Suggestion / Sugerencia
+    validations:
+      required: true

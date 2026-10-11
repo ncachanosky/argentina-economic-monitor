@@ -187,7 +187,11 @@ def indicator_series(reg, ind_id: str, variant: str) -> pd.Series:
     if key not in _SERIES_CACHE:
         ind = next(i for i in reg.indicators if i.id == ind_id)
         sid = ind.variants[variant].source_id
-        _SERIES_CACHE[key] = derive.compute(ind, reg)[0][sid].dropna() if ind.derive else store.as_of(sid)
+        s = derive.compute(ind, reg)[0][sid].dropna() if ind.derive else store.as_of(sid)
+        if ind.variants[variant].lag:
+            s = s.copy()
+            s.index = s.index - pd.DateOffset(months=ind.variants[variant].lag)
+        _SERIES_CACHE[key] = s
     return _SERIES_CACHE[key]
 
 
@@ -409,6 +413,12 @@ def export(out: Path) -> None:
             print(f"skip {ind.id}: no data yet")
             continue
 
+        for v in ind.variants.values():
+            if v.lag and v.source_id in wide:
+                # The source dates the value at its release month; place it at the month it measures.
+                s = wide[v.source_id].dropna()
+                s.index = s.index - pd.DateOffset(months=v.lag)
+                wide[v.source_id] = s.reindex(wide.index)
         raw_wide = wide.copy()
         if ind.index_base:
             # Show levels as an index: the base year's average = 100 (per series).

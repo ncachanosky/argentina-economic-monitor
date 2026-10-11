@@ -201,7 +201,7 @@ def test_registry_flow_maps_have_no_stray_keys():
     raw = yaml.safe_load(registry.REGISTRY_PATH.read_text(encoding="utf-8"))
     for ind in raw["indicators"]:
         for k, v in (ind.get("variants") or {}).items():
-            assert set(v) <= {"label", "id"}, (ind["id"], k, v)
+            assert set(v) <= {"label", "id", "lag"}, (ind["id"], k, v)
         for g in (ind.get("contributions") or {}).get("groups", []):
             assert set(g) <= {"key", "label", "color", "add", "subtract", "residual"}, (ind["id"], g)
 

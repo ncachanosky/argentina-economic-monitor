@@ -28,6 +28,7 @@ class Variant:
     key: str
     label: str
     source_id: str
+    lag: int = 0      # months the source's dates run ahead of the period measured (dated back on export)
 
 
 # Display-only card options, passed to the site unchanged:
@@ -248,7 +249,7 @@ def load(path: Path = REGISTRY_PATH, releases_path: Path = RELEASES_PATH) -> Reg
         for key, v in (item.get("variants") or {}).items():
             if not v.get("id") or not v.get("label"):
                 raise RegistryError(f"{where}: variant '{key}' needs id and label")
-            variants[key] = Variant(key=key, label=v["label"], source_id=str(v["id"]))
+            variants[key] = Variant(key=key, label=v["label"], source_id=str(v["id"]), lag=int(v.get("lag", 0)))
         if item["kind"] in TABLE_KINDS:
             # A full table written by a source adapter (data/tables/<source>), no series.
             if not (item.get("table") or {}).get("source"):

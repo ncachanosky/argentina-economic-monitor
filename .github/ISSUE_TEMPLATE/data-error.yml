@@ -1,0 +1,18 @@
+name: Data error / Error en los datos
+description: A number looks wrong, a series stopped updating, or a source changed. / Un dato parece incorrecto, una serie dejó de actualizarse o cambió una fuente.
+labels: ["data"]
+body:
+  - type: input
+    id: card
+    attributes:
+      label: Card or page / Tarjeta o página
+      description: Title of the card, or paste its link (the card's share button gives one). / Título de la tarjeta o su enlace.
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What looks wrong / Qué parece incorrecto
+      description: The value shown, the date, and what you expected. A link to the official source helps. / El valor, la fecha y lo que esperaba; un enlace a la fuente oficial ayuda.
+    validations:
+      required: true
