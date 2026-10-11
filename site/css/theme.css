@@ -103,7 +103,7 @@ a:hover { color: var(--accent-ink); }
 .brand-name::before { content: ""; display: inline-block; width: 22px; height: 22px; background: url("../img/logo.svg") center / contain no-repeat; margin-right: 8px; vertical-align: -4px; }
 :root[data-theme="dark"] .brand-name::before { filter: drop-shadow(0 0 0.5px rgba(255,255,255,.6)); }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .brand-name::before { filter: drop-shadow(0 0 0.5px rgba(255,255,255,.6)); } }
-.brand-by { font-family: var(--font-ui); font-size: 12px; color: var(--ink-3); text-transform: uppercase; letter-spacing: .08em; margin-left: 18px; }
+.brand-by { font-family: var(--font-ui); font-size: 12px; color: var(--ink-3); text-transform: uppercase; letter-spacing: .08em; margin-left: 30px; }  /* logo (22px) + gap (8px): aligns with the name */
 .nav { display: flex; gap: 4px; flex: 1; align-items: center; font-family: var(--font-ui); font-size: 15px; }
 .nav a, .nav-trigger { text-decoration: none; padding: 6px 10px; border-radius: 6px; color: var(--ink-2); white-space: nowrap; }
 .nav a:hover, .nav-trigger:hover { color: var(--ink); }
