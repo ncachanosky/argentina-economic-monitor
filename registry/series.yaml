@@ -325,6 +325,8 @@ inputs:
   - {id: "rem:cpi12_p25", source: rem, frequency: M, measure: flow, allow_gaps: true, label: "REM: expected CPI inflation, next 12 months, %, 25th percentile"}
   - {id: "rem:cpi12_p75", source: rem, frequency: M, measure: flow, allow_gaps: true, label: "REM: expected CPI inflation, next 12 months, %, 75th percentile"}
   - {id: "rem:cpi12_p90", source: rem, frequency: M, measure: flow, allow_gaps: true, label: "REM: expected CPI inflation, next 12 months, %, 90th percentile"}
+  - {id: "rem:cpi_m0", source: rem, frequency: M, measure: flow, allow_gaps: true, label: "REM: expected CPI inflation for the survey month, m/m %, median"}
+  - {id: "rem:core_m0", source: rem, frequency: M, measure: flow, allow_gaps: true, label: "REM: expected core CPI inflation for the survey month, m/m %, median"}
   # Dollar futures (A3 Mercados, formerly MATba-Rofex; the exchange's market-data API, not an official statistic).
   - {id: "a3:f12", source: a3, frequency: D, measure: index, allow_gaps: true, stale_days: 7, label: "Dollar futures: price twelve months ahead (interpolated), pesos per US dollar"}
   - {id: "a3:f6", source: a3, frequency: D, measure: index, allow_gaps: true, stale_days: 7, label: "Dollar futures: price six months ahead (interpolated), pesos per US dollar"}

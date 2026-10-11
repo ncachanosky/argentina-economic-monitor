@@ -8,6 +8,9 @@ Series ids ("rem:<key>"), by survey month:
   fx12                      median expected official (wholesale) rate twelve months ahead
   cpi12, cpi12_p10 ... _p90 expected CPI inflation over the next twelve months, %:
                             median and percentiles 10, 25, 75, 90
+  cpi_m0, core_m0           median expected CPI (headline, core) inflation for the survey
+                            month itself, m/m %: the forecast made just before INDEC
+                            publishes that month (used by the monthly report)
 
 Tables (write_tables, data/tables/rem/):
   paths.json      the latest survey's expected path, month by month or quarter by
@@ -129,6 +132,9 @@ def series(df: pd.DataFrame) -> dict[str, pd.Series]:
     for q in ("p10", "p25", "p75", "p90"):
         if q in c:
             out[f"cpi12_{q}"] = c[q].dropna().sort_index()
+    for var in ("cpi", "core"):
+        m = df[(df["var"] == var) & (df["kind"] == "m") & (df["period"] == df["survey"])]
+        out[f"{var}_m0"] = m.groupby("survey")["med"].last().dropna().sort_index()
     return out
 
 
