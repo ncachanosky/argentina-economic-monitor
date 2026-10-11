@@ -1,33 +1,28 @@
 [
  {
-  "source": "datos_gob (M)",
-  "seconds": 85.1,
-  "series": 146
- },
- {
   "source": "bcra (D)",
-  "seconds": 68.7,
+  "seconds": 57.3,
   "series": 46
  },
  {
-  "source": "datos_gob (Q)",
-  "seconds": 45.4,
-  "series": 100
- },
- {
   "source": "finanzas (M)",
-  "seconds": 34.7,
+  "seconds": 38.1,
   "series": 39
  },
  {
   "source": "bcra_entities (M)",
-  "seconds": 34.0,
+  "seconds": 24.8,
   "series": 32
  },
  {
   "source": "ustreasury (D)",
-  "seconds": 19.2,
+  "seconds": 18.3,
   "series": 1
+ },
+ {
+  "source": "vdem (Y)",
+  "seconds": 7.8,
+  "series": 62
  },
  {
   "source": "bcra_fx (D)",
@@ -36,48 +31,48 @@
  },
  {
   "source": "itcrm (D)",
-  "seconds": 6.1,
+  "seconds": 5.0,
   "series": 5
  },
  {
-  "source": "bcra_banks (M)",
-  "seconds": 4.3,
-  "series": 67
- },
- {
-  "source": "vdem (Y)",
-  "seconds": 4.2,
-  "series": 62
- },
- {
   "source": "bcra_cambiario (M)",
-  "seconds": 4.1,
+  "seconds": 4.2,
   "series": 14
  },
  {
-  "source": "officials (Y)",
-  "seconds": 3.1,
-  "series": 2
- },
- {
-  "source": "efw (Y)",
-  "seconds": 2.9,
-  "series": 22
+  "source": "bcra_banks (M)",
+  "seconds": 3.3,
+  "series": 67
  },
  {
   "source": "rem (M)",
-  "seconds": 2.3,
+  "seconds": 2.4,
   "series": 8
  },
  {
+  "source": "datos_gob (M)",
+  "seconds": 2.3,
+  "series": 146
+ },
+ {
+  "source": "efw (Y)",
+  "seconds": 2.1,
+  "series": 22
+ },
+ {
+  "source": "bcra_balance (M)",
+  "seconds": 1.8,
+  "series": 20
+ },
+ {
   "source": "bcra_weekly (D)",
-  "seconds": 1.9,
+  "seconds": 1.7,
   "series": 6
  },
  {
-  "source": "datos_gob (Y)",
-  "seconds": 1.5,
-  "series": 2
+  "source": "aif (M)",
+  "seconds": 1.6,
+  "series": 35
  },
  {
   "source": "dolar (D)",
@@ -85,29 +80,34 @@
   "series": 5
  },
  {
-  "source": "bcra_balance (M)",
-  "seconds": 1.2,
-  "series": 20
+  "source": "bcra (M)",
+  "seconds": 0.9,
+  "series": 1
+ },
+ {
+  "source": "datos_gob (Q)",
+  "seconds": 0.9,
+  "series": 100
+ },
+ {
+  "source": "datos_gob (Y)",
+  "seconds": 0.8,
+  "series": 2
  },
  {
   "source": "a3 (D)",
-  "seconds": 1.0,
+  "seconds": 0.7,
   "series": 3
  },
  {
-  "source": "bcra (M)",
-  "seconds": 1.0,
-  "series": 1
- },
- {
-  "source": "aif (M)",
-  "seconds": 0.8,
-  "series": 35
- },
- {
   "source": "riesgo (D)",
-  "seconds": 0.5,
+  "seconds": 0.7,
   "series": 1
+ },
+ {
+  "source": "officials (Y)",
+  "seconds": 0.1,
+  "series": 2
  },
  {
   "source": "manual (S)",
