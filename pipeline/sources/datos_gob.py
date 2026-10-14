@@ -17,6 +17,7 @@ PAGE_SIZE = 1000          # API limit on rows per request
 TIMEOUT = 60
 RETRIES = 3
 REFETCH_TRIES = 4         # single-id calls merged for series the API returned incomplete
+REFETCH_BUDGET = 240      # seconds per fetch() spent on those calls, so a bad API day can't time out the run
 USER_AGENT = "argentina-economic-monitor (+https://github.com/ncachanosky/argentina-economic-monitor)"
 
 
@@ -97,13 +98,17 @@ def _incomplete(long: pd.DataFrame, meta: dict) -> list[str]:
     return bad
 
 
-def _fill_incomplete(long: pd.DataFrame, meta: dict, session: requests.Session) -> pd.DataFrame:
+def _fill_incomplete(long: pd.DataFrame, meta: dict, session: requests.Session, deadline: float) -> pd.DataFrame:
     """Re-request incomplete series one at a time and merge the answers: the API drops
     different observations on each call, so the union of a few calls is complete.
     A series with genuine gaps (fewer values than its index) costs REFETCH_TRIES calls."""
     for sid in _incomplete(long, meta):
+        if time.monotonic() > deadline:
+            break
         got = long[long["series_id"] == sid]
         for attempt in range(REFETCH_TRIES):
+            if time.monotonic() > deadline:
+                break
             try:
                 one, _ = _fetch_chunk([sid], session)
             except Exception:
@@ -119,13 +124,14 @@ def _fill_incomplete(long: pd.DataFrame, meta: dict, session: requests.Session) 
 def fetch(ids: list[str] | set[str]) -> FetchResult:
     ids = sorted(set(ids))
     frames, meta, errors = [], {}, {}
+    deadline = time.monotonic() + REFETCH_BUDGET
     with requests.Session() as session:
         session.headers["User-Agent"] = USER_AGENT
         for i in range(0, len(ids), MAX_IDS_PER_CALL):
             chunk = ids[i : i + MAX_IDS_PER_CALL]
             try:
                 df, m = _fetch_chunk(chunk, session)
-                df = _fill_incomplete(df, m, session)
+                df = _fill_incomplete(df, m, session, deadline)
                 frames.append(df)
                 meta.update(m)
             except Exception as exc:
