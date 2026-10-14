@@ -16,7 +16,7 @@ MAX_IDS_PER_CALL = 40     # API limit on ids per request
 PAGE_SIZE = 1000          # API limit on rows per request
 TIMEOUT = 60
 RETRIES = 3
-REFETCH_TRIES = 3         # single-id retries for series the API returned incomplete
+REFETCH_TRIES = 4         # single-id calls merged for series the API returned incomplete
 USER_AGENT = "argentina-economic-monitor (+https://github.com/ncachanosky/argentina-economic-monitor)"
 
 
@@ -64,6 +64,7 @@ def _fetch_chunk(ids: list[str], session: requests.Session) -> tuple[pd.DataFram
                     "description": f.get("description"),
                     "time_index_start": f.get("time_index_start"),
                     "time_index_end": f.get("time_index_end"),
+                    "time_index_size": f.get("time_index_size"),
                     "dataset": (entry.get("dataset") or {}).get("title"),
                 }
         start += len(data)
@@ -82,33 +83,36 @@ def _fetch_chunk(ids: list[str], session: requests.Session) -> tuple[pd.DataFram
 
 
 def _incomplete(long: pd.DataFrame, meta: dict) -> list[str]:
-    """Ids whose returned observations do not span the range the API's own metadata
-    declares. Since October 2026 the API intermittently returns some series of a
-    multi-id request empty or cut short (a different subset on each call)."""
+    """Ids with fewer observations than the API's own metadata declares (time_index_size),
+    or not spanning time_index_start..end. Since October 2026 the API intermittently
+    drops observations: whole series, their ends, or scattered months, a different
+    subset on each call."""
     bad = []
     for sid, m in meta.items():
         s = long.loc[long["series_id"] == sid, "date"]
-        start, end = m.get("time_index_start"), m.get("time_index_end")
-        if s.empty or (start and s.min() > pd.Timestamp(start)) or (end and s.max() < pd.Timestamp(end)):
+        start, end, size = m.get("time_index_start"), m.get("time_index_end"), m.get("time_index_size")
+        if (s.empty or (start and s.min() > pd.Timestamp(start)) or (end and s.max() < pd.Timestamp(end))
+                or (size and s.nunique() < int(size))):
             bad.append(sid)
     return bad
 
 
 def _fill_incomplete(long: pd.DataFrame, meta: dict, session: requests.Session) -> pd.DataFrame:
-    """Re-request incomplete series one at a time; keep the longest answer."""
+    """Re-request incomplete series one at a time and merge the answers: the API drops
+    different observations on each call, so the union of a few calls is complete.
+    A series with genuine gaps (fewer values than its index) costs REFETCH_TRIES calls."""
     for sid in _incomplete(long, meta):
-        best = long[long["series_id"] == sid]
+        got = long[long["series_id"] == sid]
         for attempt in range(REFETCH_TRIES):
             try:
-                one, m = _fetch_chunk([sid], session)
+                one, _ = _fetch_chunk([sid], session)
             except Exception:
-                one, m = best.iloc[0:0], {}
-            if len(one) > len(best):
-                best = one
-            if m and not _incomplete(one, {sid: m[sid]}):
+                one = got.iloc[0:0]
+            got = pd.concat([got, one], ignore_index=True).drop_duplicates(["date"], keep="first")
+            if not _incomplete(got, {sid: meta[sid]}):
                 break
-            time.sleep(2 * (attempt + 1))
-        long = pd.concat([long[long["series_id"] != sid], best], ignore_index=True)
+            time.sleep(1 + attempt)
+        long = pd.concat([long[long["series_id"] != sid], got], ignore_index=True)
     return long
 
 
