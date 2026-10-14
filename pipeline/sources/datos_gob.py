@@ -16,6 +16,7 @@ MAX_IDS_PER_CALL = 40     # API limit on ids per request
 PAGE_SIZE = 1000          # API limit on rows per request
 TIMEOUT = 60
 RETRIES = 3
+REFETCH_TRIES = 3         # single-id retries for series the API returned incomplete
 USER_AGENT = "argentina-economic-monitor (+https://github.com/ncachanosky/argentina-economic-monitor)"
 
 
@@ -61,6 +62,7 @@ def _fetch_chunk(ids: list[str], session: requests.Session) -> tuple[pd.DataFram
                 meta[f.get("id")] = {
                     "units": f.get("units"),
                     "description": f.get("description"),
+                    "time_index_start": f.get("time_index_start"),
                     "time_index_end": f.get("time_index_end"),
                     "dataset": (entry.get("dataset") or {}).get("title"),
                 }
@@ -79,6 +81,37 @@ def _fetch_chunk(ids: list[str], session: requests.Session) -> tuple[pd.DataFram
     return long, meta
 
 
+def _incomplete(long: pd.DataFrame, meta: dict) -> list[str]:
+    """Ids whose returned observations do not span the range the API's own metadata
+    declares. Since October 2026 the API intermittently returns some series of a
+    multi-id request empty or cut short (a different subset on each call)."""
+    bad = []
+    for sid, m in meta.items():
+        s = long.loc[long["series_id"] == sid, "date"]
+        start, end = m.get("time_index_start"), m.get("time_index_end")
+        if s.empty or (start and s.min() > pd.Timestamp(start)) or (end and s.max() < pd.Timestamp(end)):
+            bad.append(sid)
+    return bad
+
+
+def _fill_incomplete(long: pd.DataFrame, meta: dict, session: requests.Session) -> pd.DataFrame:
+    """Re-request incomplete series one at a time; keep the longest answer."""
+    for sid in _incomplete(long, meta):
+        best = long[long["series_id"] == sid]
+        for attempt in range(REFETCH_TRIES):
+            try:
+                one, m = _fetch_chunk([sid], session)
+            except Exception:
+                one, m = best.iloc[0:0], {}
+            if len(one) > len(best):
+                best = one
+            if m and not _incomplete(one, {sid: m[sid]}):
+                break
+            time.sleep(2 * (attempt + 1))
+        long = pd.concat([long[long["series_id"] != sid], best], ignore_index=True)
+    return long
+
+
 def fetch(ids: list[str] | set[str]) -> FetchResult:
     ids = sorted(set(ids))
     frames, meta, errors = [], {}, {}
@@ -88,6 +121,7 @@ def fetch(ids: list[str] | set[str]) -> FetchResult:
             chunk = ids[i : i + MAX_IDS_PER_CALL]
             try:
                 df, m = _fetch_chunk(chunk, session)
+                df = _fill_incomplete(df, m, session)
                 frames.append(df)
                 meta.update(m)
             except Exception as exc:
