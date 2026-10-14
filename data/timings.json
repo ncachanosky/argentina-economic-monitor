@@ -1,73 +1,73 @@
 [
  {
   "source": "datos_gob (M)",
-  "seconds": 88.5,
+  "seconds": 109.4,
   "series": 146
  },
  {
   "source": "bcra (D)",
-  "seconds": 57.4,
+  "seconds": 74.6,
   "series": 46
  },
  {
   "source": "datos_gob (Q)",
-  "seconds": 49.7,
+  "seconds": 61.6,
   "series": 100
  },
  {
   "source": "finanzas (M)",
-  "seconds": 47.9,
+  "seconds": 39.3,
   "series": 39
  },
  {
   "source": "bcra_entities (M)",
-  "seconds": 34.7,
+  "seconds": 32.0,
   "series": 32
  },
  {
   "source": "ustreasury (D)",
-  "seconds": 18.4,
+  "seconds": 19.5,
   "series": 1
  },
  {
-  "source": "bcra_cambiario (M)",
-  "seconds": 12.6,
-  "series": 14
+  "source": "a3 (D)",
+  "seconds": 15.4,
+  "series": 3
  },
  {
   "source": "bcra_fx (D)",
-  "seconds": 11.4,
+  "seconds": 9.0,
   "series": 1
  },
  {
-  "source": "vdem (Y)",
-  "seconds": 6.4,
-  "series": 62
- },
- {
   "source": "itcrm (D)",
-  "seconds": 6.0,
+  "seconds": 7.0,
   "series": 5
  },
  {
+  "source": "vdem (Y)",
+  "seconds": 6.2,
+  "series": 62
+ },
+ {
   "source": "bcra_banks (M)",
-  "seconds": 4.9,
+  "seconds": 4.2,
   "series": 67
  },
  {
   "source": "efw (Y)",
-  "seconds": 3.4,
+  "seconds": 2.8,
   "series": 22
  },
  {
-  "source": "rem (M)",
-  "seconds": 2.6,
-  "series": 8
+  "source": "dolar (D)",
+  "seconds": 2.3,
+  "series": 5
  },
  {
-  "source": "dolar (D)",
-  "seconds": 2.6,
-  "series": 5
+  "source": "datos_gob (Y)",
+  "seconds": 2.1,
+  "series": 2
  },
  {
   "source": "bcra_weekly (D)",
@@ -81,18 +81,13 @@
  },
  {
   "source": "aif (M)",
-  "seconds": 1.5,
+  "seconds": 1.4,
   "series": 35
  },
  {
-  "source": "datos_gob (Y)",
+  "source": "rem (M)",
   "seconds": 1.2,
-  "series": 2
- },
- {
-  "source": "bcra (M)",
-  "seconds": 1.1,
-  "series": 1
+  "series": 8
  },
  {
   "source": "riesgo (D)",
@@ -100,9 +95,14 @@
   "series": 1
  },
  {
-  "source": "a3 (D)",
-  "seconds": 0.9,
-  "series": 3
+  "source": "bcra (M)",
+  "seconds": 1.0,
+  "series": 1
+ },
+ {
+  "source": "bcra_cambiario (M)",
+  "seconds": 0.8,
+  "series": 14
  },
  {
   "source": "officials (Y)",
