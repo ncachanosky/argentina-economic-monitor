@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="es-AR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    
+    
+    <meta name="color-scheme" content="light dark" />
+    <!-- El --papel de cada modo, leído de theme.css al compilar (vite.config.ts, coloresDeTema). -->
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f1efea" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#1c1c1f" />
+    <!-- Modo elegido a mano (lib/tema.ts), aplicado antes de pintar: sin destello claro. -->
+    <script>
+      var m = null
+      try {
+        m = localStorage.getItem('tema')
+      } catch (e) {}
+      if (m === 'claro' || m === 'oscuro') {
+        document.documentElement.dataset.theme = m === 'oscuro' ? 'dark' : 'light'
+        document.querySelectorAll('meta[name="theme-color"]').forEach(function (t) {
+          t.setAttribute('data-sistema', t.content) // lib/tema.ts lo repone al volver a seguir al sistema
+          t.content = m === 'oscuro' ? '#1c1c1f' : '#f1efea'
+        })
+      }
+    </script>
+    <link rel="icon" href="/favicon.ico" sizes="48x48" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/icon-192.png" />
+    <!-- Las cifras (último valor, período, frescura) llegan en estado.json: se pide ya,
+         sin esperar al JS. Misma URL que lib/data.ts (sin ?v=) para que el fetch la reuse. -->
+    <link rel="preload" href="/data/estado.json" as="fetch" crossorigin />
+    <script type="module" crossorigin src="/assets/index-Bc04kDnZ.js"></script>
+    <link rel="modulepreload" crossorigin href="/assets/tanstack-BQxi6ONQ.js">
+    <link rel="stylesheet" crossorigin href="/assets/index-CXk5AWhK.css">
+    <link rel="preload" href="/assets/geist-latin-wght-normal-BgDaEnEv.woff2" as="font" type="font/woff2" crossorigin="">
+  <link rel="manifest" href="/manifest.webmanifest"><script id="vite-plugin-pwa:register-sw" src="/registerSW.js" defer></script>
+    <title>Acerca: fuentes y metodología · Monitor Argy</title>
+    <meta name="description" content="Indicadores macroeconómicos de Argentina con la fecha de cada dato, su fuente oficial y cuándo sale el próximo." />
+    <link rel="canonical" href="https://monitorargy.com/acerca" />
+    <link rel="alternate" hreflang="es-AR" href="https://monitorargy.com/acerca" />
+    <link rel="alternate" hreflang="en" href="https://monitorargy.com/en/about" />
+    <link rel="alternate" hreflang="x-default" href="https://monitorargy.com/acerca" />
+    <meta property="og:site_name" content="Monitor Argy" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Acerca: fuentes y metodología · Monitor Argy" />
+    <meta property="og:description" content="Indicadores macroeconómicos de Argentina con la fecha de cada dato, su fuente oficial y cuándo sale el próximo." />
+    <meta property="og:url" content="https://monitorargy.com/acerca" />
+    <meta property="og:image" content="https://monitorargy.com/og/portada.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:alt" content="Acerca: fuentes y metodología · Monitor Argy" />
+    <meta property="og:locale" content="es_AR" />
+    <meta property="og:locale:alternate" content="en_US" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Acerca: fuentes y metodología · Monitor Argy" />
+    <meta name="twitter:description" content="Indicadores macroeconómicos de Argentina con la fecha de cada dato, su fuente oficial y cuándo sale el próximo." />
+    <meta name="twitter:image" content="https://monitorargy.com/og/portada.png" />
+    <meta name="twitter:image:alt" content="Acerca: fuentes y metodología · Monitor Argy" />
+    <meta name="twitter:creator" content="@gtacchini" />
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"AboutPage","name":"Acerca de Monitor Argy","url":"https://monitorargy.com/acerca","inLanguage":"es-AR","about":{"@id":"https://monitorargy.com/#sitio"},"author":{"@type":"Person","name":"Giorgio Tacchini","url":"https://monitorargy.com/acerca","sameAs":["https://www.linkedin.com/in/gtacchini","https://x.com/gtacchini"]}}</script>
+  </head>
+  <body>
+    <div id="root"><div class="envoltorio shell-estatico">
+<a href="#contenido" class="saltar">Saltar al contenido</a>
+<header class="shell-cabecera"><a href="/" class="shell-marca" translate="no"><img src="/favicon.svg" alt="" width="24" height="24" />Monitor Argy</a><nav aria-label="Principal"><ul><li><a href="/">Monitor</a></li><li><a href="/actividad">Actividad</a></li><li><a href="/precios">Precios</a></li><li><a href="/dolar">Dólar</a></li><li><a href="/comercio-exterior">Comercio exterior</a></li><li><a href="/tasas">Tasas</a></li><li><a href="/fiscal">Frente fiscal</a></li><li><a href="/empleo">Empleo</a></li><li><a href="/pobreza">Pobreza</a></li><li><a href="/coyuntura">Coyuntura</a></li><li><a href="/calendario">Calendario</a></li><li><a href="/datos">Datos</a></li><li><a href="/acerca">Acerca</a></li><li><a href="/privacidad">Privacidad</a></li><li><a href="/contacto">Contacto</a></li></ul></nav></header>
+<nav class="shell-migas" aria-label="Migas"><ol><li><a href="/">Monitor</a></li><li aria-current="page">Acerca</li></ol></nav><main id="contenido" tabindex="-1"><h1>Acerca de Monitor Argy</h1><p>Indicadores macroeconómicos de Argentina con la fecha de cada dato, su fuente oficial y cuándo sale el próximo.</p><h2>Qué es</h2><p>Monitor Argy sigue series públicas de la economía argentina —inflación, actividad, dólar, reservas, empleo, salarios, consumo, comercio exterior— y muestra, para cada una, de qué período es el último dato, si está al día y cuándo se publica el siguiente.</p><p>El problema que resuelve no es encontrar el número, sino saber si está al día: los organismos publican con demoras irregulares y revisan las series hacia atrás.</p><h2>De dónde salen los datos</h2><p>Cada serie se descarga de su fuente oficial: INDEC, el BCRA (Principales Variables y el Relevamiento de Expectativas de Mercado), la Secretaría de Trabajo (SIPA), el Ministerio de Economía, la Universidad Torcuato Di Tella y cámaras sectoriales como ADEFA, la Cámara Argentina del Acero, la Asociación de Fabricantes de Cemento Portland o los colegios de escribanos. Cada ficha enlaza al archivo de origen.</p><h2>Cómo se actualizan</h2><p>Un proceso automático baja las series del BCRA todos los días hábiles y las de INDEC en las fechas de su calendario oficial. Cada carga guarda cuándo se hizo: si un organismo revisa un dato, la versión anterior no se pierde.</p><p>Antes de publicar, cada valor se valida contra un rango posible y contra su propia historia. Si un número no pasa la validación, no se publica.</p><h2>Al día, demorado o vencido</h2><p>Cada serie tiene un plazo esperado entre el fin del período y la publicación del dato. «Al día» quiere decir que el último dato llegó dentro de ese plazo; «demorado», que se pasó; «vencido», que se pasó por más de la mitad del plazo. En las series diarias el plazo se cuenta en días hábiles. Si el calendario dice que el dato siguiente todavía no se publicó, la serie está al día aunque se haya pasado del plazo; una serie calculada espera a la más lenta de las que usa.</p><h2 id="desestacionalizacion">Desestacionalización</h2><p>Cuando el organismo publica la serie desestacionalizada, se usa la oficial: no se calcula una serie que ya existe. Las demás se desestacionalizan con X-13ARIMA-SEATS, el programa de la Oficina del Censo de Estados Unidos, y se rotulan «desest. (propia)». La ficha de cada una dice cómo se calculó: el modelo, los efectos de calendario, los valores atípicos y la calidad del ajuste.</p><p>El criterio es el de INDEC. Se corrige la composición de días de la semana (cuántos lunes, martes o sábados tiene el mes). Los feriados nacionales, Carnaval y Semana Santa se estiman con un calendario argentino, para que no deformen el modelo, pero quedan en la serie, como en las desestacionalizadas de INDEC: así una serie propia se compara con una oficial. Los préstamos, que son promedios de saldos diarios, no se corrigen por días de la semana.</p><p>Cada serie tiene su modelo ARIMA, su transformación (logaritmos o niveles) y los valores atípicos que encontró X-13 (la pandemia, una devaluación), fijados y revisados una vez por año. En el medio, X-13 reestima los parámetros y busca atípicos sólo en los datos nuevos: un dato nuevo no cambia el modelo. Aun así, cada dato recalcula toda la serie, y los últimos meses son los que más se revisan.</p><p>Antes de publicar se mide la calidad. Hacen falta al menos cinco años de historia, y una serie sin estacionalidad identificable (la prueba M7 de X-13) no se publica desestacionalizada. Si el ajuste es dudoso —Q mayor que 1 o estacionalidad residual según la prueba QS—, se publica con el aviso en la ficha.</p><p>Con el mismo método sobre las series originales de INDEC, la variación mensual desde 2022 tiene una correlación de 0,87 con el EMAE desestacionalizado oficial (diferencia media de 0,58 puntos) y de 0,92 con el IPI manufacturero (0,75 puntos).</p><p>Límites conocidos: los feriados trasladables se cuentan en su fecha original y no se modelan los fines de semana largos turísticos; el Jueves Santo cuenta como feriado, aunque es día no laborable.</p><h2>Cómo citar y reutilizar</h2><p>Citá «Monitor Argy (monitorargy.com), con datos de» el organismo de la serie, junto con el período del dato, que figura en cada ficha.</p><p>Todas las series se pueden descargar en CSV desde la sección Datos. Los cálculos propios (desestacionalizaciones, variaciones, series deflactadas) se publican bajo licencia Creative Commons Atribución 4.0 (CC BY 4.0); los datos originales pertenecen a los organismos que los publican.</p><h2>Quién lo hace</h2><p>Monitor Argy es un proyecto personal de Giorgio Tacchini. No tiene relación con los organismos que publican los datos ni recibe financiamiento de ellos.</p></main>
+<footer class="shell-pie"><p><span translate="no">Monitor Argy</span> sigue indicadores macroeconómicos públicos de Argentina y muestra, para cada uno, de qué período es el último dato y si está al día. Datos: INDEC · BCRA · BNA · ArgentinaDatos · BCRA, INDEC y REM · JP Morgan (EMBI) · CIARA-CEC · Secretaría de Minería · Ministerio de Economía / ARCA · Secretaría de Agricultura, Ganadería y Pesca · Secretaría de Agricultura · INYM · ADEFA · Cámara Argentina del Acero · Secretaría de Seguridad Social (RIPTE) · Secretaría de Trabajo · INDEC (CGI) y Secretaría de Trabajo (SIPA) · Universidad Torcuato Di Tella · CAMMESA · DNRPA (Ministerio de Justicia) · Grupo Construya · AFCP · Colegio de Escribanos de la Ciudad de Buenos Aires · Colegio de Escribanos de la Provincia de Buenos Aires · Secretaría de Hacienda (IMIG) · Secretaría de Hacienda (IMIG) e INDEC · ARCA e INDEC · Secretaría de Finanzas · Secretaría de Finanzas y BCRA · Secretaría de Finanzas, BCRA e INDEC · ArgentinaDatos y BCRA · Secretaría de Finanzas y ArgentinaDatos · BCRA y ArgentinaDatos · Secretaría de Finanzas, BCRA y ArgentinaDatos · Secretaría de Finanzas, BCRA, ArgentinaDatos e INDEC · BCRA e INDEC · Ministerio de Economía (DNAP). Un proyecto de Giorgio Tacchini. <a href="/acerca">Cómo se hace</a> · <a href="/privacidad">Privacidad</a>.</p></footer>
+</div></div>
+    <!-- Cloudflare Web Analytics no va acá: Cloudflare inyecta su beacon en todo HTML que
+         sirve el Worker (verificado el 16-oct en portada, fichas, fijas, /en y 404). Con uno
+         a mano se cargaban dos, con el mismo token. -->
+  </body>
+</html>

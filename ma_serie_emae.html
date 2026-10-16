@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="es-AR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    
+    
+    <meta name="color-scheme" content="light dark" />
+    <!-- El --papel de cada modo, leído de theme.css al compilar (vite.config.ts, coloresDeTema). -->
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f1efea" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#1c1c1f" />
+    <!-- Modo elegido a mano (lib/tema.ts), aplicado antes de pintar: sin destello claro. -->
+    <script>
+      var m = null
+      try {
+        m = localStorage.getItem('tema')
+      } catch (e) {}
+      if (m === 'claro' || m === 'oscuro') {
+        document.documentElement.dataset.theme = m === 'oscuro' ? 'dark' : 'light'
+        document.querySelectorAll('meta[name="theme-color"]').forEach(function (t) {
+          t.setAttribute('data-sistema', t.content) // lib/tema.ts lo repone al volver a seguir al sistema
+          t.content = m === 'oscuro' ? '#1c1c1f' : '#f1efea'
+        })
+      }
+    </script>
+    <link rel="icon" href="/favicon.ico" sizes="48x48" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/icon-192.png" />
+    <!-- Las cifras (último valor, período, frescura) llegan en estado.json: se pide ya,
+         sin esperar al JS. Misma URL que lib/data.ts (sin ?v=) para que el fetch la reuse. -->
+    <link rel="preload" href="/data/estado.json" as="fetch" crossorigin />
+    <script type="module" crossorigin src="/assets/index-Bc04kDnZ.js"></script>
+    <link rel="modulepreload" crossorigin href="/assets/tanstack-BQxi6ONQ.js">
+    <link rel="stylesheet" crossorigin href="/assets/index-CXk5AWhK.css">
+    <link rel="preload" href="/assets/geist-latin-wght-normal-BgDaEnEv.woff2" as="font" type="font/woff2" crossorigin="">
+  <link rel="manifest" href="/manifest.webmanifest"><script id="vite-plugin-pwa:register-sw" src="/registerSW.js" defer></script>
+    <title>Página no encontrada · Monitor Argy</title>
+    <meta name="description" content="Esta página no existe." />
+    <meta name="robots" content="noindex, follow" />
+    <meta property="og:site_name" content="Monitor Argy" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Página no encontrada · Monitor Argy" />
+    <meta property="og:description" content="Esta página no existe." />
+    <meta property="og:url" content="https://monitorargy.com/" />
+    <meta property="og:image" content="https://monitorargy.com/og/portada.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:alt" content="Página no encontrada · Monitor Argy" />
+    <meta property="og:locale" content="es_AR" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Página no encontrada · Monitor Argy" />
+    <meta name="twitter:description" content="Esta página no existe." />
+    <meta name="twitter:image" content="https://monitorargy.com/og/portada.png" />
+    <meta name="twitter:image:alt" content="Página no encontrada · Monitor Argy" />
+    <meta name="twitter:creator" content="@gtacchini" />
+  </head>
+  <body>
+    <div id="root"><div class="envoltorio shell-estatico">
+<a href="#contenido" class="saltar">Saltar al contenido</a>
+<header class="shell-cabecera"><a href="/" class="shell-marca" translate="no"><img src="/favicon.svg" alt="" width="24" height="24" />Monitor Argy</a><nav aria-label="Principal"><ul><li><a href="/">Monitor</a></li><li><a href="/actividad">Actividad</a></li><li><a href="/precios">Precios</a></li><li><a href="/dolar">Dólar</a></li><li><a href="/comercio-exterior">Comercio exterior</a></li><li><a href="/tasas">Tasas</a></li><li><a href="/fiscal">Frente fiscal</a></li><li><a href="/empleo">Empleo</a></li><li><a href="/pobreza">Pobreza</a></li><li><a href="/coyuntura">Coyuntura</a></li><li><a href="/calendario">Calendario</a></li><li><a href="/datos">Datos</a></li><li><a href="/acerca">Acerca</a></li><li><a href="/privacidad">Privacidad</a></li><li><a href="/contacto">Contacto</a></li></ul></nav></header>
+<main id="contenido" tabindex="-1"><h1>Esta página no existe.</h1><p><a href="/">Volver al monitor</a> o buscar la serie en <a href="/datos">Datos</a>.</p><p><a href="/en" lang="en">English version →</a></p></main>
+<footer class="shell-pie"><p><span translate="no">Monitor Argy</span> sigue indicadores macroeconómicos públicos de Argentina y muestra, para cada uno, de qué período es el último dato y si está al día. Datos: INDEC · BCRA · BNA · ArgentinaDatos · BCRA, INDEC y REM · JP Morgan (EMBI) · CIARA-CEC · Secretaría de Minería · Ministerio de Economía / ARCA · Secretaría de Agricultura, Ganadería y Pesca · Secretaría de Agricultura · INYM · ADEFA · Cámara Argentina del Acero · Secretaría de Seguridad Social (RIPTE) · Secretaría de Trabajo · INDEC (CGI) y Secretaría de Trabajo (SIPA) · Universidad Torcuato Di Tella · CAMMESA · DNRPA (Ministerio de Justicia) · Grupo Construya · AFCP · Colegio de Escribanos de la Ciudad de Buenos Aires · Colegio de Escribanos de la Provincia de Buenos Aires · Secretaría de Hacienda (IMIG) · Secretaría de Hacienda (IMIG) e INDEC · ARCA e INDEC · Secretaría de Finanzas · Secretaría de Finanzas y BCRA · Secretaría de Finanzas, BCRA e INDEC · ArgentinaDatos y BCRA · Secretaría de Finanzas y ArgentinaDatos · BCRA y ArgentinaDatos · Secretaría de Finanzas, BCRA y ArgentinaDatos · Secretaría de Finanzas, BCRA, ArgentinaDatos e INDEC · BCRA e INDEC · Ministerio de Economía (DNAP). Un proyecto de Giorgio Tacchini. <a href="/acerca">Cómo se hace</a> · <a href="/privacidad">Privacidad</a>.</p></footer>
+</div></div>
+    <!-- Cloudflare Web Analytics no va acá: Cloudflare inyecta su beacon en todo HTML que
+         sirve el Worker (verificado el 16-oct en portada, fichas, fijas, /en y 404). Con uno
+         a mano se cargaban dos, con el mismo token. -->
+  </body>
+</html>
