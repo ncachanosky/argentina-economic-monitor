@@ -124,6 +124,17 @@ def _fill_incomplete(long: pd.DataFrame, meta: dict, session: requests.Session, 
 def fetch(ids: list[str] | set[str]) -> FetchResult:
     ids = sorted(set(ids))
     frames, meta, errors = [], {}, {}
+    # CPI series come from INDEC's own release file first (same values, updated on release
+    # day); the API is the fallback if that file can't be read.
+    try:
+        from . import indec_ipc
+        df, m, served = indec_ipc.fetch(ids)
+        if served:
+            frames.append(df)
+            meta.update(m)
+            ids = [sid for sid in ids if sid not in served]
+    except Exception as exc:
+        print(f"INDEC CPI file unavailable, using the API for CPI series: {exc}")
     deadline = time.monotonic() + REFETCH_BUDGET
     with requests.Session() as session:
         session.headers["User-Agent"] = USER_AGENT

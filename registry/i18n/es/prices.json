@@ -73,5 +73,6 @@
  "Wholesale prices": "Precios mayoristas",
  "INDEC's domestic wholesale price index: prices of domestic and imported goods at the first stage of sale. Often a leading signal for consumer goods inflation.": "Índice de precios internos al por mayor del INDEC: precios de bienes nacionales e importados en la primera etapa de comercialización. Suele anticipar la inflación de bienes de consumo.",
  "Index, Dec 2015 = 100": "Índice, dic. 2015 = 100",
- "Wholesale prices (IPIM)": "Precios mayoristas (IPIM)"
+ "Wholesale prices (IPIM)": "Precios mayoristas (IPIM)",
+ "INDEC (CPI release file serie_ipc_divisiones.csv)": "INDEC (archivo del IPC serie_ipc_divisiones.csv)"
 }

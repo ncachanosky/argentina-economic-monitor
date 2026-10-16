@@ -1272,7 +1272,7 @@ indicators:
       it began.
     release: ipc
     source: datos_gob
-    source_label: INDEC, via datos.gob.ar
+    source_label: INDEC (CPI release file serie_ipc_divisiones.csv)
     frequency: M
     units: Index, Dec 2016 = 100
     variants:
@@ -1366,7 +1366,7 @@ indicators:
       monthly inflation each category contributed.
     release: ipc
     source: datos_gob
-    source_label: INDEC, via datos.gob.ar
+    source_label: INDEC (CPI release file serie_ipc_divisiones.csv)
     frequency: M
     units: Index, Dec 2016 = 100
     variants:
@@ -1392,7 +1392,7 @@ indicators:
       compare their paths.
     release: ipc
     source: datos_gob
-    source_label: INDEC, via datos.gob.ar
+    source_label: INDEC (CPI release file serie_ipc_divisiones.csv)
     frequency: M
     units: Index, Dec 2016 = 100
     variants:
@@ -1567,7 +1567,7 @@ indicators:
       Headline CPI in each of INDEC's six regions.
     release: ipc
     source: datos_gob
-    source_label: INDEC, via datos.gob.ar
+    source_label: INDEC (CPI release file serie_ipc_divisiones.csv)
     frequency: M
     units: Index, Dec 2016 = 100
     variants:
