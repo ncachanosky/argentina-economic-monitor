@@ -114,9 +114,9 @@ def _emae_rows(df: pd.DataFrame, header: int) -> pd.DatetimeIndex:
     """Dates for an INDEC EMAE table: year in column 0 (first month only), month name in column 1."""
     year, dates = None, []
     for _, r in df.iloc[header + 1:].iterrows():
-        y = pd.to_numeric(r.iloc[0], errors="coerce")
-        if pd.notna(y) and 1990 <= y <= 2100:
-            year = int(y)
+        y = re.match(r"((?:19|20)\d{2})(?:\D|$)", norm(r.iloc[0]).replace(".0", ""))   # 2024, "2024*", 2024.0
+        if y:
+            year = int(y.group(1))
         m = month_label(r.iloc[1]) if pd.notna(r.iloc[1]) else None
         dates.append(pd.Timestamp(year, m, 1) if (year and m) else pd.NaT)
     return pd.DatetimeIndex(dates)
@@ -256,6 +256,162 @@ def read_cpi(raw: bytes) -> dict[str, pd.Series]:
     return out
 
 
+# ── foreign trade (INDEC ICA and price/quantity indices; datos.gob.ar full CSVs) ───────────
+
+ICA_PAGE = "https://www.indec.gob.ar/Nivel4/Tema/3/2/40"
+
+
+def ica_file(pattern: str):
+    """Resolver for an ICA file whose name carries the years (e.g. expo_grandes_rubros_2025_2026.xls)."""
+    def resolve() -> str:
+        html = download(ICA_PAGE).decode("utf-8", "replace")
+        found = sorted(set(re.findall(pattern, html)))
+        if not found:
+            raise FileNotFound(f"no file matching /{pattern}/ on {ICA_PAGE}")
+        return f"{INDEC}/economia/{found[-1]}"
+    return resolve
+
+
+def _year_blocks(df: pd.DataFrame, cats: dict[str, str]) -> dict[str, pd.Series]:
+    """Monthly tables laid out as one block per category, each with a column per year
+    ("Año 2026e", "Año 2025*") and a row per month (Ene ... Dic)."""
+    hrow = find_row(df, cats[next(iter(cats))])
+    starts = {sid: find_col(df, hrow, pat) for sid, pat in cats.items()}
+    yrow = next((i for i in range(hrow, min(hrow + 6, len(df)))
+                 if any(re.search(r"a[ñn]o \d{4}", norm(v)) for v in df.iloc[i])), None)
+    if yrow is None:
+        raise LayoutChanged("no 'Año YYYY' header under the category row", preview(df, 12, 12))
+    pcol = find_col(df, find_row(df, r"^per[ií]odo"), r"^per[ií]odo")
+    edges = sorted(starts.values()) + [df.shape[1]]
+    out = {}
+    for sid, c in starts.items():
+        end = next(e for e in edges if e > c)
+        vals = {}
+        for j in range(c, end):
+            m = re.search(r"a[ñn]o (\d{4})", norm(df.iat[yrow, j]))
+            if not m:
+                continue
+            year = int(m.group(1))
+            for i in range(yrow + 1, len(df)):
+                lab = norm(df.iat[i, pcol])
+                mon = MONTHS.get(lab[:3]) if re.fullmatch(r"[a-z]{3}\.?\*?", lab) else None
+                v = pd.to_numeric(df.iat[i, j], errors="coerce")
+                if mon and pd.notna(v):
+                    vals[pd.Timestamp(year, mon, 1)] = float(v)
+        if not vals:
+            raise LayoutChanged(f"no monthly values for {sid} under {df.iat[hrow, c]!r}", preview(df, 14, 12))
+        out[sid] = pd.Series(vals).sort_index()
+    return out
+
+
+def read_trade_totals(raw: bytes) -> dict[str, pd.Series]:
+    df = pd.read_excel(io.BytesIO(raw), sheet_name=0, header=None)
+    h = find_row(df, r"^per[ií]odo", col=0)
+    ce, ci, cs = find_col(df, h, r"^exportaciones"), find_col(df, h, r"^importaciones"), find_col(df, h, r"^saldo")
+    sub = next(i for i in range(h, h + 3) if "total mensual" in norm(df.iat[i, ce]))
+    if "total mensual" not in norm(df.iat[sub, ci]):
+        raise LayoutChanged("imports block has no 'Total mensual' column", preview(df, 8, 12))
+    dates = _emae_rows(df, sub)
+    body = df.iloc[sub + 1:]
+    cols = {"74.3_IET_0_M_16": ce, "74.3_IIT_0_M_25": ci, "74.3_ISC_0_M_19": cs}
+    return {sid: pd.Series(num(body.iloc[:, j]).values, index=dates).dropna().loc[lambda s: s.index.notna()]
+            for sid, j in cols.items()}
+
+
+def read_export_groups(raw: bytes) -> dict[str, pd.Series]:
+    df = pd.read_excel(io.BytesIO(raw), sheet_name=0, header=None)
+    return _year_blocks(df, {"74.3_IEPP_0_M_35": r"productos primarios",
+                             "74.3_IEMOA_0_M_48": r"origen agropecuario",
+                             "74.3_IEMOI_0_M_46": r"origen industrial",
+                             "74.3_IECE_0_M_35": r"^combustibles y energ"})
+
+
+def read_import_uses(raw: bytes) -> dict[str, pd.Series]:
+    df = pd.read_excel(io.BytesIO(raw), sheet_name=0, header=None)
+    return _year_blocks(df, {"74.3_IIBCA_0_M_32": r"^bienes de capital",
+                             "74.3_IIBI_0_M_36": r"^bienes intermedios",
+                             "74.3_IICL_0_M_42": r"^combustibles y lubricantes",
+                             "74.3_IIPABC_0_M_50": r"^piezas y accesorios",
+                             "74.3_IIBCO_0_M_32": r"^bienes de consumo",
+                             "74.3_IIVAP_0_M_49": r"^veh[ií]culos automotores",
+                             "74.3_IIR_0_M_23": r"^resto"})
+
+
+def read_trade_indices(raw: bytes) -> dict[str, pd.Series]:
+    """Quarterly value, price and quantity indices (2004 = 100) and the terms of trade."""
+    df = pd.read_excel(io.BytesIO(raw), sheet_name=0, header=None)
+    h = find_row(df, r"^per[ií]odo", col=0)
+    ce, ci, ct = find_col(df, h, r"^exportaciones"), find_col(df, h, r"^importaciones"), find_col(df, h, r"t[ée]rminos")
+    def sub(lo, hi, pat):
+        for j in range(lo, hi):
+            if re.search(pat, norm(df.iat[h + 1, j])):
+                return j
+        raise LayoutChanged(f"no /{pat}/ column between {lo} and {hi}", preview(df, 8, 12))
+    cols = {"80.2_IIPENG_0_T_45": sub(ce, ci, r"precio"), "80.2_IICENG_0_T_47": sub(ce, ci, r"cantidad"),
+            "81.2_IIPING_0_T_45": sub(ci, ct, r"precio"), "81.2_IICING_0_T_47": sub(ci, ct, r"cantidad"),
+            "82.2_ITI_2004_T_27": ct}
+    cols["82.2_IPE_2004_T_26"], cols["82.2_IPI_2004_T_26"] = cols["80.2_IIPENG_0_T_45"], cols["81.2_IIPING_0_T_45"]
+    year, dates = None, []
+    for _, r in df.iloc[h + 2:].iterrows():
+        label = f"{norm(r.iloc[0])} {norm(r.iloc[1]) if not isinstance(r.iloc[1], (int, float)) else ''}"
+        y = re.match(r"\s*((?:19|20)\d{2})", label)          # year only on each year's first quarter
+        if y:
+            year = int(y.group(1))
+        q = re.search(r"([1-4])\s*[º°o]?\.?\s*trim", label)
+        dates.append(pd.Timestamp(year, 3 * int(q.group(1)) - 2, 1) if (year and q) else pd.NaT)
+    dates = pd.DatetimeIndex(dates)
+    body = df.iloc[h + 2:]
+    return {sid: pd.Series(num(body.iloc[:, j]).values, index=dates).dropna().loc[lambda s: s.index.notna()]
+            for sid, j in cols.items()}
+
+
+def read_trade_1910(raw: bytes) -> dict[str, pd.Series]:
+    """Annual exports and imports since 1910, thousands of US dollars (stored in millions)."""
+    df = pd.read_excel(io.BytesIO(raw), sheet_name=0, header=None)
+    h = find_row(df, r"^a[ñn]os", col=0)
+    ce, ci = find_col(df, h, r"^exportaci"), find_col(df, h, r"^importaci")
+    if not any("miles de usd" in norm(v) for v in df.iloc[h:h + 6, 0]):
+        raise LayoutChanged("units are no longer 'Miles de USD'", preview(df, 10, 6))
+    years = pd.to_numeric(df.iloc[h + 1:, 0].astype(str).str.extract(r"^(\d{4})")[0], errors="coerce")
+    idx = pd.DatetimeIndex([pd.Timestamp(int(y), 1, 1) if pd.notna(y) else pd.NaT for y in years])
+    body = df.iloc[h + 1:]
+    return {sid: (pd.Series(num(body.iloc[:, j]).values, index=idx) / 1000).dropna().loc[lambda s: s.index.notna()]
+            for sid, j in {"74.1_IET_0_A_16": ce, "74.1_IIT_0_A_25": ci}.items()}
+
+
+def datos_csv(columns: dict[str, str]):
+    """Reader for a datos.gob.ar distribution CSV (the whole dataset as one file, not the API)."""
+    def read(raw: bytes) -> dict[str, pd.Series]:
+        df = pd.read_csv(io.BytesIO(raw))
+        if "indice_tiempo" not in df.columns:
+            raise LayoutChanged(f"no indice_tiempo column; columns {list(df.columns)[:10]}")
+        missing = [c for c in columns.values() if c not in df.columns]
+        if missing:
+            raise LayoutChanged(f"missing columns {missing}")
+        df.index = pd.to_datetime(df["indice_tiempo"])
+        return {sid: pd.to_numeric(df[c], errors="coerce").dropna() for sid, c in columns.items()}
+    return read
+
+
+DATOS = "https://infra.datos.gob.ar/catalog/sspm/dataset"
+ICA_CSV = {"74.3_IET_0_M_16": "ica_expo_totales", "74.3_IIT_0_M_25": "ica_importaciones_totales",
+           "74.3_ISC_0_M_19": "ica_saldo_comercial", "74.3_IEPP_0_M_35": "ica_exportacion_productos_primarios",
+           "74.3_IEMOA_0_M_48": "ica_exportacion_manufacturas_origen_agropecuario",
+           "74.3_IEMOI_0_M_46": "ica_exportacion_manufacturas_origen_industrial",
+           "74.3_IECE_0_M_35": "ica_exportacion_combustible_energia",
+           "74.3_IIBCA_0_M_32": "ica_importaciones_bienes_capital", "74.3_IIBI_0_M_36": "ica_importaciones_bienes_intermedios",
+           "74.3_IICL_0_M_42": "ica_importaciones_combustibles_lubricantes",
+           "74.3_IIPABC_0_M_50": "ica_importaciones_piezas_accesorios_bienes_capital",
+           "74.3_IIBCO_0_M_32": "ica_importaciones_bienes_consumo",
+           "74.3_IIVAP_0_M_49": "ica_importaciones_vehiculos_automotores_pasajeros", "74.3_IIR_0_M_23": "ica_importaciones_resto"}
+EXPO_PAISES = {"77.3_IEB_0_A_24": "ica_exportaciones_brasil", "77.3_IEC_0_A_23": "ica_exportaciones_china",
+               "77.3_IEEU_0_A_32": "ica_exportaciones_estados_unidos", "77.3_IERU_0_A_29_20": "ica_exportaciones_resto_ue_28",
+               "77.3_IETM_0_A_32": "ica_exportaciones_total_mercosur", "77.3_IET_0_A_25": "ica_exportaciones_totales"}
+IMPO_PAISES = {"78.3_IIB_0_A_24": "ica_importaciones_brasil", "78.3_IIC_0_A_23": "ica_importaciones_china",
+               "78.3_IIM_0_A_22_15": "ica_importaciones_estados_unidos", "78.3_IIRU_0_A_23_52": "ica_importaciones_resto_ue_28",
+               "78.3_IITM_0_A_32": "ica_importaciones_total_mercosur", "78.3_IIT_0_A_25": "ica_importaciones_totales"}
+
+
 # ── providers ────────────────────────────────────────────────────────────────
 # mode "full": the file has the whole history. "recent": only the latest months, merged
 # onto the stored history (the newer file wins where they overlap).
@@ -277,6 +433,33 @@ PROVIDERS = [
      "url": sipa_url, "page": SIPA_PAGE, "read": read_sipa, "mode": "full", "ids": list(SIPA_COLS)},
     {"name": "Seguridad Social, RIPTE (web page table)", "url": RIPTE_PAGE,
      "read": read_ripte, "mode": "recent", "ids": ["158.1_REPTE_0_0_5"]},
+    # Foreign trade. Totals have full history; the product-group and use files cover the current
+    # and previous year only and are merged onto the stored history.
+    {"name": "INDEC trade balance (balanmensual.xls)", "url": f"{INDEC}/economia/balanmensual.xls",
+     "read": read_trade_totals, "mode": "full", "ids": ["74.3_IET_0_M_16", "74.3_IIT_0_M_25", "74.3_ISC_0_M_19"]},
+    {"name": "INDEC exports by product group (expo_grandes_rubros_*.xls)",
+     "url": ica_file(r"expo_grandes_rubros_\d{4}_\d{4}\.xls"), "page": ICA_PAGE,
+     "read": read_export_groups, "mode": "recent",
+     "ids": ["74.3_IEPP_0_M_35", "74.3_IEMOA_0_M_48", "74.3_IEMOI_0_M_46", "74.3_IECE_0_M_35"]},
+    {"name": "INDEC imports by use (impo_uso_economico_*.xls)",
+     "url": ica_file(r"impo_uso_economico_\d{4}_\d{4}\.xls"), "page": ICA_PAGE,
+     "read": read_import_uses, "mode": "recent",
+     "ids": ["74.3_IIBCA_0_M_32", "74.3_IIBI_0_M_36", "74.3_IICL_0_M_42", "74.3_IIPABC_0_M_50",
+             "74.3_IIBCO_0_M_32", "74.3_IIVAP_0_M_49", "74.3_IIR_0_M_23"]},
+    {"name": "INDEC trade price and quantity indices (sh_indices_comext_04.xls)",
+     "url": f"{INDEC}/economia/sh_indices_comext_04.xls", "read": read_trade_indices, "mode": "full",
+     "ids": ["80.2_IIPENG_0_T_45", "80.2_IICENG_0_T_47", "81.2_IIPING_0_T_45", "81.2_IICING_0_T_47",
+             "82.2_IPE_2004_T_26", "82.2_IPI_2004_T_26", "82.2_ITI_2004_T_27"]},
+    {"name": "INDEC trade since 1910 (balan_1910_*.xls)", "url": ica_file(r"balan_1910_\d{4}\.xls"),
+     "page": ICA_PAGE, "read": read_trade_1910, "mode": "full", "ids": ["74.1_IET_0_A_16", "74.1_IIT_0_A_25"]},
+    # datos.gob.ar's full CSV downloads: the only monthly source by partner, and the fallback
+    # for the INDEC trade files above (series already served are skipped).
+    {"name": "datos.gob.ar exports by partner (CSV)", "url": f"{DATOS}/77/distribution/77.3/download/exportaciones-por-paises-regiones-mensual.csv",
+     "read": datos_csv(EXPO_PAISES), "mode": "full", "ids": list(EXPO_PAISES)},
+    {"name": "datos.gob.ar imports by partner (CSV)", "url": f"{DATOS}/78/distribution/78.3/download/importaciones-por-paises-regiones-mensual.csv",
+     "read": datos_csv(IMPO_PAISES), "mode": "full", "ids": list(IMPO_PAISES)},
+    {"name": "datos.gob.ar trade by group and use (CSV, fallback)", "url": f"{DATOS}/74/distribution/74.3/download/intercambio-comercial-argentino-mensual.csv",
+     "read": datos_csv(ICA_CSV), "mode": "full", "ids": list(ICA_CSV), "fallback": True},
 ]
 
 
@@ -325,10 +508,10 @@ def run_provider(p: dict, wanted: set[str]) -> tuple[dict[str, pd.Series], dict]
         url = p["url"]() if callable(p["url"]) else p["url"]
         entry["url"] = url
         series = p["read"](download(url))
-        missing = [sid for sid in _ids(p) if sid in wanted and (sid not in series or series[sid].empty)]
+        missing = [sid for sid in wanted if sid not in series or series[sid].empty]
         if missing:
             raise LayoutChanged(f"no data for {missing}")
-        bad = [msg for sid in _ids(p) if sid in wanted and (msg := agreement(sid, series[sid]))]
+        bad = [msg for sid in sorted(wanted) if (msg := agreement(sid, series[sid]))]
         if bad:
             raise LayoutChanged("; ".join(bad))
         if p["mode"] == "recent":
@@ -353,9 +536,13 @@ def fetch(ids) -> tuple[pd.DataFrame, dict, set]:
     status = _load_status()
     frames, meta, served = [], {}, set()
     for p in PROVIDERS:
-        if not wanted & set(_ids(p)):
+        todo = (wanted - served) & set(_ids(p))
+        if not todo:
+            if p.get("fallback") and wanted & set(_ids(p)):
+                status[p["name"]] = {**status.get(p["name"], {}), "status": "standby",
+                                     "checked": datetime.now(timezone.utc).isoformat(timespec="seconds")}
             continue
-        series, entry = run_provider(p, wanted)
+        series, entry = run_provider(p, todo)
         prev = status.get(p["name"], {})
         if entry["status"] == "error":
             entry["error_since"] = prev.get("error_since") or entry["checked"]

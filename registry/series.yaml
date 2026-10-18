@@ -3031,7 +3031,7 @@ indicators:
       Exports and imports of goods each month (imports shown below zero) and
       the trade balance, millions of US dollars, since 1992.
     source: derived
-    source_label: INDEC (Intercambio Comercial Argentino), via datos.gob.ar
+    source_label: INDEC (Intercambio Comercial Argentino)
     frequency: M
     units: Millions of US dollars
     ranges: [2Y, 5Y, 10Y, Max]
@@ -3074,7 +3074,7 @@ indicators:
       Exports and imports of goods by year since 1910, millions of current
       US dollars, on a log scale.
     source: datos_gob
-    source_label: INDEC, via datos.gob.ar
+    source_label: INDEC
     frequency: Y
     units: Millions of US dollars
     transforms: [level]
@@ -3101,7 +3101,7 @@ indicators:
       Exports of goods by INDEC's four broad types, millions of US dollars,
       monthly since 1992.
     source: derived
-    source_label: INDEC (Intercambio Comercial Argentino), via datos.gob.ar
+    source_label: INDEC (Intercambio Comercial Argentino)
     frequency: M
     units: Millions of US dollars
     ranges: [2Y, 5Y, 10Y, Max]
@@ -3148,7 +3148,7 @@ indicators:
       Change in exports over the last twelve months against the twelve
       before, and the contribution of each type, in percentage points.
     source: derived
-    source_label: INDEC (Intercambio Comercial Argentino), via datos.gob.ar
+    source_label: INDEC (Intercambio Comercial Argentino)
     frequency: M
     units: Percentage points
     ranges: [5Y, 10Y, Max]
@@ -3192,7 +3192,7 @@ indicators:
       Imports of goods by economic use, millions of US dollars, monthly since
       1992.
     source: derived
-    source_label: INDEC (Intercambio Comercial Argentino), via datos.gob.ar
+    source_label: INDEC (Intercambio Comercial Argentino)
     frequency: M
     units: Millions of US dollars
     ranges: [2Y, 5Y, 10Y, Max]
@@ -3243,7 +3243,7 @@ indicators:
       Change in imports over the last twelve months against the twelve
       before, and the contribution of each use, in percentage points.
     source: derived
-    source_label: INDEC (Intercambio Comercial Argentino), via datos.gob.ar
+    source_label: INDEC (Intercambio Comercial Argentino)
     frequency: M
     units: Percentage points
     ranges: [5Y, 10Y, Max]
@@ -3288,7 +3288,7 @@ indicators:
       zero) and the balance between them, millions of US dollars, monthly
       since 1992.
     source: derived
-    source_label: INDEC (Intercambio Comercial Argentino), via datos.gob.ar
+    source_label: INDEC (Intercambio Comercial Argentino)
     frequency: M
     units: Millions of US dollars
     ranges: [5Y, 10Y, Max]
@@ -3328,7 +3328,7 @@ indicators:
       Change in the dollar value of exports from the same quarter a year
       earlier, split into prices and quantities, percentage points.
     source: derived
-    source_label: INDEC (índices de precios y cantidades), via datos.gob.ar
+    source_label: INDEC (índices de precios y cantidades)
     frequency: Q
     units: Percentage points
     ranges: [5Y, 10Y, Max]
@@ -3366,7 +3366,7 @@ indicators:
       Change in the dollar value of imports from the same quarter a year
       earlier, split into prices and quantities, percentage points.
     source: derived
-    source_label: INDEC (índices de precios y cantidades), via datos.gob.ar
+    source_label: INDEC (índices de precios y cantidades)
     frequency: Q
     units: Percentage points
     ranges: [5Y, 10Y, Max]
@@ -3405,7 +3405,7 @@ indicators:
       The price of Argentina's exports relative to the price of its imports,
       and the two price indices, quarterly since 1990 (2004 = 100).
     source: datos_gob
-    source_label: INDEC, via datos.gob.ar
+    source_label: INDEC
     frequency: Q
     units: Index, 2004 = 100
     transforms: [level, yoy]

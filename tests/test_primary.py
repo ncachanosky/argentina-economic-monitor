@@ -24,6 +24,11 @@ CASES = [
     ("read_sipa", "trabajoregistrado.xlsx", 7, "151.1_AARIADOTAC_2012_M_26", "2026-07-01", 6106.796),
     ("read_ripte", "ripte.html", 1, "158.1_REPTE_0_0_5", "2026-08-01", 1982518.19),
     ("read_cpi", "serie_ipc_divisiones.csv", 22, "148.3_INIVELNAL_DICI_M_26", "2026-09-01", 12514.1508),
+    ("read_trade_totals", "balanmensual.xls", 3, "74.3_IET_0_M_16", "2026-08-01", 8882.5825),
+    ("read_export_groups", "expo_grandes_rubros.xls", 4, "74.3_IEMOI_0_M_46", "2026-08-01", 2356.2457),
+    ("read_import_uses", "impo_uso_economico.xls", 7, "74.3_IIBCA_0_M_32", "2026-08-01", 1310.2484),
+    ("read_trade_indices", "sh_indices_comext_04.xls", 7, "82.2_ITI_2004_T_27", "2026-04-01", 145.1401),
+    ("read_trade_1910", "balan_1910.xls", 2, "74.1_IET_0_A_16", "2025-01-01", 87111.1968),
 ]
 
 
@@ -104,3 +109,34 @@ def test_source_issue_rules():
     assert "<!-- source: new layout -->" in r["new layout"][1]
     assert "briefly missing" not in r                      # waits MIN_HOURS
     assert r["long missing"][0].startswith("Source file not found")
+
+
+def test_partner_csv_reader():
+    out = P.datos_csv(P.EXPO_PAISES)(raw("expo_paises.csv"))
+    assert out["77.3_IEB_0_A_24"][pd.Timestamp("2026-08-01")] == pytest.approx(1183.9973, rel=1e-6)
+
+
+def test_ica_files_are_found_on_the_page(monkeypatch):
+    monkeypatch.setattr(P, "download", lambda url, retries=3: raw("indec_ica_page.html"))
+    found = {p["name"]: p["url"]() for p in P.PROVIDERS if p.get("page") == P.ICA_PAGE}
+    assert any(u.endswith("expo_grandes_rubros_2025_2026.xls") for u in found.values())
+    assert any(u.endswith("balan_1910_2025.xls") for u in found.values())
+
+
+def test_fallback_provider_only_fills_what_primary_missed(monkeypatch, tmp_path):
+    """If the INDEC trade-balance file fails, its series come from the datos.gob.ar CSV;
+    if it works, the CSV is not used for them."""
+    monkeypatch.setattr(P, "STATUS_FILE", tmp_path / "s.json")
+    monkeypatch.setattr(P, "agreement", lambda sid, s: None)
+    calls = []
+    def fake(url, retries=3):
+        calls.append(url)
+        if url.endswith("balanmensual.xls"):
+            raise P.FileNotFound("down")
+        idx = pd.date_range("2020-01-01", periods=3, freq="MS")
+        cols = {c: [1.0, 2.0, 3.0] for c in P.ICA_CSV.values()}
+        return pd.DataFrame({"indice_tiempo": idx.strftime("%Y-%m-%d"), **cols}).to_csv(index=False).encode()
+    monkeypatch.setattr(P, "download", fake)
+    data, meta, served = P.fetch(["74.3_IET_0_M_16"])
+    assert served == {"74.3_IET_0_M_16"} and "datos.gob.ar" in meta["74.3_IET_0_M_16"]["dataset"]
+    assert any("intercambio-comercial" in u for u in calls)
