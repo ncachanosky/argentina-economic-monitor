@@ -1,76 +1,76 @@
 {
  "INDEC CPI (serie_ipc_divisiones.csv)": {
-  "checked": "2026-10-18T00:45:22+00:00",
+  "checked": "2026-10-18T01:05:59+00:00",
   "page": null,
   "url": "https://www.indec.gob.ar/ftp/cuadros/economia/serie_ipc_divisiones.csv",
   "status": "ok",
   "last": "2026-09-01"
  },
  "INDEC EMAE (sh_emae_mensual_base2004.xls)": {
-  "checked": "2026-10-18T00:45:24+00:00",
+  "checked": "2026-10-18T01:06:02+00:00",
   "page": null,
   "url": "https://www.indec.gob.ar/ftp/cuadros/economia/sh_emae_mensual_base2004.xls",
   "status": "ok",
   "last": "2026-07-01"
  },
  "INDEC EMAE by sector (sh_emae_actividad_base2004.xls)": {
-  "checked": "2026-10-18T00:45:25+00:00",
+  "checked": "2026-10-18T01:06:03+00:00",
   "page": null,
   "url": "https://www.indec.gob.ar/ftp/cuadros/economia/sh_emae_actividad_base2004.xls",
   "status": "ok",
   "last": "2026-07-01"
  },
  "INDEC wage index (indice_salarios.csv)": {
-  "checked": "2026-10-18T00:45:26+00:00",
+  "checked": "2026-10-18T01:06:04+00:00",
   "page": null,
   "url": "https://www.indec.gob.ar/ftp/cuadros/sociedad/indice_salarios.csv",
   "status": "ok",
   "last": "2026-07-01"
  },
  "Secretaría de Trabajo, registered employment (trabajoregistrado_*_estadisticas.xlsx)": {
-  "checked": "2026-10-18T00:45:27+00:00",
+  "checked": "2026-10-18T01:06:05+00:00",
   "page": "https://www.argentina.gob.ar/trabajo/estadisticas/situacion-y-evolucion-del-trabajo-registrado",
   "url": "https://www.argentina.gob.ar/sites/default/files/trabajoregistrado_2607_estadisticas.xlsx",
   "status": "ok",
   "last": "2026-07-01"
  },
  "Seguridad Social, RIPTE (web page table)": {
-  "checked": "2026-10-18T00:45:28+00:00",
+  "checked": "2026-10-18T01:06:06+00:00",
   "page": null,
   "url": "https://www.argentina.gob.ar/trabajo/seguridadsocial/ripte",
   "status": "ok",
   "last": "2026-08-01"
  },
  "INDEC trade balance (balanmensual.xls)": {
-  "checked": "2026-10-18T00:45:28+00:00",
+  "checked": "2026-10-18T01:06:06+00:00",
   "page": null,
   "url": "https://www.indec.gob.ar/ftp/cuadros/economia/balanmensual.xls",
   "status": "ok",
   "last": "2026-08-01"
  },
  "INDEC exports by product group (expo_grandes_rubros_*.xls)": {
-  "checked": "2026-10-18T00:45:29+00:00",
+  "checked": "2026-10-18T01:06:08+00:00",
   "page": "https://www.indec.gob.ar/Nivel4/Tema/3/2/40",
   "url": "https://www.indec.gob.ar/ftp/cuadros/economia/expo_grandes_rubros_2025_2026.xls",
   "status": "ok",
   "last": "2026-08-01"
  },
  "INDEC imports by use (impo_uso_economico_*.xls)": {
-  "checked": "2026-10-18T00:45:32+00:00",
+  "checked": "2026-10-18T01:06:10+00:00",
   "page": "https://www.indec.gob.ar/Nivel4/Tema/3/2/40",
   "url": "https://www.indec.gob.ar/ftp/cuadros/economia/impo_uso_economico_2025_2026.xls",
   "status": "ok",
   "last": "2026-08-01"
  },
  "datos.gob.ar exports by partner (CSV)": {
-  "checked": "2026-10-18T00:45:35+00:00",
+  "checked": "2026-10-18T01:06:13+00:00",
   "page": null,
   "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/77/distribution/77.3/download/exportaciones-por-paises-regiones-mensual.csv",
   "status": "ok",
   "last": "2026-08-01"
  },
  "datos.gob.ar imports by partner (CSV)": {
-  "checked": "2026-10-18T00:45:35+00:00",
+  "checked": "2026-10-18T01:06:13+00:00",
   "page": null,
   "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/78/distribution/78.3/download/importaciones-por-paises-regiones-mensual.csv",
   "status": "ok",
@@ -78,17 +78,17 @@
  },
  "datos.gob.ar trade by group and use (CSV, fallback)": {
   "status": "standby",
-  "checked": "2026-10-18T00:45:35+00:00"
+  "checked": "2026-10-18T01:06:13+00:00"
  },
  "INDEC trade price and quantity indices (sh_indices_comext_04.xls)": {
-  "checked": "2026-10-18T00:47:59+00:00",
+  "checked": "2026-10-18T01:08:25+00:00",
   "page": null,
   "url": "https://www.indec.gob.ar/ftp/cuadros/economia/sh_indices_comext_04.xls",
   "status": "ok",
   "last": "2026-04-01"
  },
  "INDEC trade since 1910 (balan_1910_*.xls)": {
-  "checked": "2026-10-18T00:56:45+00:00",
+  "checked": "2026-10-18T01:16:36+00:00",
   "page": "https://www.indec.gob.ar/Nivel4/Tema/3/2/40",
   "url": "https://www.indec.gob.ar/ftp/cuadros/economia/balan_1910_2025.xls",
   "status": "ok",
