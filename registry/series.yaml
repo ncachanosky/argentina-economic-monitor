@@ -1595,9 +1595,22 @@ indicators:
     source_label: INDEC
     frequency: M
     units: Index, Dec 2015 = 100
+    overlay: true
+    emphasis: total
+    overlay_default: [total, primary, manufactured, imported]
+    note: >-
+      Domestic products are primary goods (farm, fishing, mining and oil)
+      plus manufactures and electricity; imported goods are priced in pesos
+      at the border, so they follow the exchange rate most closely. The
+      breakdown comes from INDEC's file; datos.gob.ar publishes it only
+      in the old base, to 2015.
     variants:
       total: {label: Wholesale prices (IPIM), id: 448.1_NIVEL_GENERAL_0_0_13_46}
-    default: {variant: total, transform: mom, start: "2017-01"}
+      domestic: {label: Domestic products, id: indec_ipim_domestic}
+      primary: {label: Primary products, id: indec_ipim_primary}
+      manufactured: {label: Manufactures and electricity, id: indec_ipim_manufactured}
+      imported: {label: Imported products, id: indec_ipim_imported}
+    default: {variant: total, transform: yoy, start: "2019-01"}
 
   # ======================= MONEY & BANKING =======================
 

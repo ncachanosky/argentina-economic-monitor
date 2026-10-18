@@ -466,13 +466,36 @@
       : h("span", { class: "fresh-tag ok", title: "The latest official figure is on the Monitor." }, "Up to date");
   }
 
+  // "Source file: indice_ipim.csv · checked 17 Oct, 06:10": the publisher's own file the data was read from.
+  function sourceFilesNote(ind) {
+    const files = ind.source_files;
+    if (!files || !files.length) return null;
+    const es = LANG === "es";
+    const when = (iso) => iso ? new Date(iso).toLocaleString(LOCALE, { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit",
+      timeZone: "America/Argentina/Buenos_Aires" }) : null;
+    const links = [];
+    files.forEach((f, i) => {
+      if (i) links.push(", ");
+      links.push(h("a", { href: f.url, target: "_blank", rel: "noopener", title: f.publisher },
+        f.name || (es ? "página de la fuente" : "source page")));
+    });
+    const checked = when(files.map((f) => f.checked).filter(Boolean).sort().pop());
+    return h("span", { class: "src-files", title: es
+        ? "Archivo del organismo del que el Monitor leyó estos datos. Se revisa dos veces por día y se compara con la historia guardada antes de publicarse."
+        : "The publisher's own file the Monitor read these data from. Checked twice a day and compared with the stored history before publication." },
+      es ? (files.length > 1 ? "Archivos de origen: " : "Archivo de origen: ") : (files.length > 1 ? "Source files: " : "Source file: "),
+      ...links, checked ? ` · ${es ? "revisado" : "checked"} ${checked} (${es ? "hora de Buenos Aires" : "Buenos Aires time"})` : null);
+  }
+
   function footer(ind, onPNG, onCSV) {
     const src = Object.values(ind.variants)[0].source_url;
     const nr = nextReleaseNote(ind);
     const fresh = freshnessTag(ind);
+    const files = sourceFilesNote(ind);
     return h("div", { class: "card-foot" },
       h("span", {}, "Source: ", src ? h("a", { href: src, target: "_blank", rel: "noopener" }, ind.source_label) : ind.source_label,
-        ` · Latest: ${fmtPeriod(ind.last_obs, ind.frequency)}`, fresh ? " " : null, fresh, nr ? " · " : null, nr),
+        ` · Latest: ${fmtPeriod(ind.last_obs, ind.frequency)}`, fresh ? " " : null, fresh, nr ? " · " : null, nr,
+        files ? h("br") : null, files),
       h("div", { class: "actions" },
         h("button", { class: "btn", type: "button", onclick: onPNG, title: "Download this chart as a 1200×800 PNG" }, "PNG"),
         h("button", { class: "btn", type: "button", onclick: onCSV, title: "Download the data in this view as CSV" }, "CSV"),

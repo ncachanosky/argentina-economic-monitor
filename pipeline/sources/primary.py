@@ -428,7 +428,12 @@ def read_ucii(raw: bytes) -> dict[str, pd.Series]:
             for sid, j in cols.items()}
 
 
-IPIM_CODES = {"448.1_NIVEL_GENERAL_0_0_13_46": "ng_nivel_general"}
+IPIM_CODES = {"448.1_NIVEL_GENERAL_0_0_13_46": "ng_nivel_general",
+              # INDEC-only ids: datos.gob.ar has these aggregates only in the old base (to 2015)
+              "indec_ipim_domestic": "n_productos_nacionales",
+              "indec_ipim_primary": "1_primarios",
+              "indec_ipim_manufactured": "2_industria_manufacturera_ y_energia_electrica",
+              "indec_ipim_imported": "i_productos_importados"}
 
 
 def read_ipim(raw: bytes) -> dict[str, pd.Series]:
@@ -443,6 +448,8 @@ def read_ipim(raw: bytes) -> dict[str, pd.Series]:
     out = {}
     for sid, code in IPIM_CODES.items():
         s = df[df["nivel_general_aperturas"].str.strip() == code]
+        if s.empty:
+            raise LayoutChanged(f"no rows for {code!r}; codes now: {sorted(df['nivel_general_aperturas'].str.strip().unique())[:12]}")
         out[sid] = pd.Series(s["v"].values, index=pd.DatetimeIndex(s["date"])).dropna().sort_index()
     return out
 

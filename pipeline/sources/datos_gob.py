@@ -135,6 +135,11 @@ def fetch(ids: list[str] | set[str]) -> FetchResult:
             ids = [sid for sid in ids if sid not in served]
     except Exception as exc:
         print(f"primary source files unavailable, using the API: {exc}")
+    # Ids starting "indec_" exist only in INDEC's files (e.g. IPIM aggregates datos.gob.ar
+    # doesn't publish in the current base): no API fallback, the last good data stays.
+    for sid in [s for s in ids if s.startswith("indec_")]:
+        errors[sid] = "INDEC file unavailable or failed its checks (no datos.gob.ar copy of this series)"
+    ids = [s for s in ids if not s.startswith("indec_")]
     deadline = time.monotonic() + REFETCH_BUDGET
     with requests.Session() as session:
         session.headers["User-Agent"] = USER_AGENT

@@ -74,5 +74,10 @@
  "INDEC's domestic wholesale price index: prices of domestic and imported goods at the first stage of sale. Often a leading signal for consumer goods inflation.": "Índice de precios internos al por mayor del INDEC: precios de bienes nacionales e importados en la primera etapa de comercialización. Suele anticipar la inflación de bienes de consumo.",
  "Index, Dec 2015 = 100": "Índice, dic. 2015 = 100",
  "Wholesale prices (IPIM)": "Precios mayoristas (IPIM)",
- "INDEC (CPI release file serie_ipc_divisiones.csv)": "INDEC (archivo del IPC serie_ipc_divisiones.csv)"
+ "INDEC (CPI release file serie_ipc_divisiones.csv)": "INDEC (archivo del IPC serie_ipc_divisiones.csv)",
+ "Domestic products": "Productos nacionales",
+ "Primary products": "Productos primarios",
+ "Manufactures and electricity": "Manufacturas y energía eléctrica",
+ "Imported products": "Productos importados",
+ "Domestic products are primary goods (farm, fishing, mining and oil) plus manufactures and electricity; imported goods are priced in pesos at the border, so they follow the exchange rate most closely. The breakdown comes from INDEC's file; datos.gob.ar publishes it only in the old base, to 2015.": "Los productos nacionales son los primarios (agropecuarios, pesqueros, minerales y petróleo) más las manufacturas y la energía eléctrica; los importados se valúan en pesos en frontera, por lo que siguen más de cerca al tipo de cambio. La apertura proviene del archivo del INDEC; datos.gob.ar la publica solo en la base anterior, hasta 2015."
 }

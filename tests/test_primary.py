@@ -30,7 +30,7 @@ CASES = [
     ("read_trade_indices", "sh_indices_comext_04.xls", 7, "82.2_ITI_2004_T_27", "2026-04-01", 145.1401),
     ("read_trade_1910", "balan_1910.xls", 2, "74.1_IET_0_A_16", "2025-01-01", 87111.1968),
     ("read_ucii", "sh_capacidad.xls", 13, "31.3_UV_2004_M_25", "2026-08-01", 46.2),
-    ("read_ipim", "indice_ipim.csv", 1, "448.1_NIVEL_GENERAL_0_0_13_46", "2026-09-01", 17104.023329),
+    ("read_ipim", "indice_ipim.csv", 5, "448.1_NIVEL_GENERAL_0_0_13_46", "2026-09-01", 17104.023329),
     ("read_cgi", "serie_cgi.xlsx", 3, "53.1_TRTA_0_0_37", "2026-04-01", 0.429375),
     ("read_gini", "serie_coeficiente_gini.xlsx", 1, "65.1_CGI_0_0_21", "2026-04-01", 0.428),
 ]

@@ -487,3 +487,6 @@ main:focus { outline: none; }
 .how-list { padding-left: 1.2em; }
 .how-list li { margin-bottom: .5em; }
 kbd { font-family: var(--font-ui); font-size: .85em; padding: 1px 5px; border: 1px solid var(--rule); border-radius: 4px; background: var(--surface); }
+
+.card-foot .src-files { font-size: .92em; }
+.card-foot .src-files a { color: inherit; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 2px; }

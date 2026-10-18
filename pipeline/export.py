@@ -25,6 +25,27 @@ from .update import STATUS_PATH
 DATOS_GOB_SERIES_URL = "https://datos.gob.ar/series/api/series/?ids={id}"
 
 
+def source_files_for(ind) -> list[dict] | None:
+    """The publisher files a card's series were last read from (pipeline/sources/primary.py),
+    with the time each was checked; only files whose latest read succeeded."""
+    try:
+        from .sources import primary
+        files = json.loads(primary.STATUS_FILE.read_text(encoding="utf-8"))
+    except Exception:
+        return None
+    ids = set(ind.input_ids())
+    out = []
+    for p in primary.PROVIDERS:
+        e = files.get(p["name"]) or {}
+        if not (ids & set(primary._ids(p))) or e.get("status") != "ok" or not e.get("url"):
+            continue
+        url = e["url"]
+        name = url.rstrip("/").rsplit("/", 1)[-1] if url.lower().split("?")[0].endswith((".xls", ".xlsx", ".csv")) else None
+        out.append({"name": name, "url": url, "page": e.get("page"), "checked": e.get("checked"),
+                    "publisher": p["name"].split(" (")[0]})
+    return out or None
+
+
 def _clean(values) -> list:
     # Significant digits, not decimals: long-run price indices reach 1e-12.
     return [None if (v is None or (isinstance(v, float) and math.isnan(v))) else float(f"{float(v):.9g}")
@@ -465,6 +486,7 @@ def export(out: Path) -> None:
             "fan": ind.fan,
             "secondary_bar": ind.secondary_bar,
             "source_label": ind.source_label,
+            "source_files": source_files_for(ind),
             "default": ind.default,
             "headline": ind.headline,
             "overlay": ind.overlay,
@@ -490,7 +512,7 @@ def export(out: Path) -> None:
                     "label": v.label,
                     "source_id": v.source_id,
                     "source_url": DATOS_GOB_SERIES_URL.format(id=v.source_id)
-                    if ind.source == "datos_gob" else None,
+                    if ind.source == "datos_gob" and not v.source_id.startswith("indec_") else None,
                     "values": _clean(wide[v.source_id].tolist()),
                 }
                 for k, v in ind.variants.items()
