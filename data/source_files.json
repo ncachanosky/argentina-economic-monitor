@@ -1,0 +1,44 @@
+{
+ "INDEC CPI (serie_ipc_divisiones.csv)": {
+  "checked": "2026-10-18T00:24:59+00:00",
+  "page": null,
+  "url": "https://www.indec.gob.ar/ftp/cuadros/economia/serie_ipc_divisiones.csv",
+  "status": "ok",
+  "last": "2026-09-01"
+ },
+ "INDEC EMAE (sh_emae_mensual_base2004.xls)": {
+  "checked": "2026-10-18T00:25:02+00:00",
+  "page": null,
+  "url": "https://www.indec.gob.ar/ftp/cuadros/economia/sh_emae_mensual_base2004.xls",
+  "status": "ok",
+  "last": "2026-07-01"
+ },
+ "INDEC EMAE by sector (sh_emae_actividad_base2004.xls)": {
+  "checked": "2026-10-18T00:25:03+00:00",
+  "page": null,
+  "url": "https://www.indec.gob.ar/ftp/cuadros/economia/sh_emae_actividad_base2004.xls",
+  "status": "ok",
+  "last": "2026-07-01"
+ },
+ "INDEC wage index (indice_salarios.csv)": {
+  "checked": "2026-10-18T00:25:06+00:00",
+  "page": null,
+  "url": "https://www.indec.gob.ar/ftp/cuadros/sociedad/indice_salarios.csv",
+  "status": "ok",
+  "last": "2026-07-01"
+ },
+ "Secretaría de Trabajo, registered employment (trabajoregistrado_*_estadisticas.xlsx)": {
+  "checked": "2026-10-18T00:25:07+00:00",
+  "page": "https://www.argentina.gob.ar/trabajo/estadisticas/situacion-y-evolucion-del-trabajo-registrado",
+  "url": "https://www.argentina.gob.ar/sites/default/files/trabajoregistrado_2607_estadisticas.xlsx",
+  "status": "ok",
+  "last": "2026-07-01"
+ },
+ "Seguridad Social, RIPTE (web page table)": {
+  "checked": "2026-10-18T00:25:08+00:00",
+  "page": null,
+  "url": "https://www.argentina.gob.ar/trabajo/seguridadsocial/ripte",
+  "status": "ok",
+  "last": "2026-08-01"
+ }
+}
