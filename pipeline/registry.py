@@ -172,6 +172,7 @@ class Registry:
             # An input entry's tolerances also apply when an indicator shows the same series.
             m["allow_gaps"] = bool(m.get("allow_gaps")) or bool(inp.get("allow_gaps"))
             m["stale_days"] = m.get("stale_days") or inp.get("stale_days")
+            m["static"] = bool(m.get("static")) or bool(inp.get("static"))   # e.g. a discontinued series on a live card
         return out
 
     def next_release(self, ind: "Indicator", last_obs: str) -> dict | None:

@@ -931,7 +931,7 @@ indicators:
       earlier years. Changes are in percentage points.
     release: ucii
     source: datos_gob
-    source_label: INDEC, via datos.gob.ar
+    source_label: INDEC
     frequency: M
     units: "% of installed capacity"
     variants:
@@ -952,7 +952,7 @@ indicators:
       month. Select industries to compare their paths.
     release: ucii
     source: datos_gob
-    source_label: INDEC, via datos.gob.ar
+    source_label: INDEC
     frequency: M
     units: "% of installed capacity"
     variants:
@@ -1592,7 +1592,7 @@ indicators:
       goods inflation.
     release: sipm
     source: datos_gob
-    source_label: INDEC, via datos.gob.ar
+    source_label: INDEC
     frequency: M
     units: Index, Dec 2015 = 100
     variants:
@@ -4388,7 +4388,7 @@ indicators:
       same income; 1: one household has everything), urban areas,
       quarterly since 2003.
     source: datos_gob
-    source_label: INDEC (Encuesta Permanente de Hogares), via datos.gob.ar
+    source_label: INDEC (Encuesta Permanente de Hogares)
     frequency: Q
     units: Gini coefficient
     transforms: [level]
@@ -4415,7 +4415,7 @@ indicators:
       income of the self-employed, and operating surplus, % of GDP at
       factor cost, quarterly since 2016.
     source: derived
-    source_label: INDEC (Cuenta generación del ingreso), via datos.gob.ar
+    source_label: INDEC (Cuenta generación del ingreso)
     frequency: Q
     units: "% of GDP at factor cost"
     ranges: [Max]

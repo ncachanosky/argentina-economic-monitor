@@ -29,6 +29,10 @@ CASES = [
     ("read_import_uses", "impo_uso_economico.xls", 7, "74.3_IIBCA_0_M_32", "2026-08-01", 1310.2484),
     ("read_trade_indices", "sh_indices_comext_04.xls", 7, "82.2_ITI_2004_T_27", "2026-04-01", 145.1401),
     ("read_trade_1910", "balan_1910.xls", 2, "74.1_IET_0_A_16", "2025-01-01", 87111.1968),
+    ("read_ucii", "sh_capacidad.xls", 13, "31.3_UV_2004_M_25", "2026-08-01", 46.2),
+    ("read_ipim", "indice_ipim.csv", 1, "448.1_NIVEL_GENERAL_0_0_13_46", "2026-09-01", 17104.023329),
+    ("read_cgi", "serie_cgi.xlsx", 3, "53.1_TRTA_0_0_37", "2026-04-01", 0.429375),
+    ("read_gini", "serie_coeficiente_gini.xlsx", 1, "65.1_CGI_0_0_21", "2026-04-01", 0.428),
 ]
 
 
@@ -127,7 +131,7 @@ def test_fallback_provider_only_fills_what_primary_missed(monkeypatch, tmp_path)
     """If the INDEC trade-balance file fails, its series come from the datos.gob.ar CSV;
     if it works, the CSV is not used for them."""
     monkeypatch.setattr(P, "STATUS_FILE", tmp_path / "s.json")
-    monkeypatch.setattr(P, "agreement", lambda sid, s: None)
+    monkeypatch.setattr(P, "agreement", lambda sid, s, since=None: None)
     calls = []
     def fake(url, retries=3):
         calls.append(url)
@@ -140,3 +144,24 @@ def test_fallback_provider_only_fills_what_primary_missed(monkeypatch, tmp_path)
     data, meta, served = P.fetch(["74.3_IET_0_M_16"])
     assert served == {"74.3_IET_0_M_16"} and "datos.gob.ar" in meta["74.3_IET_0_M_16"]["dataset"]
     assert any("intercambio-comercial" in u for u in calls)
+
+
+def test_dated_file_takes_the_newest_month(monkeypatch):
+    """sh_capacidad_MM_YY.xls: the resolver walks back from this month to the first real Excel file."""
+    class R:
+        def __init__(self, ok, body): self.ok, self.body = ok, body
+        def iter_content(self, n): yield self.body[:n]
+        def close(self): pass
+    tried = []
+    def get(url, **kw):
+        tried.append(url)
+        return R(len(tried) == 3, b"\xd0\xcf\x11\xe0rest")
+    monkeypatch.setattr(P.requests, "get", get)
+    url = P.dated_file("sh_capacidad")()
+    assert url == tried[2] and len(tried) == 3 and url.endswith(".xls")
+
+
+def test_ucii_months_follow_the_year_rows():
+    s = P.read_ucii(raw("sh_capacidad.xls"))["31.3_UNG_2004_M_18"]
+    assert s[pd.Timestamp("2016-01-01")] == pytest.approx(62.9)
+    assert s[pd.Timestamp("2025-12-01")] == pytest.approx(53.8)

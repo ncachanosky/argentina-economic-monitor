@@ -379,6 +379,128 @@ def read_trade_1910(raw: bytes) -> dict[str, pd.Series]:
             for sid, j in {"74.1_IET_0_A_16": ce, "74.1_IIT_0_A_25": ci}.items()}
 
 
+# ── industry, wholesale prices, income distribution ─────────────────────────
+
+def dated_file(stem: str, ext: str = "xls", back: int = 14):
+    """Resolver for an INDEC file named after its publication month, e.g.
+    sh_capacidad_10_26.xls (October 2026): tries this month and then earlier ones."""
+    def resolve() -> str:
+        today = datetime.now(timezone.utc).date()
+        y, m = today.year, today.month
+        for _ in range(back):
+            url = f"{INDEC}/economia/{stem}_{m:02d}_{y % 100:02d}.{ext}"
+            try:
+                r = requests.get(url, timeout=30, headers={"User-Agent": USER_AGENT}, stream=True)
+                head = next(r.iter_content(8), b"") if r.ok else b""
+                r.close()
+                if head[:4] in (b"\xd0\xcf\x11\xe0", b"PK\x03\x04"):       # an Excel file, not an error page
+                    return url
+            except requests.RequestException:
+                pass
+            y, m = (y, m - 1) if m > 1 else (y - 1, 12)
+        raise FileNotFound(f"no {stem}_MM_YY.{ext} in the last {back} months")
+    return resolve
+
+
+UCII_COLS = {"31.3_UNG_2004_M_18": r"^nivel general", "31.3_UPAB_2004_M_35": r"alimenticios",
+             "31.3_UPT_2004_M_21": r"tabaco", "31.3_UPT_2004_M_23": r"textiles", "31.3_UPC_2004_M_17": r"^papel",
+             "31.3_UEI_2004_M_22": r"^edici[oó]n", "31.3_URP_2004_M_24": r"^refinaci[oó]n",
+             "31.3_USPQ_2004_M_34": r"qu[ií]micos", "31.3_UCP_2004_M_20": r"caucho",
+             "31.3_UMNM_2004_M_27": r"minerales no met", "31.3_UIMB_2004_M_33": r"met[aá]licas b[aá]sicas",
+             "31.3_UV_2004_M_25": r"^industria automotriz", "31.3_UMNIA_2004_M_42": r"^metalmec"}
+
+
+def read_ucii(raw: bytes) -> dict[str, pd.Series]:
+    """Capacity utilization (%), total and the twelve blocks: a 'Año YYYY' row, then one row per month."""
+    df = pd.read_excel(io.BytesIO(raw), sheet_name=0, header=None)
+    h = find_row(df, r"^per[ií]odo", col=0)
+    cols = {sid: find_col(df, h, pat) for sid, pat in UCII_COLS.items()}
+    year, dates = None, []
+    for v in df.iloc[h + 1:, 0]:
+        y = re.match(r"a[ñn]o ((?:19|20)\d{2})", norm(v))
+        if y:
+            year = int(y.group(1))
+        m = month_label(v) if (pd.notna(v) and not y) else None
+        dates.append(pd.Timestamp(year, m, 1) if (year and m) else pd.NaT)
+    dates = pd.DatetimeIndex(dates)
+    body = df.iloc[h + 1:]
+    return {sid: pd.Series(num(body.iloc[:, j]).values, index=dates).dropna().loc[lambda s: s.index.notna()]
+            for sid, j in cols.items()}
+
+
+IPIM_CODES = {"448.1_NIVEL_GENERAL_0_0_13_46": "ng_nivel_general"}
+
+
+def read_ipim(raw: bytes) -> dict[str, pd.Series]:
+    """Wholesale price index (IPIM, Dec 2015 = 100), long CSV: periodo; apertura; índice."""
+    df = pd.read_csv(io.BytesIO(raw), sep=";", dtype=str, encoding="latin-1")
+    df.columns = [c.strip().lstrip("ï»¿﻿") for c in df.columns]
+    need = ["periodo", "nivel_general_aperturas", "indice_ipim"]
+    if any(c not in df.columns for c in need):
+        raise LayoutChanged(f"expected columns {need}; found {list(df.columns)}", df.head(8).to_string())
+    df["date"] = pd.to_datetime(df["periodo"].str.strip(), format="%Y-%m-%d", errors="coerce")
+    df["v"] = pd.to_numeric(df["indice_ipim"].str.replace(",", ".", regex=False), errors="coerce")
+    out = {}
+    for sid, code in IPIM_CODES.items():
+        s = df[df["nivel_general_aperturas"].str.strip() == code]
+        out[sid] = pd.Series(s["v"].values, index=pd.DatetimeIndex(s["date"])).dropna().sort_index()
+    return out
+
+
+def _quarter(label: str) -> int | None:
+    q = re.search(r"([1-4])\s*[º°o]?\.?\s*trim", norm(label))
+    return int(q.group(1)) if q else None
+
+
+def read_gini(raw: bytes) -> dict[str, pd.Series]:
+    """Gini coefficient of per capita household income, quarterly EPH (the October/May
+    rounds of the pre-2003 survey are left out, as in the stored series)."""
+    df = pd.read_excel(io.BytesIO(raw), sheet_name=0, header=None)
+    h = find_row(df, r"^a[ñn]o$", col=0)
+    c = find_col(df, h, r"gini")
+    year, vals = None, {}
+    for _, r in df.iloc[h + 1:].iterrows():
+        y = re.match(r"((?:19|20)\d{2})(?:\D|$)", norm(r.iloc[0]).replace(".0", ""))
+        if y:
+            year = int(y.group(1))
+        q = _quarter(r.iloc[1]) if pd.notna(r.iloc[1]) else None
+        v = pd.to_numeric(r.iloc[c], errors="coerce")
+        if year and q and pd.notna(v):
+            vals[pd.Timestamp(year, 3 * q - 2, 1)] = float(v)
+    return {"65.1_CGI_0_0_21": pd.Series(vals, dtype=float).sort_index()}
+
+
+CGI_SHARES = {"53.1_TRTA_0_0_37": "RTA", "53.1_TIMB_0_0_25": "IBM", "53.1_EBE_0_0_27": "EEB"}
+
+
+def _cgi_total(x: pd.ExcelFile, sheet: str) -> pd.Series:
+    if sheet not in x.sheet_names:
+        raise LayoutChanged(f"no sheet {sheet!r}; sheets: {x.sheet_names}")
+    df = x.parse(sheet, header=None)
+    qrow = find_row(df, r"trimestre$")
+    trow = find_row(df, r"^total general$")
+    year, vals = None, {}
+    for j in range(df.shape[1]):
+        y = re.match(r"((?:19|20)\d{2})", norm(df.iat[qrow - 1, j]).replace(".0", ""))
+        if y:
+            year = int(y.group(1))
+        q = _quarter(df.iat[qrow, j]) if pd.notna(df.iat[qrow, j]) else None
+        v = pd.to_numeric(df.iat[trow, j], errors="coerce")
+        if year and q and pd.notna(v):
+            vals[pd.Timestamp(year, 3 * q - 2, 1)] = float(v)
+    if not vals:
+        raise LayoutChanged(f"no quarterly totals in sheet {sheet!r}", preview(df, 8, 10))
+    return pd.Series(vals).sort_index()
+
+
+def read_cgi(raw: bytes) -> dict[str, pd.Series]:
+    """Generation-of-income account: compensation of employees, mixed income and operating
+    surplus as shares of gross value added at basic prices (the shares datos.gob.ar publishes)."""
+    x = pd.ExcelFile(io.BytesIO(raw))
+    vab = _cgi_total(x, "VAB_pb")
+    return {sid: (_cgi_total(x, sh) / vab).dropna() for sid, sh in CGI_SHARES.items()}
+
+
 def datos_csv(columns: dict[str, str]):
     """Reader for a datos.gob.ar distribution CSV (the whole dataset as one file, not the API)."""
     def read(raw: bytes) -> dict[str, pd.Series]:
@@ -452,6 +574,19 @@ PROVIDERS = [
              "82.2_IPE_2004_T_26", "82.2_IPI_2004_T_26", "82.2_ITI_2004_T_27"]},
     {"name": "INDEC trade since 1910 (balan_1910_*.xls)", "url": ica_file(r"balan_1910_\d{4}\.xls"),
      "page": ICA_PAGE, "read": read_trade_1910, "mode": "full", "ids": ["74.1_IET_0_A_16", "74.1_IIT_0_A_25"]},
+    # Industry, wholesale prices, income distribution.
+    {"name": "INDEC capacity utilization (sh_capacidad_MM_YY.xls)", "url": dated_file("sh_capacidad"),
+     "read": read_ucii, "mode": "full", "ids": list(UCII_COLS)},
+    {"name": "INDEC wholesale prices (indice_ipim.csv)", "url": f"{INDEC}/economia/indice_ipim.csv",
+     "read": read_ipim, "mode": "full", "ids": list(IPIM_CODES)},
+    {"name": "INDEC generation-of-income account (serie_cgi_MM_YY.xls)", "url": dated_file("serie_cgi"),
+     "read": read_cgi, "mode": "full", "ids": list(CGI_SHARES)},
+    {"name": "INDEC Gini coefficient (serie_coeficiente_gini.xlsx)",
+     "url": f"{INDEC}/sociedad/serie_coeficiente_gini.xlsx", "read": read_gini, "mode": "full",
+     "ids": ["65.1_CGI_0_0_21"],
+     # INDEC has revised 2003-2006 since datos.gob.ar copied the series, and no longer publishes
+     # the first half of 2007; its file is the official one, so the check starts in 2007.
+     "agree_from": "2007-01-01"},
     # datos.gob.ar's full CSV downloads: the only monthly source by partner, and the fallback
     # for the INDEC trade files above (series already served are skipped).
     {"name": "datos.gob.ar exports by partner (CSV)", "url": f"{DATOS}/77/distribution/77.3/download/exportaciones-por-paises-regiones-mensual.csv",
@@ -475,9 +610,11 @@ AGREE_SHARE = 0.9        # share of overlapping months that must be within 2 x t
 RECENT_EXCLUDED = 12     # latest months left out of the comparison (they get revised)
 
 
-def agreement(sid: str, new: pd.Series) -> str | None:
-    """None if `new` agrees with the stored history; else a description of the mismatch."""
+def agreement(sid: str, new: pd.Series, since: str | None = None) -> str | None:
+    """None if `new` agrees with the stored history (from `since`, if given); else a description of the mismatch."""
     old = store.as_of(sid).dropna()
+    if since:
+        old = old[old.index >= pd.Timestamp(since)]
     if old.empty or new.empty:
         return None
     common = old.index.intersection(new.index)
@@ -511,7 +648,7 @@ def run_provider(p: dict, wanted: set[str]) -> tuple[dict[str, pd.Series], dict]
         missing = [sid for sid in wanted if sid not in series or series[sid].empty]
         if missing:
             raise LayoutChanged(f"no data for {missing}")
-        bad = [msg for sid in sorted(wanted) if (msg := agreement(sid, series[sid]))]
+        bad = [msg for sid in sorted(wanted) if (msg := agreement(sid, series[sid], p.get("agree_from")))]
         if bad:
             raise LayoutChanged("; ".join(bad))
         if p["mode"] == "recent":
