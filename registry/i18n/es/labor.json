@@ -67,11 +67,9 @@
  "Gini (per capita household income)": "Gini (ingreso per cápita familiar)",
  "Labor Share of Income": "Participación del trabajo en el ingreso",
  "Labor share": "Participación del trabajo",
- "Gross value added split into wages (employee compensation), mixed income of the self-employed, and operating surplus, % of GDP at factor cost, quarterly since 2016.": "Valor agregado bruto dividido en salarios (remuneración del trabajo asalariado), ingreso mixto de los trabajadores independientes y excedente de explotación, % del PIB a costo de factores, trimestral desde 2016.",
  "INDEC (Cuenta generación del ingreso), via datos.gob.ar": "INDEC (Cuenta generación del ingreso), vía datos.gob.ar",
- "% of GDP at factor cost": "% del PIB a costo de factores",
- "Mixed income: earnings of the self-employed and unincorporated businesses, part labor and part capital income. Operating surplus: the return to capital of firms (before interest and taxes on profits).": "Ingreso mixto: ingresos de los trabajadores independientes y de las empresas no constituidas en sociedad, en parte ingreso del trabajo y en parte del capital. Excedente de explotación: la retribución al capital de las empresas (antes de intereses e impuestos a las ganancias).",
- "GDP at factor cost": "PIB a costo de factores",
+ "% of gross value added at basic prices": "% del valor agregado bruto a precios básicos",
+ "Gross value added at basic prices": "Valor agregado bruto a precios básicos",
  "Employee compensation": "Remuneración del trabajo asalariado",
  "Mixed income": "Ingreso mixto",
  "Operating surplus": "Excedente de explotación",
@@ -79,5 +77,7 @@
  "Secretaría de Trabajo (SIPA, trabajo registrado)": "Secretaría de Trabajo (SIPA, trabajo registrado)",
  "INDEC (Índice de salarios); Secretaría de Seguridad Social (RIPTE)": "INDEC (Índice de salarios); Secretaría de Seguridad Social (RIPTE)",
  "INDEC (Cuenta generación del ingreso)": "INDEC (Cuenta generación del ingreso)",
- "INDEC (Encuesta Permanente de Hogares)": "INDEC (Encuesta Permanente de Hogares)"
+ "INDEC (Encuesta Permanente de Hogares)": "INDEC (Encuesta Permanente de Hogares)",
+ "Gross value added split into wages (employee compensation), mixed income of the self-employed, and operating surplus, % of gross value added at basic prices, quarterly since 2016.": "Valor agregado bruto dividido en salarios (remuneración del trabajo asalariado), ingreso mixto de los trabajadores independientes y excedente de explotación, % del valor agregado bruto a precios básicos, trimestral desde 2016.",
+ "Mixed income: earnings of the self-employed and unincorporated businesses, part labor and part capital income. Operating surplus: the return to capital of firms (before interest and taxes on profits). The three shares do not add to exactly 100%: the rest is other taxes on production net of subsidies (negative when subsidies are larger).": "Ingreso mixto: ingresos de los trabajadores independientes y de las empresas no constituidas en sociedad, en parte ingreso del trabajo y en parte del capital. Excedente de explotación: la retribución al capital de las empresas (antes de intereses e impuestos a las ganancias). Las tres participaciones no suman exactamente 100%: el resto son otros impuestos sobre la producción netos de subsidios (negativo cuando los subsidios son mayores)."
 }

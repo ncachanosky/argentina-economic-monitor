@@ -438,9 +438,9 @@ inputs:
   - {id: 151.1_IPENDIETAC_2012_M_36, source: datos_gob, frequency: M, measure: index, stale_days: 200, label: "Registered workers (SIPA): monotributo, seasonally adjusted, thousands"}
   - {id: 151.1_IPENDIETAC_2012_M_43, source: datos_gob, frequency: M, measure: index, stale_days: 200, label: "Registered workers (SIPA): social monotributo, seasonally adjusted, thousands"}
   - {id: 151.1_TL_SIN_TAC_2012_M_15, source: datos_gob, frequency: M, measure: index, stale_days: 200, label: "Registered workers (SIPA): total, seasonally adjusted, thousands"}
-  - {id: 53.1_TRTA_0_0_37, source: datos_gob, frequency: Q, measure: flow, label: "Employee compensation, share of GDP at factor cost"}
-  - {id: 53.1_TIMB_0_0_25, source: datos_gob, frequency: Q, measure: flow, label: "Mixed income, share of GDP at factor cost"}
-  - {id: 53.1_EBE_0_0_27, source: datos_gob, frequency: Q, measure: flow, label: "Operating surplus, share of GDP at factor cost"}
+  - {id: 53.1_TRTA_0_0_37, source: datos_gob, frequency: Q, measure: flow, label: "Employee compensation, share of gross value added at basic prices"}
+  - {id: 53.1_TIMB_0_0_25, source: datos_gob, frequency: Q, measure: flow, label: "Mixed income, share of gross value added at basic prices"}
+  - {id: 53.1_EBE_0_0_27, source: datos_gob, frequency: Q, measure: flow, label: "Operating surplus, share of gross value added at basic prices"}
   - {id: "indec_poverty", source: manual, frequency: S, measure: flow, allow_gaps: true, label: "INDEC poverty, persons, % (hand-kept from INDEC reports)"}
   - {id: "poverty_cedlas", source: manual, frequency: S, measure: flow, allow_gaps: true, static: true, label: "CEDLAS comparable poverty, persons, %"}
   - {id: "poverty_uca", source: manual, frequency: S, measure: flow, allow_gaps: true, static: true, label: "UCA-ODSA poverty, persons, % (annual survey)"}
@@ -4412,21 +4412,23 @@ indicators:
     short_title: Labor share
     description: >-
       Gross value added split into wages (employee compensation), mixed
-      income of the self-employed, and operating surplus, % of GDP at
-      factor cost, quarterly since 2016.
+      income of the self-employed, and operating surplus, % of gross
+      value added at basic prices, quarterly since 2016.
     source: derived
     source_label: INDEC (Cuenta generación del ingreso)
     frequency: Q
-    units: "% of GDP at factor cost"
+    units: "% of gross value added at basic prices"
     ranges: [Max]
     note: >-
       Mixed income: earnings of the self-employed and unincorporated
       businesses, part labor and part capital income. Operating surplus:
       the return to capital of firms (before interest and taxes on profits).
+      The three shares do not add to exactly 100%: the rest is other taxes
+      on production net of subsidies (negative when subsidies are larger).
     contributions:
       precomputed: true
       total: total
-      total_label: GDP at factor cost
+      total_label: Gross value added at basic prices
       units: "%"
       groups:
         - {key: wages,   label: Employee compensation, add: [wages], color: copper}
