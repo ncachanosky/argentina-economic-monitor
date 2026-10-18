@@ -7,6 +7,10 @@ on:
       url:
         description: File URL(s), space separated; optionally name=URL
         required: true
+      agent:
+        description: User-Agent header (optional)
+        required: false
+        default: argentina-economic-monitor
 permissions:
   contents: write
 jobs:
@@ -16,6 +20,7 @@ jobs:
       - name: Download and push to the inspect branch
         env:
           URLS: ${{ inputs.url }}
+          AGENT: ${{ inputs.agent }}
         run: |
           set -f
           git init -q work && cd work
@@ -27,7 +32,7 @@ jobs:
               *=http*) name="${item%%=http*}"; url="http${item#*=http}" ;;
               *) url="$item"; name="$(basename "${url%%\?*}")" ;;
             esac
-            curl -sSL --retry 3 -A "argentina-economic-monitor" -o "$name" "$url" || echo "failed: $url"
+            curl -sSL --retry 3 -A "${AGENT:-argentina-economic-monitor}" -D "$name.headers" -o "$name" "$url" || echo "failed: $url"
           done
           ls -la
           git add -A && git commit -q -m "inspect: files"
