@@ -1,0 +1,62 @@
+# Manual helper: open URLs in a headless Chromium on GitHub's network (for sites
+# that block plain HTTP clients) and push status, title and any download to `inspect`.
+name: Probe with a browser
+on:
+  workflow_dispatch:
+    inputs:
+      url:
+        description: URL(s), space separated
+        required: true
+permissions:
+  contents: write
+jobs:
+  probe:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/setup-python@v6
+        with: {python-version: "3.12"}
+      - name: Open in Chromium
+        env:
+          URLS: ${{ inputs.url }}
+        run: |
+          pip install -q playwright && python -m playwright install --with-deps chromium >/dev/null
+          mkdir out && cd out
+          cat > probe.py <<'PY'
+          import asyncio, os, json
+          from playwright.async_api import async_playwright
+          async def main():
+              res = {}
+              async with async_playwright() as p:
+                  b = await p.chromium.launch()
+                  ctx = await b.new_context(accept_downloads=True, locale="es-AR")
+                  pg = await ctx.new_page()
+                  for i, url in enumerate(os.environ["URLS"].split()):
+                      try:
+                          r = await pg.goto(url, wait_until="load", timeout=60000)
+                          await pg.wait_for_timeout(5000)
+                          res[url] = {"status": r.status if r else None, "title": await pg.title(), "html": (await pg.content())[:400]}
+                      except Exception as e:
+                          if "Download is starting" in str(e):
+                              async with pg.expect_download(timeout=60000) as d:
+                                  await pg.evaluate(f"window.location.href = {json.dumps(url)}")
+                              dl = await d.value; await dl.save_as(f"file{i}_" + dl.suggested_filename)
+                              res[url] = {"download": dl.suggested_filename, "size": os.path.getsize(f"file{i}_" + dl.suggested_filename)}
+                          else:
+                              res[url] = {"error": str(e)[:300]}
+                  # a file fetched with the page's cookies
+                  for i, url in enumerate(os.environ["URLS"].split()):
+                      r = await ctx.request.get(url)
+                      res[url]["request_with_cookies"] = r.status
+                  res["cookies"] = [c["name"] for c in await ctx.cookies()]
+                  await b.close()
+              json.dump(res, open("probe.json", "w"), indent=1)
+              print(json.dumps(res, indent=1))
+          asyncio.run(main())
+          PY
+          python probe.py
+      - name: Push to inspect
+        run: |
+          cd out && git init -q && git checkout -q -b inspect
+          git config user.name "aem-bot"; git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A && git commit -q -m "inspect: browser probe"
+          git push -f -q "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" inspect
