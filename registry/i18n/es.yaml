@@ -22,6 +22,9 @@ site:
   about_title: Acerca de
   about_lede: Qué es el Monitor, cómo usarlo, quién está detrás y cómo citarlo o informar un error.
   about_desc: Acerca del Monitor de la Economía Argentina, un proyecto de Economic Order.
+  calendar_title: Calendario de publicaciones
+  calendar_lede: Cuándo salen los próximos datos oficiales y si los últimos ya están en el Monitor.
+  calendar_desc: Calendario de difusión de las estadísticas económicas oficiales de la Argentina (INDEC) - próximas fechas y últimas publicaciones.
   embed_title: Gráfico
   embed_desc: Un gráfico del Monitor de la Economía Argentina.
   loading: Cargando datos…
@@ -49,7 +52,7 @@ site:
           </div>
           <div>
             <h4>Datos</h4>
-            <p>Cada gráfico ofrece la serie en CSV. Los historiales completos de revisiones (cada versión publicada) están en <code>data/vintages/</code>. Cómo se calcula cada número: <a href="__ROOT__methodology/">Metodología</a>.</p>
+            <p>Cada gráfico ofrece la serie en CSV. Los historiales completos de revisiones (cada versión publicada) están en <code>data/vintages/</code>. Cómo se calcula cada número: <a href="__ROOT__methodology/">Metodología</a>. Cuándo salen los próximos datos: <a href="__ROOT__calendar/">Calendario de publicaciones</a>.</p>
           </div>
 
 topics:
@@ -169,6 +172,12 @@ ui:
   Source:: "Fuente:"
   Latest:: "Último dato:"
   Next release: Próxima publicación
+  Up to date: Al día
+  Calendar: Calendario
+  Late: Demorado
+  Full release calendar →: Calendario completo →
+  "The latest official figure is on the Monitor.": El último dato oficial ya está en el Monitor.
+  "The official release date has passed and the new figure is not on the Monitor yet: the source has not published it in its files, or it failed our checks.": "La fecha oficial de publicación ya pasó y el dato nuevo todavía no está en el Monitor: la fuente no lo cargó en sus archivos o no pasó nuestros controles."
   PNG: PNG
   CSV: CSV
   All data: Todos los datos
@@ -571,6 +580,7 @@ patterns:
   - ["Next release: (.+) \\((.+) data\\)", "Próxima publicación: $1 (datos de $2)"]
   - ["· Latest: (.+) ·", "· Último dato: $1 ·"]
   - ["· Latest: (.+)", "· Último dato: $1"]
+  - ["(.+) data was due (.+); not yet published in the source files", "Los datos de $1 debían publicarse el $2; la fuente todavía no los cargó en sus archivos"]
   - ["(.+) data was due (.+); updating", "Los datos de $1 debían publicarse el $2; actualizando"]
   - ["As published \\((.+)\\)", "Tal como se publica ($1)"]
   - ["(.+) \\((.+) = 100\\)", "$1 ($2 = 100)"]

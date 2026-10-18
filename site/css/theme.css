@@ -206,6 +206,17 @@ a:hover { color: var(--accent-ink); }
 .chart.tall { height: 470px; }
 .card-foot { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; justify-content: space-between; border-top: 1px solid var(--rule); margin-top: 6px; padding-top: 10px; font-family: var(--font-ui); font-size: 13px; color: var(--ink-3); }
 .card-foot .actions { display: flex; gap: 6px; }
+.fresh-tag { display: inline-block; font-size: 11px; line-height: 1.5; padding: 0 7px; border-radius: 999px; vertical-align: 1px; font-family: var(--font-ui); }
+.fresh-tag.ok { background: color-mix(in srgb, #87A96B 22%, transparent); color: var(--ink); }
+.fresh-tag.late { background: var(--warn-bg); color: var(--accent-ink); }
+.tl-more { margin: 8px 0 0; font-size: 14px; }
+.latest-text { margin: 12px 0; font-size: 14px; }
+.latest-text ul { padding-left: 18px; }
+.cal-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.cal-table th, .cal-table td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+.cal-table th { font-family: var(--font-ui); font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: var(--ink-3); }
+.cal-ok { color: var(--ink-3); }
+.cal-late { color: var(--accent-ink); font-weight: 600; }
 .status-badge { display: inline-block; font-size: 12px; padding: 1px 8px; border-radius: 999px; background: var(--warn-bg); color: var(--accent-ink); margin-left: 6px; }
 .summary-line { font-family: var(--font-ui); font-size: 14px; color: var(--ink-2); margin: 2px 0 6px; }
 .summary-line b { color: var(--ink); font-weight: 600; }

@@ -22,6 +22,7 @@ from pathlib import Path
 import yaml
 
 from . import export, registry
+from . import summaries
 from .registry import ROOT
 
 SITE = ROOT / "site"
@@ -40,6 +41,9 @@ EN = {
     "about_title": "About",
     "about_lede": "What the Monitor is, how to use it, who is behind it, and how to cite it or report an error.",
     "about_desc": "About the Argentina Economic Monitor, a project of Economic Order.",
+    "calendar_title": "Release calendar",
+    "calendar_lede": "When the next official figures come out, and whether the latest ones are already on the Monitor.",
+    "calendar_desc": "Release calendar for Argentina's official economic statistics (INDEC): upcoming dates and the latest releases.",
     "embed_title": "Chart",
     "embed_desc": "A chart from the Argentina Economic Monitor.",
     "loading": "Loading data…",
@@ -68,7 +72,7 @@ EN = {
       </div>
       <div>
         <h4>Data</h4>
-        <p>Each chart offers the series as CSV. Full revision histories (every published vintage) are in <code>data/vintages/</code>. How every number is calculated: <a href="__ROOT__methodology/">Methodology</a>.</p>
+        <p>Each chart offers the series as CSV. Full revision histories (every published vintage) are in <code>data/vintages/</code>. How every number is calculated: <a href="__ROOT__methodology/">Methodology</a>. When the next figures come out: <a href="__ROOT__calendar/">Release calendar</a>.</p>
       </div>""",
 }
 
@@ -168,6 +172,11 @@ def build(out: Path, tag: str, with_data: bool = True) -> None:
     shutil.copytree(SITE, out, ignore=shutil.ignore_patterns("data"))
     template = (SITE / "index.html").read_text(encoding="utf-8")
     es = load_i18n("es")
+    content_es = load_content("es")
+    try:
+        status = json.loads((ROOT / "data" / "status.json").read_text(encoding="utf-8"))
+    except Exception:
+        status = {}
 
     def pages(lang: str):
         """(path under the language root, page id, title, h1, lede, desc, content, image) for every page."""
@@ -183,6 +192,8 @@ def build(out: Path, tag: str, with_data: bool = True) -> None:
             src = SITE / (f"{key}.es.html" if lang == "es" and (SITE / f"{key}.es.html").exists() else f"{key}.html")
             yield (f"{key}/", key, f"{T[key + '_title']} · {site_name}", T[key + "_title"], T[key + "_lede"], T[key + "_desc"],
                    src.read_text(encoding="utf-8"), img("home"))
+        yield ("calendar/", "calendar", f"{T['calendar_title']} · {site_name}", T["calendar_title"], T["calendar_lede"],
+               T["calendar_desc"], summaries.calendar_html(reg, status, lang, content_es, "../"), img("home"))
         yield "embed/", "embed", f"{T['embed_title']} · {site_name}", "", "", T["embed_desc"], None, img("home")
 
     for lang, prefix in (("en", ""), ("es", "es/")):
@@ -240,7 +251,19 @@ def build(out: Path, tag: str, with_data: bool = True) -> None:
                                                          encoding="utf-8")
         from . import social
         print(f"social: {social.build(out, reg, base)} preview images")
-    print(f"built {4 + len(reg.topics)} pages per language in {out}")
+        # Plain-text latest values: a list on each topic page (read by crawlers before the charts
+        # replace it) and /llms.txt for AI assistants.
+        for lang, prefix in (("en", ""), ("es", "es/")):
+            lines = summaries.latest_lines(out / "data", reg, lang, content_es)
+            for t in reg.topics:
+                f = out / prefix / t["slug"] / "index.html"
+                if f.exists() and lines.get(t["id"]):
+                    page = f.read_text(encoding="utf-8")
+                    page = page.replace('<div class="loading">', summaries.topic_block(lines[t["id"]], lang) + '<div class="loading">', 1)
+                    f.write_text(page, encoding="utf-8")
+            if lang == "en" and base:
+                (out / "llms.txt").write_text(summaries.llms_txt(lines, reg, base), encoding="utf-8")
+    print(f"built {5 + len(reg.topics)} pages per language in {out}")
 
 
 
@@ -264,7 +287,7 @@ def dataset_jsonld(reg, base: str, lang: str, name: str, desc: str) -> str:
 
 
 def site_paths(reg) -> list[str]:
-    return [""] + [f"{t['slug']}/" for t in reg.topics] + ["methodology/", "about/"]
+    return [""] + [f"{t['slug']}/" for t in reg.topics] + ["methodology/", "about/", "calendar/"]
 
 
 def write_crawl_files(out: Path, reg, base: str, spanish: bool) -> None:

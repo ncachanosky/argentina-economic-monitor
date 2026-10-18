@@ -438,6 +438,7 @@
     const period = fmtPeriod(nr.period + "-01", nr.frequency || ind.frequency);
     const text = nr.date > today ? `Next release: ${day} (${period} data)`
       : nr.date === today ? `Next release: today (${period} data)`
+      : (Date.parse(today) - Date.parse(nr.date)) / 864e5 >= 1 ? `${period} data was due ${day}; not yet published in the source files`
       : `${period} data was due ${day}; updating`;
     return h("span", { class: "next-release" }, nr.calendar_url
       ? h("a", { href: nr.calendar_url, target: "_blank", rel: "noopener", title: `INDEC release calendar: ${nr.name || ""}` }, text) : text);
@@ -452,12 +453,26 @@
         h("a", { class: "btn", href: `${DATA}${ind.id}${LANG === "es" ? ".es" : ""}.csv`, download: `${ind.id}_all.csv`, title: "All variants, levels, as published" }, "All data")));
   }
 
+  // Up to date / late, from the official calendar (Buenos Aires time). A release counts as late
+  // from the day after its date, when the twice-daily update should have picked it up.
+  function freshnessTag(ind) {
+    if (ind.status === "error" || ind.status === "stale") return null;   // the title badge says it
+    const nr = ind.next_release;
+    if (!nr) return null;
+    const today = new Date().toLocaleDateString("en-CA", { timeZone: "America/Argentina/Buenos_Aires" });
+    const late = nr.date < today && (Date.parse(today) - Date.parse(nr.date)) / 864e5 >= 1;
+    return late
+      ? h("span", { class: "fresh-tag late", title: "The official release date has passed and the new figure is not on the Monitor yet: the source has not published it in its files, or it failed our checks." }, "Late")
+      : h("span", { class: "fresh-tag ok", title: "The latest official figure is on the Monitor." }, "Up to date");
+  }
+
   function footer(ind, onPNG, onCSV) {
     const src = Object.values(ind.variants)[0].source_url;
     const nr = nextReleaseNote(ind);
+    const fresh = freshnessTag(ind);
     return h("div", { class: "card-foot" },
       h("span", {}, "Source: ", src ? h("a", { href: src, target: "_blank", rel: "noopener" }, ind.source_label) : ind.source_label,
-        ` · Latest: ${fmtPeriod(ind.last_obs, ind.frequency)}`, nr ? " · " : null, nr),
+        ` · Latest: ${fmtPeriod(ind.last_obs, ind.frequency)}`, fresh ? " " : null, fresh, nr ? " · " : null, nr),
       h("div", { class: "actions" },
         h("button", { class: "btn", type: "button", onclick: onPNG, title: "Download this chart as a 1200×800 PNG" }, "PNG"),
         h("button", { class: "btn", type: "button", onclick: onCSV, title: "Download the data in this view as CSV" }, "CSV"),
@@ -1599,6 +1614,7 @@
     menu.addEventListener("focusout", (e) => { if (e.relatedTarget && !menu.contains(e.relatedTarget)) close(false); });
     nav.append(menu,
       h("a", { href: `${ROOT}methodology/`, "aria-current": PAGE === "methodology" ? "page" : null }, tr("Methodology")),
+      h("a", { href: `${ROOT}calendar/`, "aria-current": PAGE === "calendar" ? "page" : null }, tr("Calendar")),
       h("a", { href: `${ROOT}about/`, "aria-current": PAGE === "about" ? "page" : null }, tr("About")));
   }
 
@@ -2994,7 +3010,8 @@
       : h("p", { class: "tl-none" }, "No scheduled INDEC releases in the next three weeks.");
     return h("section", { class: "timeline", "aria-label": "Recent and upcoming releases" },
       h("div", {}, h("h3", {}, "New data"), recent),
-      h("div", {}, h("h3", {}, "Coming up (INDEC calendar)"), ahead));
+      h("div", {}, h("h3", {}, "Coming up (INDEC calendar)"), ahead,
+        h("p", { class: "tl-more" }, h("a", { href: `${ROOT}calendar/` }, "Full release calendar →"))));
   }
   // "Índice de precios al consumidor (IPC)" -> "CPI"; other names keep their acronym or a short form.
   function shortRelease(name) {
@@ -3197,7 +3214,7 @@
     });
 
     const topicsEl2 = $("#topics");
-    if (PAGE === "methodology" || PAGE === "about") return;   // static pages: nothing to load
+    if (PAGE === "methodology" || PAGE === "about" || PAGE === "calendar") return;   // static pages: nothing to load
     if (PAGE === "home") {
       // Home: the summary dashboard, then one card per topic.
       let dash = null;
