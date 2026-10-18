@@ -761,7 +761,7 @@ indicators:
       standard read on month-to-month momentum.
     release: emae
     source: datos_gob
-    source_label: INDEC, via datos.gob.ar
+    source_label: INDEC (sh_emae_mensual_base2004.xls)
     frequency: M
     units: Index, 2004 = 100
     variants:
@@ -811,7 +811,7 @@ indicators:
       series. Select sectors to compare their paths.
     release: emae
     source: datos_gob
-    source_label: INDEC, via datos.gob.ar
+    source_label: INDEC (sh_emae_actividad_base2004.xls)
     frequency: M
     units: Index, 2004 = 100
     variants:
@@ -4159,7 +4159,7 @@ indicators:
       (autónomos) and monotributistas. Seasonally adjusted, monthly since
       2012.
     source: datos_gob
-    source_label: Ministerio de Capital Humano (SIPA), via datos.gob.ar
+    source_label: Secretaría de Trabajo (SIPA, trabajo registrado)
     frequency: M
     units: Thousands of workers
     transforms: [level, yoy, mom]
@@ -4194,7 +4194,7 @@ indicators:
       workers, and the average taxable wage of stable workers (RIPTE), in
       real terms (deflated by the CPI). Monthly.
     source: datos_gob
-    source_label: INDEC (Índice de salarios); Secretaría de Seguridad Social (RIPTE); via datos.gob.ar
+    source_label: INDEC (Índice de salarios); Secretaría de Seguridad Social (RIPTE)
     frequency: M
     units: Index and pesos
     transforms: [level, yoy, mom]
