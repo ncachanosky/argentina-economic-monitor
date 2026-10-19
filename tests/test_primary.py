@@ -31,7 +31,7 @@ CASES = [
     ("read_trade_1910", "balan_1910.xls", 2, "74.1_IET_0_A_16", "2025-01-01", 87111.1968),
     ("read_ipi", "sh_ipi_manufacturero.xlsx", 2, "453.1_SERIE_DESEADA_0_0_24_58", "2026-08-01", 114.286133),
     ("read_isac", "sh_isac.xlsx", 3, "33.2_ISAC_CICLOCIA_0_M_20_62", "2026-08-01", 142.428332),
-    ("read_national_accounts", "sh_oferta_demanda.xlsx", 32, "6.2_IPNS_2004_T_35", "2026-04-01", 65507.9437645984),
+    ("read_national_accounts", "sh_oferta_demanda.xlsx", 34, "6.2_IPNS_2004_T_35", "2026-04-01", 65507.9437645984),
     ("read_gdp_sa", "sh_oferta_demanda_desest.xls", 1, "3.2_OGP_D_2004_T_17", "2026-04-01", 747969.9),
     ("read_ucii", "sh_capacidad.xls", 13, "31.3_UV_2004_M_25", "2026-08-01", 46.2),
     ("read_ipim", "indice_ipim.csv", 5, "448.1_NIVEL_GENERAL_0_0_13_46", "2026-09-01", 17104.023329),

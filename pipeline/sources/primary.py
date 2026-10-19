@@ -630,7 +630,7 @@ OD_INVESTMENT = {"4.2_DGIC_2004_T_32": r"^construcciones$", "4.2_DGIEDPMET_2004_
                  "4.2_DGIEDPMTT_2004_T_53": r"^equipo de transporte"}
 OD_CURRENT = {"4.4_OGP_2004_T_17": r"^producto interno bruto", "4.4_DGI_2004_T_19": r"^formaci[oó]n bruta de capital fijo"}
 OD_DEFLATOR = {"25.2_OGP_2004_T_17": r"^producto interno bruto"}
-GDP_BY_SECTOR = {"6.2_PIBPM_2004_T_38": r"^producto interno bruto", "6.2_IPNS_2004_T_35": r"^d214",
+GDP_BY_SECTOR = {"6.2_PIBPM_2004_T_38": r"^producto interno bruto", "6.2_IPNS_2004_T_35": r"^d214", "6.2_IVA_2004_T_23": r"^d211$", "6.2_DI_2004_T_20": r"^d212$",
                  "6.2_AGCS_2004_T_39": r"^a$", "6.2_P_2004_T_5": r"^b$", "6.2_EMC_2004_T_26": r"^c$",
                  "6.2_IM_2004_T_23": r"^d$", "6.2_SEGA_2004_T_32": r"^e$", "6.2_C_2004_T_12": r"^f$",
                  "6.2_CMMR_2004_T_41": r"^g$", "6.2_HR_2004_T_20": r"^h$", "6.2_TAC_2004_T_40": r"^i$",

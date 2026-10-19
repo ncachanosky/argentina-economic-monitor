@@ -1138,9 +1138,10 @@ indicators:
     note: >-
       Value added by industry at constant 2004 prices (original series).
       Goods: agriculture, fishing, mining, manufacturing, utilities and
-      construction. "Other services & net taxes" (other community services,
-      domestic service, and taxes net of subsidies on products) is the residual
-      that closes the gap to GDP growth.
+      construction. Taxes on products are VAT, import duties and other
+      taxes on products net of subsidies, which lift GDP at market prices
+      above value added. "Other services" (other community services and
+      domestic service) is the residual that closes the gap to GDP growth.
     variants:
       gdp:          {label: GDP,                                id: 6.2_PIBPM_2004_T_38}
       agro:         {label: Agriculture & livestock,            id: 6.2_AGCS_2004_T_39}
@@ -1159,7 +1160,9 @@ indicators:
       health:       {label: Health & social services,           id: 6.2_SSS_2004_T_24}
       other_services: {label: Other community services,         id: 6.2_OASCSP_2004_T_60}
       households:   {label: Domestic service,                   id: 6.2_HPSD_2004_T_32}
-      net_taxes:    {label: Net taxes on products,              id: 6.2_IPNS_2004_T_35}
+      net_taxes:    {label: Other taxes on products (net),      id: 6.2_IPNS_2004_T_35}
+      vat:          {label: VAT,                                id: 6.2_IVA_2004_T_23}
+      import_duties: {label: Import duties,                     id: 6.2_DI_2004_T_20}
     contributions:
       total: gdp
       groups:
@@ -1167,7 +1170,8 @@ indicators:
         - {key: trade,    label: Trade & transport,             color: sky,      add: [trade, hotels, transport]}
         - {key: business, label: Finance & business services,   color: sage,     add: [finance, real_estate]}
         - {key: public,   label: "Public admin, education & health", color: lavender, add: [public_admin, education, health]}
-        - {key: other,    label: Other services & net taxes,    color: neutral,  residual: true}
+        - {key: taxes,    label: Taxes on products,             color: gold,     add: [vat, import_duties, net_taxes]}
+        - {key: other,    label: Other services,                color: neutral,  residual: true}
       lines: groups
       lines_title: Industry groups, year-over-year change
     default: {variant: gdp, transform: yoy, start: "2016-01"}

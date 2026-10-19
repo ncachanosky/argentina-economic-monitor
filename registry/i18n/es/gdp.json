@@ -33,13 +33,11 @@
  "Which Industries Drive GDP Growth": "Qué sectores impulsan el crecimiento del PIB",
  "GDP by industry": "PIB por sector",
  "Contribution of each group of industries to GDP growth versus the same quarter a year earlier, in percentage points. Bars add up to GDP growth (the marker).": "Contribución de cada grupo de sectores al crecimiento del PIB respecto del mismo trimestre del año anterior, en puntos porcentuales. Las barras suman el crecimiento del PIB (el marcador).",
- "Value added by industry at constant 2004 prices (original series). Goods: agriculture, fishing, mining, manufacturing, utilities and construction. \"Other services & net taxes\" (other community services, domestic service, and taxes net of subsidies on products) is the residual that closes the gap to GDP growth.": "Valor agregado por sector a precios constantes de 2004 (serie original). Bienes: agricultura, pesca, minería, industria manufacturera, electricidad, gas y agua, y construcción. \"Otros servicios e impuestos netos\" (otros servicios comunitarios, servicio doméstico e impuestos netos de subsidios sobre los productos) es el residuo que cierra la diferencia con el crecimiento del PIB.",
  "Domestic service": "Servicio doméstico",
  "Goods": "Bienes",
  "Trade & transport": "Comercio y transporte",
  "Finance & business services": "Finanzas y servicios empresariales",
  "Public admin, education & health": "Administración pública, educación y salud",
- "Other services & net taxes": "Otros servicios e impuestos netos",
  "Industry groups, year-over-year change": "Grupos de sectores, variación i.a.",
  "Investment by Type": "Inversión por tipo",
  "Contribution of construction, machinery and equipment, and transport equipment to the growth of gross fixed capital formation versus the same quarter a year earlier, in percentage points.": "Contribución de la construcción, la maquinaria y equipo y el equipo de transporte al crecimiento de la formación bruta de capital fijo respecto del mismo trimestre del año anterior, en puntos porcentuales.",
@@ -60,5 +58,11 @@
  "GDP deflator": "Deflactor del PIB",
  "The implicit price index of GDP: the price of everything produced in Argentina, not just the consumer basket.": "Índice de precios implícitos del PIB: el precio de todo lo que se produce en la Argentina, no solo de la canasta de consumo.",
  "GDP": "PIB",
- "INDEC (1993 and 2004 bases, chain-linked)": "INDEC (bases 1993 y 2004, empalmadas)"
+ "INDEC (1993 and 2004 bases, chain-linked)": "INDEC (bases 1993 y 2004, empalmadas)",
+ "Value added by industry at constant 2004 prices (original series). Goods: agriculture, fishing, mining, manufacturing, utilities and construction. Taxes on products are VAT, import duties and other taxes on products net of subsidies, which lift GDP at market prices above value added. \"Other services\" (other community services and domestic service) is the residual that closes the gap to GDP growth.": "Valor agregado por sector a precios constantes de 2004 (serie original). Bienes: agro, pesca, minería, industria manufacturera, electricidad, gas y agua, y construcción. Los impuestos a los productos son el IVA, los derechos de importación y otros impuestos a los productos netos de subsidios, que llevan el PIB a precios de mercado por encima del valor agregado. «Otros servicios» (otras actividades comunitarias y servicio doméstico) es el residuo que cierra la diferencia con el crecimiento del PIB.",
+ "Other taxes on products (net)": "Otros impuestos a los productos (netos)",
+ "VAT": "IVA",
+ "Import duties": "Derechos de importación",
+ "Taxes on products": "Impuestos a los productos",
+ "Other services": "Otros servicios"
 }
