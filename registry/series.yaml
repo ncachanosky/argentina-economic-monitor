@@ -46,15 +46,15 @@ site:
 inputs:
   - {id: cpi_private_composite, source: manual, frequency: M, measure: index, static: true,
      label: "Private CPI composite (replaces INDEC, Jan 2007 - Apr 2016)"}
-  - {id: 178.1_NL_GENERAL_0_0_13, source: datos_gob, frequency: M, measure: index, static: true,
+  - {id: 178.1_NL_GENERAL_0_0_13, source: manual, frequency: M, measure: index, static: true,
      label: "INDEC historical CPI, 1943-2008"}
-  - {id: 96.3_INGV_2008_M_20, source: datos_gob, frequency: M, measure: flow, static: true,
+  - {id: 96.3_INGV_2008_M_20, source: manual, frequency: M, measure: flow, static: true,
      label: "INDEC CPI-GBA (base Apr 2008), m/m %, 1993-2013"}
-  - {id: 98.3_INNG_2013_0_20, source: datos_gob, frequency: M, measure: index, static: true,
+  - {id: 98.3_INNG_2013_0_20, source: manual, frequency: M, measure: index, static: true,
      label: "INDEC IPC-NU (national urban), Dec 2013 - Oct 2015"}
   - {id: 103.1_I2N_2016_M_19, source: datos_gob, frequency: M, measure: index,
      label: "INDEC CPI-GBA (base Apr 2016)"}
-  - {id: 2.2_OGP_1993_T_17, source: datos_gob, frequency: Q, measure: index, static: true,
+  - {id: 2.2_OGP_1993_T_17, source: manual, frequency: Q, measure: index, static: true,
      label: "INDEC GDP at 1993 prices, 1993-2013"}
   # BCRA statistics API (daily). Ids are BCRA's idVariable numbers.
   - {id: "bcra:15",  source: bcra, frequency: D, measure: index, label: "Base money"}
@@ -862,7 +862,7 @@ indicators:
       original series and the construction trend-cycle can be added below
       the chart.
     source: datos_gob
-    source_label: INDEC, via datos.gob.ar
+    source_label: INDEC
     release: ipi_manufacturero
     frequency: M
     units: Index, 2004 = 100
@@ -982,7 +982,7 @@ indicators:
       standard read on quarter-to-quarter momentum.
     release: pib
     source: datos_gob
-    source_label: INDEC, via datos.gob.ar
+    source_label: INDEC
     frequency: Q
     units: Index, 2004 = 100
     index_base: "2004"
@@ -1012,7 +1012,7 @@ indicators:
       before INDEC releases GDP.
     release: emae
     source: derived
-    source_label: INDEC, via datos.gob.ar
+    source_label: INDEC
     frequency: Q
     units: Index, 2004 = 100
     index_base: "2004"
@@ -1046,7 +1046,7 @@ indicators:
       series. Original (not seasonally adjusted) data.
     release: pib
     source: derived
-    source_label: INDEC, via datos.gob.ar (1993 and 2004 bases, chain-linked)
+    source_label: INDEC (1993 and 2004 bases, chain-linked)
     frequency: Q
     units: Index, 2004 = 100
     index_base: "2004"
@@ -1088,7 +1088,7 @@ indicators:
       (the marker).
     release: pib
     source: datos_gob
-    source_label: INDEC, via datos.gob.ar
+    source_label: INDEC
     frequency: Q
     units: Percentage points
     source_units: millions of 2004 pesos
@@ -1131,7 +1131,7 @@ indicators:
       (the marker).
     release: pib
     source: datos_gob
-    source_label: INDEC, via datos.gob.ar
+    source_label: INDEC
     frequency: Q
     units: Percentage points
     source_units: millions of 2004 pesos
@@ -1184,7 +1184,7 @@ indicators:
       quarter a year earlier, in percentage points.
     release: pib
     source: datos_gob
-    source_label: INDEC, via datos.gob.ar
+    source_label: INDEC
     frequency: Q
     units: Percentage points
     source_units: millions of 2004 pesos
@@ -1221,7 +1221,7 @@ indicators:
       the last four quarters.
     release: pib
     source: derived
-    source_label: INDEC, via datos.gob.ar
+    source_label: INDEC
     frequency: Q
     units: "% of GDP"
     transforms: [level, yoy]
@@ -1629,7 +1629,7 @@ indicators:
       (CPI), wholesale prices (IPIM) and the GDP deflator, which covers
       everything produced in the country. Quarterly averages.
     source: derived
-    source_label: INDEC, via datos.gob.ar
+    source_label: INDEC
     frequency: Q
     units: "% vs. the same quarter a year earlier"
     transforms: [level]

@@ -508,6 +508,175 @@ def read_cgi(raw: bytes) -> dict[str, pd.Series]:
     return {sid: (_cgi_total(x, sh) / vab).dropna() for sid, sh in CGI_SHARES.items()}
 
 
+# ── monthly activity (IPI, ISAC) and quarterly national accounts ─────────────
+
+def year_file(stem: str, ext: str = "xls"):
+    """Resolver for an INDEC file named after its year (sh_ipi_manufacturero_2026.xls):
+    this year's file, or last year's early in January before the new one appears."""
+    def resolve() -> str:
+        y = datetime.now(timezone.utc).year
+        for year in (y, y - 1):
+            url = f"{INDEC}/economia/{stem}_{year}.{ext}"
+            try:
+                r = requests.get(url, timeout=30, headers={"User-Agent": USER_AGENT}, stream=True)
+                head = next(r.iter_content(8), b"") if r.ok else b""
+                r.close()
+                if head[:4] in (b"\xd0\xcf\x11\xe0", b"PK\x03\x04"):
+                    return url
+            except requests.RequestException:
+                pass
+        raise FileNotFound(f"no {stem}_{y}.{ext} or {stem}_{y - 1}.{ext}")
+    return resolve
+
+
+def _monthly_blocks(df: pd.DataFrame, cols: dict[str, str]) -> dict[str, pd.Series]:
+    """INDEC monthly tables with year and month in the first columns and one column group per
+    series ("Serie original", "Serie desestacionalizada", "Serie tendencia-ciclo"): the index
+    column of each group is the first one whose units read "Números índice"."""
+    h = find_row(df, r"^per[ií]odo")
+    units = find_row(df.iloc[h:h + 8], r"n[uú]meros [ií]ndice")
+    out_cols = {}
+    for sid, pat in cols.items():
+        start = find_col(df, h, pat)
+        j = next((j for j in range(start, min(start + 4, df.shape[1]))
+                  if re.search(r"n[uú]meros [ií]ndice", norm(df.iat[units, j]))), None)
+        if j is None:
+            raise LayoutChanged(f"no 'Números índice' column under /{pat}/", preview(df, 10, 12))
+        out_cols[sid] = j
+    year, dates = None, []
+    for i in range(units + 1, len(df)):
+        lead = [df.iat[i, k] for k in range(min(3, df.shape[1]))]
+        for v in lead:
+            y = re.match(r"((?:19|20)\d{2})(?:\D|$)", norm(v).replace(".0", ""))
+            if y:
+                year = int(y.group(1))
+        m = next((month_label(v) for v in lead if isinstance(v, str) and month_label(v)), None)
+        dates.append(pd.Timestamp(year, m, 1) if (year and m) else pd.NaT)
+    idx = pd.DatetimeIndex(dates)
+    body = df.iloc[units + 1:]
+    return {sid: pd.Series(num(body.iloc[:, j]).values, index=idx).dropna().loc[lambda s: s.index.notna()]
+            for sid, j in out_cols.items()}
+
+
+def read_ipi(raw: bytes) -> dict[str, pd.Series]:
+    """Manufacturing production index (IPI manufacturero, 2004 = 100), Cuadro 1."""
+    x = pd.ExcelFile(io.BytesIO(raw))
+    if "Cuadro 1" not in x.sheet_names:
+        raise LayoutChanged(f"no sheet 'Cuadro 1'; sheets: {x.sheet_names}")
+    return _monthly_blocks(x.parse("Cuadro 1", header=None),
+                           {"453.1_SERIE_ORIGNAL_0_0_14_46": r"^serie original",
+                            "453.1_SERIE_DESEADA_0_0_24_58": r"^serie desestacionalizada"})
+
+
+def read_isac(raw: bytes) -> dict[str, pd.Series]:
+    """Construction activity indicator (ISAC, 2004 = 100), Cuadro 1."""
+    x = pd.ExcelFile(io.BytesIO(raw))
+    if "Cuadro 1" not in x.sheet_names:
+        raise LayoutChanged(f"no sheet 'Cuadro 1'; sheets: {x.sheet_names}")
+    return _monthly_blocks(x.parse("Cuadro 1", header=None),
+                           {"33.2_ISAC_NIVELRAL_0_M_18_63": r"^serie original",
+                            "33.2_ISAC_SIN_EDAD_0_M_23_56": r"^serie desestacionalizada",
+                            "33.2_ISAC_CICLOCIA_0_M_20_62": r"^serie tendencia"})
+
+
+CA_PAGE = "https://www.indec.gob.ar/Nivel4/Tema/3/9/47"
+
+
+def ca_file(pattern: str):
+    """Resolver for a national-accounts file named after its publication month
+    (sh_oferta_demanda_09_26.xls), from INDEC's national accounts page: the latest one."""
+    def resolve() -> str:
+        html = download(CA_PAGE).decode("utf-8", "replace")
+        found = set(re.findall(pattern, html))
+        if not found:
+            raise FileNotFound(f"no file matching /{pattern}/ on {CA_PAGE}")
+        def when(name):
+            m, y = re.findall(r"_(\d{2})_(\d{2})\.xls", name)[-1]
+            return (int(y), int(m))
+        return f"{INDEC}/economia/{max(found, key=when)}"
+    return resolve
+
+
+def _quarter_table(df: pd.DataFrame, rows: dict[str, str]) -> dict[str, pd.Series]:
+    """National accounts tables: one row per aggregate (code in column 0, name in column 1),
+    one column per quarter under a year header ("2026 (2)"), with an annual "Total" column."""
+    qrow = find_row(df, r"[1-4]\s*[º°o]?\s*trimestre")
+    year, qcols = None, {}
+    for j in range(2, df.shape[1]):
+        y = re.match(r"((?:19|20)\d{2})", norm(df.iat[qrow - 1, j]).replace(".0", ""))
+        if y:
+            year = int(y.group(1))
+        q = _quarter(df.iat[qrow, j]) if pd.notna(df.iat[qrow, j]) else None
+        if year and q:
+            qcols[j] = pd.Timestamp(year, 3 * q - 2, 1)
+    if not qcols:
+        raise LayoutChanged("no quarter columns", preview(df, 8, 10))
+    out = {}
+    for sid, pat in rows.items():
+        rx = re.compile(pat, re.I)
+        i = next((i for i in range(qrow + 1, len(df)) if rx.search(norm(df.iat[i, 1])) or rx.search(norm(df.iat[i, 0]))), None)
+        if i is None:
+            raise LayoutChanged(f"no row matching /{pat}/", preview(df, 30, 3))
+        out[sid] = pd.Series({d: pd.to_numeric(df.iat[i, j], errors="coerce") for j, d in qcols.items()},
+                             dtype=float).dropna().sort_index()
+    return out
+
+
+OD_CONSTANT = {"4.2_OGP_2004_T_17": r"^producto interno bruto", "4.2_OGI_2004_T_25": r"^importaciones",
+               "4.2_MGCP_2004_T_25": r"^consumo privado", "4.2_DGCP_2004_T_30": r"^consumo p[uú]blico",
+               "4.2_DGE_2004_T_26": r"^exportaciones", "4.2_DGIT_2004_T_25": r"^formaci[oó]n bruta de capital fijo",
+               "4.2_VE_2004_T_21": r"^variaci[oó]n de existencias", "4.2_DE_2004_T_24": r"^discrepancia"}
+OD_INVESTMENT = {"4.2_DGIC_2004_T_32": r"^construcciones$", "4.2_DGIEDPMET_2004_T_51": r"^maquinaria y equipo",
+                 "4.2_DGIEDPMTT_2004_T_53": r"^equipo de transporte"}
+OD_CURRENT = {"4.4_OGP_2004_T_17": r"^producto interno bruto", "4.4_DGI_2004_T_19": r"^formaci[oó]n bruta de capital fijo"}
+OD_DEFLATOR = {"25.2_OGP_2004_T_17": r"^producto interno bruto"}
+GDP_BY_SECTOR = {"6.2_PIBPM_2004_T_38": r"^producto interno bruto", "6.2_IPNS_2004_T_35": r"^d214",
+                 "6.2_AGCS_2004_T_39": r"^a$", "6.2_P_2004_T_5": r"^b$", "6.2_EMC_2004_T_26": r"^c$",
+                 "6.2_IM_2004_T_23": r"^d$", "6.2_SEGA_2004_T_32": r"^e$", "6.2_C_2004_T_12": r"^f$",
+                 "6.2_CMMR_2004_T_41": r"^g$", "6.2_HR_2004_T_20": r"^h$", "6.2_TAC_2004_T_40": r"^i$",
+                 "6.2_IF_2004_T_25": r"^j$", "6.2_AIEA_2004_T_48": r"^k$", "6.2_APDPSSAO_2004_T_60": r"^l$",
+                 "6.2_E_2004_T_10": r"^m$", "6.2_SSS_2004_T_24": r"^n$", "6.2_OASCSP_2004_T_60": r"^o$",
+                 "6.2_HPSD_2004_T_32": r"^p$"}
+
+
+def read_national_accounts(raw: bytes) -> dict[str, pd.Series]:
+    """INDEC's supply-and-demand workbook (sh_oferta_demanda_MM_YY.xls): GDP and its demand
+    components at 2004 prices (cuadro 1), GDP by sector (cuadro 4), fixed investment by type
+    (cuadro 6), current prices (cuadro 8) and implicit deflators (cuadro 9)."""
+    x = pd.ExcelFile(io.BytesIO(raw))
+    sheets = {norm(s): s for s in x.sheet_names}
+    out = {}
+    for name, rows in [("cuadro 1", OD_CONSTANT), ("cuadro 4", GDP_BY_SECTOR), ("cuadro 6", OD_INVESTMENT),
+                       ("cuadro 8", OD_CURRENT), ("cuadro 9", OD_DEFLATOR)]:
+        if name not in sheets:
+            raise LayoutChanged(f"no sheet {name!r}; sheets: {x.sheet_names}")
+        out.update(_quarter_table(x.parse(sheets[name], header=None), rows))
+    # The statistical discrepancy is left blank in the definitive years (2004-2023): it is zero.
+    gdp = out["4.2_OGP_2004_T_17"]
+    out["4.2_DE_2004_T_24"] = out["4.2_DE_2004_T_24"].reindex(gdp.index).fillna(0.0)
+    return out
+
+
+def read_gdp_sa(raw: bytes) -> dict[str, pd.Series]:
+    """Seasonally adjusted GDP at 2004 prices (sh_oferta_demanda_desest_MM_YY.xls): year in
+    column 0 (first quarter only), quarter as a Roman numeral in column 1."""
+    x = pd.ExcelFile(io.BytesIO(raw))
+    df = x.parse(x.sheet_names[0], header=None)
+    h = find_row(df, r"^a[ñn]o$", col=0)
+    c = find_col(df, h, r"^pib$")
+    roman = {"i": 1, "ii": 2, "iii": 3, "iv": 4}
+    year, vals = None, {}
+    for i in range(h + 1, len(df)):
+        y = re.match(r"((?:19|20)\d{2})", norm(df.iat[i, 0]).replace(".0", ""))
+        if y:
+            year = int(y.group(1))
+        q = roman.get(re.sub(r"[^ivx]", "", norm(df.iat[i, 1])))
+        v = pd.to_numeric(df.iat[i, c], errors="coerce")
+        if year and q and pd.notna(v):
+            vals[pd.Timestamp(year, 3 * q - 2, 1)] = float(v)
+    return {"3.2_OGP_D_2004_T_17": pd.Series(vals, dtype=float).sort_index()}
+
+
 def datos_csv(columns: dict[str, str]):
     """Reader for a datos.gob.ar distribution CSV (the whole dataset as one file, not the API)."""
     def read(raw: bytes) -> dict[str, pd.Series]:
@@ -581,6 +750,18 @@ PROVIDERS = [
              "82.2_IPE_2004_T_26", "82.2_IPI_2004_T_26", "82.2_ITI_2004_T_27"]},
     {"name": "INDEC trade since 1910 (balan_1910_*.xls)", "url": ica_file(r"balan_1910_\d{4}\.xls"),
      "page": ICA_PAGE, "read": read_trade_1910, "mode": "full", "ids": ["74.1_IET_0_A_16", "74.1_IIT_0_A_25"]},
+    # Monthly activity and quarterly national accounts.
+    {"name": "INDEC manufacturing production (sh_ipi_manufacturero_YYYY.xls)",
+     "url": year_file("sh_ipi_manufacturero"), "read": read_ipi, "mode": "full",
+     "ids": ["453.1_SERIE_ORIGNAL_0_0_14_46", "453.1_SERIE_DESEADA_0_0_24_58"]},
+    {"name": "INDEC construction activity (sh_isac_YYYY.xls)", "url": year_file("sh_isac"), "read": read_isac,
+     "mode": "full", "ids": ["33.2_ISAC_NIVELRAL_0_M_18_63", "33.2_ISAC_SIN_EDAD_0_M_23_56", "33.2_ISAC_CICLOCIA_0_M_20_62"]},
+    {"name": "INDEC supply and demand (sh_oferta_demanda_MM_YY.xls)",
+     "url": ca_file(r"sh_oferta_demanda_\d{2}_\d{2}\.xls"), "page": CA_PAGE, "read": read_national_accounts,
+     "mode": "full", "ids": [*OD_CONSTANT, *OD_INVESTMENT, *OD_CURRENT, *OD_DEFLATOR, *GDP_BY_SECTOR]},
+    {"name": "INDEC seasonally adjusted GDP (sh_oferta_demanda_desest_MM_YY.xls)",
+     "url": ca_file(r"sh_oferta_demanda_desest_\d{2}_\d{2}\.xls"), "page": CA_PAGE, "read": read_gdp_sa,
+     "mode": "full", "ids": ["3.2_OGP_D_2004_T_17"]},
     # Industry, wholesale prices, income distribution.
     {"name": "INDEC capacity utilization (sh_capacidad_MM_YY.xls)", "url": dated_file("sh_capacidad"),
      "read": read_ucii, "mode": "full", "ids": list(UCII_COLS)},

@@ -29,6 +29,10 @@ CASES = [
     ("read_import_uses", "impo_uso_economico.xls", 7, "74.3_IIBCA_0_M_32", "2026-08-01", 1310.2484),
     ("read_trade_indices", "sh_indices_comext_04.xls", 7, "82.2_ITI_2004_T_27", "2026-04-01", 145.1401),
     ("read_trade_1910", "balan_1910.xls", 2, "74.1_IET_0_A_16", "2025-01-01", 87111.1968),
+    ("read_ipi", "sh_ipi_manufacturero.xlsx", 2, "453.1_SERIE_DESEADA_0_0_24_58", "2026-08-01", 114.286133),
+    ("read_isac", "sh_isac.xlsx", 3, "33.2_ISAC_CICLOCIA_0_M_20_62", "2026-08-01", 142.428332),
+    ("read_national_accounts", "sh_oferta_demanda.xlsx", 32, "6.2_IPNS_2004_T_35", "2026-04-01", 65507.9437645984),
+    ("read_gdp_sa", "sh_oferta_demanda_desest.xls", 1, "3.2_OGP_D_2004_T_17", "2026-04-01", 747969.9),
     ("read_ucii", "sh_capacidad.xls", 13, "31.3_UV_2004_M_25", "2026-08-01", 46.2),
     ("read_ipim", "indice_ipim.csv", 5, "448.1_NIVEL_GENERAL_0_0_13_46", "2026-09-01", 17104.023329),
     ("read_cgi", "serie_cgi.xlsx", 3, "53.1_TRTA_0_0_37", "2026-04-01", 0.429375),
@@ -165,3 +169,17 @@ def test_ucii_months_follow_the_year_rows():
     s = P.read_ucii(raw("sh_capacidad.xls"))["31.3_UNG_2004_M_18"]
     assert s[pd.Timestamp("2016-01-01")] == pytest.approx(62.9)
     assert s[pd.Timestamp("2025-12-01")] == pytest.approx(53.8)
+
+
+def test_national_accounts_rows_and_quarters():
+    out = P.read_national_accounts(raw("sh_oferta_demanda.xlsx"))
+    gdp = out["4.2_OGP_2004_T_17"]
+    assert gdp.index.min() == pd.Timestamp("2004-01-01") and len(gdp) == 90   # quarters only, no annual totals
+    assert out["4.2_DGIC_2004_T_32"][pd.Timestamp("2026-04-01")] == pytest.approx(42858.498, rel=1e-6)  # not "Otras construcciones"
+    assert out["4.2_DE_2004_T_24"][pd.Timestamp("2010-01-01")] == 0.0                                  # blank in definitive years
+
+
+def test_latest_national_accounts_file_is_picked(monkeypatch):
+    page = raw("indec_ca_page.html").decode("utf-8", "replace") + ' href="/ftp/cuadros/economia/sh_oferta_demanda_12_25.xls"'
+    monkeypatch.setattr(P, "download", lambda url, retries=3: page.encode())
+    assert P.ca_file(r"sh_oferta_demanda_\d{2}_\d{2}\.xls")().endswith("sh_oferta_demanda_09_26.xls")
