@@ -724,6 +724,89 @@ AIF_CSV = {"379.9_GTOS_CAP_2017__13_60": "gtos_cap_2017",
            "379.9_SUPERAVIT_017__23_94": "superavit_primario_2017"}
 
 
+# datos.gob.ar full distribution files (dataset CSVs), mapped from the catalog's field ids.
+ICC_MENSUAL = {
+    "380.3_DESAGREGACCRO_0_T_40": "desagregacion_subindices_situacion_macro",
+    "380.3_DESAGREGACGBA_0_T_26": "desagregacion_regiones_gba",
+    "380.3_DESAGREGACIOR_0_T_31": "desagregacion_regiones_interior",
+    "380.3_DESAGREGACLES_0_T_50": "desagregacion_subindices_bienes_durables_inmuebles",
+    "380.3_DESAGREGACNAL_0_T_43": "desagregacion_subindices_situacion_personal",
+    "380.3_DESAGREGACTAL_0_T_30": "desagregacion_regiones_capital",
+    "380.3_ICC_NACIONNAL_0_T_12": "icc_nacional",
+}
+PII_CATEGORIA = {
+    "144.2_AVOSCALES_0_T_24": "activos_cat_trimestrales",
+    "144.2_AVOSRELES_0_T_29": "activos_reservas_trimestrales",
+    "144.2_IRSIONCTA_0_T_17": "inversion_directa",
+    "144.2_IRSIONERA_0_T_17": "inversion_cartera",
+    "144.2_MDADEPRAL_0_T_27": "moneda_depositos_trimestral",
+    "144.2_OINVERRAL_0_T_25": "otra_inversion_trimestral",
+    "144.2_PCIONETA_0_T_37": "posicion_inversion_internacional_neta",
+    "144.2_PVOSDELES_0_T_42": "pasivos_derivados_financieros_trimestrales",
+    "144.2_PVOSINLESC_0_T_38": "pasivos_inversion_cartera_trimestrales",
+    "144.2_PVOSINLES_0_T_38": "pasivos_inversion_directa_trimestrales",
+    "144.2_PVOSOTION_0_T_22": "pasivos_otra_inversion",
+    "144.2_PVOSTRLES_0_T_20": "pasivos_trimestrales",
+}
+PII_SECTOR = {
+    "144.4_AVOSOTLESIN_0_T_30": "activos_otros_sectores_anuales",
+    "144.4_AVOSOTLES_0_T_48": "activos_otros_sectores_inversion_cartera_anuales",
+    "144.4_AVOSOTRAL_0_T_46": "activos_otros_sectores_inversion_directa_anual",
+    "144.4_AVOSOTUAL_0_T_54": "activos_otros_sectores_otra_inversion_trimestral_anual",
+    "144.4_BOCENTRAL_0_T_19": "banco_central_anual",
+    "144.4_GERNOGRAL_0_T_22": "gobierno_general_anual",
+    "144.4_OSSECTRES_0_T_14": "otros_sectores",
+    "144.4_SEDADESTOS_0_T_31": "sociedades_captadoras_depositos",
+}
+BOP_TRIM = {
+    "160.2_AVOS_RERVA_0_T_15": "activos_reserva",
+    "160.2_CCTE_INCTA_0_T_51": "cta_cte_ingresos_primarios_rentas_inversion_directa",
+    "160.2_CFIN_INTAL_0_T_57": "cta_fin_inversion_directa_activos_participaciones_capital",
+    "160.2_CFIN_INTAL_AC_0_T_57": "cta_fin_inversion_cartera_activos_participaciones_capital",
+    "160.2_CFIN_INUDA_0_T_52": "cta_fin_inversion_directa_pasivos_instrumentos_deuda",
+    "160.2_CFIN_PAINTAL_0_T_57": "cta_fin_inversion_cartera_pasivos_participaciones_capital",
+    "160.2_CFIN_PASINTAL_0_T_57": "cta_fin_inversion_directa_pasivos_participaciones_capital",
+    "160.2_CTA_ACFINUDA_0_T_59": "cuenta_financiera_inversion_cartera_activos_instrumentosuda",
+    "160.2_CTA_CORDOS_0_T_49": "cuenta_corriente_ingresos_primarios_rem_empleados",
+    "160.2_CTA_CORFOB_0_T_59": "cuenta_corrientes_bienes_servicios_bienes_exportaciones_fob",
+    "160.2_CTA_CORION_0_T_57": "cuenta_corriente_ingresos_primarios_rentas_otra_inversion",
+    "160.2_CTA_CORION_0_T_58": "cuenta_corriente_ingresos_primarios_total_rentas_inversion",
+    "160.2_CTA_CORIOS_0_T_37": "cuenta_corriente_ingresos_secundarios",
+    "160.2_CTA_CORIOS_0_T_39": "cuenta_corriente_total_bienes_servicios",
+    "160.2_CTA_CORIOS_0_T_41": "cuenta_corriente_total_ingresos_primarios",
+    "160.2_CTA_CORIOS_0_T_49": "cuenta_corriente_bienes_servicios_total_servicios",
+    "160.2_CTA_CORIOS_0_T_51": "cuenta_corriente_bienes_servicios_egresos_servicios",
+    "160.2_CTA_CORIOS_0_T_52": "cuenta_corriente_bienes_servicios_ingresos_servicios",
+    "160.2_CTA_CORNES_0_T_46": "cuenta_corriente_bienes_servicios_total_bienes",
+    "160.2_CTA_CORRFOB_0_T_59": "cuenta_corrientes_bienes_servicios_bienes_importaciones_fob",
+    "160.2_CTA_FINCTA_0_T_41": "cuenta_financiera_total_inversion_directa",
+    "160.2_CTA_FINERA_0_T_41": "cuenta_financiera_total_inversion_cartera",
+    "160.2_CTA_FINION_0_T_38": "cuenta_financiera_total_otra_inversion",
+    "160.2_CTA_FINROS_0_T_36": "cuenta_financierarivados_financieros",
+    "160.2_CTA_FINUDA_0_T_59": "cuenta_financiera_inversion_directa_activos_instrumentosuda",
+    "160.2_CTA_PAFINUDA_0_T_59": "cuenta_financiera_inversion_cartera_pasivos_instrumentosuda",
+    "160.2_ERES_OMTOS_0_T_23": "errores_omisiones_netos",
+    "160.2_IESOS_PERA_0_T_53": "ingresos_primarios_rentas_inversion_inversion_cartera",
+    "160.2_TL_CUENERA_0_T_23": "total_cuenta_financiera",
+    "160.2_TL_CUENNTE_0_T_22": "total_cuenta_corriente",
+    "160.2_TL_CUENTAL_0_T_20": "total_cuenta_capital",
+}
+IMIG_MENSUAL = {
+    "452.2_APORTES_COIAL_0_T_39_29": "aportes_contribuciones_seguridad_social",
+    "452.2_BIENES_PERLES_0_T_17_26": "bienes_personales",
+    "452.2_COMBUSTIBLLES_0_T_12_97": "combustibles",
+    "452.2_DEBITOS_CRTOS_0_T_16_22": "debitos_creditos",
+    "452.2_DERECHOS_EION_0_T_20_42": "derechos_exportacion",
+    "452.2_DERECHOS_IION_0_T_20_60": "derechos_importacion",
+    "452.2_ENERGIAGIA_0_T_7_56": "energia",
+    "452.2_GANANCIASIAS_0_T_9_51": "ganancias",
+    "452.2_IMPUESTOS_NOS_0_T_18_87": "impuestos_internos",
+    "452.2_IVA_NETO_RROS_0_T_19_67": "iva_neto_reintegros",
+    "452.2_OTRAS_FUNCNES_0_T_15_25": "otras_funciones",
+    "452.2_RESTO_TRIBIOS_0_T_17_0": "resto_tributarios",
+    "452.2_TRANSPORTERTE_0_T_10_32": "transporte",
+}
+
 # ── providers ────────────────────────────────────────────────────────────────
 # mode "full": the file has the whole history. "recent": only the latest months, merged
 # onto the stored history (the newer file wins where they overlap).
@@ -794,6 +877,17 @@ PROVIDERS = [
     {"name": "datos.gob.ar public sector accounts (CSV)",
      "url": f"{DATOS}/379/distribution/379.9/download/sector-publico-nacional-valores-mensuales-17.csv",
      "read": datos_csv(AIF_CSV), "mode": "full", "ids": list(AIF_CSV)},
+    # More datos.gob.ar datasets read as whole files instead of through the API.
+    {"name": "datos.gob.ar consumer confidence (UTDT) (CSV)", "url": f"{DATOS}/380/distribution/380.3/download/indice-confianza-consumidor-valores-mensuales.csv",
+     "read": datos_csv(ICC_MENSUAL), "mode": "full", "ids": list(ICC_MENSUAL)},
+    {"name": "datos.gob.ar international investment position by category (CSV)", "url": f"{DATOS}/144/distribution/144.2/download/posicion-inversion-internacional-neta-por-categoria-trimestral.csv",
+     "read": datos_csv(PII_CATEGORIA), "mode": "full", "ids": list(PII_CATEGORIA)},
+    {"name": "datos.gob.ar international investment position by sector (CSV)", "url": f"{DATOS}/144/distribution/144.4/download/posicion-inversion-internacional-neta-por-sector-trimestral.csv",
+     "read": datos_csv(PII_SECTOR), "mode": "full", "ids": list(PII_SECTOR)},
+    {"name": "datos.gob.ar balance of payments (BPM6) (CSV)", "url": f"{DATOS}/160/distribution/160.2/download/estimacion-palance-pagos-mbp6-trimestral.csv",
+     "read": datos_csv(BOP_TRIM), "mode": "full", "ids": list(BOP_TRIM)},
+    {"name": "datos.gob.ar national public sector revenue and spending (IMIG) (CSV)", "url": f"{DATOS}/452/distribution/452.3/download/imig-mensual.csv",
+     "read": datos_csv(IMIG_MENSUAL), "mode": "full", "ids": list(IMIG_MENSUAL)},
     # datos.gob.ar's full CSV downloads: the only monthly source by partner, and the fallback
     # for the INDEC trade files above (series already served are skipped).
     {"name": "datos.gob.ar exports by partner (CSV)", "url": f"{DATOS}/77/distribution/77.3/download/exportaciones-por-paises-regiones-mensual.csv",

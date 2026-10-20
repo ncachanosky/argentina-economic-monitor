@@ -189,3 +189,12 @@ def test_public_sector_csv_reader():
     out = P.datos_csv(P.AIF_CSV)(raw("aif_17.csv"))
     assert len(out) == 12 and all(s.index.min() == pd.Timestamp("2015-01-01") for s in out.values())
     assert out["379.9_GTOS_PRIMA017__37_33"].index.max() == pd.Timestamp("2026-08-01")
+
+
+@pytest.mark.parametrize("mapping,file,last", [("BOP_TRIM", "bop_mbp6_trim.csv", "2026-04-01"),
+                                                ("IMIG_MENSUAL", "imig_mensual.csv", "2026-08-01")])
+def test_dataset_csv_readers(mapping, file, last):
+    cols = getattr(P, mapping)
+    out = P.datos_csv(cols)(raw(file))
+    assert set(out) == set(cols)
+    assert max(s.index.max() for s in out.values()) == pd.Timestamp(last)
