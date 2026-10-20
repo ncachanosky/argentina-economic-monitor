@@ -710,6 +710,20 @@ IMPO_PAISES = {"78.3_IIB_0_A_24": "ica_importaciones_brasil", "78.3_IIC_0_A_23":
                "78.3_IITM_0_A_32": "ica_importaciones_total_mercosur", "78.3_IIT_0_A_25": "ica_importaciones_totales"}
 
 
+AIF_CSV = {"379.9_GTOS_CAP_2017__13_60": "gtos_cap_2017",
+           "379.9_GTOS_CAP_T017__50_91": "gtos_cap_transf_cap_prov_caba_total_prov_caba_2017",
+           "379.9_GTOS_CORR_017_3_0_M_50_79": "gtos_corr_transf_corr_sec_priv_total_sec_priv_2017",
+           "379.9_GTOS_CORR_017_5_0_M_51_42": "gtos_corr_transf_corr_sect_pub_caba_total_caba_2017",
+           "379.9_GTOS_CORR_017__35_92": "gtos_corr_prestaciones_seg_soc_2017",
+           "379.9_GTOS_CORR_017__40_84": "gtos_corr_int_ot_ren_prop_int_netos_2017",
+           "379.9_GTOS_CORR_017__49_26": "gtos_corr_gtos_cons_operacion_remuneraciones_2017",
+           "379.9_GTOS_PRIMA017__37_33": "gtos_primario_antes_figurativos_2017",
+           "379.9_ING_ANTES_017__26_83": "ing_antes_figurativos_2017",
+           "379.9_ING_CORR_I017__29_10": "ing_corr_ing_tributarios_2017",
+           "379.9_RESULTADO_017__18_38": "resultado_fin_2017",
+           "379.9_SUPERAVIT_017__23_94": "superavit_primario_2017"}
+
+
 # ── providers ────────────────────────────────────────────────────────────────
 # mode "full": the file has the whole history. "recent": only the latest months, merged
 # onto the stored history (the newer file wins where they overlap).
@@ -775,6 +789,11 @@ PROVIDERS = [
      # INDEC has revised 2003-2006 since datos.gob.ar copied the series, and no longer publishes
      # the first half of 2007; its file is the official one, so the check starts in 2007.
      "agree_from": "2007-01-01"},
+    # Public sector accounts (Secretaría de Hacienda, base caja): the whole statement as one file,
+    # the same file the "aif:" series read.
+    {"name": "datos.gob.ar public sector accounts (CSV)",
+     "url": f"{DATOS}/379/distribution/379.9/download/sector-publico-nacional-valores-mensuales-17.csv",
+     "read": datos_csv(AIF_CSV), "mode": "full", "ids": list(AIF_CSV)},
     # datos.gob.ar's full CSV downloads: the only monthly source by partner, and the fallback
     # for the INDEC trade files above (series already served are skipped).
     {"name": "datos.gob.ar exports by partner (CSV)", "url": f"{DATOS}/77/distribution/77.3/download/exportaciones-por-paises-regiones-mensual.csv",

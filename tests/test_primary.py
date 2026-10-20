@@ -183,3 +183,9 @@ def test_latest_national_accounts_file_is_picked(monkeypatch):
     page = raw("indec_ca_page.html").decode("utf-8", "replace") + ' href="/ftp/cuadros/economia/sh_oferta_demanda_12_25.xls"'
     monkeypatch.setattr(P, "download", lambda url, retries=3: page.encode())
     assert P.ca_file(r"sh_oferta_demanda_\d{2}_\d{2}\.xls")().endswith("sh_oferta_demanda_09_26.xls")
+
+
+def test_public_sector_csv_reader():
+    out = P.datos_csv(P.AIF_CSV)(raw("aif_17.csv"))
+    assert len(out) == 12 and all(s.index.min() == pd.Timestamp("2015-01-01") for s in out.values())
+    assert out["379.9_GTOS_PRIMA017__37_33"].index.max() == pd.Timestamp("2026-08-01")
