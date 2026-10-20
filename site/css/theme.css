@@ -97,7 +97,7 @@ a:hover { color: var(--accent-ink); }
 
 /* Header */
 .site-header { border-bottom: 1px solid var(--rule); background: var(--surface); position: sticky; top: 0; z-index: 10; }
-.site-header .wrap { display: flex; align-items: center; gap: 24px; min-height: 64px; flex-wrap: wrap; }
+.site-header .wrap { display: flex; align-items: center; gap: 16px; min-height: 64px; flex-wrap: wrap; max-width: 1280px; }  /* a bit wider than the content: brand, menu and tools fit on one row */
 .brand { display: flex; flex-direction: column; text-decoration: none; padding: 10px 0; }
 .brand-name { font-family: var(--font-ui); font-weight: 700; font-size: 20px; letter-spacing: .01em; color: var(--ink); }
 .brand-name::before { content: ""; display: inline-block; width: 22px; height: 22px; background: url("../img/logo.svg") center / contain no-repeat; margin-right: 8px; vertical-align: -4px; }
@@ -465,7 +465,7 @@ main:focus { outline: none; }
 
 /* Site search */
 .site-search { position: relative; }
-.search-input { width: 210px; font: inherit; font-family: var(--font-ui); font-size: 14px; padding: 6px 10px; border: 1px solid var(--rule); border-radius: 6px; background: var(--surface); color: var(--ink); }
+.search-input { width: 190px; font: inherit; font-family: var(--font-ui); font-size: 14px; padding: 6px 10px; border: 1px solid var(--rule); border-radius: 6px; background: var(--surface); color: var(--ink); }
 .search-input:focus { outline: 2px solid var(--accent); outline-offset: 0; border-color: var(--accent); }
 .search-toggle { display: none; }
 .search-results { position: absolute; right: 0; top: calc(100% + 6px); z-index: 60; width: 340px; max-width: calc(100vw - 24px); margin: 0; padding: 4px 0; list-style: none;
@@ -476,12 +476,15 @@ main:focus { outline: none; }
 .sr-title { font-size: 14px; color: var(--ink); }
 .sr-where { font-size: 12px; color: var(--ink-3); }
 .sr-empty { font-size: 13px; color: var(--ink-3); cursor: default !important; }
-@media (max-width: 900px) {
+@media (max-width: 1240px) {   /* below this the box would push the tools to a second row: a search button instead */
   .search-toggle { display: inline-flex; }
   .search-panel { display: none; position: fixed; left: 12px; right: 12px; top: var(--search-top, 64px); z-index: 60; }
   .site-search.open .search-panel { display: block; }
   .search-input { width: 100%; box-shadow: 0 8px 24px rgba(0,0,0,.12); }
   .search-results { position: static; width: 100%; margin-top: 4px; }
+}
+@media (min-width: 901px) and (max-width: 1240px) {   /* desktop with the search button: a panel under it, not full width */
+  .search-panel { left: auto; right: 16px; width: 420px; }
 }
 
 .how-list { padding-left: 1.2em; }
