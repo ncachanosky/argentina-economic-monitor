@@ -52,7 +52,7 @@ inputs:
      label: "INDEC CPI-GBA (base Apr 2008), m/m %, 1993-2013"}
   - {id: 98.3_INNG_2013_0_20, source: manual, frequency: M, measure: index, static: true,
      label: "INDEC IPC-NU (national urban), Dec 2013 - Oct 2015"}
-  - {id: 103.1_I2N_2016_M_19, source: datos_gob, frequency: M, measure: index,
+  - {id: 103.1_I2N_2016_M_19, source: manual, frequency: M, measure: index, static: true,
      label: "INDEC CPI-GBA (base Apr 2016)"}
   - {id: 2.2_OGP_1993_T_17, source: manual, frequency: Q, measure: index, static: true,
      label: "INDEC GDP at 1993 prices, 1993-2013"}

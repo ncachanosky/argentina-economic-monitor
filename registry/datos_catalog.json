@@ -1,10 +1,4 @@
 {
- "103.1_I2N_2016_M_19": {
-  "distribution": "101.5",
-  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/101/distribution/101.5/download/indice-precios-al-consumidor-categorias-base-diciembre-2016-mensual.csv",
-  "column": "ipc_2016_nivgeneral",
-  "title": "Índice de Precios al Consumidor, por categorías. Base diciembre 2016. Valores mensuales"
- },
  "11.3_AGCS_2004_M_41": {
   "distribution": "11.3",
   "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/11/distribution/11.3/download/emae-apertura-por-sectores-valores-mensuales-indice-base-2004.csv",
