@@ -76,23 +76,29 @@ def _candidates(today: date | None = None) -> list[str]:
 
 
 def download() -> tuple[bytes, str]:
-    last = None
+    """The newest monthly archive. A month that is not published yet (404 or a small page) is skipped; any
+    other failure stops the search instead of falling back to an older archive, which would
+    make every series go backwards (the run then keeps the last good data)."""
     with requests.Session() as s:
         s.headers["User-Agent"] = USER_AGENT
         for ym in _candidates():
-            try:
-                r = s.get(BASE.format(ym=ym), timeout=TIMEOUT)
-                if r.status_code == 404 or len(r.content) < 1_000_000:
-                    continue
-                r.raise_for_status()
-                expected = r.headers.get("Content-Length")
-                if expected and int(expected) != len(r.content):
-                    raise IOError(f"incomplete download: {len(r.content)} of {expected} bytes")
-                return r.content, ym
-            except Exception as exc:
-                last = exc
-                time.sleep(5)
-    raise RuntimeError(f"no entity archive found for the last six months ({last})")
+            last = None
+            for attempt in range(3):
+                try:
+                    r = s.get(BASE.format(ym=ym), timeout=TIMEOUT)
+                    if r.status_code == 404 or (r.ok and len(r.content) < 1_000_000):
+                        break                     # not published yet (missing months can return a small page)
+                    r.raise_for_status()
+                    expected = r.headers.get("Content-Length")
+                    if expected and int(expected) != len(r.content):
+                        raise IOError(f"incomplete download: {len(r.content)} of {expected} bytes")
+                    return r.content, ym
+                except Exception as exc:
+                    last = exc
+                    time.sleep(10 * (attempt + 1))
+            if last is not None:
+                raise RuntimeError(f"entity archive {ym}: {last}")
+    raise RuntimeError("no entity archive found for the last six months")
 
 
 def _read_txt(raw: bytes, names: list[str]) -> pd.DataFrame:
