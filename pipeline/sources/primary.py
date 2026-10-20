@@ -968,12 +968,33 @@ def run_provider(p: dict, wanted: set[str]) -> tuple[dict[str, pd.Series], dict]
     return {}, entry
 
 
+def catalog_providers(ids=None) -> list[dict]:
+    """One provider per datos.gob.ar distribution CSV, from registry/datos_catalog.json:
+    the file version of every datos.gob.ar series, read when no publisher file served it
+    (or that file failed). Only series not in the map are left to the API."""
+    from ..datos_catalog import load_map
+    groups: dict[str, dict] = {}
+    for sid, e in load_map().items():
+        if ids is not None and sid not in ids:
+            continue
+        g = groups.setdefault(e["url"], {"name": f"datos.gob.ar {e.get('title') or e['distribution']} ({e['distribution']}, CSV)",
+                                         "url": e["url"], "cols": {}})
+        g["cols"][sid] = e["column"]
+    return [{"name": g["name"], "url": g["url"], "read": datos_csv(g["cols"]), "mode": "full", "ids": list(g["cols"])}
+            for g in groups.values()]
+
+
+def all_providers() -> list[dict]:
+    return PROVIDERS + catalog_providers()
+
+
 def fetch(ids) -> tuple[pd.DataFrame, dict, set]:
-    """Long data, meta and the set of ids served from primary files, for the ids they cover."""
+    """Long data, meta and the set of ids served from files, for the ids they cover: publishers'
+    own files first, then datos.gob.ar's CSV for whatever is left."""
     wanted = set(ids)
     status = _load_status()
     frames, meta, served = [], {}, set()
-    for p in PROVIDERS:
+    for p in PROVIDERS + catalog_providers(wanted):
         todo = (wanted - served) & set(_ids(p))
         if not todo:
             if p.get("fallback") and wanted & set(_ids(p)):

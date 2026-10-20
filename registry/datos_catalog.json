@@ -1,0 +1,1478 @@
+{
+ "103.1_I2N_2016_M_19": {
+  "distribution": "101.5",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/101/distribution/101.5/download/indice-precios-al-consumidor-categorias-base-diciembre-2016-mensual.csv",
+  "column": "ipc_2016_nivgeneral",
+  "title": "Índice de Precios al Consumidor, por categorías. Base diciembre 2016. Valores mensuales"
+ },
+ "11.3_AGCS_2004_M_41": {
+  "distribution": "11.3",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/11/distribution/11.3/download/emae-apertura-por-sectores-valores-mensuales-indice-base-2004.csv",
+  "column": "comercio_mayorista_minorista_reparaciones",
+  "title": "EMAE apertura por sectores. Índice Base 2004. Valores mensuales."
+ },
+ "11.3_CMMR_2004_M_10": {
+  "distribution": "11.3",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/11/distribution/11.3/download/emae-apertura-por-sectores-valores-mensuales-indice-base-2004.csv",
+  "column": "ensenianza",
+  "title": "EMAE apertura por sectores. Índice Base 2004. Valores mensuales."
+ },
+ "11.3_C_2004_M_60": {
+  "distribution": "11.3",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/11/distribution/11.3/download/emae-apertura-por-sectores-valores-mensuales-indice-base-2004.csv",
+  "column": "admin_publica_planes_seguridad_social_afiliacion_obligatoria",
+  "title": "EMAE apertura por sectores. Índice Base 2004. Valores mensuales."
+ },
+ "11.3_EMC_2004_M_25": {
+  "distribution": "11.3",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/11/distribution/11.3/download/emae-apertura-por-sectores-valores-mensuales-indice-base-2004.csv",
+  "column": "transporte_comunicaciones",
+  "title": "EMAE apertura por sectores. Índice Base 2004. Valores mensuales."
+ },
+ "11.3_HR_2004_M_24": {
+  "distribution": "11.3",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/11/distribution/11.3/download/emae-apertura-por-sectores-valores-mensuales-indice-base-2004.csv",
+  "column": "servicios_sociales_salud",
+  "title": "EMAE apertura por sectores. Índice Base 2004. Valores mensuales."
+ },
+ "11.3_IF_2004_M_25": {
+  "distribution": "11.3",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/11/distribution/11.3/download/emae-apertura-por-sectores-valores-mensuales-indice-base-2004.csv",
+  "column": "impuestos_netos_subsidios",
+  "title": "EMAE apertura por sectores. Índice Base 2004. Valores mensuales."
+ },
+ "11.3_IM_2004_M_25": {
+  "distribution": "11.3",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/11/distribution/11.3/download/emae-apertura-por-sectores-valores-mensuales-indice-base-2004.csv",
+  "column": "intermediacion_financiera",
+  "title": "EMAE apertura por sectores. Índice Base 2004. Valores mensuales."
+ },
+ "11.3_ISD_2004_M_26": {
+  "distribution": "11.3",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/11/distribution/11.3/download/emae-apertura-por-sectores-valores-mensuales-indice-base-2004.csv",
+  "column": "explotacion_minas_canteras",
+  "title": "EMAE apertura por sectores. Índice Base 2004. Valores mensuales."
+ },
+ "11.3_ISOM_2004_M_39": {
+  "distribution": "11.3",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/11/distribution/11.3/download/emae-apertura-por-sectores-valores-mensuales-indice-base-2004.csv",
+  "column": "agricultura_ganaderia_caza_silvicultura",
+  "title": "EMAE apertura por sectores. Índice Base 2004. Valores mensuales."
+ },
+ "11.3_ITC_2004_M_21": {
+  "distribution": "11.3",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/11/distribution/11.3/download/emae-apertura-por-sectores-valores-mensuales-indice-base-2004.csv",
+  "column": "electricidad_gas_agua",
+  "title": "EMAE apertura por sectores. Índice Base 2004. Valores mensuales."
+ },
+ "11.3_P_2004_M_20": {
+  "distribution": "11.3",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/11/distribution/11.3/download/emae-apertura-por-sectores-valores-mensuales-indice-base-2004.csv",
+  "column": "hoteles_restaurantes",
+  "title": "EMAE apertura por sectores. Índice Base 2004. Valores mensuales."
+ },
+ "11.3_SEGA_2004_M_48": {
+  "distribution": "11.3",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/11/distribution/11.3/download/emae-apertura-por-sectores-valores-mensuales-indice-base-2004.csv",
+  "column": "actividades_inmobiliarias_empresariales_alquiler",
+  "title": "EMAE apertura por sectores. Índice Base 2004. Valores mensuales."
+ },
+ "11.3_TAC_2004_M_60": {
+  "distribution": "11.3",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/11/distribution/11.3/download/emae-apertura-por-sectores-valores-mensuales-indice-base-2004.csv",
+  "column": "otras_actividades_servicios_comunitarias_sociales_personales",
+  "title": "EMAE apertura por sectores. Índice Base 2004. Valores mensuales."
+ },
+ "11.3_VIPAA_2004_M_5": {
+  "distribution": "11.3",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/11/distribution/11.3/download/emae-apertura-por-sectores-valores-mensuales-indice-base-2004.csv",
+  "column": "pesca",
+  "title": "EMAE apertura por sectores. Índice Base 2004. Valores mensuales."
+ },
+ "11.3_VMASD_2004_M_23": {
+  "distribution": "11.3",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/11/distribution/11.3/download/emae-apertura-por-sectores-valores-mensuales-indice-base-2004.csv",
+  "column": "industria_manufacturera",
+  "title": "EMAE apertura por sectores. Índice Base 2004. Valores mensuales."
+ },
+ "11.3_VMATC_2004_M_12": {
+  "distribution": "11.3",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/11/distribution/11.3/download/emae-apertura-por-sectores-valores-mensuales-indice-base-2004.csv",
+  "column": "construccion",
+  "title": "EMAE apertura por sectores. Índice Base 2004. Valores mensuales."
+ },
+ "143.3_NO_PR_2004_A_21": {
+  "distribution": "143.3",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/143/distribution/143.3/download/emae-valores-anuales-indice-base-2004-mensual.csv",
+  "column": "emae_original",
+  "title": "EMAE. Índice Base 2004.Valores mensuales."
+ },
+ "143.3_NO_PR_2004_A_28": {
+  "distribution": "143.3",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/143/distribution/143.3/download/emae-valores-anuales-indice-base-2004-mensual.csv",
+  "column": "emae_tendencia_ciclo",
+  "title": "EMAE. Índice Base 2004.Valores mensuales."
+ },
+ "143.3_NO_PR_2004_A_31": {
+  "distribution": "143.3",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/143/distribution/143.3/download/emae-valores-anuales-indice-base-2004-mensual.csv",
+  "column": "emae_desestacionalizada",
+  "title": "EMAE. Índice Base 2004.Valores mensuales."
+ },
+ "144.2_AVOSCALES_0_T_24": {
+  "distribution": "144.2",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/144/distribution/144.2/download/posicion-inversion-internacional-neta-por-categoria-trimestral.csv",
+  "column": "activos_cat_trimestrales",
+  "title": "Posición de Inversión Internacional neta por categoría. Valores trimestrales"
+ },
+ "144.2_AVOSRELES_0_T_29": {
+  "distribution": "144.2",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/144/distribution/144.2/download/posicion-inversion-internacional-neta-por-categoria-trimestral.csv",
+  "column": "activos_reservas_trimestrales",
+  "title": "Posición de Inversión Internacional neta por categoría. Valores trimestrales"
+ },
+ "144.2_IRSIONCTA_0_T_17": {
+  "distribution": "144.2",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/144/distribution/144.2/download/posicion-inversion-internacional-neta-por-categoria-trimestral.csv",
+  "column": "inversion_directa",
+  "title": "Posición de Inversión Internacional neta por categoría. Valores trimestrales"
+ },
+ "144.2_IRSIONERA_0_T_17": {
+  "distribution": "144.2",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/144/distribution/144.2/download/posicion-inversion-internacional-neta-por-categoria-trimestral.csv",
+  "column": "inversion_cartera",
+  "title": "Posición de Inversión Internacional neta por categoría. Valores trimestrales"
+ },
+ "144.2_MDADEPRAL_0_T_27": {
+  "distribution": "144.2",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/144/distribution/144.2/download/posicion-inversion-internacional-neta-por-categoria-trimestral.csv",
+  "column": "moneda_depositos_trimestral",
+  "title": "Posición de Inversión Internacional neta por categoría. Valores trimestrales"
+ },
+ "144.2_OINVERRAL_0_T_25": {
+  "distribution": "144.2",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/144/distribution/144.2/download/posicion-inversion-internacional-neta-por-categoria-trimestral.csv",
+  "column": "otra_inversion_trimestral",
+  "title": "Posición de Inversión Internacional neta por categoría. Valores trimestrales"
+ },
+ "144.2_PCIONETA_0_T_37": {
+  "distribution": "144.2",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/144/distribution/144.2/download/posicion-inversion-internacional-neta-por-categoria-trimestral.csv",
+  "column": "posicion_inversion_internacional_neta",
+  "title": "Posición de Inversión Internacional neta por categoría. Valores trimestrales"
+ },
+ "144.2_PVOSDELES_0_T_42": {
+  "distribution": "144.2",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/144/distribution/144.2/download/posicion-inversion-internacional-neta-por-categoria-trimestral.csv",
+  "column": "pasivos_derivados_financieros_trimestrales",
+  "title": "Posición de Inversión Internacional neta por categoría. Valores trimestrales"
+ },
+ "144.2_PVOSINLESC_0_T_38": {
+  "distribution": "144.2",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/144/distribution/144.2/download/posicion-inversion-internacional-neta-por-categoria-trimestral.csv",
+  "column": "pasivos_inversion_cartera_trimestrales",
+  "title": "Posición de Inversión Internacional neta por categoría. Valores trimestrales"
+ },
+ "144.2_PVOSINLES_0_T_38": {
+  "distribution": "144.2",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/144/distribution/144.2/download/posicion-inversion-internacional-neta-por-categoria-trimestral.csv",
+  "column": "pasivos_inversion_directa_trimestrales",
+  "title": "Posición de Inversión Internacional neta por categoría. Valores trimestrales"
+ },
+ "144.2_PVOSOTION_0_T_22": {
+  "distribution": "144.2",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/144/distribution/144.2/download/posicion-inversion-internacional-neta-por-categoria-trimestral.csv",
+  "column": "pasivos_otra_inversion",
+  "title": "Posición de Inversión Internacional neta por categoría. Valores trimestrales"
+ },
+ "144.2_PVOSTRLES_0_T_20": {
+  "distribution": "144.2",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/144/distribution/144.2/download/posicion-inversion-internacional-neta-por-categoria-trimestral.csv",
+  "column": "pasivos_trimestrales",
+  "title": "Posición de Inversión Internacional neta por categoría. Valores trimestrales"
+ },
+ "144.4_AVOSOTLESIN_0_T_30": {
+  "distribution": "144.4",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/144/distribution/144.4/download/posicion-inversion-internacional-neta-por-sector-trimestral.csv",
+  "column": "activos_otros_sectores_anuales",
+  "title": "Posición de Inversión Internacional neta por sector. Valores trimestrales"
+ },
+ "144.4_AVOSOTLES_0_T_48": {
+  "distribution": "144.4",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/144/distribution/144.4/download/posicion-inversion-internacional-neta-por-sector-trimestral.csv",
+  "column": "activos_otros_sectores_inversion_cartera_anuales",
+  "title": "Posición de Inversión Internacional neta por sector. Valores trimestrales"
+ },
+ "144.4_AVOSOTRAL_0_T_46": {
+  "distribution": "144.4",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/144/distribution/144.4/download/posicion-inversion-internacional-neta-por-sector-trimestral.csv",
+  "column": "activos_otros_sectores_inversion_directa_anual",
+  "title": "Posición de Inversión Internacional neta por sector. Valores trimestrales"
+ },
+ "144.4_AVOSOTUAL_0_T_54": {
+  "distribution": "144.4",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/144/distribution/144.4/download/posicion-inversion-internacional-neta-por-sector-trimestral.csv",
+  "column": "activos_otros_sectores_otra_inversion_trimestral_anual",
+  "title": "Posición de Inversión Internacional neta por sector. Valores trimestrales"
+ },
+ "144.4_BOCENTRAL_0_T_19": {
+  "distribution": "144.4",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/144/distribution/144.4/download/posicion-inversion-internacional-neta-por-sector-trimestral.csv",
+  "column": "banco_central_anual",
+  "title": "Posición de Inversión Internacional neta por sector. Valores trimestrales"
+ },
+ "144.4_GERNOGRAL_0_T_22": {
+  "distribution": "144.4",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/144/distribution/144.4/download/posicion-inversion-internacional-neta-por-sector-trimestral.csv",
+  "column": "gobierno_general_anual",
+  "title": "Posición de Inversión Internacional neta por sector. Valores trimestrales"
+ },
+ "144.4_OSSECTRES_0_T_14": {
+  "distribution": "144.4",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/144/distribution/144.4/download/posicion-inversion-internacional-neta-por-sector-trimestral.csv",
+  "column": "otros_sectores",
+  "title": "Posición de Inversión Internacional neta por sector. Valores trimestrales"
+ },
+ "144.4_SEDADESTOS_0_T_31": {
+  "distribution": "144.4",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/144/distribution/144.4/download/posicion-inversion-internacional-neta-por-sector-trimestral.csv",
+  "column": "sociedades_captadoras_depositos",
+  "title": "Posición de Inversión Internacional neta por sector. Valores trimestrales"
+ },
+ "146.3_IALIMENNAL_DICI_M_45": {
+  "distribution": "145.5",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/145/distribution/145.5/download/indice-precios-al-consumidor-apertura-por-capitulos-base-diciembre-2016-mensual.csv",
+  "column": "ipc_alimentos_bebidas_no_alcoholicas_nacional",
+  "title": "Índice de Precios al Consumidor, por capítulos. Base diciembre 2016. Valores mensuales"
+ },
+ "146.3_IBEBIDANAL_DICI_M_39": {
+  "distribution": "145.5",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/145/distribution/145.5/download/indice-precios-al-consumidor-apertura-por-capitulos-base-diciembre-2016-mensual.csv",
+  "column": "ipc_bebidas_alcoholicas_tabaco_nacional",
+  "title": "Índice de Precios al Consumidor, por capítulos. Base diciembre 2016. Valores mensuales"
+ },
+ "146.3_IBIENESNAL_DICI_M_36": {
+  "distribution": "145.5",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/145/distribution/145.5/download/indice-precios-al-consumidor-apertura-por-capitulos-base-diciembre-2016-mensual.csv",
+  "column": "ipc_bienes_servicios_varios_nacional",
+  "title": "Índice de Precios al Consumidor, por capítulos. Base diciembre 2016. Valores mensuales"
+ },
+ "146.3_ICOMUNINAL_DICI_M_27": {
+  "distribution": "145.5",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/145/distribution/145.5/download/indice-precios-al-consumidor-apertura-por-capitulos-base-diciembre-2016-mensual.csv",
+  "column": "ipc_comunicaciones_nacional",
+  "title": "Índice de Precios al Consumidor, por capítulos. Base diciembre 2016. Valores mensuales"
+ },
+ "146.3_IEDUCACNAL_DICI_M_22": {
+  "distribution": "145.5",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/145/distribution/145.5/download/indice-precios-al-consumidor-apertura-por-capitulos-base-diciembre-2016-mensual.csv",
+  "column": "ipc_educacion_nacional",
+  "title": "Índice de Precios al Consumidor, por capítulos. Base diciembre 2016. Valores mensuales"
+ },
+ "146.3_IEQUIPANAL_DICI_M_46": {
+  "distribution": "145.5",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/145/distribution/145.5/download/indice-precios-al-consumidor-apertura-por-capitulos-base-diciembre-2016-mensual.csv",
+  "column": "ipc_equipamiento_mantenimientos_hogar_nacional",
+  "title": "Índice de Precios al Consumidor, por capítulos. Base diciembre 2016. Valores mensuales"
+ },
+ "146.3_IPRENDANAL_DICI_M_35": {
+  "distribution": "145.5",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/145/distribution/145.5/download/indice-precios-al-consumidor-apertura-por-capitulos-base-diciembre-2016-mensual.csv",
+  "column": "ipc_prendas_vestir_calzado_nacional",
+  "title": "Índice de Precios al Consumidor, por capítulos. Base diciembre 2016. Valores mensuales"
+ },
+ "146.3_IRECREANAL_DICI_M_31": {
+  "distribution": "145.5",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/145/distribution/145.5/download/indice-precios-al-consumidor-apertura-por-capitulos-base-diciembre-2016-mensual.csv",
+  "column": "ipc_recreacion_cultura_nacional",
+  "title": "Índice de Precios al Consumidor, por capítulos. Base diciembre 2016. Valores mensuales"
+ },
+ "146.3_IRESTAUNAL_DICI_M_33": {
+  "distribution": "145.5",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/145/distribution/145.5/download/indice-precios-al-consumidor-apertura-por-capitulos-base-diciembre-2016-mensual.csv",
+  "column": "ipc_restaurantes_hoteles_nacional",
+  "title": "Índice de Precios al Consumidor, por capítulos. Base diciembre 2016. Valores mensuales"
+ },
+ "146.3_ISALUDNAL_DICI_M_18": {
+  "distribution": "145.5",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/145/distribution/145.5/download/indice-precios-al-consumidor-apertura-por-capitulos-base-diciembre-2016-mensual.csv",
+  "column": "ipc_salud_nacional",
+  "title": "Índice de Precios al Consumidor, por capítulos. Base diciembre 2016. Valores mensuales"
+ },
+ "146.3_ITRANSPNAL_DICI_M_23": {
+  "distribution": "145.5",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/145/distribution/145.5/download/indice-precios-al-consumidor-apertura-por-capitulos-base-diciembre-2016-mensual.csv",
+  "column": "ipc_transporte_nacional",
+  "title": "Índice de Precios al Consumidor, por capítulos. Base diciembre 2016. Valores mensuales"
+ },
+ "146.3_IVIVIENNAL_DICI_M_52": {
+  "distribution": "145.5",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/145/distribution/145.5/download/indice-precios-al-consumidor-apertura-por-capitulos-base-diciembre-2016-mensual.csv",
+  "column": "ipc_vivienda_agua_electricidad_combustibles_nacional",
+  "title": "Índice de Precios al Consumidor, por capítulos. Base diciembre 2016. Valores mensuales"
+ },
+ "148.3_IESTACINAL_DICI_M_25": {
+  "distribution": "145.9",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/145/distribution/145.9/download/indice-precios-al-consumidor-apertura-por-categorias-base-diciembre-2016-mensual.csv",
+  "column": "ipc_estacionales_nacional",
+  "title": "Índice de Precios al Consumidor, por categorías y regiones. Base diciembre de 2016. Valores mensuales"
+ },
+ "148.3_INIVELANA_DICI_M_26": {
+  "distribution": "145.9",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/145/distribution/145.9/download/indice-precios-al-consumidor-apertura-por-categorias-base-diciembre-2016-mensual.csv",
+  "column": "ipc_nivel_general_pampeana",
+  "title": "Índice de Precios al Consumidor, por categorías y regiones. Base diciembre de 2016. Valores mensuales"
+ },
+ "148.3_INIVELGBA_DICI_M_21": {
+  "distribution": "145.9",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/145/distribution/145.9/download/indice-precios-al-consumidor-apertura-por-categorias-base-diciembre-2016-mensual.csv",
+  "column": "ipc_nivel_general_gba",
+  "title": "Índice de Precios al Consumidor, por categorías y regiones. Base diciembre de 2016. Valores mensuales"
+ },
+ "148.3_INIVELNAL_DICI_M_26": {
+  "distribution": "145.9",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/145/distribution/145.9/download/indice-precios-al-consumidor-apertura-por-categorias-base-diciembre-2016-mensual.csv",
+  "column": "ipc_nivel_general_nacional",
+  "title": "Índice de Precios al Consumidor, por categorías y regiones. Base diciembre de 2016. Valores mensuales"
+ },
+ "148.3_INIVELNEA_DICI_M_21": {
+  "distribution": "145.9",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/145/distribution/145.9/download/indice-precios-al-consumidor-apertura-por-categorias-base-diciembre-2016-mensual.csv",
+  "column": "ipc_nivel_general_nea",
+  "title": "Índice de Precios al Consumidor, por categorías y regiones. Base diciembre de 2016. Valores mensuales"
+ },
+ "148.3_INIVELNIA_DICI_M_27": {
+  "distribution": "145.9",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/145/distribution/145.9/download/indice-precios-al-consumidor-apertura-por-categorias-base-diciembre-2016-mensual.csv",
+  "column": "ipc_nivel_general_patagonia",
+  "title": "Índice de Precios al Consumidor, por categorías y regiones. Base diciembre de 2016. Valores mensuales"
+ },
+ "148.3_INIVELNOA_DICI_M_21": {
+  "distribution": "145.9",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/145/distribution/145.9/download/indice-precios-al-consumidor-apertura-por-categorias-base-diciembre-2016-mensual.csv",
+  "column": "ipc_nivel_general_noa",
+  "title": "Índice de Precios al Consumidor, por categorías y regiones. Base diciembre de 2016. Valores mensuales"
+ },
+ "148.3_INIVELUYO_DICI_M_22": {
+  "distribution": "145.9",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/145/distribution/145.9/download/indice-precios-al-consumidor-apertura-por-categorias-base-diciembre-2016-mensual.csv",
+  "column": "ipc_nivel_general_cuyo",
+  "title": "Índice de Precios al Consumidor, por categorías y regiones. Base diciembre de 2016. Valores mensuales"
+ },
+ "148.3_INUCLEONAL_DICI_M_19": {
+  "distribution": "145.9",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/145/distribution/145.9/download/indice-precios-al-consumidor-apertura-por-categorias-base-diciembre-2016-mensual.csv",
+  "column": "ipc_nucleo_nacional",
+  "title": "Índice de Precios al Consumidor, por categorías y regiones. Base diciembre de 2016. Valores mensuales"
+ },
+ "148.3_IREGULANAL_DICI_M_22": {
+  "distribution": "145.9",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/145/distribution/145.9/download/indice-precios-al-consumidor-apertura-por-categorias-base-diciembre-2016-mensual.csv",
+  "column": "ipc_regulados_nacional",
+  "title": "Índice de Precios al Consumidor, por categorías y regiones. Base diciembre de 2016. Valores mensuales"
+ },
+ "149.1_SOR_PRIADO_OCTU_0_25": {
+  "distribution": "149.1",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/149/distribution/149.1/download/indice-salarios-periodicidad-mensual-base-octubre-2016.csv",
+  "column": "indice_salarios_registrado_sector_privado",
+  "title": "Índice de salarios. Base octubre 2016.  Valores mensuales."
+ },
+ "149.1_SOR_PRIADO_OCTU_0_28": {
+  "distribution": "149.1",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/149/distribution/149.1/download/indice-salarios-periodicidad-mensual-base-octubre-2016.csv",
+  "column": "indice_salarios_no_registrado_sector_privado",
+  "title": "Índice de salarios. Base octubre 2016.  Valores mensuales."
+ },
+ "149.1_SOR_PUBICO_OCTU_0_14": {
+  "distribution": "149.1",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/149/distribution/149.1/download/indice-salarios-periodicidad-mensual-base-octubre-2016.csv",
+  "column": "indice_salarios_registrado_sector_publico",
+  "title": "Índice de salarios. Base octubre 2016.  Valores mensuales."
+ },
+ "149.1_TL_INDIIOS_OCTU_0_21": {
+  "distribution": "149.1",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/149/distribution/149.1/download/indice-salarios-periodicidad-mensual-base-octubre-2016.csv",
+  "column": "indice_salarios",
+  "title": "Índice de salarios. Base octubre 2016.  Valores mensuales."
+ },
+ "150.1_LA_INDICIA_0_D_16": {
+  "distribution": "150.1",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/150/distribution/150.1/download/valores-canasta-basica-alimentos-canasta-basica-total-mensual-2016.csv",
+  "column": "linea_indigencia",
+  "title": "Canasta Básica Alimentaria y Total por adulto equivalente desde 2016. Pesos corrientes. Valores mensuales"
+ },
+ "150.1_LA_POBREZA_0_D_13": {
+  "distribution": "150.1",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/150/distribution/150.1/download/valores-canasta-basica-alimentos-canasta-basica-total-mensual-2016.csv",
+  "column": "linea_pobreza",
+  "title": "Canasta Básica Alimentaria y Total por adulto equivalente desde 2016. Pesos corrientes. Valores mensuales"
+ },
+ "151.1_AARIADOTAC_2012_M_25": {
+  "distribution": "151.1",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/151/distribution/151.1/download/trabajadores-registrados-modalidad-ocupacional-principal-mensual-total-pais-miles-base-2012.csv",
+  "column": "asalariados_pub_sin_estac",
+  "title": "Trabajadores registrados según modalidad ocupacional principal. Total del país en miles. Base 2012. Valores mensuales."
+ },
+ "151.1_AARIADOTAC_2012_M_26": {
+  "distribution": "151.1",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/151/distribution/151.1/download/trabajadores-registrados-modalidad-ocupacional-principal-mensual-total-pais-miles-base-2012.csv",
+  "column": "asalariados_priv_sin_estac",
+  "title": "Trabajadores registrados según modalidad ocupacional principal. Total del país en miles. Base 2012. Valores mensuales."
+ },
+ "151.1_AARIADOTAC_2012_M_40": {
+  "distribution": "151.1",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/151/distribution/151.1/download/trabajadores-registrados-modalidad-ocupacional-principal-mensual-total-pais-miles-base-2012.csv",
+  "column": "asalariados_casas_particulares_sin_estac",
+  "title": "Trabajadores registrados según modalidad ocupacional principal. Total del país en miles. Base 2012. Valores mensuales."
+ },
+ "151.1_IPENDIETAC_2012_M_34": {
+  "distribution": "151.1",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/151/distribution/151.1/download/trabajadores-registrados-modalidad-ocupacional-principal-mensual-total-pais-miles-base-2012.csv",
+  "column": "independientes_autonomos_sin_estac",
+  "title": "Trabajadores registrados según modalidad ocupacional principal. Total del país en miles. Base 2012. Valores mensuales."
+ },
+ "151.1_IPENDIETAC_2012_M_36": {
+  "distribution": "151.1",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/151/distribution/151.1/download/trabajadores-registrados-modalidad-ocupacional-principal-mensual-total-pais-miles-base-2012.csv",
+  "column": "independientes_monotributo_sin_estac",
+  "title": "Trabajadores registrados según modalidad ocupacional principal. Total del país en miles. Base 2012. Valores mensuales."
+ },
+ "151.1_IPENDIETAC_2012_M_43": {
+  "distribution": "151.1",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/151/distribution/151.1/download/trabajadores-registrados-modalidad-ocupacional-principal-mensual-total-pais-miles-base-2012.csv",
+  "column": "independientes_monotributo_social_sin_estac",
+  "title": "Trabajadores registrados según modalidad ocupacional principal. Total del país en miles. Base 2012. Valores mensuales."
+ },
+ "151.1_TL_SIN_TAC_2012_M_15": {
+  "distribution": "151.1",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/151/distribution/151.1/download/trabajadores-registrados-modalidad-ocupacional-principal-mensual-total-pais-miles-base-2012.csv",
+  "column": "total_sin_estac",
+  "title": "Trabajadores registrados según modalidad ocupacional principal. Total del país en miles. Base 2012. Valores mensuales."
+ },
+ "158.1_REPTE_0_0_5": {
+  "distribution": "158.1",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/158/distribution/158.1/download/remuneracion-imponible-promedio-trabajadores-estables-ripte-total-pais-pesos-serie-mensual.csv",
+  "column": "ripte",
+  "title": "Remuneración imponible promedio de los trabajadores estables RIPTE. Total país en pesos. Serie mensual"
+ },
+ "160.2_AVOS_RERVA_0_T_15": {
+  "distribution": "160.2",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/160/distribution/160.2/download/estimacion-palance-pagos-mbp6-trimestral.csv",
+  "column": "activos_reserva",
+  "title": "Estimación del Balance de Pagos (MBP6). Valores trimestrales."
+ },
+ "160.2_CCTE_INCTA_0_T_51": {
+  "distribution": "160.2",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/160/distribution/160.2/download/estimacion-palance-pagos-mbp6-trimestral.csv",
+  "column": "cta_cte_ingresos_primarios_rentas_inversion_directa",
+  "title": "Estimación del Balance de Pagos (MBP6). Valores trimestrales."
+ },
+ "160.2_CFIN_INTAL_0_T_57": {
+  "distribution": "160.2",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/160/distribution/160.2/download/estimacion-palance-pagos-mbp6-trimestral.csv",
+  "column": "cta_fin_inversion_directa_activos_participaciones_capital",
+  "title": "Estimación del Balance de Pagos (MBP6). Valores trimestrales."
+ },
+ "160.2_CFIN_INTAL_AC_0_T_57": {
+  "distribution": "160.2",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/160/distribution/160.2/download/estimacion-palance-pagos-mbp6-trimestral.csv",
+  "column": "cta_fin_inversion_cartera_activos_participaciones_capital",
+  "title": "Estimación del Balance de Pagos (MBP6). Valores trimestrales."
+ },
+ "160.2_CFIN_INUDA_0_T_52": {
+  "distribution": "160.2",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/160/distribution/160.2/download/estimacion-palance-pagos-mbp6-trimestral.csv",
+  "column": "cta_fin_inversion_directa_pasivos_instrumentos_deuda",
+  "title": "Estimación del Balance de Pagos (MBP6). Valores trimestrales."
+ },
+ "160.2_CFIN_PAINTAL_0_T_57": {
+  "distribution": "160.2",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/160/distribution/160.2/download/estimacion-palance-pagos-mbp6-trimestral.csv",
+  "column": "cta_fin_inversion_cartera_pasivos_participaciones_capital",
+  "title": "Estimación del Balance de Pagos (MBP6). Valores trimestrales."
+ },
+ "160.2_CFIN_PASINTAL_0_T_57": {
+  "distribution": "160.2",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/160/distribution/160.2/download/estimacion-palance-pagos-mbp6-trimestral.csv",
+  "column": "cta_fin_inversion_directa_pasivos_participaciones_capital",
+  "title": "Estimación del Balance de Pagos (MBP6). Valores trimestrales."
+ },
+ "160.2_CTA_ACFINUDA_0_T_59": {
+  "distribution": "160.2",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/160/distribution/160.2/download/estimacion-palance-pagos-mbp6-trimestral.csv",
+  "column": "cuenta_financiera_inversion_cartera_activos_instrumentosuda",
+  "title": "Estimación del Balance de Pagos (MBP6). Valores trimestrales."
+ },
+ "160.2_CTA_CORDOS_0_T_49": {
+  "distribution": "160.2",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/160/distribution/160.2/download/estimacion-palance-pagos-mbp6-trimestral.csv",
+  "column": "cuenta_corriente_ingresos_primarios_rem_empleados",
+  "title": "Estimación del Balance de Pagos (MBP6). Valores trimestrales."
+ },
+ "160.2_CTA_CORFOB_0_T_59": {
+  "distribution": "160.2",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/160/distribution/160.2/download/estimacion-palance-pagos-mbp6-trimestral.csv",
+  "column": "cuenta_corrientes_bienes_servicios_bienes_exportaciones_fob",
+  "title": "Estimación del Balance de Pagos (MBP6). Valores trimestrales."
+ },
+ "160.2_CTA_CORION_0_T_57": {
+  "distribution": "160.2",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/160/distribution/160.2/download/estimacion-palance-pagos-mbp6-trimestral.csv",
+  "column": "cuenta_corriente_ingresos_primarios_rentas_otra_inversion",
+  "title": "Estimación del Balance de Pagos (MBP6). Valores trimestrales."
+ },
+ "160.2_CTA_CORION_0_T_58": {
+  "distribution": "160.2",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/160/distribution/160.2/download/estimacion-palance-pagos-mbp6-trimestral.csv",
+  "column": "cuenta_corriente_ingresos_primarios_total_rentas_inversion",
+  "title": "Estimación del Balance de Pagos (MBP6). Valores trimestrales."
+ },
+ "160.2_CTA_CORIOS_0_T_37": {
+  "distribution": "160.2",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/160/distribution/160.2/download/estimacion-palance-pagos-mbp6-trimestral.csv",
+  "column": "cuenta_corriente_ingresos_secundarios",
+  "title": "Estimación del Balance de Pagos (MBP6). Valores trimestrales."
+ },
+ "160.2_CTA_CORIOS_0_T_39": {
+  "distribution": "160.2",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/160/distribution/160.2/download/estimacion-palance-pagos-mbp6-trimestral.csv",
+  "column": "cuenta_corriente_total_bienes_servicios",
+  "title": "Estimación del Balance de Pagos (MBP6). Valores trimestrales."
+ },
+ "160.2_CTA_CORIOS_0_T_41": {
+  "distribution": "160.2",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/160/distribution/160.2/download/estimacion-palance-pagos-mbp6-trimestral.csv",
+  "column": "cuenta_corriente_total_ingresos_primarios",
+  "title": "Estimación del Balance de Pagos (MBP6). Valores trimestrales."
+ },
+ "160.2_CTA_CORIOS_0_T_49": {
+  "distribution": "160.2",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/160/distribution/160.2/download/estimacion-palance-pagos-mbp6-trimestral.csv",
+  "column": "cuenta_corriente_bienes_servicios_total_servicios",
+  "title": "Estimación del Balance de Pagos (MBP6). Valores trimestrales."
+ },
+ "160.2_CTA_CORIOS_0_T_51": {
+  "distribution": "160.2",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/160/distribution/160.2/download/estimacion-palance-pagos-mbp6-trimestral.csv",
+  "column": "cuenta_corriente_bienes_servicios_egresos_servicios",
+  "title": "Estimación del Balance de Pagos (MBP6). Valores trimestrales."
+ },
+ "160.2_CTA_CORIOS_0_T_52": {
+  "distribution": "160.2",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/160/distribution/160.2/download/estimacion-palance-pagos-mbp6-trimestral.csv",
+  "column": "cuenta_corriente_bienes_servicios_ingresos_servicios",
+  "title": "Estimación del Balance de Pagos (MBP6). Valores trimestrales."
+ },
+ "160.2_CTA_CORNES_0_T_46": {
+  "distribution": "160.2",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/160/distribution/160.2/download/estimacion-palance-pagos-mbp6-trimestral.csv",
+  "column": "cuenta_corriente_bienes_servicios_total_bienes",
+  "title": "Estimación del Balance de Pagos (MBP6). Valores trimestrales."
+ },
+ "160.2_CTA_CORRFOB_0_T_59": {
+  "distribution": "160.2",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/160/distribution/160.2/download/estimacion-palance-pagos-mbp6-trimestral.csv",
+  "column": "cuenta_corrientes_bienes_servicios_bienes_importaciones_fob",
+  "title": "Estimación del Balance de Pagos (MBP6). Valores trimestrales."
+ },
+ "160.2_CTA_FINCTA_0_T_41": {
+  "distribution": "160.2",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/160/distribution/160.2/download/estimacion-palance-pagos-mbp6-trimestral.csv",
+  "column": "cuenta_financiera_total_inversion_directa",
+  "title": "Estimación del Balance de Pagos (MBP6). Valores trimestrales."
+ },
+ "160.2_CTA_FINERA_0_T_41": {
+  "distribution": "160.2",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/160/distribution/160.2/download/estimacion-palance-pagos-mbp6-trimestral.csv",
+  "column": "cuenta_financiera_total_inversion_cartera",
+  "title": "Estimación del Balance de Pagos (MBP6). Valores trimestrales."
+ },
+ "160.2_CTA_FINION_0_T_38": {
+  "distribution": "160.2",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/160/distribution/160.2/download/estimacion-palance-pagos-mbp6-trimestral.csv",
+  "column": "cuenta_financiera_total_otra_inversion",
+  "title": "Estimación del Balance de Pagos (MBP6). Valores trimestrales."
+ },
+ "160.2_CTA_FINROS_0_T_36": {
+  "distribution": "160.2",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/160/distribution/160.2/download/estimacion-palance-pagos-mbp6-trimestral.csv",
+  "column": "cuenta_financierarivados_financieros",
+  "title": "Estimación del Balance de Pagos (MBP6). Valores trimestrales."
+ },
+ "160.2_CTA_FINUDA_0_T_59": {
+  "distribution": "160.2",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/160/distribution/160.2/download/estimacion-palance-pagos-mbp6-trimestral.csv",
+  "column": "cuenta_financiera_inversion_directa_activos_instrumentosuda",
+  "title": "Estimación del Balance de Pagos (MBP6). Valores trimestrales."
+ },
+ "160.2_CTA_PAFINUDA_0_T_59": {
+  "distribution": "160.2",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/160/distribution/160.2/download/estimacion-palance-pagos-mbp6-trimestral.csv",
+  "column": "cuenta_financiera_inversion_cartera_pasivos_instrumentosuda",
+  "title": "Estimación del Balance de Pagos (MBP6). Valores trimestrales."
+ },
+ "160.2_ERES_OMTOS_0_T_23": {
+  "distribution": "160.2",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/160/distribution/160.2/download/estimacion-palance-pagos-mbp6-trimestral.csv",
+  "column": "errores_omisiones_netos",
+  "title": "Estimación del Balance de Pagos (MBP6). Valores trimestrales."
+ },
+ "160.2_IESOS_PERA_0_T_53": {
+  "distribution": "160.2",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/160/distribution/160.2/download/estimacion-palance-pagos-mbp6-trimestral.csv",
+  "column": "ingresos_primarios_rentas_inversion_inversion_cartera",
+  "title": "Estimación del Balance de Pagos (MBP6). Valores trimestrales."
+ },
+ "160.2_TL_CUENERA_0_T_23": {
+  "distribution": "160.2",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/160/distribution/160.2/download/estimacion-palance-pagos-mbp6-trimestral.csv",
+  "column": "total_cuenta_financiera",
+  "title": "Estimación del Balance de Pagos (MBP6). Valores trimestrales."
+ },
+ "160.2_TL_CUENNTE_0_T_22": {
+  "distribution": "160.2",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/160/distribution/160.2/download/estimacion-palance-pagos-mbp6-trimestral.csv",
+  "column": "total_cuenta_corriente",
+  "title": "Estimación del Balance de Pagos (MBP6). Valores trimestrales."
+ },
+ "160.2_TL_CUENTAL_0_T_20": {
+  "distribution": "160.2",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/160/distribution/160.2/download/estimacion-palance-pagos-mbp6-trimestral.csv",
+  "column": "total_cuenta_capital",
+  "title": "Estimación del Balance de Pagos (MBP6). Valores trimestrales."
+ },
+ "183.1_COBROS_EXPNES_0_M_27": {
+  "distribution": "183.1",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/183/distribution/183.1/download/cobros-pagos-bienes-modalidad.csv",
+  "column": "cobros_exportaciones_bienes",
+  "title": "Cobros y pagos por bienes por modalidad de pago. Valores mensuales"
+ },
+ "183.1_PAGOS_IMPONES_0_M_26": {
+  "distribution": "183.1",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/183/distribution/183.1/download/cobros-pagos-bienes-modalidad.csv",
+  "column": "pagos_importaciones_bienes",
+  "title": "Cobros y pagos por bienes por modalidad de pago. Valores mensuales"
+ },
+ "25.2_OGP_2004_T_17": {
+  "distribution": "25.2",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/25/distribution/25.2/download/indice-precios-implicitos-oferta-demanda-globales-valores-trimestrales-base-2004.csv",
+  "column": "oferta_global_pib",
+  "title": "Índice de precios implícitos de la Oferta y Demanda Globales. Base 2004. Valores trimestrales"
+ },
+ "3.2_OGP_D_2004_T_17": {
+  "distribution": "3.2",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/3/distribution/3.2/download/oferta-demanda-globales-datos-desestacionalizados-valores-trimestral-base-2004.csv",
+  "column": "oferta_global_pib",
+  "title": "Oferta y Demanda Global. Precios constantes desestacionalizados. Base 2004. Valores trimestrales."
+ },
+ "31.3_UCP_2004_M_20": {
+  "distribution": "31.3",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/31/distribution/31.3/download/utilizacion-capacidad-instalada-industria-valores-mensuales-base-2004.csv",
+  "column": "ucii_caucho_plastico",
+  "title": "Utilización de la capacidad instalada en la industria. Base 2004. Valores mensuales"
+ },
+ "31.3_UEI_2004_M_22": {
+  "distribution": "31.3",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/31/distribution/31.3/download/utilizacion-capacidad-instalada-industria-valores-mensuales-base-2004.csv",
+  "column": "ucii_edicion_impresion",
+  "title": "Utilización de la capacidad instalada en la industria. Base 2004. Valores mensuales"
+ },
+ "31.3_UIMB_2004_M_33": {
+  "distribution": "31.3",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/31/distribution/31.3/download/utilizacion-capacidad-instalada-industria-valores-mensuales-base-2004.csv",
+  "column": "ucii_industrias_metalicas_basicas",
+  "title": "Utilización de la capacidad instalada en la industria. Base 2004. Valores mensuales"
+ },
+ "31.3_UMNIA_2004_M_42": {
+  "distribution": "31.3",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/31/distribution/31.3/download/utilizacion-capacidad-instalada-industria-valores-mensuales-base-2004.csv",
+  "column": "ucii_metalmecanica_no_industria_automotriz",
+  "title": "Utilización de la capacidad instalada en la industria. Base 2004. Valores mensuales"
+ },
+ "31.3_UMNM_2004_M_27": {
+  "distribution": "31.3",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/31/distribution/31.3/download/utilizacion-capacidad-instalada-industria-valores-mensuales-base-2004.csv",
+  "column": "ucii_minerales_no_metalicos",
+  "title": "Utilización de la capacidad instalada en la industria. Base 2004. Valores mensuales"
+ },
+ "31.3_UNG_2004_M_18": {
+  "distribution": "31.3",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/31/distribution/31.3/download/utilizacion-capacidad-instalada-industria-valores-mensuales-base-2004.csv",
+  "column": "ucii_nivel_general",
+  "title": "Utilización de la capacidad instalada en la industria. Base 2004. Valores mensuales"
+ },
+ "31.3_UPAB_2004_M_35": {
+  "distribution": "31.3",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/31/distribution/31.3/download/utilizacion-capacidad-instalada-industria-valores-mensuales-base-2004.csv",
+  "column": "ucii_productos_alimenticios_bebidas",
+  "title": "Utilización de la capacidad instalada en la industria. Base 2004. Valores mensuales"
+ },
+ "31.3_UPC_2004_M_17": {
+  "distribution": "31.3",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/31/distribution/31.3/download/utilizacion-capacidad-instalada-industria-valores-mensuales-base-2004.csv",
+  "column": "ucii_papel_carton",
+  "title": "Utilización de la capacidad instalada en la industria. Base 2004. Valores mensuales"
+ },
+ "31.3_UPT_2004_M_21": {
+  "distribution": "31.3",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/31/distribution/31.3/download/utilizacion-capacidad-instalada-industria-valores-mensuales-base-2004.csv",
+  "column": "ucii_productos_tabaco",
+  "title": "Utilización de la capacidad instalada en la industria. Base 2004. Valores mensuales"
+ },
+ "31.3_UPT_2004_M_23": {
+  "distribution": "31.3",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/31/distribution/31.3/download/utilizacion-capacidad-instalada-industria-valores-mensuales-base-2004.csv",
+  "column": "ucii_productos_textiles",
+  "title": "Utilización de la capacidad instalada en la industria. Base 2004. Valores mensuales"
+ },
+ "31.3_URP_2004_M_24": {
+  "distribution": "31.3",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/31/distribution/31.3/download/utilizacion-capacidad-instalada-industria-valores-mensuales-base-2004.csv",
+  "column": "ucii_refinacion_petroleo",
+  "title": "Utilización de la capacidad instalada en la industria. Base 2004. Valores mensuales"
+ },
+ "31.3_USPQ_2004_M_34": {
+  "distribution": "31.3",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/31/distribution/31.3/download/utilizacion-capacidad-instalada-industria-valores-mensuales-base-2004.csv",
+  "column": "ucii_sustancias_productos_quimicos",
+  "title": "Utilización de la capacidad instalada en la industria. Base 2004. Valores mensuales"
+ },
+ "31.3_UV_2004_M_25": {
+  "distribution": "31.3",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/31/distribution/31.3/download/utilizacion-capacidad-instalada-industria-valores-mensuales-base-2004.csv",
+  "column": "ucii_vehiculosautomotores",
+  "title": "Utilización de la capacidad instalada en la industria. Base 2004. Valores mensuales"
+ },
+ "33.2_ISAC_CICLOCIA_0_M_20_62": {
+  "distribution": "33.2",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/33/distribution/33.2/download/indicador-sintetico-actividad-construccion-valores-mensuales-base-2004.csv",
+  "column": "isac_ciclo_tendencia",
+  "title": "Indicador sintético de la actividad de la construcción (ISAC)"
+ },
+ "33.2_ISAC_NIVELRAL_0_M_18_63": {
+  "distribution": "33.2",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/33/distribution/33.2/download/indicador-sintetico-actividad-construccion-valores-mensuales-base-2004.csv",
+  "column": "isac_nivel_general",
+  "title": "Indicador sintético de la actividad de la construcción (ISAC)"
+ },
+ "33.2_ISAC_SIN_EDAD_0_M_23_56": {
+  "distribution": "33.2",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/33/distribution/33.2/download/indicador-sintetico-actividad-construccion-valores-mensuales-base-2004.csv",
+  "column": "isac_sin_estacionalidad",
+  "title": "Indicador sintético de la actividad de la construcción (ISAC)"
+ },
+ "370.3_CAPACIDADDAD_0_0_9_83": {
+  "distribution": "370.3",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/370/distribution/370.3/download/indice-confianza-gobierno-valores-mensuales.csv",
+  "column": "capacidad",
+  "title": "Índice de Confianza en el Gobierno. Serie mensual."
+ },
+ "370.3_EFICIENCIACIA_0_0_10_66": {
+  "distribution": "370.3",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/370/distribution/370.3/download/indice-confianza-gobierno-valores-mensuales.csv",
+  "column": "eficiencia",
+  "title": "Índice de Confianza en el Gobierno. Serie mensual."
+ },
+ "370.3_EVALUACIONRAL_0_0_18_90": {
+  "distribution": "370.3",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/370/distribution/370.3/download/indice-confianza-gobierno-valores-mensuales.csv",
+  "column": "evaluacion_general",
+  "title": "Índice de Confianza en el Gobierno. Serie mensual."
+ },
+ "370.3_HONESTIDADDAD_0_0_10_58": {
+  "distribution": "370.3",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/370/distribution/370.3/download/indice-confianza-gobierno-valores-mensuales.csv",
+  "column": "honestidad",
+  "title": "Índice de Confianza en el Gobierno. Serie mensual."
+ },
+ "370.3_ICG_NIVEL_RAL_0_0_17_94": {
+  "distribution": "370.3",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/370/distribution/370.3/download/indice-confianza-gobierno-valores-mensuales.csv",
+  "column": "icg_nivel_general",
+  "title": "Índice de Confianza en el Gobierno. Serie mensual."
+ },
+ "370.3_INTERES_GERAL_0_0_15_61": {
+  "distribution": "370.3",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/370/distribution/370.3/download/indice-confianza-gobierno-valores-mensuales.csv",
+  "column": "interes_general",
+  "title": "Índice de Confianza en el Gobierno. Serie mensual."
+ },
+ "379.9_GTOS_CAP_2017__13_60": {
+  "distribution": "379.9",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/379/distribution/379.9/download/sector-publico-nacional-valores-mensuales-17.csv",
+  "column": "gtos_cap_2017",
+  "title": "Sector Público Nacional. Valores mensuales 2017"
+ },
+ "379.9_GTOS_CAP_T017__50_91": {
+  "distribution": "379.9",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/379/distribution/379.9/download/sector-publico-nacional-valores-mensuales-17.csv",
+  "column": "gtos_cap_transf_cap_prov_caba_total_prov_caba_2017",
+  "title": "Sector Público Nacional. Valores mensuales 2017"
+ },
+ "379.9_GTOS_CORR_017_3_0_M_50_79": {
+  "distribution": "379.9",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/379/distribution/379.9/download/sector-publico-nacional-valores-mensuales-17.csv",
+  "column": "gtos_corr_transf_corr_sec_priv_total_sec_priv_2017",
+  "title": "Sector Público Nacional. Valores mensuales 2017"
+ },
+ "379.9_GTOS_CORR_017_5_0_M_51_42": {
+  "distribution": "379.9",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/379/distribution/379.9/download/sector-publico-nacional-valores-mensuales-17.csv",
+  "column": "gtos_corr_transf_corr_sect_pub_caba_total_caba_2017",
+  "title": "Sector Público Nacional. Valores mensuales 2017"
+ },
+ "379.9_GTOS_CORR_017__35_92": {
+  "distribution": "379.9",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/379/distribution/379.9/download/sector-publico-nacional-valores-mensuales-17.csv",
+  "column": "gtos_corr_prestaciones_seg_soc_2017",
+  "title": "Sector Público Nacional. Valores mensuales 2017"
+ },
+ "379.9_GTOS_CORR_017__40_84": {
+  "distribution": "379.9",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/379/distribution/379.9/download/sector-publico-nacional-valores-mensuales-17.csv",
+  "column": "gtos_corr_int_ot_ren_prop_int_netos_2017",
+  "title": "Sector Público Nacional. Valores mensuales 2017"
+ },
+ "379.9_GTOS_CORR_017__49_26": {
+  "distribution": "379.9",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/379/distribution/379.9/download/sector-publico-nacional-valores-mensuales-17.csv",
+  "column": "gtos_corr_gtos_cons_operacion_remuneraciones_2017",
+  "title": "Sector Público Nacional. Valores mensuales 2017"
+ },
+ "379.9_GTOS_PRIMA017__37_33": {
+  "distribution": "379.9",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/379/distribution/379.9/download/sector-publico-nacional-valores-mensuales-17.csv",
+  "column": "gtos_primario_antes_figurativos_2017",
+  "title": "Sector Público Nacional. Valores mensuales 2017"
+ },
+ "379.9_ING_ANTES_017__26_83": {
+  "distribution": "379.9",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/379/distribution/379.9/download/sector-publico-nacional-valores-mensuales-17.csv",
+  "column": "ing_antes_figurativos_2017",
+  "title": "Sector Público Nacional. Valores mensuales 2017"
+ },
+ "379.9_ING_CORR_I017__29_10": {
+  "distribution": "379.9",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/379/distribution/379.9/download/sector-publico-nacional-valores-mensuales-17.csv",
+  "column": "ing_corr_ing_tributarios_2017",
+  "title": "Sector Público Nacional. Valores mensuales 2017"
+ },
+ "379.9_RESULTADO_017__18_38": {
+  "distribution": "379.9",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/379/distribution/379.9/download/sector-publico-nacional-valores-mensuales-17.csv",
+  "column": "resultado_fin_2017",
+  "title": "Sector Público Nacional. Valores mensuales 2017"
+ },
+ "379.9_SUPERAVIT_017__23_94": {
+  "distribution": "379.9",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/379/distribution/379.9/download/sector-publico-nacional-valores-mensuales-17.csv",
+  "column": "superavit_primario_2017",
+  "title": "Sector Público Nacional. Valores mensuales 2017"
+ },
+ "380.3_DESAGREGACCRO_0_T_40": {
+  "distribution": "380.3",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/380/distribution/380.3/download/indice-confianza-consumidor-valores-mensuales.csv",
+  "column": "desagregacion_subindices_situacion_macro",
+  "title": "Índice de Confianza del Consumidor. Serie Mensual."
+ },
+ "380.3_DESAGREGACGBA_0_T_26": {
+  "distribution": "380.3",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/380/distribution/380.3/download/indice-confianza-consumidor-valores-mensuales.csv",
+  "column": "desagregacion_regiones_gba",
+  "title": "Índice de Confianza del Consumidor. Serie Mensual."
+ },
+ "380.3_DESAGREGACIOR_0_T_31": {
+  "distribution": "380.3",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/380/distribution/380.3/download/indice-confianza-consumidor-valores-mensuales.csv",
+  "column": "desagregacion_regiones_interior",
+  "title": "Índice de Confianza del Consumidor. Serie Mensual."
+ },
+ "380.3_DESAGREGACLES_0_T_50": {
+  "distribution": "380.3",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/380/distribution/380.3/download/indice-confianza-consumidor-valores-mensuales.csv",
+  "column": "desagregacion_subindices_bienes_durables_inmuebles",
+  "title": "Índice de Confianza del Consumidor. Serie Mensual."
+ },
+ "380.3_DESAGREGACNAL_0_T_43": {
+  "distribution": "380.3",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/380/distribution/380.3/download/indice-confianza-consumidor-valores-mensuales.csv",
+  "column": "desagregacion_subindices_situacion_personal",
+  "title": "Índice de Confianza del Consumidor. Serie Mensual."
+ },
+ "380.3_DESAGREGACTAL_0_T_30": {
+  "distribution": "380.3",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/380/distribution/380.3/download/indice-confianza-consumidor-valores-mensuales.csv",
+  "column": "desagregacion_regiones_capital",
+  "title": "Índice de Confianza del Consumidor. Serie Mensual."
+ },
+ "380.3_ICC_NACIONNAL_0_T_12": {
+  "distribution": "380.3",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/380/distribution/380.3/download/indice-confianza-consumidor-valores-mensuales.csv",
+  "column": "icc_nacional",
+  "title": "Índice de Confianza del Consumidor. Serie Mensual."
+ },
+ "4.2_DE_2004_T_24": {
+  "distribution": "4.2",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/4/distribution/4.2/download/oferta-demanda-globales-precios-2004-valores-trimestrales-base-2004.csv",
+  "column": "discrepancia_estadistica",
+  "title": "Oferta y Demanda Global, Precios constantes. Base 2004. Valores trimestrales"
+ },
+ "4.2_DGCP_2004_T_30": {
+  "distribution": "4.2",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/4/distribution/4.2/download/oferta-demanda-globales-precios-2004-valores-trimestrales-base-2004.csv",
+  "column": "demanda_global_consumo_publico",
+  "title": "Oferta y Demanda Global, Precios constantes. Base 2004. Valores trimestrales"
+ },
+ "4.2_DGE_2004_T_26": {
+  "distribution": "4.2",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/4/distribution/4.2/download/oferta-demanda-globales-precios-2004-valores-trimestrales-base-2004.csv",
+  "column": "demanda_global_exportacion",
+  "title": "Oferta y Demanda Global, Precios constantes. Base 2004. Valores trimestrales"
+ },
+ "4.2_DGIC_2004_T_32": {
+  "distribution": "4.2",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/4/distribution/4.2/download/oferta-demanda-globales-precios-2004-valores-trimestrales-base-2004.csv",
+  "column": "demanda_global_ibif_construccion",
+  "title": "Oferta y Demanda Global, Precios constantes. Base 2004. Valores trimestrales"
+ },
+ "4.2_DGIEDPMET_2004_T_51": {
+  "distribution": "4.2",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/4/distribution/4.2/download/oferta-demanda-globales-precios-2004-valores-trimestrales-base-2004.csv",
+  "column": "dg_ibif_equipo_durable_prod_maquinaria_equipo_total",
+  "title": "Oferta y Demanda Global, Precios constantes. Base 2004. Valores trimestrales"
+ },
+ "4.2_DGIEDPMTT_2004_T_53": {
+  "distribution": "4.2",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/4/distribution/4.2/download/oferta-demanda-globales-precios-2004-valores-trimestrales-base-2004.csv",
+  "column": "dg_ibif_equipo_durable_prod_material_transporte_total",
+  "title": "Oferta y Demanda Global, Precios constantes. Base 2004. Valores trimestrales"
+ },
+ "4.2_DGIT_2004_T_25": {
+  "distribution": "4.2",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/4/distribution/4.2/download/oferta-demanda-globales-precios-2004-valores-trimestrales-base-2004.csv",
+  "column": "demanda_global_ibif_total",
+  "title": "Oferta y Demanda Global, Precios constantes. Base 2004. Valores trimestrales"
+ },
+ "4.2_MGCP_2004_T_25": {
+  "distribution": "4.2",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/4/distribution/4.2/download/oferta-demanda-globales-precios-2004-valores-trimestrales-base-2004.csv",
+  "column": "manda_global_consumo_priv",
+  "title": "Oferta y Demanda Global, Precios constantes. Base 2004. Valores trimestrales"
+ },
+ "4.2_OGI_2004_T_25": {
+  "distribution": "4.2",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/4/distribution/4.2/download/oferta-demanda-globales-precios-2004-valores-trimestrales-base-2004.csv",
+  "column": "oferta_global_importacion",
+  "title": "Oferta y Demanda Global, Precios constantes. Base 2004. Valores trimestrales"
+ },
+ "4.2_OGP_2004_T_17": {
+  "distribution": "4.2",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/4/distribution/4.2/download/oferta-demanda-globales-precios-2004-valores-trimestrales-base-2004.csv",
+  "column": "oferta_global_pib",
+  "title": "Oferta y Demanda Global, Precios constantes. Base 2004. Valores trimestrales"
+ },
+ "4.2_VE_2004_T_21": {
+  "distribution": "4.2",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/4/distribution/4.2/download/oferta-demanda-globales-precios-2004-valores-trimestrales-base-2004.csv",
+  "column": "variacion_existencias",
+  "title": "Oferta y Demanda Global, Precios constantes. Base 2004. Valores trimestrales"
+ },
+ "4.4_DGI_2004_T_19": {
+  "distribution": "4.4",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/4/distribution/4.4/download/oferta-demanda-globales-precios-corrientes-valores-trimestrales-base-2004.csv",
+  "column": "demanda_global_ibif",
+  "title": "Oferta y Demanda Global. Precios corrientes. Base 2004. Valores trimestrales"
+ },
+ "4.4_OGP_2004_T_17": {
+  "distribution": "4.4",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/4/distribution/4.4/download/oferta-demanda-globales-precios-corrientes-valores-trimestrales-base-2004.csv",
+  "column": "oferta_global_pib",
+  "title": "Oferta y Demanda Global. Precios corrientes. Base 2004. Valores trimestrales"
+ },
+ "43.2_ECTAT_0_T_33": {
+  "distribution": "43.2",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/43/distribution/43.2/download/tasa-actividad-valores-trimestrales.csv",
+  "column": "eph_continua_tasa_actividad_total",
+  "title": "Tasa de actividad. Valores trimestrales"
+ },
+ "44.2_ECTET_0_T_30": {
+  "distribution": "44.2",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/44/distribution/44.2/download/tasa-empleo-valores-trimestrales.csv",
+  "column": "eph_continua_tasa_empleo_total",
+  "title": "Tasa de empleo. Valores trimestrales"
+ },
+ "448.1_NIVEL_GENERAL_0_0_13_46": {
+  "distribution": "448.1",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/448/distribution/448.1/download/indice-precios-internos-al-por-mayor.csv",
+  "column": "nivel_general",
+  "title": "Índice de Precios Internos al por Mayor (IPIM). Dic-2015 = 100"
+ },
+ "45.2_ECTDT_0_T_33": {
+  "distribution": "45.2",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/45/distribution/45.2/download/tasa-desempleo-valores-trimestrales.csv",
+  "column": "eph_continua_tasa_desempleo_total",
+  "title": "Tasa de desempleo. Valores trimestrales"
+ },
+ "452.2_APORTES_COIAL_0_T_39_29": {
+  "distribution": "452.3",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/452/distribution/452.3/download/imig-mensual.csv",
+  "column": "aportes_contribuciones_seguridad_social",
+  "title": "Informe Mensual de Ingresos y Gastos. Sector Público Nacional No Financiero.  Valores mensuales 2015-2018"
+ },
+ "452.2_BIENES_PERLES_0_T_17_26": {
+  "distribution": "452.3",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/452/distribution/452.3/download/imig-mensual.csv",
+  "column": "bienes_personales",
+  "title": "Informe Mensual de Ingresos y Gastos. Sector Público Nacional No Financiero.  Valores mensuales 2015-2018"
+ },
+ "452.2_COMBUSTIBLLES_0_T_12_97": {
+  "distribution": "452.3",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/452/distribution/452.3/download/imig-mensual.csv",
+  "column": "combustibles",
+  "title": "Informe Mensual de Ingresos y Gastos. Sector Público Nacional No Financiero.  Valores mensuales 2015-2018"
+ },
+ "452.2_DEBITOS_CRTOS_0_T_16_22": {
+  "distribution": "452.3",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/452/distribution/452.3/download/imig-mensual.csv",
+  "column": "debitos_creditos",
+  "title": "Informe Mensual de Ingresos y Gastos. Sector Público Nacional No Financiero.  Valores mensuales 2015-2018"
+ },
+ "452.2_DERECHOS_EION_0_T_20_42": {
+  "distribution": "452.3",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/452/distribution/452.3/download/imig-mensual.csv",
+  "column": "derechos_exportacion",
+  "title": "Informe Mensual de Ingresos y Gastos. Sector Público Nacional No Financiero.  Valores mensuales 2015-2018"
+ },
+ "452.2_DERECHOS_IION_0_T_20_60": {
+  "distribution": "452.3",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/452/distribution/452.3/download/imig-mensual.csv",
+  "column": "derechos_importacion",
+  "title": "Informe Mensual de Ingresos y Gastos. Sector Público Nacional No Financiero.  Valores mensuales 2015-2018"
+ },
+ "452.2_ENERGIAGIA_0_T_7_56": {
+  "distribution": "452.3",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/452/distribution/452.3/download/imig-mensual.csv",
+  "column": "energia",
+  "title": "Informe Mensual de Ingresos y Gastos. Sector Público Nacional No Financiero.  Valores mensuales 2015-2018"
+ },
+ "452.2_GANANCIASIAS_0_T_9_51": {
+  "distribution": "452.3",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/452/distribution/452.3/download/imig-mensual.csv",
+  "column": "ganancias",
+  "title": "Informe Mensual de Ingresos y Gastos. Sector Público Nacional No Financiero.  Valores mensuales 2015-2018"
+ },
+ "452.2_IMPUESTOS_NOS_0_T_18_87": {
+  "distribution": "452.3",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/452/distribution/452.3/download/imig-mensual.csv",
+  "column": "impuestos_internos",
+  "title": "Informe Mensual de Ingresos y Gastos. Sector Público Nacional No Financiero.  Valores mensuales 2015-2018"
+ },
+ "452.2_IVA_NETO_RROS_0_T_19_67": {
+  "distribution": "452.3",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/452/distribution/452.3/download/imig-mensual.csv",
+  "column": "iva_neto_reintegros",
+  "title": "Informe Mensual de Ingresos y Gastos. Sector Público Nacional No Financiero.  Valores mensuales 2015-2018"
+ },
+ "452.2_OTRAS_FUNCNES_0_T_15_25": {
+  "distribution": "452.3",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/452/distribution/452.3/download/imig-mensual.csv",
+  "column": "otras_funciones",
+  "title": "Informe Mensual de Ingresos y Gastos. Sector Público Nacional No Financiero.  Valores mensuales 2015-2018"
+ },
+ "452.2_RESTO_TRIBIOS_0_T_17_0": {
+  "distribution": "452.3",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/452/distribution/452.3/download/imig-mensual.csv",
+  "column": "resto_tributarios",
+  "title": "Informe Mensual de Ingresos y Gastos. Sector Público Nacional No Financiero.  Valores mensuales 2015-2018"
+ },
+ "452.2_TRANSPORTERTE_0_T_10_32": {
+  "distribution": "452.3",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/452/distribution/452.3/download/imig-mensual.csv",
+  "column": "transporte",
+  "title": "Informe Mensual de Ingresos y Gastos. Sector Público Nacional No Financiero.  Valores mensuales 2015-2018"
+ },
+ "453.1_SERIE_DESEADA_0_0_24_58": {
+  "distribution": "453.1",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/453/distribution/453.1/download/ipi-manufacturero.csv",
+  "column": "serie_desestacionalizada",
+  "title": "Índice de Producción Industrial Manufacturero (IPI). Nivel General, series original y desestacionalizada"
+ },
+ "453.1_SERIE_ORIGNAL_0_0_14_46": {
+  "distribution": "453.1",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/453/distribution/453.1/download/ipi-manufacturero.csv",
+  "column": "serie_original",
+  "title": "Índice de Producción Industrial Manufacturero (IPI). Nivel General, series original y desestacionalizada"
+ },
+ "46.2_ECTST_0_T_36": {
+  "distribution": "46.2",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/46/distribution/46.2/download/tasa-subocupacion-valores-trimestrales.csv",
+  "column": "eph_continua_tasa_subocupacion_total",
+  "title": "Tasa de subocupación. Valores trimestrales"
+ },
+ "53.1_EBE_0_0_27": {
+  "distribution": "53.1",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/53/distribution/53.1/download/distribucion-funcional-ingreso-sector-privado-pib-costo-factores-anual.csv",
+  "column": "excedente_bruto_explotacion",
+  "title": "Distribución funcional del ingreso en el total de la economía y en el sector privado. Como porcentaje del Producto Interno Bruto a costo de factores. Valores trimestrales"
+ },
+ "53.1_TIMB_0_0_25": {
+  "distribution": "53.1",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/53/distribution/53.1/download/distribucion-funcional-ingreso-sector-privado-pib-costo-factores-anual.csv",
+  "column": "total_ingreso_mixto_bruto",
+  "title": "Distribución funcional del ingreso en el total de la economía y en el sector privado. Como porcentaje del Producto Interno Bruto a costo de factores. Valores trimestrales"
+ },
+ "53.1_TRTA_0_0_37": {
+  "distribution": "53.1",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/53/distribution/53.1/download/distribucion-funcional-ingreso-sector-privado-pib-costo-factores-anual.csv",
+  "column": "total_remuneracion_trabajo_asalariado",
+  "title": "Distribución funcional del ingreso en el total de la economía y en el sector privado. Como porcentaje del Producto Interno Bruto a costo de factores. Valores trimestrales"
+ },
+ "57.1_SMVMM_0_M_34": {
+  "distribution": "57.1",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/57/distribution/57.1/download/indice-salario-minimo-vital-movil-valores-mensuales-pesos-corrientes-desde-1988.csv",
+  "column": "salario_minimo_vital_movil_mensual",
+  "title": "Índice de salario mínimo vital y movil. Pesos corrientes. Valores mensuales"
+ },
+ "58.1_MP_0_M_24": {
+  "distribution": "58.1",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/58/distribution/58.1/download/haber-minimo-jubilatorio-pesos-corrientes-valores-mensuales-desde-1971.csv",
+  "column": "mensual_pesos_corrientes",
+  "title": "Haber mínimo jubilatorio. Pesos corrientes. Valores mensuales"
+ },
+ "6.2_AGCS_2004_T_39": {
+  "distribution": "6.2",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/6/distribution/6.2/download/producto-interno-bruto-valores-trimestrales-base-2004.csv",
+  "column": "agricultura_ganaderia_caza_silvicultura",
+  "title": "Producto Interno Bruto. Precios constantes. Base 2004. Valores trimestrales."
+ },
+ "6.2_AIEA_2004_T_48": {
+  "distribution": "6.2",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/6/distribution/6.2/download/producto-interno-bruto-valores-trimestrales-base-2004.csv",
+  "column": "actividades_inmobiliarias_empresariales_alquiler",
+  "title": "Producto Interno Bruto. Precios constantes. Base 2004. Valores trimestrales."
+ },
+ "6.2_APDPSSAO_2004_T_60": {
+  "distribution": "6.2",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/6/distribution/6.2/download/producto-interno-bruto-valores-trimestrales-base-2004.csv",
+  "column": "admin_publica_planes_seguridad_social_afiliacion_obligatoria",
+  "title": "Producto Interno Bruto. Precios constantes. Base 2004. Valores trimestrales."
+ },
+ "6.2_CMMR_2004_T_41": {
+  "distribution": "6.2",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/6/distribution/6.2/download/producto-interno-bruto-valores-trimestrales-base-2004.csv",
+  "column": "comercio_mayorista_minorista_reparaciones",
+  "title": "Producto Interno Bruto. Precios constantes. Base 2004. Valores trimestrales."
+ },
+ "6.2_C_2004_T_12": {
+  "distribution": "6.2",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/6/distribution/6.2/download/producto-interno-bruto-valores-trimestrales-base-2004.csv",
+  "column": "construccion",
+  "title": "Producto Interno Bruto. Precios constantes. Base 2004. Valores trimestrales."
+ },
+ "6.2_DI_2004_T_20": {
+  "distribution": "6.2",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/6/distribution/6.2/download/producto-interno-bruto-valores-trimestrales-base-2004.csv",
+  "column": "derechos_importacion",
+  "title": "Producto Interno Bruto. Precios constantes. Base 2004. Valores trimestrales."
+ },
+ "6.2_EMC_2004_T_26": {
+  "distribution": "6.2",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/6/distribution/6.2/download/producto-interno-bruto-valores-trimestrales-base-2004.csv",
+  "column": "explotacion_minas_canteras",
+  "title": "Producto Interno Bruto. Precios constantes. Base 2004. Valores trimestrales."
+ },
+ "6.2_E_2004_T_10": {
+  "distribution": "6.2",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/6/distribution/6.2/download/producto-interno-bruto-valores-trimestrales-base-2004.csv",
+  "column": "ensenianza",
+  "title": "Producto Interno Bruto. Precios constantes. Base 2004. Valores trimestrales."
+ },
+ "6.2_HPSD_2004_T_32": {
+  "distribution": "6.2",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/6/distribution/6.2/download/producto-interno-bruto-valores-trimestrales-base-2004.csv",
+  "column": "hogares_privs_servicio_domestico",
+  "title": "Producto Interno Bruto. Precios constantes. Base 2004. Valores trimestrales."
+ },
+ "6.2_HR_2004_T_20": {
+  "distribution": "6.2",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/6/distribution/6.2/download/producto-interno-bruto-valores-trimestrales-base-2004.csv",
+  "column": "hoteles_restaurantes",
+  "title": "Producto Interno Bruto. Precios constantes. Base 2004. Valores trimestrales."
+ },
+ "6.2_IF_2004_T_25": {
+  "distribution": "6.2",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/6/distribution/6.2/download/producto-interno-bruto-valores-trimestrales-base-2004.csv",
+  "column": "intermediacion_financiera",
+  "title": "Producto Interno Bruto. Precios constantes. Base 2004. Valores trimestrales."
+ },
+ "6.2_IM_2004_T_23": {
+  "distribution": "6.2",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/6/distribution/6.2/download/producto-interno-bruto-valores-trimestrales-base-2004.csv",
+  "column": "industria_manufacturera",
+  "title": "Producto Interno Bruto. Precios constantes. Base 2004. Valores trimestrales."
+ },
+ "6.2_IPNS_2004_T_35": {
+  "distribution": "6.2",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/6/distribution/6.2/download/producto-interno-bruto-valores-trimestrales-base-2004.csv",
+  "column": "impuestos_productos_netos_subsidios",
+  "title": "Producto Interno Bruto. Precios constantes. Base 2004. Valores trimestrales."
+ },
+ "6.2_IVA_2004_T_23": {
+  "distribution": "6.2",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/6/distribution/6.2/download/producto-interno-bruto-valores-trimestrales-base-2004.csv",
+  "column": "impuesto_valor_agregado",
+  "title": "Producto Interno Bruto. Precios constantes. Base 2004. Valores trimestrales."
+ },
+ "6.2_OASCSP_2004_T_60": {
+  "distribution": "6.2",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/6/distribution/6.2/download/producto-interno-bruto-valores-trimestrales-base-2004.csv",
+  "column": "otras_actividades_servicios_comunitarias_sociales_personales",
+  "title": "Producto Interno Bruto. Precios constantes. Base 2004. Valores trimestrales."
+ },
+ "6.2_PIBPM_2004_T_38": {
+  "distribution": "6.2",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/6/distribution/6.2/download/producto-interno-bruto-valores-trimestrales-base-2004.csv",
+  "column": "producto_interno_bruto_precios_mercado",
+  "title": "Producto Interno Bruto. Precios constantes. Base 2004. Valores trimestrales."
+ },
+ "6.2_P_2004_T_5": {
+  "distribution": "6.2",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/6/distribution/6.2/download/producto-interno-bruto-valores-trimestrales-base-2004.csv",
+  "column": "pesca",
+  "title": "Producto Interno Bruto. Precios constantes. Base 2004. Valores trimestrales."
+ },
+ "6.2_SEGA_2004_T_32": {
+  "distribution": "6.2",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/6/distribution/6.2/download/producto-interno-bruto-valores-trimestrales-base-2004.csv",
+  "column": "suministro_electricidad_gas_agua",
+  "title": "Producto Interno Bruto. Precios constantes. Base 2004. Valores trimestrales."
+ },
+ "6.2_SSS_2004_T_24": {
+  "distribution": "6.2",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/6/distribution/6.2/download/producto-interno-bruto-valores-trimestrales-base-2004.csv",
+  "column": "servicios_sociales_salud",
+  "title": "Producto Interno Bruto. Precios constantes. Base 2004. Valores trimestrales."
+ },
+ "6.2_TAC_2004_T_40": {
+  "distribution": "6.2",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/6/distribution/6.2/download/producto-interno-bruto-valores-trimestrales-base-2004.csv",
+  "column": "transporte_almacenamiento_comunicaciones",
+  "title": "Producto Interno Bruto. Precios constantes. Base 2004. Valores trimestrales."
+ },
+ "65.1_CGI_0_0_21": {
+  "distribution": "65.1",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/65/distribution/65.1/download/indicadores-distribucion-ingreso-ocupacion-principal-e-ingreso-per-capita-familiar.csv",
+  "column": "coeficiente_gini_ipcf",
+  "title": "Distribución Personal del Ingreso. Coeficiente de Gini y Brecha de Ingresos para el Ingreso de la Ocupación Principal e Ingreso per cápita Familiar. Percentil 90 / Percentil 10"
+ },
+ "74.1_IET_0_A_16": {
+  "distribution": "74.1",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/74/distribution/74.1/download/intercambio-comercial-argentino-anual.csv",
+  "column": "ica_expo_totales",
+  "title": "Intercambio Comercial Argentino. Valores anuales"
+ },
+ "74.1_IIT_0_A_25": {
+  "distribution": "74.1",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/74/distribution/74.1/download/intercambio-comercial-argentino-anual.csv",
+  "column": "ica_importaciones_totales",
+  "title": "Intercambio Comercial Argentino. Valores anuales"
+ },
+ "74.3_IECE_0_M_35": {
+  "distribution": "74.3",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/74/distribution/74.3/download/intercambio-comercial-argentino-mensual.csv",
+  "column": "ica_exportacion_combustible_energia",
+  "title": "Intercambio Comercial Argentino. Valores mensuales"
+ },
+ "74.3_IEMOA_0_M_48": {
+  "distribution": "74.3",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/74/distribution/74.3/download/intercambio-comercial-argentino-mensual.csv",
+  "column": "ica_exportacion_manufacturas_origen_agropecuario",
+  "title": "Intercambio Comercial Argentino. Valores mensuales"
+ },
+ "74.3_IEMOI_0_M_46": {
+  "distribution": "74.3",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/74/distribution/74.3/download/intercambio-comercial-argentino-mensual.csv",
+  "column": "ica_exportacion_manufacturas_origen_industrial",
+  "title": "Intercambio Comercial Argentino. Valores mensuales"
+ },
+ "74.3_IEPP_0_M_35": {
+  "distribution": "74.3",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/74/distribution/74.3/download/intercambio-comercial-argentino-mensual.csv",
+  "column": "ica_exportacion_productos_primarios",
+  "title": "Intercambio Comercial Argentino. Valores mensuales"
+ },
+ "74.3_IET_0_M_16": {
+  "distribution": "74.3",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/74/distribution/74.3/download/intercambio-comercial-argentino-mensual.csv",
+  "column": "ica_expo_totales",
+  "title": "Intercambio Comercial Argentino. Valores mensuales"
+ },
+ "74.3_IIBCA_0_M_32": {
+  "distribution": "74.3",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/74/distribution/74.3/download/intercambio-comercial-argentino-mensual.csv",
+  "column": "ica_importaciones_bienes_capital",
+  "title": "Intercambio Comercial Argentino. Valores mensuales"
+ },
+ "74.3_IIBCO_0_M_32": {
+  "distribution": "74.3",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/74/distribution/74.3/download/intercambio-comercial-argentino-mensual.csv",
+  "column": "ica_importaciones_bienes_consumo",
+  "title": "Intercambio Comercial Argentino. Valores mensuales"
+ },
+ "74.3_IIBI_0_M_36": {
+  "distribution": "74.3",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/74/distribution/74.3/download/intercambio-comercial-argentino-mensual.csv",
+  "column": "ica_importaciones_bienes_intermedios",
+  "title": "Intercambio Comercial Argentino. Valores mensuales"
+ },
+ "74.3_IICL_0_M_42": {
+  "distribution": "74.3",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/74/distribution/74.3/download/intercambio-comercial-argentino-mensual.csv",
+  "column": "ica_importaciones_combustibles_lubricantes",
+  "title": "Intercambio Comercial Argentino. Valores mensuales"
+ },
+ "74.3_IIPABC_0_M_50": {
+  "distribution": "74.3",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/74/distribution/74.3/download/intercambio-comercial-argentino-mensual.csv",
+  "column": "ica_importaciones_piezas_accesorios_bienes_capital",
+  "title": "Intercambio Comercial Argentino. Valores mensuales"
+ },
+ "74.3_IIR_0_M_23": {
+  "distribution": "74.3",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/74/distribution/74.3/download/intercambio-comercial-argentino-mensual.csv",
+  "column": "ica_importaciones_resto",
+  "title": "Intercambio Comercial Argentino. Valores mensuales"
+ },
+ "74.3_IIT_0_M_25": {
+  "distribution": "74.3",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/74/distribution/74.3/download/intercambio-comercial-argentino-mensual.csv",
+  "column": "ica_importaciones_totales",
+  "title": "Intercambio Comercial Argentino. Valores mensuales"
+ },
+ "74.3_IIVAP_0_M_49": {
+  "distribution": "74.3",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/74/distribution/74.3/download/intercambio-comercial-argentino-mensual.csv",
+  "column": "ica_importaciones_vehiculos_automotores_pasajeros",
+  "title": "Intercambio Comercial Argentino. Valores mensuales"
+ },
+ "74.3_ISC_0_M_19": {
+  "distribution": "74.3",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/74/distribution/74.3/download/intercambio-comercial-argentino-mensual.csv",
+  "column": "ica_saldo_comercial",
+  "title": "Intercambio Comercial Argentino. Valores mensuales"
+ },
+ "77.3_IEB_0_A_24": {
+  "distribution": "77.3",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/77/distribution/77.3/download/exportaciones-por-paises-regiones-mensual.csv",
+  "column": "ica_exportaciones_brasil",
+  "title": "Exportaciones por país y región. Valores mensuales"
+ },
+ "77.3_IEC_0_A_23": {
+  "distribution": "77.3",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/77/distribution/77.3/download/exportaciones-por-paises-regiones-mensual.csv",
+  "column": "ica_exportaciones_china",
+  "title": "Exportaciones por país y región. Valores mensuales"
+ },
+ "77.3_IEEU_0_A_32": {
+  "distribution": "77.3",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/77/distribution/77.3/download/exportaciones-por-paises-regiones-mensual.csv",
+  "column": "ica_exportaciones_estados_unidos",
+  "title": "Exportaciones por país y región. Valores mensuales"
+ },
+ "77.3_IERU_0_A_29_20": {
+  "distribution": "77.3",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/77/distribution/77.3/download/exportaciones-por-paises-regiones-mensual.csv",
+  "column": "ica_exportaciones_resto_ue_28",
+  "title": "Exportaciones por país y región. Valores mensuales"
+ },
+ "77.3_IETM_0_A_32": {
+  "distribution": "77.3",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/77/distribution/77.3/download/exportaciones-por-paises-regiones-mensual.csv",
+  "column": "ica_exportaciones_total_mercosur",
+  "title": "Exportaciones por país y región. Valores mensuales"
+ },
+ "77.3_IET_0_A_25": {
+  "distribution": "77.3",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/77/distribution/77.3/download/exportaciones-por-paises-regiones-mensual.csv",
+  "column": "ica_exportaciones_totales",
+  "title": "Exportaciones por país y región. Valores mensuales"
+ },
+ "78.3_IIB_0_A_24": {
+  "distribution": "78.3",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/78/distribution/78.3/download/importaciones-por-paises-regiones-mensual.csv",
+  "column": "ica_importaciones_brasil",
+  "title": "Importaciones por país y región. Valores mensuales"
+ },
+ "78.3_IIC_0_A_23": {
+  "distribution": "78.3",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/78/distribution/78.3/download/importaciones-por-paises-regiones-mensual.csv",
+  "column": "ica_importaciones_china",
+  "title": "Importaciones por país y región. Valores mensuales"
+ },
+ "78.3_IIM_0_A_22_15": {
+  "distribution": "78.3",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/78/distribution/78.3/download/importaciones-por-paises-regiones-mensual.csv",
+  "column": "ica_importaciones_estados_unidos",
+  "title": "Importaciones por país y región. Valores mensuales"
+ },
+ "78.3_IIRU_0_A_23_52": {
+  "distribution": "78.3",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/78/distribution/78.3/download/importaciones-por-paises-regiones-mensual.csv",
+  "column": "ica_importaciones_resto_ue_28",
+  "title": "Importaciones por país y región. Valores mensuales"
+ },
+ "78.3_IITM_0_A_32": {
+  "distribution": "78.3",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/78/distribution/78.3/download/importaciones-por-paises-regiones-mensual.csv",
+  "column": "ica_importaciones_total_mercosur",
+  "title": "Importaciones por país y región. Valores mensuales"
+ },
+ "78.3_IIT_0_A_25": {
+  "distribution": "78.3",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/78/distribution/78.3/download/importaciones-por-paises-regiones-mensual.csv",
+  "column": "ica_importaciones_totales",
+  "title": "Importaciones por país y región. Valores mensuales"
+ },
+ "80.2_IICENG_0_T_47": {
+  "distribution": "80.2",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/80/distribution/80.2/download/indices-valor-precios-cantidad-exportaciones-bienes-trimestral.csv",
+  "column": "ica_indice_cantidad_exportaciones_nivel_general",
+  "title": "Índices de valor, precios y cantidad de las exportaciones de bienes. Valores trimestrales"
+ },
+ "80.2_IIPENG_0_T_45": {
+  "distribution": "80.2",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/80/distribution/80.2/download/indices-valor-precios-cantidad-exportaciones-bienes-trimestral.csv",
+  "column": "ica_indice_precio_exportaciones_nivel_general",
+  "title": "Índices de valor, precios y cantidad de las exportaciones de bienes. Valores trimestrales"
+ },
+ "81.2_IICING_0_T_47": {
+  "distribution": "81.2",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/81/distribution/81.2/download/indices-valor-precios-cantidad-importaciones-bienes-trimestral.csv",
+  "column": "ica_indice_cantidad_importaciones_nivel_general",
+  "title": "Índices de valor, precios y cantidad de las importaciones de bienes. Valores trimestrales"
+ },
+ "81.2_IIPING_0_T_45": {
+  "distribution": "81.2",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/81/distribution/81.2/download/indices-valor-precios-cantidad-importaciones-bienes-trimestral.csv",
+  "column": "ica_indice_precio_importaciones_nivel_general",
+  "title": "Índices de valor, precios y cantidad de las importaciones de bienes. Valores trimestrales"
+ },
+ "82.2_IPE_2004_T_26": {
+  "distribution": "82.2",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/82/distribution/82.2/download/indice-terminos-intercambio-trimestral-base-2004.csv",
+  "column": "indice_precios_exportacion",
+  "title": "Índice de terminos del intercambio. Base 2004. Valores trimestrales."
+ },
+ "82.2_IPI_2004_T_26": {
+  "distribution": "82.2",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/82/distribution/82.2/download/indice-terminos-intercambio-trimestral-base-2004.csv",
+  "column": "indice_precios_importacion",
+  "title": "Índice de terminos del intercambio. Base 2004. Valores trimestrales."
+ },
+ "82.2_ITI_2004_T_27": {
+  "distribution": "82.2",
+  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/82/distribution/82.2/download/indice-terminos-intercambio-trimestral-base-2004.csv",
+  "column": "indice_terminos_intercambio",
+  "title": "Índice de terminos del intercambio. Base 2004. Valores trimestrales."
+ }
+}

@@ -198,3 +198,17 @@ def test_dataset_csv_readers(mapping, file, last):
     out = P.datos_csv(cols)(raw(file))
     assert set(out) == set(cols)
     assert max(s.index.max() for s in out.values()) == pd.Timestamp(last)
+
+
+def test_every_datos_series_has_a_csv_file():
+    """Adding a datos.gob.ar series to the registry needs `python -m pipeline.datos_catalog`."""
+    from pipeline import datos_catalog
+    m = datos_catalog.load_map()
+    missing = [sid for sid in datos_catalog.datos_ids() if sid not in m]
+    assert not missing, f"not in registry/datos_catalog.json: {missing}"
+
+
+def test_catalog_providers_group_by_file():
+    provs = P.catalog_providers({"43.2_ECTAT_0_T_33", "45.2_ECTDT_0_T_33", "370.3_ICG_NIVEL_RAL_0_0_17_94",
+                                 "370.3_HONESTIDADDAD_0_0_10_58"})
+    assert len(provs) == 3 and sorted(len(p["ids"]) for p in provs) == [1, 1, 2]

@@ -35,7 +35,7 @@ def source_files_for(ind) -> list[dict] | None:
         return None
     ids = set(ind.input_ids())
     out = []
-    for p in primary.PROVIDERS:
+    for p in primary.all_providers():
         e = files.get(p["name"]) or {}
         if not (ids & set(primary._ids(p))) or e.get("status") != "ok" or not e.get("url"):
             continue

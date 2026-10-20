@@ -124,8 +124,9 @@ def _fill_incomplete(long: pd.DataFrame, meta: dict, session: requests.Session, 
 def fetch(ids: list[str] | set[str]) -> FetchResult:
     ids = sorted(set(ids))
     frames, meta, errors = [], {}, {}
-    # Series with a primary-source reader (CPI, EMAE, wages, registered employment, RIPTE)
-    # come from the publisher's own file first; the API is the fallback (pipeline/sources/primary.py).
+    # Series come from files first: the publisher's own file where there is a reader, else the
+    # datos.gob.ar CSV that holds the series (registry/datos_catalog.json). The API is only the
+    # last fallback, for series in neither (pipeline/sources/primary.py).
     try:
         from . import primary
         df, m, served = primary.fetch(ids)
