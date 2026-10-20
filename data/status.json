@@ -1,18 +1,16 @@
 {
   "103.1_I2N_2016_M_19": {
-    "error": "validation failed: latest date went backwards (2026-08 -> 2020-07); 73 previously published observations disappeared",
-    "error_since": "2026-10-20T15:59:13+00:00",
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
-    "source": "datos_gob",
+    "source": "manual",
     "source_units": "\u00cdndice Dic-2016=100",
-    "status": "error",
+    "status": "ok",
     "warnings": []
   },
   "11.3_AGCS_2004_M_41": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-07-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice 2004=100",
@@ -21,7 +19,7 @@
   },
   "11.3_CMMR_2004_M_10": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-07-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice 2004=100",
@@ -30,7 +28,7 @@
   },
   "11.3_C_2004_M_60": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-07-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice 2004=100",
@@ -39,7 +37,7 @@
   },
   "11.3_EMC_2004_M_25": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-07-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice 2004=100",
@@ -48,7 +46,7 @@
   },
   "11.3_HR_2004_M_24": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-07-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice 2004=100",
@@ -57,7 +55,7 @@
   },
   "11.3_IF_2004_M_25": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-07-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice 2004=100",
@@ -66,7 +64,7 @@
   },
   "11.3_IM_2004_M_25": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-07-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice 2004=100",
@@ -75,7 +73,7 @@
   },
   "11.3_ISD_2004_M_26": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-07-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice 2004=100",
@@ -84,7 +82,7 @@
   },
   "11.3_ISOM_2004_M_39": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-07-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice 2004=100",
@@ -93,7 +91,7 @@
   },
   "11.3_ITC_2004_M_21": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-07-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice 2004=100",
@@ -102,7 +100,7 @@
   },
   "11.3_P_2004_M_20": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-07-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice 2004=100",
@@ -111,7 +109,7 @@
   },
   "11.3_SEGA_2004_M_48": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-07-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice 2004=100",
@@ -120,7 +118,7 @@
   },
   "11.3_TAC_2004_M_60": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-07-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice 2004=100",
@@ -129,7 +127,7 @@
   },
   "11.3_VIPAA_2004_M_5": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-07-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice 2004=100",
@@ -138,7 +136,7 @@
   },
   "11.3_VMASD_2004_M_23": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-07-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice 2004=100",
@@ -147,7 +145,7 @@
   },
   "11.3_VMATC_2004_M_12": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-07-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice 2004=100",
@@ -156,7 +154,7 @@
   },
   "143.3_NO_PR_2004_A_21": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-07-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice 2004=100",
@@ -165,7 +163,7 @@
   },
   "143.3_NO_PR_2004_A_28": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-07-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice 2004=100",
@@ -174,7 +172,7 @@
   },
   "143.3_NO_PR_2004_A_31": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-07-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice 2004=100",
@@ -183,7 +181,7 @@
   },
   "144.2_AVOSCALES_0_T_24": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de d\u00f3lares",
@@ -192,7 +190,7 @@
   },
   "144.2_AVOSRELES_0_T_29": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de d\u00f3lares",
@@ -201,7 +199,7 @@
   },
   "144.2_IRSIONCTA_0_T_17": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de d\u00f3lares",
@@ -210,7 +208,7 @@
   },
   "144.2_IRSIONERA_0_T_17": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de d\u00f3lares",
@@ -219,7 +217,7 @@
   },
   "144.2_MDADEPRAL_0_T_27": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de d\u00f3lares",
@@ -228,7 +226,7 @@
   },
   "144.2_OINVERRAL_0_T_25": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de d\u00f3lares",
@@ -237,7 +235,7 @@
   },
   "144.2_PCIONETA_0_T_37": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de d\u00f3lares",
@@ -246,7 +244,7 @@
   },
   "144.2_PVOSDELES_0_T_42": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de d\u00f3lares",
@@ -255,7 +253,7 @@
   },
   "144.2_PVOSINLESC_0_T_38": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de d\u00f3lares",
@@ -264,7 +262,7 @@
   },
   "144.2_PVOSINLES_0_T_38": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de d\u00f3lares",
@@ -273,7 +271,7 @@
   },
   "144.2_PVOSOTION_0_T_22": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de d\u00f3lares",
@@ -282,7 +280,7 @@
   },
   "144.2_PVOSTRLES_0_T_20": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de d\u00f3lares",
@@ -291,7 +289,7 @@
   },
   "144.4_AVOSOTLESIN_0_T_30": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de d\u00f3lares",
@@ -300,7 +298,7 @@
   },
   "144.4_AVOSOTLES_0_T_48": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de d\u00f3lares",
@@ -309,7 +307,7 @@
   },
   "144.4_AVOSOTRAL_0_T_46": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de d\u00f3lares",
@@ -318,7 +316,7 @@
   },
   "144.4_AVOSOTUAL_0_T_54": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de d\u00f3lares",
@@ -327,7 +325,7 @@
   },
   "144.4_BOCENTRAL_0_T_19": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de d\u00f3lares",
@@ -336,7 +334,7 @@
   },
   "144.4_GERNOGRAL_0_T_22": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de d\u00f3lares",
@@ -345,7 +343,7 @@
   },
   "144.4_OSSECTRES_0_T_14": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de d\u00f3lares",
@@ -354,7 +352,7 @@
   },
   "144.4_SEDADESTOS_0_T_31": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de d\u00f3lares",
@@ -363,7 +361,7 @@
   },
   "146.3_IALIMENNAL_DICI_M_45": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice",
@@ -372,7 +370,7 @@
   },
   "146.3_IBEBIDANAL_DICI_M_39": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice",
@@ -381,7 +379,7 @@
   },
   "146.3_IBIENESNAL_DICI_M_36": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice",
@@ -390,7 +388,7 @@
   },
   "146.3_ICOMUNINAL_DICI_M_27": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice",
@@ -399,7 +397,7 @@
   },
   "146.3_IEDUCACNAL_DICI_M_22": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice",
@@ -408,7 +406,7 @@
   },
   "146.3_IEQUIPANAL_DICI_M_46": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice",
@@ -417,7 +415,7 @@
   },
   "146.3_IPRENDANAL_DICI_M_35": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice",
@@ -426,7 +424,7 @@
   },
   "146.3_IRECREANAL_DICI_M_31": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice",
@@ -435,7 +433,7 @@
   },
   "146.3_IRESTAUNAL_DICI_M_33": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice",
@@ -444,7 +442,7 @@
   },
   "146.3_ISALUDNAL_DICI_M_18": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice",
@@ -453,7 +451,7 @@
   },
   "146.3_ITRANSPNAL_DICI_M_23": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice",
@@ -462,7 +460,7 @@
   },
   "146.3_IVIVIENNAL_DICI_M_52": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice",
@@ -471,7 +469,7 @@
   },
   "148.3_IESTACINAL_DICI_M_25": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice",
@@ -480,7 +478,7 @@
   },
   "148.3_INIVELANA_DICI_M_26": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice",
@@ -489,7 +487,7 @@
   },
   "148.3_INIVELGBA_DICI_M_21": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice",
@@ -498,7 +496,7 @@
   },
   "148.3_INIVELNAL_DICI_M_26": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice",
@@ -507,7 +505,7 @@
   },
   "148.3_INIVELNEA_DICI_M_21": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice",
@@ -516,7 +514,7 @@
   },
   "148.3_INIVELNIA_DICI_M_27": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice",
@@ -525,7 +523,7 @@
   },
   "148.3_INIVELNOA_DICI_M_21": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice",
@@ -534,7 +532,7 @@
   },
   "148.3_INIVELUYO_DICI_M_22": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice",
@@ -543,7 +541,7 @@
   },
   "148.3_INUCLEONAL_DICI_M_19": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice",
@@ -552,7 +550,7 @@
   },
   "148.3_IREGULANAL_DICI_M_22": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice",
@@ -561,7 +559,7 @@
   },
   "149.1_SOR_PRIADO_OCTU_0_25": {
     "last_changed": "2026-10-18",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-07-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice",
@@ -570,7 +568,7 @@
   },
   "149.1_SOR_PRIADO_OCTU_0_28": {
     "last_changed": "2026-10-18",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-07-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice",
@@ -579,7 +577,7 @@
   },
   "149.1_SOR_PUBICO_OCTU_0_14": {
     "last_changed": "2026-10-18",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-07-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice",
@@ -588,7 +586,7 @@
   },
   "149.1_TL_INDIIOS_OCTU_0_21": {
     "last_changed": "2026-10-18",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-07-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice",
@@ -597,7 +595,7 @@
   },
   "150.1_LA_INDICIA_0_D_16": {
     "last_changed": "2026-10-20",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "datos_gob",
     "source_units": "Pesos corrientes",
@@ -606,7 +604,7 @@
   },
   "150.1_LA_POBREZA_0_D_13": {
     "last_changed": "2026-10-20",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "datos_gob",
     "source_units": "Pesos corrientes",
@@ -615,7 +613,7 @@
   },
   "151.1_AARIADOTAC_2012_M_25": {
     "last_changed": "2026-10-18",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-07-01",
     "source": "datos_gob",
     "source_units": "Miles de Personas",
@@ -624,7 +622,7 @@
   },
   "151.1_AARIADOTAC_2012_M_26": {
     "last_changed": "2026-10-18",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-07-01",
     "source": "datos_gob",
     "source_units": "Miles de Personas",
@@ -633,7 +631,7 @@
   },
   "151.1_AARIADOTAC_2012_M_40": {
     "last_changed": "2026-10-18",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-07-01",
     "source": "datos_gob",
     "source_units": "Miles de Personas",
@@ -642,7 +640,7 @@
   },
   "151.1_IPENDIETAC_2012_M_34": {
     "last_changed": "2026-10-18",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-07-01",
     "source": "datos_gob",
     "source_units": "Miles de Personas",
@@ -651,7 +649,7 @@
   },
   "151.1_IPENDIETAC_2012_M_36": {
     "last_changed": "2026-10-18",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-07-01",
     "source": "datos_gob",
     "source_units": "Miles de Personas",
@@ -660,7 +658,7 @@
   },
   "151.1_IPENDIETAC_2012_M_43": {
     "last_changed": "2026-10-18",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-07-01",
     "source": "datos_gob",
     "source_units": "Miles de Personas",
@@ -669,7 +667,7 @@
   },
   "151.1_TL_SIN_TAC_2012_M_15": {
     "last_changed": "2026-10-18",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-07-01",
     "source": "datos_gob",
     "source_units": "Miles de Personas",
@@ -678,7 +676,7 @@
   },
   "158.1_REPTE_0_0_5": {
     "last_changed": "2026-10-18",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "datos_gob",
     "source_units": "Pesos corrientes",
@@ -687,7 +685,7 @@
   },
   "160.2_AVOS_RERVA_0_T_15": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de d\u00f3lares",
@@ -696,7 +694,7 @@
   },
   "160.2_CCTE_INCTA_0_T_51": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de d\u00f3lares",
@@ -705,7 +703,7 @@
   },
   "160.2_CFIN_INTAL_0_T_57": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de d\u00f3lares",
@@ -714,7 +712,7 @@
   },
   "160.2_CFIN_INTAL_AC_0_T_57": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de d\u00f3lares",
@@ -723,7 +721,7 @@
   },
   "160.2_CFIN_INUDA_0_T_52": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de d\u00f3lares",
@@ -732,7 +730,7 @@
   },
   "160.2_CFIN_PAINTAL_0_T_57": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de d\u00f3lares",
@@ -741,7 +739,7 @@
   },
   "160.2_CFIN_PASINTAL_0_T_57": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de d\u00f3lares",
@@ -750,7 +748,7 @@
   },
   "160.2_CTA_ACFINUDA_0_T_59": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de d\u00f3lares",
@@ -759,7 +757,7 @@
   },
   "160.2_CTA_CORDOS_0_T_49": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de d\u00f3lares",
@@ -768,7 +766,7 @@
   },
   "160.2_CTA_CORFOB_0_T_59": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de d\u00f3lares",
@@ -777,7 +775,7 @@
   },
   "160.2_CTA_CORION_0_T_57": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de d\u00f3lares",
@@ -786,7 +784,7 @@
   },
   "160.2_CTA_CORION_0_T_58": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de d\u00f3lares",
@@ -795,7 +793,7 @@
   },
   "160.2_CTA_CORIOS_0_T_37": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de d\u00f3lares",
@@ -804,7 +802,7 @@
   },
   "160.2_CTA_CORIOS_0_T_39": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de d\u00f3lares",
@@ -813,7 +811,7 @@
   },
   "160.2_CTA_CORIOS_0_T_41": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de d\u00f3lares",
@@ -822,7 +820,7 @@
   },
   "160.2_CTA_CORIOS_0_T_49": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de d\u00f3lares",
@@ -831,7 +829,7 @@
   },
   "160.2_CTA_CORIOS_0_T_51": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de d\u00f3lares",
@@ -840,7 +838,7 @@
   },
   "160.2_CTA_CORIOS_0_T_52": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de d\u00f3lares",
@@ -849,7 +847,7 @@
   },
   "160.2_CTA_CORNES_0_T_46": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de d\u00f3lares",
@@ -858,7 +856,7 @@
   },
   "160.2_CTA_CORRFOB_0_T_59": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de d\u00f3lares",
@@ -867,7 +865,7 @@
   },
   "160.2_CTA_FINCTA_0_T_41": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de d\u00f3lares",
@@ -876,7 +874,7 @@
   },
   "160.2_CTA_FINERA_0_T_41": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de d\u00f3lares",
@@ -885,7 +883,7 @@
   },
   "160.2_CTA_FINION_0_T_38": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de d\u00f3lares",
@@ -894,7 +892,7 @@
   },
   "160.2_CTA_FINROS_0_T_36": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de d\u00f3lares",
@@ -903,7 +901,7 @@
   },
   "160.2_CTA_FINUDA_0_T_59": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de d\u00f3lares",
@@ -912,7 +910,7 @@
   },
   "160.2_CTA_PAFINUDA_0_T_59": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de d\u00f3lares",
@@ -921,7 +919,7 @@
   },
   "160.2_ERES_OMTOS_0_T_23": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de d\u00f3lares",
@@ -930,7 +928,7 @@
   },
   "160.2_IESOS_PERA_0_T_53": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de d\u00f3lares",
@@ -939,7 +937,7 @@
   },
   "160.2_TL_CUENERA_0_T_23": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de d\u00f3lares",
@@ -948,7 +946,7 @@
   },
   "160.2_TL_CUENNTE_0_T_22": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de d\u00f3lares",
@@ -957,7 +955,7 @@
   },
   "160.2_TL_CUENTAL_0_T_20": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de d\u00f3lares",
@@ -966,7 +964,7 @@
   },
   "178.1_NL_GENERAL_0_0_13": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2008-04-01",
     "source": "manual",
     "source_units": "\u00cdndice base 100",
@@ -975,7 +973,7 @@
   },
   "183.1_COBROS_EXPNES_0_M_27": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "datos_gob",
     "source_units": "Millones de d\u00f3lares",
@@ -984,7 +982,7 @@
   },
   "183.1_PAGOS_IMPONES_0_M_26": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "datos_gob",
     "source_units": "Millones de d\u00f3lares",
@@ -993,7 +991,7 @@
   },
   "2.2_OGP_1993_T_17": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2013-07-01",
     "source": "manual",
     "source_units": "Millones de pesos a precios de 1993",
@@ -1002,7 +1000,7 @@
   },
   "25.2_OGP_2004_T_17": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice 2004=100",
@@ -1011,7 +1009,7 @@
   },
   "3.2_OGP_D_2004_T_17": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos a precios de 2004",
@@ -1020,7 +1018,7 @@
   },
   "31.3_UCP_2004_M_20": {
     "last_changed": "2026-10-18",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "datos_gob",
     "source_units": "Porcentaje",
@@ -1029,7 +1027,7 @@
   },
   "31.3_UEI_2004_M_22": {
     "last_changed": "2026-10-18",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "datos_gob",
     "source_units": "Porcentaje",
@@ -1038,7 +1036,7 @@
   },
   "31.3_UIMB_2004_M_33": {
     "last_changed": "2026-10-18",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "datos_gob",
     "source_units": "Porcentaje",
@@ -1047,7 +1045,7 @@
   },
   "31.3_UMNIA_2004_M_42": {
     "last_changed": "2026-10-18",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "datos_gob",
     "source_units": "Porcentaje",
@@ -1056,7 +1054,7 @@
   },
   "31.3_UMNM_2004_M_27": {
     "last_changed": "2026-10-18",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "datos_gob",
     "source_units": "Porcentaje",
@@ -1065,7 +1063,7 @@
   },
   "31.3_UNG_2004_M_18": {
     "last_changed": "2026-10-18",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "datos_gob",
     "source_units": "Porcentaje",
@@ -1074,7 +1072,7 @@
   },
   "31.3_UPAB_2004_M_35": {
     "last_changed": "2026-10-18",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "datos_gob",
     "source_units": "Porcentaje",
@@ -1083,7 +1081,7 @@
   },
   "31.3_UPC_2004_M_17": {
     "last_changed": "2026-10-18",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "datos_gob",
     "source_units": "Porcentaje",
@@ -1092,7 +1090,7 @@
   },
   "31.3_UPT_2004_M_21": {
     "last_changed": "2026-10-18",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "datos_gob",
     "source_units": "Porcentaje",
@@ -1101,7 +1099,7 @@
   },
   "31.3_UPT_2004_M_23": {
     "last_changed": "2026-10-18",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "datos_gob",
     "source_units": "Porcentaje",
@@ -1110,7 +1108,7 @@
   },
   "31.3_URP_2004_M_24": {
     "last_changed": "2026-10-18",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "datos_gob",
     "source_units": "Porcentaje",
@@ -1119,7 +1117,7 @@
   },
   "31.3_USPQ_2004_M_34": {
     "last_changed": "2026-10-18",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "datos_gob",
     "source_units": "Porcentaje",
@@ -1128,7 +1126,7 @@
   },
   "31.3_UV_2004_M_25": {
     "last_changed": "2026-10-18",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "datos_gob",
     "source_units": "Porcentaje",
@@ -1137,7 +1135,7 @@
   },
   "33.2_ISAC_CICLOCIA_0_M_20_62": {
     "last_changed": "2026-10-07",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice 2004=100",
@@ -1146,7 +1144,7 @@
   },
   "33.2_ISAC_NIVELRAL_0_M_18_63": {
     "last_changed": "2026-10-07",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice 2004=100",
@@ -1155,7 +1153,7 @@
   },
   "33.2_ISAC_SIN_EDAD_0_M_23_56": {
     "last_changed": "2026-10-07",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice 2004=100",
@@ -1164,7 +1162,7 @@
   },
   "370.3_CAPACIDADDAD_0_0_9_83": {
     "last_changed": "2026-10-19",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "datos_gob",
     "source_units": "Indice",
@@ -1173,7 +1171,7 @@
   },
   "370.3_EFICIENCIACIA_0_0_10_66": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "datos_gob",
     "source_units": "Indice",
@@ -1182,7 +1180,7 @@
   },
   "370.3_EVALUACIONRAL_0_0_18_90": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "datos_gob",
     "source_units": "Indice",
@@ -1191,7 +1189,7 @@
   },
   "370.3_HONESTIDADDAD_0_0_10_58": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "datos_gob",
     "source_units": "Indice",
@@ -1200,7 +1198,7 @@
   },
   "370.3_ICG_NIVEL_RAL_0_0_17_94": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "datos_gob",
     "source_units": "Indice",
@@ -1209,7 +1207,7 @@
   },
   "370.3_INTERES_GERAL_0_0_15_61": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "datos_gob",
     "source_units": "Indice",
@@ -1218,7 +1216,7 @@
   },
   "379.9_GTOS_CAP_2017__13_60": {
     "last_changed": "2026-10-07",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos",
@@ -1227,7 +1225,7 @@
   },
   "379.9_GTOS_CAP_T017__50_91": {
     "last_changed": "2026-10-07",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos",
@@ -1236,7 +1234,7 @@
   },
   "379.9_GTOS_CORR_017_3_0_M_50_79": {
     "last_changed": "2026-10-07",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos",
@@ -1245,7 +1243,7 @@
   },
   "379.9_GTOS_CORR_017_5_0_M_51_42": {
     "last_changed": "2026-10-07",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos",
@@ -1254,7 +1252,7 @@
   },
   "379.9_GTOS_CORR_017__35_92": {
     "last_changed": "2026-10-07",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos",
@@ -1263,7 +1261,7 @@
   },
   "379.9_GTOS_CORR_017__40_84": {
     "last_changed": "2026-10-07",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos",
@@ -1272,7 +1270,7 @@
   },
   "379.9_GTOS_CORR_017__49_26": {
     "last_changed": "2026-10-07",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos",
@@ -1281,7 +1279,7 @@
   },
   "379.9_GTOS_PRIMA017__37_33": {
     "last_changed": "2026-10-07",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos",
@@ -1290,7 +1288,7 @@
   },
   "379.9_ING_ANTES_017__26_83": {
     "last_changed": "2026-10-07",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos",
@@ -1299,7 +1297,7 @@
   },
   "379.9_ING_CORR_I017__29_10": {
     "last_changed": "2026-10-07",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos",
@@ -1308,7 +1306,7 @@
   },
   "379.9_RESULTADO_017__18_38": {
     "last_changed": "2026-10-07",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos",
@@ -1317,7 +1315,7 @@
   },
   "379.9_SUPERAVIT_017__23_94": {
     "last_changed": "2026-10-07",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos",
@@ -1326,7 +1324,7 @@
   },
   "380.3_DESAGREGACCRO_0_T_40": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "datos_gob",
     "source_units": "Indice",
@@ -1335,7 +1333,7 @@
   },
   "380.3_DESAGREGACGBA_0_T_26": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "datos_gob",
     "source_units": "Indice",
@@ -1344,7 +1342,7 @@
   },
   "380.3_DESAGREGACIOR_0_T_31": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "datos_gob",
     "source_units": "Indice",
@@ -1353,7 +1351,7 @@
   },
   "380.3_DESAGREGACLES_0_T_50": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "datos_gob",
     "source_units": "Indice",
@@ -1362,7 +1360,7 @@
   },
   "380.3_DESAGREGACNAL_0_T_43": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "datos_gob",
     "source_units": "Indice",
@@ -1371,7 +1369,7 @@
   },
   "380.3_DESAGREGACTAL_0_T_30": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "datos_gob",
     "source_units": "Indice",
@@ -1380,7 +1378,7 @@
   },
   "380.3_ICC_NACIONNAL_0_T_12": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "datos_gob",
     "source_units": "Indice",
@@ -1389,7 +1387,7 @@
   },
   "4.2_DE_2004_T_24": {
     "last_changed": "2026-10-19",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos a precios de 2004",
@@ -1398,7 +1396,7 @@
   },
   "4.2_DGCP_2004_T_30": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos a precios de 2004",
@@ -1407,7 +1405,7 @@
   },
   "4.2_DGE_2004_T_26": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos a precios de 2004",
@@ -1416,7 +1414,7 @@
   },
   "4.2_DGIC_2004_T_32": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos a precios de 2004",
@@ -1425,7 +1423,7 @@
   },
   "4.2_DGIEDPMET_2004_T_51": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos a precios de 2004",
@@ -1434,7 +1432,7 @@
   },
   "4.2_DGIEDPMTT_2004_T_53": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos a precios de 2004",
@@ -1443,7 +1441,7 @@
   },
   "4.2_DGIT_2004_T_25": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos a precios de 2004",
@@ -1452,7 +1450,7 @@
   },
   "4.2_MGCP_2004_T_25": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos a precios de 2004",
@@ -1461,7 +1459,7 @@
   },
   "4.2_OGI_2004_T_25": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos a precios de 2004",
@@ -1470,7 +1468,7 @@
   },
   "4.2_OGP_2004_T_17": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos a precios de 2004",
@@ -1479,7 +1477,7 @@
   },
   "4.2_VE_2004_T_21": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos a precios de 2004",
@@ -1488,7 +1486,7 @@
   },
   "4.4_DGI_2004_T_19": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos",
@@ -1497,7 +1495,7 @@
   },
   "4.4_OGP_2004_T_17": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos",
@@ -1506,7 +1504,7 @@
   },
   "43.2_ECTAT_0_T_33": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Porcentaje",
@@ -1517,7 +1515,7 @@
   },
   "44.2_ECTET_0_T_30": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Porcentaje",
@@ -1528,7 +1526,7 @@
   },
   "448.1_NIVEL_GENERAL_0_0_13_46": {
     "last_changed": "2026-10-18",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice Dic-2015=100",
@@ -1537,7 +1535,7 @@
   },
   "45.2_ECTDT_0_T_33": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Porcentaje",
@@ -1548,7 +1546,7 @@
   },
   "452.2_APORTES_COIAL_0_T_39_29": {
     "last_changed": "2026-10-07",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos",
@@ -1557,7 +1555,7 @@
   },
   "452.2_BIENES_PERLES_0_T_17_26": {
     "last_changed": "2026-10-07",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos",
@@ -1566,7 +1564,7 @@
   },
   "452.2_COMBUSTIBLLES_0_T_12_97": {
     "last_changed": "2026-10-07",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos",
@@ -1575,7 +1573,7 @@
   },
   "452.2_DEBITOS_CRTOS_0_T_16_22": {
     "last_changed": "2026-10-07",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos",
@@ -1584,7 +1582,7 @@
   },
   "452.2_DERECHOS_EION_0_T_20_42": {
     "last_changed": "2026-10-07",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos",
@@ -1593,7 +1591,7 @@
   },
   "452.2_DERECHOS_IION_0_T_20_60": {
     "last_changed": "2026-10-07",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos",
@@ -1602,7 +1600,7 @@
   },
   "452.2_ENERGIAGIA_0_T_7_56": {
     "last_changed": "2026-10-07",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos",
@@ -1611,7 +1609,7 @@
   },
   "452.2_GANANCIASIAS_0_T_9_51": {
     "last_changed": "2026-10-07",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos",
@@ -1620,7 +1618,7 @@
   },
   "452.2_IMPUESTOS_NOS_0_T_18_87": {
     "last_changed": "2026-10-07",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos",
@@ -1629,7 +1627,7 @@
   },
   "452.2_IVA_NETO_RROS_0_T_19_67": {
     "last_changed": "2026-10-07",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos",
@@ -1638,7 +1636,7 @@
   },
   "452.2_OTRAS_FUNCNES_0_T_15_25": {
     "last_changed": "2026-10-07",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos",
@@ -1647,7 +1645,7 @@
   },
   "452.2_RESTO_TRIBIOS_0_T_17_0": {
     "last_changed": "2026-10-07",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos",
@@ -1656,7 +1654,7 @@
   },
   "452.2_TRANSPORTERTE_0_T_10_32": {
     "last_changed": "2026-10-07",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos",
@@ -1665,7 +1663,7 @@
   },
   "453.1_SERIE_DESEADA_0_0_24_58": {
     "last_changed": "2026-10-07",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice 2004 = 100",
@@ -1674,7 +1672,7 @@
   },
   "453.1_SERIE_ORIGNAL_0_0_14_46": {
     "last_changed": "2026-10-07",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice 2004 = 100",
@@ -1683,7 +1681,7 @@
   },
   "46.2_ECTST_0_T_36": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Porcentaje",
@@ -1694,7 +1692,7 @@
   },
   "53.1_EBE_0_0_27": {
     "last_changed": "2026-10-18",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Porcentaje",
@@ -1703,7 +1701,7 @@
   },
   "53.1_TIMB_0_0_25": {
     "last_changed": "2026-10-18",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Porcentaje",
@@ -1712,7 +1710,7 @@
   },
   "53.1_TRTA_0_0_37": {
     "last_changed": "2026-10-18",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Porcentaje",
@@ -1721,7 +1719,7 @@
   },
   "57.1_SMVMM_0_M_34": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2027-04-01",
     "source": "datos_gob",
     "source_units": "Pesos corrientes",
@@ -1730,7 +1728,7 @@
   },
   "58.1_MP_0_M_24": {
     "last_changed": "2026-10-20",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-10-01",
     "source": "datos_gob",
     "source_units": "Pesos corrientes",
@@ -1739,7 +1737,7 @@
   },
   "6.2_AGCS_2004_T_39": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos a precios de 2004",
@@ -1748,7 +1746,7 @@
   },
   "6.2_AIEA_2004_T_48": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos a precios de 2004",
@@ -1757,7 +1755,7 @@
   },
   "6.2_APDPSSAO_2004_T_60": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos a precios de 2004",
@@ -1766,7 +1764,7 @@
   },
   "6.2_CMMR_2004_T_41": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos a precios de 2004",
@@ -1775,7 +1773,7 @@
   },
   "6.2_C_2004_T_12": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos a precios de 2004",
@@ -1784,7 +1782,7 @@
   },
   "6.2_DI_2004_T_20": {
     "last_changed": "2026-10-19",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "status": "ok",
@@ -1792,7 +1790,7 @@
   },
   "6.2_EMC_2004_T_26": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos a precios de 2004",
@@ -1801,7 +1799,7 @@
   },
   "6.2_E_2004_T_10": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos a precios de 2004",
@@ -1810,7 +1808,7 @@
   },
   "6.2_HPSD_2004_T_32": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos a precios de 2004",
@@ -1819,7 +1817,7 @@
   },
   "6.2_HR_2004_T_20": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos a precios de 2004",
@@ -1828,7 +1826,7 @@
   },
   "6.2_IF_2004_T_25": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos a precios de 2004",
@@ -1837,7 +1835,7 @@
   },
   "6.2_IM_2004_T_23": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos a precios de 2004",
@@ -1846,7 +1844,7 @@
   },
   "6.2_IPNS_2004_T_35": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos a precios de 2004",
@@ -1855,7 +1853,7 @@
   },
   "6.2_IVA_2004_T_23": {
     "last_changed": "2026-10-19",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "status": "ok",
@@ -1863,7 +1861,7 @@
   },
   "6.2_OASCSP_2004_T_60": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos a precios de 2004",
@@ -1872,7 +1870,7 @@
   },
   "6.2_PIBPM_2004_T_38": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos a precios de 2004",
@@ -1881,7 +1879,7 @@
   },
   "6.2_P_2004_T_5": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos a precios de 2004",
@@ -1890,7 +1888,7 @@
   },
   "6.2_SEGA_2004_T_32": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos a precios de 2004",
@@ -1899,7 +1897,7 @@
   },
   "6.2_SSS_2004_T_24": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos a precios de 2004",
@@ -1908,7 +1906,7 @@
   },
   "6.2_TAC_2004_T_40": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Millones de pesos a precios de 2004",
@@ -1917,7 +1915,7 @@
   },
   "65.1_CGI_0_0_21": {
     "last_changed": "2026-10-18",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "Coeficiente de Gini",
@@ -1928,7 +1926,7 @@
   },
   "74.1_IET_0_A_16": {
     "last_changed": "2026-10-18",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2025-01-01",
     "source": "datos_gob",
     "source_units": "Millones de d\u00f3lares",
@@ -1937,7 +1935,7 @@
   },
   "74.1_IIT_0_A_25": {
     "last_changed": "2026-10-18",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2025-01-01",
     "source": "datos_gob",
     "source_units": "Millones de d\u00f3lares",
@@ -1946,7 +1944,7 @@
   },
   "74.3_IECE_0_M_35": {
     "last_changed": "2026-10-19",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "datos_gob",
     "source_units": "Millones de d\u00f3lares",
@@ -1955,7 +1953,7 @@
   },
   "74.3_IEMOA_0_M_48": {
     "last_changed": "2026-10-19",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "datos_gob",
     "source_units": "Millones de d\u00f3lares",
@@ -1964,7 +1962,7 @@
   },
   "74.3_IEMOI_0_M_46": {
     "last_changed": "2026-10-19",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "datos_gob",
     "source_units": "Millones de d\u00f3lares",
@@ -1973,7 +1971,7 @@
   },
   "74.3_IEPP_0_M_35": {
     "last_changed": "2026-10-19",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "datos_gob",
     "source_units": "Millones de d\u00f3lares",
@@ -1982,7 +1980,7 @@
   },
   "74.3_IET_0_M_16": {
     "last_changed": "2026-10-19",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "datos_gob",
     "source_units": "Millones de d\u00f3lares",
@@ -1991,7 +1989,7 @@
   },
   "74.3_IIBCA_0_M_32": {
     "last_changed": "2026-10-19",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "datos_gob",
     "source_units": "Millones de d\u00f3lares",
@@ -2000,7 +1998,7 @@
   },
   "74.3_IIBCO_0_M_32": {
     "last_changed": "2026-10-19",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "datos_gob",
     "source_units": "Millones de d\u00f3lares",
@@ -2009,7 +2007,7 @@
   },
   "74.3_IIBI_0_M_36": {
     "last_changed": "2026-10-19",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "datos_gob",
     "source_units": "Millones de d\u00f3lares",
@@ -2018,7 +2016,7 @@
   },
   "74.3_IICL_0_M_42": {
     "last_changed": "2026-10-19",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "datos_gob",
     "source_units": "Millones de d\u00f3lares",
@@ -2027,7 +2025,7 @@
   },
   "74.3_IIPABC_0_M_50": {
     "last_changed": "2026-10-19",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "datos_gob",
     "source_units": "Millones de d\u00f3lares",
@@ -2036,7 +2034,7 @@
   },
   "74.3_IIR_0_M_23": {
     "last_changed": "2026-10-19",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "datos_gob",
     "source_units": "Millones de d\u00f3lares",
@@ -2045,7 +2043,7 @@
   },
   "74.3_IIT_0_M_25": {
     "last_changed": "2026-10-19",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "datos_gob",
     "source_units": "Millones de d\u00f3lares",
@@ -2054,7 +2052,7 @@
   },
   "74.3_IIVAP_0_M_49": {
     "last_changed": "2026-10-19",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "datos_gob",
     "source_units": "Millones de d\u00f3lares",
@@ -2063,7 +2061,7 @@
   },
   "74.3_ISC_0_M_19": {
     "last_changed": "2026-10-19",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "datos_gob",
     "source_units": "Millones de d\u00f3lares",
@@ -2072,7 +2070,7 @@
   },
   "77.3_IEB_0_A_24": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "datos_gob",
     "source_units": "D\u00f3lares",
@@ -2081,7 +2079,7 @@
   },
   "77.3_IEC_0_A_23": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "datos_gob",
     "source_units": "D\u00f3lares",
@@ -2090,7 +2088,7 @@
   },
   "77.3_IEEU_0_A_32": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "datos_gob",
     "source_units": "D\u00f3lares",
@@ -2099,7 +2097,7 @@
   },
   "77.3_IERU_0_A_29_20": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "datos_gob",
     "source_units": "D\u00f3lares",
@@ -2108,7 +2106,7 @@
   },
   "77.3_IETM_0_A_32": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "datos_gob",
     "source_units": "D\u00f3lares",
@@ -2117,7 +2115,7 @@
   },
   "77.3_IET_0_A_25": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "datos_gob",
     "source_units": "D\u00f3lares",
@@ -2126,7 +2124,7 @@
   },
   "78.3_IIB_0_A_24": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "datos_gob",
     "source_units": "D\u00f3lares",
@@ -2135,7 +2133,7 @@
   },
   "78.3_IIC_0_A_23": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "datos_gob",
     "source_units": "D\u00f3lares",
@@ -2144,7 +2142,7 @@
   },
   "78.3_IIM_0_A_22_15": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "datos_gob",
     "source_units": "D\u00f3lares",
@@ -2153,7 +2151,7 @@
   },
   "78.3_IIRU_0_A_23_52": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "datos_gob",
     "source_units": "D\u00f3lares",
@@ -2162,7 +2160,7 @@
   },
   "78.3_IITM_0_A_32": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "datos_gob",
     "source_units": "D\u00f3lares",
@@ -2171,7 +2169,7 @@
   },
   "78.3_IIT_0_A_25": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "datos_gob",
     "source_units": "D\u00f3lares",
@@ -2180,7 +2178,7 @@
   },
   "80.2_IICENG_0_T_47": {
     "last_changed": "2026-10-18",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice 2004=100",
@@ -2189,7 +2187,7 @@
   },
   "80.2_IIPENG_0_T_45": {
     "last_changed": "2026-10-18",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice 2004=100",
@@ -2198,7 +2196,7 @@
   },
   "81.2_IICING_0_T_47": {
     "last_changed": "2026-10-18",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice 2004=100",
@@ -2207,7 +2205,7 @@
   },
   "81.2_IIPING_0_T_45": {
     "last_changed": "2026-10-18",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice 2004=100",
@@ -2216,7 +2214,7 @@
   },
   "82.2_IPE_2004_T_26": {
     "last_changed": "2026-10-18",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice 2004=100",
@@ -2225,7 +2223,7 @@
   },
   "82.2_IPI_2004_T_26": {
     "last_changed": "2026-10-18",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice 2004=100",
@@ -2234,7 +2232,7 @@
   },
   "82.2_ITI_2004_T_27": {
     "last_changed": "2026-10-18",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-04-01",
     "source": "datos_gob",
     "source_units": "\u00cdndice 2004=100",
@@ -2243,7 +2241,7 @@
   },
   "96.3_INGV_2008_M_20": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2013-12-01",
     "source": "manual",
     "source_units": "Porcentaje",
@@ -2252,7 +2250,7 @@
   },
   "98.3_INNG_2013_0_20": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2015-10-01",
     "source": "manual",
     "source_units": "\u00cdndice oct-13/sep-14=100",
@@ -2261,7 +2259,7 @@
   },
   "a3:f12": {
     "last_changed": "2026-10-19",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-10-19",
     "source": "a3",
     "status": "ok",
@@ -2269,7 +2267,7 @@
   },
   "a3:f6": {
     "last_changed": "2026-10-19",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-10-19",
     "source": "a3",
     "status": "ok",
@@ -2277,7 +2275,7 @@
   },
   "a3:oi": {
     "last_changed": "2026-10-19",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-10-19",
     "source": "a3",
     "status": "ok",
@@ -2285,7 +2283,7 @@
   },
   "aif:gtos_cap_2017": {
     "last_changed": "2026-10-10",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "aif",
     "source_units": "millions of pesos",
@@ -2294,7 +2292,7 @@
   },
   "aif:gtos_cap_inversion_real_directa_2017": {
     "last_changed": "2026-10-10",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "aif",
     "source_units": "millions of pesos",
@@ -2303,7 +2301,7 @@
   },
   "aif:gtos_cap_resto_2017": {
     "last_changed": "2026-10-10",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "aif",
     "source_units": "millions of pesos",
@@ -2312,7 +2310,7 @@
   },
   "aif:gtos_cap_transf_cap_ot_2017": {
     "last_changed": "2026-10-10",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "aif",
     "source_units": "millions of pesos",
@@ -2321,7 +2319,7 @@
   },
   "aif:gtos_cap_transf_cap_prov_caba_total_prov_caba_2017": {
     "last_changed": "2026-10-10",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "aif",
     "source_units": "millions of pesos",
@@ -2330,7 +2328,7 @@
   },
   "aif:gtos_corr_deficit_operativo_empresas_pub_2017": {
     "last_changed": "2026-10-10",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "aif",
     "source_units": "millions of pesos",
@@ -2339,7 +2337,7 @@
   },
   "aif:gtos_corr_gtos_cons_operacion_bienes_servicios_2017": {
     "last_changed": "2026-10-10",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "aif",
     "source_units": "millions of pesos",
@@ -2348,7 +2346,7 @@
   },
   "aif:gtos_corr_gtos_cons_operacion_ots_gtos_2017": {
     "last_changed": "2026-10-10",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "aif",
     "source_units": "millions of pesos",
@@ -2357,7 +2355,7 @@
   },
   "aif:gtos_corr_gtos_cons_operacion_remuneraciones_2017": {
     "last_changed": "2026-10-10",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "aif",
     "source_units": "millions of pesos",
@@ -2366,7 +2364,7 @@
   },
   "aif:gtos_corr_int_ot_ren_prop_int_netos_2017": {
     "last_changed": "2026-10-10",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "aif",
     "source_units": "millions of pesos",
@@ -2375,7 +2373,7 @@
   },
   "aif:gtos_corr_int_ot_ren_prop_int_pag_intra_stor_pub_2017": {
     "last_changed": "2026-10-10",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "aif",
     "source_units": "millions of pesos",
@@ -2384,7 +2382,7 @@
   },
   "aif:gtos_corr_int_ot_ren_prop_ot_ren_2017": {
     "last_changed": "2026-10-10",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "aif",
     "source_units": "millions of pesos",
@@ -2393,7 +2391,7 @@
   },
   "aif:gtos_corr_ots_gtos_2017": {
     "last_changed": "2026-10-10",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "aif",
     "source_units": "millions of pesos",
@@ -2402,7 +2400,7 @@
   },
   "aif:gtos_corr_ots_gtos_corr_2017": {
     "last_changed": "2026-10-10",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "aif",
     "source_units": "millions of pesos",
@@ -2411,7 +2409,7 @@
   },
   "aif:gtos_corr_prestaciones_seg_soc_2017": {
     "last_changed": "2026-10-10",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "aif",
     "source_units": "millions of pesos",
@@ -2420,7 +2418,7 @@
   },
   "aif:gtos_corr_transf_corr_sec_ext_2017": {
     "last_changed": "2026-10-10",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "aif",
     "source_units": "millions of pesos",
@@ -2429,7 +2427,7 @@
   },
   "aif:gtos_corr_transf_corr_sec_priv_total_sec_priv_2017": {
     "last_changed": "2026-10-10",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "aif",
     "source_units": "millions of pesos",
@@ -2438,7 +2436,7 @@
   },
   "aif:gtos_corr_transf_corr_sec_pub_ot_2017": {
     "last_changed": "2026-10-10",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "aif",
     "source_units": "millions of pesos",
@@ -2447,7 +2445,7 @@
   },
   "aif:gtos_corr_transf_corr_sec_pub_uni_2017": {
     "last_changed": "2026-10-10",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "aif",
     "source_units": "millions of pesos",
@@ -2456,7 +2454,7 @@
   },
   "aif:gtos_corr_transf_corr_sect_pub_caba_total_caba_2017": {
     "last_changed": "2026-10-10",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "aif",
     "source_units": "millions of pesos",
@@ -2465,7 +2463,7 @@
   },
   "aif:gtos_primario_antes_figurativos_2017": {
     "last_changed": "2026-10-10",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "aif",
     "source_units": "millions of pesos",
@@ -2474,7 +2472,7 @@
   },
   "aif:ing_antes_figurativos_2017": {
     "last_changed": "2026-10-10",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "aif",
     "source_units": "millions of pesos",
@@ -2483,7 +2481,7 @@
   },
   "aif:ing_corr_2017": {
     "last_changed": "2026-10-10",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "aif",
     "source_units": "millions of pesos",
@@ -2492,7 +2490,7 @@
   },
   "aif:ing_corr_aportes_contrib_seg_soc_2017": {
     "last_changed": "2026-10-10",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "aif",
     "source_units": "millions of pesos",
@@ -2501,7 +2499,7 @@
   },
   "aif:ing_corr_ing_no_tributarios_2017": {
     "last_changed": "2026-10-10",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "aif",
     "source_units": "millions of pesos",
@@ -2510,7 +2508,7 @@
   },
   "aif:ing_corr_ing_operacion_2017": {
     "last_changed": "2026-10-10",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "aif",
     "source_units": "millions of pesos",
@@ -2519,7 +2517,7 @@
   },
   "aif:ing_corr_ing_tributarios_2017": {
     "last_changed": "2026-10-10",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "aif",
     "source_units": "millions of pesos",
@@ -2528,7 +2526,7 @@
   },
   "aif:ing_corr_ren_prop_ren_percidas_bcra_2017": {
     "last_changed": "2026-10-10",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "aif",
     "source_units": "millions of pesos",
@@ -2537,7 +2535,7 @@
   },
   "aif:ing_corr_ren_prop_ren_prop_netas_2017": {
     "last_changed": "2026-10-10",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "aif",
     "source_units": "millions of pesos",
@@ -2546,7 +2544,7 @@
   },
   "aif:ing_corr_transf_corr_2017": {
     "last_changed": "2026-10-10",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "aif",
     "source_units": "millions of pesos",
@@ -2555,7 +2553,7 @@
   },
   "aif:ing_corr_ventas_bs_ser_adm_pub_2017": {
     "last_changed": "2026-10-10",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "aif",
     "source_units": "millions of pesos",
@@ -2564,7 +2562,7 @@
   },
   "aif:recursos_cap_total_recursos_cap_2017": {
     "last_changed": "2026-10-10",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "aif",
     "source_units": "millions of pesos",
@@ -2573,7 +2571,7 @@
   },
   "aif:resultado_fin_2017": {
     "last_changed": "2026-10-10",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "aif",
     "source_units": "millions of pesos",
@@ -2582,7 +2580,7 @@
   },
   "aif:resultados_primarios_sin_rentas": {
     "last_changed": "2026-10-10",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "aif",
     "source_units": "millions of pesos",
@@ -2591,7 +2589,7 @@
   },
   "aif:superavit_primario_2017": {
     "last_changed": "2026-10-10",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "aif",
     "source_units": "millions of pesos",
@@ -2600,7 +2598,7 @@
   },
   "bcra:1": {
     "last_changed": "2026-10-19",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-10-15",
     "source": "bcra",
     "status": "ok",
@@ -2608,7 +2606,7 @@
   },
   "bcra:108": {
     "last_changed": "2026-10-19",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-10-14",
     "source": "bcra",
     "status": "ok",
@@ -2616,7 +2614,7 @@
   },
   "bcra:11": {
     "last_changed": "2026-10-19",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-10-16",
     "source": "bcra",
     "status": "ok",
@@ -2626,7 +2624,7 @@
   },
   "bcra:110": {
     "last_changed": "2026-10-19",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-10-14",
     "source": "bcra",
     "status": "ok",
@@ -2634,7 +2632,7 @@
   },
   "bcra:111": {
     "last_changed": "2026-10-19",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-10-14",
     "source": "bcra",
     "status": "ok",
@@ -2642,7 +2640,7 @@
   },
   "bcra:112": {
     "last_changed": "2026-10-19",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-10-14",
     "source": "bcra",
     "status": "ok",
@@ -2650,7 +2648,7 @@
   },
   "bcra:113": {
     "last_changed": "2026-10-19",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-10-14",
     "source": "bcra",
     "status": "ok",
@@ -2658,7 +2656,7 @@
   },
   "bcra:114": {
     "last_changed": "2026-10-19",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-10-14",
     "source": "bcra",
     "status": "ok",
@@ -2666,7 +2664,7 @@
   },
   "bcra:115": {
     "last_changed": "2026-10-19",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-10-14",
     "source": "bcra",
     "status": "ok",
@@ -2674,7 +2672,7 @@
   },
   "bcra:116": {
     "last_changed": "2026-10-19",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-10-14",
     "source": "bcra",
     "status": "ok",
@@ -2682,7 +2680,7 @@
   },
   "bcra:1187": {
     "last_changed": "2026-10-20",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-10-20",
     "source": "bcra",
     "status": "ok",
@@ -2690,7 +2688,7 @@
   },
   "bcra:1188": {
     "last_changed": "2026-10-20",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-10-20",
     "source": "bcra",
     "status": "ok",
@@ -2698,7 +2696,7 @@
   },
   "bcra:12": {
     "last_changed": "2026-10-19",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-10-16",
     "source": "bcra",
     "status": "ok",
@@ -2708,7 +2706,7 @@
   },
   "bcra:125": {
     "last_changed": "2026-10-19",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-10-14",
     "source": "bcra",
     "status": "ok",
@@ -2716,7 +2714,7 @@
   },
   "bcra:13": {
     "last_changed": "2026-10-19",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-10-16",
     "source": "bcra",
     "status": "ok",
@@ -2724,7 +2722,7 @@
   },
   "bcra:14": {
     "last_changed": "2026-10-19",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-10-16",
     "source": "bcra",
     "status": "ok",
@@ -2732,7 +2730,7 @@
   },
   "bcra:15": {
     "last_changed": "2026-10-19",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-10-15",
     "source": "bcra",
     "status": "ok",
@@ -2740,7 +2738,7 @@
   },
   "bcra:160": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2025-07-10",
     "source": "bcra",
     "status": "ok",
@@ -2748,7 +2746,7 @@
   },
   "bcra:17": {
     "last_changed": "2026-10-19",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-10-15",
     "source": "bcra",
     "status": "ok",
@@ -2756,7 +2754,7 @@
   },
   "bcra:29": {
     "last_changed": "2026-10-06",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "bcra",
     "status": "ok",
@@ -2766,7 +2764,7 @@
   },
   "bcra:30": {
     "last_changed": "2026-10-19",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-10-20",
     "source": "bcra",
     "status": "ok",
@@ -2774,7 +2772,7 @@
   },
   "bcra:4": {
     "last_changed": "2026-10-19",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-10-19",
     "source": "bcra",
     "status": "ok",
@@ -2782,7 +2780,7 @@
   },
   "bcra:44": {
     "last_changed": "2026-10-20",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-10-16",
     "source": "bcra",
     "status": "ok",
@@ -2790,7 +2788,7 @@
   },
   "bcra:46": {
     "last_changed": "2026-10-19",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-10-14",
     "source": "bcra",
     "status": "ok",
@@ -2798,7 +2796,7 @@
   },
   "bcra:47": {
     "last_changed": "2026-10-19",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-10-14",
     "source": "bcra",
     "status": "ok",
@@ -2806,7 +2804,7 @@
   },
   "bcra:48": {
     "last_changed": "2026-10-19",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-10-14",
     "source": "bcra",
     "status": "ok",
@@ -2814,7 +2812,7 @@
   },
   "bcra:49": {
     "last_changed": "2026-10-19",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-10-14",
     "source": "bcra",
     "status": "ok",
@@ -2822,7 +2820,7 @@
   },
   "bcra:5": {
     "last_changed": "2026-10-19",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-10-19",
     "source": "bcra",
     "status": "ok",
@@ -2830,7 +2828,7 @@
   },
   "bcra:50": {
     "last_changed": "2026-10-19",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-10-14",
     "source": "bcra",
     "status": "ok",
@@ -2838,7 +2836,7 @@
   },
   "bcra:51": {
     "last_changed": "2026-10-19",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-10-14",
     "source": "bcra",
     "status": "ok",
@@ -2846,7 +2844,7 @@
   },
   "bcra:52": {
     "last_changed": "2026-10-19",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-10-14",
     "source": "bcra",
     "status": "ok",
@@ -2854,7 +2852,7 @@
   },
   "bcra:53": {
     "last_changed": "2026-10-19",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-10-14",
     "source": "bcra",
     "status": "ok",
@@ -2862,7 +2860,7 @@
   },
   "bcra:54": {
     "last_changed": "2026-10-19",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-10-14",
     "source": "bcra",
     "status": "ok",
@@ -2870,7 +2868,7 @@
   },
   "bcra:55": {
     "last_changed": "2026-10-19",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-10-14",
     "source": "bcra",
     "status": "ok",
@@ -2878,7 +2876,7 @@
   },
   "bcra:56": {
     "last_changed": "2026-10-19",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-10-14",
     "source": "bcra",
     "status": "ok",
@@ -2886,7 +2884,7 @@
   },
   "bcra:57": {
     "last_changed": "2026-10-19",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-10-14",
     "source": "bcra",
     "status": "ok",
@@ -2894,7 +2892,7 @@
   },
   "bcra:58": {
     "last_changed": "2026-10-19",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-10-14",
     "source": "bcra",
     "status": "ok",
@@ -2902,7 +2900,7 @@
   },
   "bcra:59": {
     "last_changed": "2026-10-19",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-10-14",
     "source": "bcra",
     "status": "ok",
@@ -2910,7 +2908,7 @@
   },
   "bcra:7": {
     "last_changed": "2026-10-19",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-10-16",
     "source": "bcra",
     "status": "ok",
@@ -2920,7 +2918,7 @@
   },
   "bcra:78": {
     "last_changed": "2026-10-19",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-10-14",
     "source": "bcra",
     "status": "ok",
@@ -2928,7 +2926,7 @@
   },
   "bcra:85": {
     "last_changed": "2026-10-19",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-10-14",
     "source": "bcra",
     "status": "ok",
@@ -2936,7 +2934,7 @@
   },
   "bcra:86": {
     "last_changed": "2026-10-19",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-10-14",
     "source": "bcra",
     "status": "ok",
@@ -2944,7 +2942,7 @@
   },
   "bcra:91": {
     "last_changed": "2026-10-19",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-10-14",
     "source": "bcra",
     "status": "ok",
@@ -2952,7 +2950,7 @@
   },
   "bcra:94": {
     "last_changed": "2026-10-19",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-10-14",
     "source": "bcra",
     "status": "ok",
@@ -2960,7 +2958,7 @@
   },
   "bcra:95": {
     "last_changed": "2026-10-19",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-10-14",
     "source": "bcra",
     "status": "ok",
@@ -2968,7 +2966,7 @@
   },
   "bcra:96": {
     "last_changed": "2026-10-19",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-10-14",
     "source": "bcra",
     "status": "ok",
@@ -2976,7 +2974,7 @@
   },
   "bcra:97": {
     "last_changed": "2026-10-19",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-10-14",
     "source": "bcra",
     "status": "ok",
@@ -2984,7 +2982,7 @@
   },
   "bcra_fx_repos": {
     "last_changed": "2026-10-06",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-07-03",
     "source": "manual",
     "status": "ok",
@@ -2992,7 +2990,7 @@
   },
   "bcra_fx_repos#short_usd_m": {
     "last_changed": "2026-10-06",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-07-03",
     "source": "manual",
     "status": "ok",
@@ -3000,7 +2998,7 @@
   },
   "bcrabal:102": {
     "last_changed": "2026-10-14",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "bcra_balance",
     "source_units": "thousands of pesos",
@@ -3009,7 +3007,7 @@
   },
   "bcrabal:103": {
     "last_changed": "2026-10-14",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "bcra_balance",
     "source_units": "thousands of pesos",
@@ -3018,7 +3016,7 @@
   },
   "bcrabal:104": {
     "last_changed": "2026-10-14",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "bcra_balance",
     "source_units": "thousands of pesos",
@@ -3027,7 +3025,7 @@
   },
   "bcrabal:105": {
     "last_changed": "2026-10-14",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "bcra_balance",
     "source_units": "thousands of pesos",
@@ -3036,7 +3034,7 @@
   },
   "bcrabal:107": {
     "last_changed": "2026-10-14",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "bcra_balance",
     "source_units": "thousands of pesos",
@@ -3045,7 +3043,7 @@
   },
   "bcrabal:111": {
     "last_changed": "2026-10-14",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "bcra_balance",
     "source_units": "thousands of pesos",
@@ -3054,7 +3052,7 @@
   },
   "bcrabal:112": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "1992-12-01",
     "source": "bcra_balance",
     "source_units": "thousands of pesos",
@@ -3063,7 +3061,7 @@
   },
   "bcrabal:113": {
     "last_changed": "2026-10-14",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "bcra_balance",
     "source_units": "thousands of pesos",
@@ -3072,7 +3070,7 @@
   },
   "bcrabal:114": {
     "last_changed": "2026-10-14",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "bcra_balance",
     "source_units": "thousands of pesos",
@@ -3081,7 +3079,7 @@
   },
   "bcrabal:115": {
     "last_changed": "2026-10-14",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "bcra_balance",
     "source_units": "thousands of pesos",
@@ -3090,7 +3088,7 @@
   },
   "bcrabal:3734": {
     "last_changed": "2026-10-14",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "bcra_balance",
     "source_units": "thousands of pesos",
@@ -3099,7 +3097,7 @@
   },
   "bcrabal:86": {
     "last_changed": "2026-10-14",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "bcra_balance",
     "source_units": "thousands of pesos",
@@ -3108,7 +3106,7 @@
   },
   "bcrabal:87": {
     "last_changed": "2026-10-14",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "bcra_balance",
     "source_units": "thousands of pesos",
@@ -3117,7 +3115,7 @@
   },
   "bcrabal:88": {
     "last_changed": "2026-10-14",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "bcra_balance",
     "source_units": "thousands of pesos",
@@ -3126,7 +3124,7 @@
   },
   "bcrabal:89": {
     "last_changed": "2026-10-14",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "bcra_balance",
     "source_units": "thousands of pesos",
@@ -3135,7 +3133,7 @@
   },
   "bcrabal:90": {
     "last_changed": "2026-10-14",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "bcra_balance",
     "source_units": "thousands of pesos",
@@ -3144,7 +3142,7 @@
   },
   "bcrabal:92": {
     "last_changed": "2026-10-14",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "bcra_balance",
     "source_units": "thousands of pesos",
@@ -3153,7 +3151,7 @@
   },
   "bcrabal:94": {
     "last_changed": "2026-10-14",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "bcra_balance",
     "source_units": "thousands of pesos",
@@ -3162,7 +3160,7 @@
   },
   "bcrabal:99": {
     "last_changed": "2026-10-14",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "bcra_balance",
     "source_units": "thousands of pesos",
@@ -3171,7 +3169,7 @@
   },
   "bcrabal:fx": {
     "last_changed": "2026-10-14",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "bcra_balance",
     "source_units": "thousands of pesos",
@@ -3180,7 +3178,7 @@
   },
   "bcrabc:capital": {
     "last_changed": "2026-10-07",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "bcra_cambiario",
     "source_units": "millions of US dollars",
@@ -3189,7 +3187,7 @@
   },
   "bcrabc:cash_purchases": {
     "last_changed": "2026-10-07",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "bcra_cambiario",
     "source_units": "millions of US dollars",
@@ -3198,7 +3196,7 @@
   },
   "bcrabc:current": {
     "last_changed": "2026-10-07",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "bcra_cambiario",
     "source_units": "millions of US dollars",
@@ -3207,7 +3205,7 @@
   },
   "bcrabc:fdi": {
     "last_changed": "2026-10-07",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "bcra_cambiario",
     "source_units": "millions of US dollars",
@@ -3216,7 +3214,7 @@
   },
   "bcrabc:financial": {
     "last_changed": "2026-10-07",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "bcra_cambiario",
     "source_units": "millions of US dollars",
@@ -3225,7 +3223,7 @@
   },
   "bcrabc:goods": {
     "last_changed": "2026-10-07",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "bcra_cambiario",
     "source_units": "millions of US dollars",
@@ -3234,7 +3232,7 @@
   },
   "bcrabc:ifis": {
     "last_changed": "2026-10-07",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "bcra_cambiario",
     "source_units": "millions of US dollars",
@@ -3243,7 +3241,7 @@
   },
   "bcrabc:imf": {
     "last_changed": "2026-10-07",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "bcra_cambiario",
     "source_units": "millions of US dollars",
@@ -3252,7 +3250,7 @@
   },
   "bcrabc:loans": {
     "last_changed": "2026-10-07",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "bcra_cambiario",
     "source_units": "millions of US dollars",
@@ -3261,7 +3259,7 @@
   },
   "bcrabc:portfolio": {
     "last_changed": "2026-10-07",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "bcra_cambiario",
     "source_units": "millions of US dollars",
@@ -3270,7 +3268,7 @@
   },
   "bcrabc:primary": {
     "last_changed": "2026-10-07",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "bcra_cambiario",
     "source_units": "millions of US dollars",
@@ -3279,7 +3277,7 @@
   },
   "bcrabc:reserves": {
     "last_changed": "2026-10-07",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "bcra_cambiario",
     "source_units": "millions of US dollars",
@@ -3288,7 +3286,7 @@
   },
   "bcrabc:secondary": {
     "last_changed": "2026-10-07",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "bcra_cambiario",
     "source_units": "millions of US dollars",
@@ -3297,7 +3295,7 @@
   },
   "bcrabc:services": {
     "last_changed": "2026-10-07",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "bcra_cambiario",
     "source_units": "millions of US dollars",
@@ -3306,7 +3304,7 @@
   },
   "bcrabk:bal_ars|system|depositos": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "bcra_banks",
     "status": "ok",
@@ -3314,7 +3312,7 @@
   },
   "bcrabk:bal_ars|system|disponibilidades": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "bcra_banks",
     "status": "ok",
@@ -3322,7 +3320,7 @@
   },
   "bcrabk:bal_ars|system|prestamos": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "bcra_banks",
     "status": "ok",
@@ -3330,7 +3328,7 @@
   },
   "bcrabk:bal|private|activo": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "bcra_banks",
     "status": "ok",
@@ -3340,7 +3338,7 @@
   },
   "bcrabk:bal|private|depositos": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "bcra_banks",
     "status": "ok",
@@ -3350,7 +3348,7 @@
   },
   "bcrabk:bal|private|patrimonio_neto": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "bcra_banks",
     "status": "ok",
@@ -3360,7 +3358,7 @@
   },
   "bcrabk:bal|private|titulos_publicos/tenencia_por_cartera_propia": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "bcra_banks",
     "status": "ok",
@@ -3370,7 +3368,7 @@
   },
   "bcrabk:bal|public|activo": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "bcra_banks",
     "status": "ok",
@@ -3380,7 +3378,7 @@
   },
   "bcrabk:bal|public|depositos": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "bcra_banks",
     "status": "ok",
@@ -3390,7 +3388,7 @@
   },
   "bcrabk:bal|public|patrimonio_neto": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "bcra_banks",
     "status": "ok",
@@ -3400,7 +3398,7 @@
   },
   "bcrabk:bal|public|titulos_publicos/tenencia_por_cartera_propia": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "bcra_banks",
     "status": "ok",
@@ -3410,7 +3408,7 @@
   },
   "bcrabk:bal|system|activo": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "bcra_banks",
     "status": "ok",
@@ -3420,7 +3418,7 @@
   },
   "bcrabk:bal|system|depositos": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "bcra_banks",
     "status": "ok",
@@ -3430,7 +3428,7 @@
   },
   "bcrabk:bal|system|disponibilidades": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "bcra_banks",
     "status": "ok",
@@ -3440,7 +3438,7 @@
   },
   "bcrabk:bal|system|patrimonio_neto": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "bcra_banks",
     "status": "ok",
@@ -3450,7 +3448,7 @@
   },
   "bcrabk:bal|system|prestamos": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "bcra_banks",
     "status": "ok",
@@ -3460,7 +3458,7 @@
   },
   "bcrabk:bal|system|prestamos/sector_privado": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "bcra_banks",
     "status": "ok",
@@ -3470,7 +3468,7 @@
   },
   "bcrabk:bal|system|titulos_publicos/tenencia_por_cartera_propia": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "bcra_banks",
     "status": "ok",
@@ -3480,7 +3478,7 @@
   },
   "bcrabk:ind|private|11a_integracion_de_capital": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "bcra_banks",
     "status": "ok",
@@ -3488,7 +3486,7 @@
   },
   "bcrabk:ind|private|1_liquidez_amplia": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "bcra_banks",
     "status": "ok",
@@ -3498,7 +3496,7 @@
   },
   "bcrabk:ind|private|2_liquidez_con_pases_lefi": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "bcra_banks",
     "status": "ok",
@@ -3508,7 +3506,7 @@
   },
   "bcrabk:ind|private|3_liquidez": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "bcra_banks",
     "status": "ok",
@@ -3518,7 +3516,7 @@
   },
   "bcrabk:ind|private|4_credito_al_sector_publico": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "bcra_banks",
     "status": "ok",
@@ -3528,7 +3526,7 @@
   },
   "bcrabk:ind|private|9b_roe_acumulado_anual_considera_ajuste_por_inflacion": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "bcra_banks",
     "status": "ok",
@@ -3538,7 +3536,7 @@
   },
   "bcrabk:ind|public|11a_integracion_de_capital": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "bcra_banks",
     "status": "ok",
@@ -3546,7 +3544,7 @@
   },
   "bcrabk:ind|public|1_liquidez_amplia": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "bcra_banks",
     "status": "ok",
@@ -3556,7 +3554,7 @@
   },
   "bcrabk:ind|public|2_liquidez_con_pases_lefi": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "bcra_banks",
     "status": "ok",
@@ -3566,7 +3564,7 @@
   },
   "bcrabk:ind|public|3_liquidez": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "bcra_banks",
     "status": "ok",
@@ -3576,7 +3574,7 @@
   },
   "bcrabk:ind|public|4_credito_al_sector_publico": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "bcra_banks",
     "status": "ok",
@@ -3586,7 +3584,7 @@
   },
   "bcrabk:ind|public|9b_roe_acumulado_anual_considera_ajuste_por_inflacion": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "bcra_banks",
     "status": "ok",
@@ -3596,7 +3594,7 @@
   },
   "bcrabk:ind|system|11a_integracion_de_capital": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "bcra_banks",
     "status": "ok",
@@ -3604,7 +3602,7 @@
   },
   "bcrabk:ind|system|1_liquidez_amplia": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "bcra_banks",
     "status": "ok",
@@ -3614,7 +3612,7 @@
   },
   "bcrabk:ind|system|2_liquidez_con_pases_lefi": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "bcra_banks",
     "status": "ok",
@@ -3624,7 +3622,7 @@
   },
   "bcrabk:ind|system|3_liquidez": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "bcra_banks",
     "status": "ok",
@@ -3634,7 +3632,7 @@
   },
   "bcrabk:ind|system|4_credito_al_sector_publico": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "bcra_banks",
     "status": "ok",
@@ -3644,7 +3642,7 @@
   },
   "bcrabk:ind|system|6_irregularidad_de_cartera_privada": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "bcra_banks",
     "status": "ok",
@@ -3654,7 +3652,7 @@
   },
   "bcrabk:ind|system|9b_roe_acumulado_anual_considera_ajuste_por_inflacion": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "bcra_banks",
     "status": "ok",
@@ -3664,7 +3662,7 @@
   },
   "bcrabk:npl_lines|system|1_1_sector_privado_en_uva/saldo_total_de_financiaciones/cartera_total": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "bcra_banks",
     "status": "ok",
@@ -3672,7 +3670,7 @@
   },
   "bcrabk:npl_lines|system|1_total_sector_privado/ratio_de_irregularidad/cartera_irregular_total": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "bcra_banks",
     "status": "ok",
@@ -3680,7 +3678,7 @@
   },
   "bcrabk:npl_lines|system|1_total_sector_privado/saldo_total_de_financiaciones/adelantos": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "bcra_banks",
     "status": "ok",
@@ -3688,7 +3686,7 @@
   },
   "bcrabk:npl_lines|system|1_total_sector_privado/saldo_total_de_financiaciones/cartera_total": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "bcra_banks",
     "status": "ok",
@@ -3696,7 +3694,7 @@
   },
   "bcrabk:npl_lines|system|1_total_sector_privado/saldo_total_de_financiaciones/con_garantia_hipotecaria": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "bcra_banks",
     "status": "ok",
@@ -3704,7 +3702,7 @@
   },
   "bcrabk:npl_lines|system|1_total_sector_privado/saldo_total_de_financiaciones/con_garantia_prendaria": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "bcra_banks",
     "status": "ok",
@@ -3712,7 +3710,7 @@
   },
   "bcrabk:npl_lines|system|1_total_sector_privado/saldo_total_de_financiaciones/documentos": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "bcra_banks",
     "status": "ok",
@@ -3720,7 +3718,7 @@
   },
   "bcrabk:npl_lines|system|1_total_sector_privado/saldo_total_de_financiaciones/otros": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "bcra_banks",
     "status": "ok",
@@ -3728,7 +3726,7 @@
   },
   "bcrabk:npl_lines|system|1_total_sector_privado/saldo_total_de_financiaciones/personales": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "bcra_banks",
     "status": "ok",
@@ -3736,7 +3734,7 @@
   },
   "bcrabk:npl_lines|system|1_total_sector_privado/saldo_total_de_financiaciones/prefinanciacion_y_financiacion_de_exportaciones": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "bcra_banks",
     "status": "ok",
@@ -3744,7 +3742,7 @@
   },
   "bcrabk:npl_lines|system|1_total_sector_privado/saldo_total_de_financiaciones/tarjetas_de_credito": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "bcra_banks",
     "status": "ok",
@@ -3752,7 +3750,7 @@
   },
   "bcrabk:npl_lines|system|2_1_familias_en_uva/saldo_total_de_financiaciones/cartera_total": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "bcra_banks",
     "status": "ok",
@@ -3760,7 +3758,7 @@
   },
   "bcrabk:npl_lines|system|2_familias_total/ratio_de_irregularidad/cartera_irregular_total": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "bcra_banks",
     "status": "ok",
@@ -3768,7 +3766,7 @@
   },
   "bcrabk:npl_lines|system|2_familias_total/saldo_total_de_financiaciones/cartera_total": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "bcra_banks",
     "status": "ok",
@@ -3776,7 +3774,7 @@
   },
   "bcrabk:npl_lines|system|3_empresas_total/ratio_de_irregularidad/cartera_irregular_total": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "bcra_banks",
     "status": "ok",
@@ -3784,7 +3782,7 @@
   },
   "bcrabk:res|system|ajustes_cer_y_cvs_2": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "bcra_banks",
     "status": "ok",
@@ -3792,7 +3790,7 @@
   },
   "bcrabk:res|system|cargas_impositivas_2": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "bcra_banks",
     "status": "ok",
@@ -3800,7 +3798,7 @@
   },
   "bcrabk:res|system|cargos_por_incobrabilidad_2": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "bcra_banks",
     "status": "ok",
@@ -3808,7 +3806,7 @@
   },
   "bcrabk:res|system|diferencias_de_cotizacion_2": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "bcra_banks",
     "status": "ok",
@@ -3816,7 +3814,7 @@
   },
   "bcrabk:res|system|diversos_2": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "bcra_banks",
     "status": "ok",
@@ -3824,7 +3822,7 @@
   },
   "bcrabk:res|system|egresos_por_intereses_2": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "bcra_banks",
     "status": "ok",
@@ -3832,7 +3830,7 @@
   },
   "bcrabk:res|system|gastos_de_administracion_2": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "bcra_banks",
     "status": "ok",
@@ -3840,7 +3838,7 @@
   },
   "bcrabk:res|system|impuesto_a_las_ganancias_2": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "bcra_banks",
     "status": "ok",
@@ -3848,7 +3846,7 @@
   },
   "bcrabk:res|system|ingresos_por_intereses_2": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "bcra_banks",
     "status": "ok",
@@ -3856,7 +3854,7 @@
   },
   "bcrabk:res|system|otros_resultados_financieros_2": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "bcra_banks",
     "status": "ok",
@@ -3864,7 +3862,7 @@
   },
   "bcrabk:res|system|primas_por_pases_2": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "bcra_banks",
     "status": "ok",
@@ -3872,7 +3870,7 @@
   },
   "bcrabk:res|system|resultado_monetario_2": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "bcra_banks",
     "status": "ok",
@@ -3880,7 +3878,7 @@
   },
   "bcrabk:res|system|resultado_por_servicios_2": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "bcra_banks",
     "status": "ok",
@@ -3888,7 +3886,7 @@
   },
   "bcrabk:res|system|resultado_por_titulos_valores_2": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "bcra_banks",
     "status": "ok",
@@ -3896,7 +3894,7 @@
   },
   "bcrabk:res|system|resultado_total_2": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "bcra_banks",
     "status": "ok",
@@ -3904,7 +3902,7 @@
   },
   "bcracot:CNY": {
     "last_changed": "2026-10-19",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-10-19",
     "source": "bcra_fx",
     "source_units": "US dollars per unit",
@@ -3913,7 +3911,7 @@
   },
   "bcraef:hhi_assets": {
     "last_changed": "2026-10-07",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-07-01",
     "source": "bcra_entities",
     "status": "ok",
@@ -3921,7 +3919,7 @@
   },
   "bcraef:hhi_bcra": {
     "last_changed": "2026-10-07",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-07-01",
     "source": "bcra_entities",
     "status": "ok",
@@ -3929,7 +3927,7 @@
   },
   "bcraef:hhi_deposits": {
     "last_changed": "2026-10-07",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-07-01",
     "source": "bcra_entities",
     "status": "ok",
@@ -3937,7 +3935,7 @@
   },
   "bcraef:hhi_loans": {
     "last_changed": "2026-10-07",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-07-01",
     "source": "bcra_entities",
     "status": "ok",
@@ -3945,7 +3943,7 @@
   },
   "bcraef:hhi_treasury": {
     "last_changed": "2026-10-07",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-07-01",
     "source": "bcra_entities",
     "status": "ok",
@@ -3953,7 +3951,7 @@
   },
   "bcraef:hold_bcra_bbva": {
     "last_changed": "2026-10-07",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-07-01",
     "source": "bcra_entities",
     "status": "ok",
@@ -3961,7 +3959,7 @@
   },
   "bcraef:hold_bcra_credicoop": {
     "last_changed": "2026-10-07",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-07-01",
     "source": "bcra_entities",
     "status": "ok",
@@ -3969,7 +3967,7 @@
   },
   "bcraef:hold_bcra_galicia": {
     "last_changed": "2026-10-07",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-07-01",
     "source": "bcra_entities",
     "status": "ok",
@@ -3977,7 +3975,7 @@
   },
   "bcraef:hold_bcra_icbc": {
     "last_changed": "2026-10-07",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-07-01",
     "source": "bcra_entities",
     "status": "ok",
@@ -3985,7 +3983,7 @@
   },
   "bcraef:hold_bcra_macro": {
     "last_changed": "2026-10-07",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-07-01",
     "source": "bcra_entities",
     "status": "ok",
@@ -3993,7 +3991,7 @@
   },
   "bcraef:hold_bcra_nacion": {
     "last_changed": "2026-10-07",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-07-01",
     "source": "bcra_entities",
     "status": "ok",
@@ -4001,7 +3999,7 @@
   },
   "bcraef:hold_bcra_other": {
     "last_changed": "2026-10-07",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-07-01",
     "source": "bcra_entities",
     "status": "ok",
@@ -4009,7 +4007,7 @@
   },
   "bcraef:hold_bcra_provincia": {
     "last_changed": "2026-10-07",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-07-01",
     "source": "bcra_entities",
     "status": "ok",
@@ -4017,7 +4015,7 @@
   },
   "bcraef:hold_bcra_santander": {
     "last_changed": "2026-10-07",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-07-01",
     "source": "bcra_entities",
     "status": "ok",
@@ -4025,7 +4023,7 @@
   },
   "bcraef:hold_treasury_bbva": {
     "last_changed": "2026-10-07",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-07-01",
     "source": "bcra_entities",
     "status": "ok",
@@ -4033,7 +4031,7 @@
   },
   "bcraef:hold_treasury_credicoop": {
     "last_changed": "2026-10-07",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-07-01",
     "source": "bcra_entities",
     "status": "ok",
@@ -4041,7 +4039,7 @@
   },
   "bcraef:hold_treasury_galicia": {
     "last_changed": "2026-10-07",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-07-01",
     "source": "bcra_entities",
     "status": "ok",
@@ -4049,7 +4047,7 @@
   },
   "bcraef:hold_treasury_icbc": {
     "last_changed": "2026-10-07",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-07-01",
     "source": "bcra_entities",
     "status": "ok",
@@ -4057,7 +4055,7 @@
   },
   "bcraef:hold_treasury_macro": {
     "last_changed": "2026-10-07",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-07-01",
     "source": "bcra_entities",
     "status": "ok",
@@ -4065,7 +4063,7 @@
   },
   "bcraef:hold_treasury_nacion": {
     "last_changed": "2026-10-07",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-07-01",
     "source": "bcra_entities",
     "status": "ok",
@@ -4073,7 +4071,7 @@
   },
   "bcraef:hold_treasury_other": {
     "last_changed": "2026-10-07",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-07-01",
     "source": "bcra_entities",
     "status": "ok",
@@ -4081,7 +4079,7 @@
   },
   "bcraef:hold_treasury_provincia": {
     "last_changed": "2026-10-07",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-07-01",
     "source": "bcra_entities",
     "status": "ok",
@@ -4089,7 +4087,7 @@
   },
   "bcraef:hold_treasury_santander": {
     "last_changed": "2026-10-07",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-07-01",
     "source": "bcra_entities",
     "status": "ok",
@@ -4097,7 +4095,7 @@
   },
   "bcraef:n_assets": {
     "last_changed": "2026-10-07",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-07-01",
     "source": "bcra_entities",
     "status": "ok",
@@ -4105,7 +4103,7 @@
   },
   "bcraef:n_deposits": {
     "last_changed": "2026-10-07",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-07-01",
     "source": "bcra_entities",
     "status": "ok",
@@ -4113,7 +4111,7 @@
   },
   "bcraef:n_loans": {
     "last_changed": "2026-10-07",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-07-01",
     "source": "bcra_entities",
     "status": "ok",
@@ -4121,7 +4119,7 @@
   },
   "bcraef:top10_assets": {
     "last_changed": "2026-10-07",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-07-01",
     "source": "bcra_entities",
     "status": "ok",
@@ -4129,7 +4127,7 @@
   },
   "bcraef:top10_deposits": {
     "last_changed": "2026-10-07",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-07-01",
     "source": "bcra_entities",
     "status": "ok",
@@ -4137,7 +4135,7 @@
   },
   "bcraef:top10_loans": {
     "last_changed": "2026-10-07",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-07-01",
     "source": "bcra_entities",
     "status": "ok",
@@ -4145,7 +4143,7 @@
   },
   "bcraef:top5_assets": {
     "last_changed": "2026-10-07",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-07-01",
     "source": "bcra_entities",
     "status": "ok",
@@ -4153,7 +4151,7 @@
   },
   "bcraef:top5_deposits": {
     "last_changed": "2026-10-07",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-07-01",
     "source": "bcra_entities",
     "status": "ok",
@@ -4161,7 +4159,7 @@
   },
   "bcraef:top5_loans": {
     "last_changed": "2026-10-07",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-07-01",
     "source": "bcra_entities",
     "status": "ok",
@@ -4169,7 +4167,7 @@
   },
   "bcrawk:encaje": {
     "last_changed": "2026-10-13",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-10-07",
     "source": "bcra_weekly",
     "source_units": "millions of dollars",
@@ -4178,7 +4176,7 @@
   },
   "bcrawk:fx": {
     "last_changed": "2026-10-13",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-10-07",
     "source": "bcra_weekly",
     "source_units": "pesos per dollar",
@@ -4187,7 +4185,7 @@
   },
   "bcrawk:gold": {
     "last_changed": "2026-10-13",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-10-07",
     "source": "bcra_weekly",
     "source_units": "millions of dollars",
@@ -4196,7 +4194,7 @@
   },
   "bcrawk:gross": {
     "last_changed": "2026-10-13",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-10-07",
     "source": "bcra_weekly",
     "source_units": "millions of dollars",
@@ -4205,7 +4203,7 @@
   },
   "bcrawk:intl_org": {
     "last_changed": "2026-10-13",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-10-07",
     "source": "bcra_weekly",
     "source_units": "millions of dollars",
@@ -4214,7 +4212,7 @@
   },
   "bcrawk:repo_line": {
     "last_changed": "2026-10-13",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-10-07",
     "source": "bcra_weekly",
     "source_units": "millions of dollars",
@@ -4223,7 +4221,7 @@
   },
   "china_swap_cny": {
     "last_changed": "2026-10-06",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2018-12-17",
     "source": "manual",
     "status": "ok",
@@ -4231,7 +4229,7 @@
   },
   "cpi_private_composite": {
     "last_changed": "2026-10-05",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-08-01",
     "source": "manual",
     "status": "ok",
@@ -4239,7 +4237,7 @@
   },
   "dolar:blue": {
     "last_changed": "2026-10-20",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-10-20",
     "source": "dolar",
     "source_units": "pesos per US dollar (selling)",
@@ -4248,7 +4246,7 @@
   },
   "dolar:ccl": {
     "last_changed": "2026-10-20",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-10-20",
     "source": "dolar",
     "source_units": "pesos per US dollar (selling)",
@@ -4257,7 +4255,7 @@
   },
   "dolar:cripto": {
     "last_changed": "2026-10-20",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-10-20",
     "source": "dolar",
     "source_units": "pesos per US dollar (selling)",
@@ -4266,7 +4264,7 @@
   },
   "dolar:mep": {
     "last_changed": "2026-10-20",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-10-20",
     "source": "dolar",
     "source_units": "pesos per US dollar (selling)",
@@ -4275,7 +4273,7 @@
   },
   "dolar:tarjeta": {
     "last_changed": "2026-10-20",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-10-20",
     "source": "dolar",
     "source_units": "pesos per US dollar (selling)",
@@ -4284,7 +4282,7 @@
   },
   "efw:ALL:count": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2024-01-01",
     "source": "efw",
     "source_units": "count",
@@ -4293,7 +4291,7 @@
   },
   "efw:ARG:a1": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2024-01-01",
     "source": "efw",
     "source_units": "rating, 0-10",
@@ -4302,7 +4300,7 @@
   },
   "efw:ARG:a2": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2024-01-01",
     "source": "efw",
     "source_units": "rating, 0-10",
@@ -4311,7 +4309,7 @@
   },
   "efw:ARG:a3": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2024-01-01",
     "source": "efw",
     "source_units": "rating, 0-10",
@@ -4320,7 +4318,7 @@
   },
   "efw:ARG:a4": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2024-01-01",
     "source": "efw",
     "source_units": "rating, 0-10",
@@ -4329,7 +4327,7 @@
   },
   "efw:ARG:a5": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2024-01-01",
     "source": "efw",
     "source_units": "rating, 0-10",
@@ -4338,7 +4336,7 @@
   },
   "efw:ARG:rank": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2024-01-01",
     "source": "efw",
     "source_units": "rank",
@@ -4347,7 +4345,7 @@
   },
   "efw:ARG:summary": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2024-01-01",
     "source": "efw",
     "source_units": "rating, 0-10",
@@ -4356,7 +4354,7 @@
   },
   "efw:AUS:summary": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2024-01-01",
     "source": "efw",
     "source_units": "rating, 0-10",
@@ -4365,7 +4363,7 @@
   },
   "efw:BRA:summary": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2024-01-01",
     "source": "efw",
     "source_units": "rating, 0-10",
@@ -4374,7 +4372,7 @@
   },
   "efw:CAN:summary": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2024-01-01",
     "source": "efw",
     "source_units": "rating, 0-10",
@@ -4383,7 +4381,7 @@
   },
   "efw:CHL:summary": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2024-01-01",
     "source": "efw",
     "source_units": "rating, 0-10",
@@ -4392,7 +4390,7 @@
   },
   "efw:COL:summary": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2024-01-01",
     "source": "efw",
     "source_units": "rating, 0-10",
@@ -4401,7 +4399,7 @@
   },
   "efw:ECU:summary": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2024-01-01",
     "source": "efw",
     "source_units": "rating, 0-10",
@@ -4410,7 +4408,7 @@
   },
   "efw:ESP:summary": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2024-01-01",
     "source": "efw",
     "source_units": "rating, 0-10",
@@ -4419,7 +4417,7 @@
   },
   "efw:LATAM:summary": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2024-01-01",
     "source": "efw",
     "source_units": "rating, 0-10",
@@ -4428,7 +4426,7 @@
   },
   "efw:MEX:summary": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2024-01-01",
     "source": "efw",
     "source_units": "rating, 0-10",
@@ -4437,7 +4435,7 @@
   },
   "efw:PAN:summary": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2024-01-01",
     "source": "efw",
     "source_units": "rating, 0-10",
@@ -4446,7 +4444,7 @@
   },
   "efw:PER:summary": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2024-01-01",
     "source": "efw",
     "source_units": "rating, 0-10",
@@ -4455,7 +4453,7 @@
   },
   "efw:SLV:summary": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2024-01-01",
     "source": "efw",
     "source_units": "rating, 0-10",
@@ -4464,7 +4462,7 @@
   },
   "efw:URY:summary": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2024-01-01",
     "source": "efw",
     "source_units": "rating, 0-10",
@@ -4473,7 +4471,7 @@
   },
   "efw:VEN:summary": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2024-01-01",
     "source": "efw",
     "source_units": "rating, 0-10",
@@ -4482,7 +4480,7 @@
   },
   "fin:a1|advances": {
     "last_changed": "2026-10-15",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "finanzas",
     "status": "ok",
@@ -4490,7 +4488,7 @@
   },
   "fin:a1|boncap": {
     "last_changed": "2026-10-15",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "finanzas",
     "status": "ok",
@@ -4498,7 +4496,7 @@
   },
   "fin:a1|lecap": {
     "last_changed": "2026-10-15",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "finanzas",
     "status": "ok",
@@ -4506,7 +4504,7 @@
   },
   "fin:a2|total": {
     "last_changed": "2026-10-15",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "finanzas",
     "status": "ok",
@@ -4514,7 +4512,7 @@
   },
   "fin:a3|eur": {
     "last_changed": "2026-10-15",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "finanzas",
     "status": "ok",
@@ -4522,7 +4520,7 @@
   },
   "fin:a3|jpy": {
     "last_changed": "2026-10-15",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "finanzas",
     "status": "ok",
@@ -4530,7 +4528,7 @@
   },
   "fin:a3|other": {
     "last_changed": "2026-10-15",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "finanzas",
     "status": "ok",
@@ -4538,7 +4536,7 @@
   },
   "fin:a3|pesos_cer": {
     "last_changed": "2026-10-15",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "finanzas",
     "status": "ok",
@@ -4546,7 +4544,7 @@
   },
   "fin:a3|pesos_other": {
     "last_changed": "2026-10-15",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "finanzas",
     "status": "ok",
@@ -4554,7 +4552,7 @@
   },
   "fin:a3|sdr": {
     "last_changed": "2026-10-15",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "finanzas",
     "status": "ok",
@@ -4562,7 +4560,7 @@
   },
   "fin:a3|usd": {
     "last_changed": "2026-10-15",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "finanzas",
     "status": "ok",
@@ -4570,7 +4568,7 @@
   },
   "fin:a4|peso_mkt_amortized": {
     "last_changed": "2026-10-15",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "finanzas",
     "status": "ok",
@@ -4578,7 +4576,7 @@
   },
   "fin:a4|peso_mkt_issued": {
     "last_changed": "2026-10-15",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "finanzas",
     "status": "ok",
@@ -4586,7 +4584,7 @@
   },
   "fin:a5|caf_capital": {
     "last_changed": "2026-10-15",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "finanzas",
     "status": "ok",
@@ -4594,7 +4592,7 @@
   },
   "fin:a5|caf_interest": {
     "last_changed": "2026-10-15",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "finanzas",
     "status": "ok",
@@ -4602,7 +4600,7 @@
   },
   "fin:a5|fx_capital": {
     "last_changed": "2026-10-15",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "finanzas",
     "status": "ok",
@@ -4610,7 +4608,7 @@
   },
   "fin:a5|fx_interest": {
     "last_changed": "2026-10-15",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "finanzas",
     "status": "ok",
@@ -4618,7 +4616,7 @@
   },
   "fin:a5|idb_capital": {
     "last_changed": "2026-10-15",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "finanzas",
     "status": "ok",
@@ -4626,7 +4624,7 @@
   },
   "fin:a5|idb_interest": {
     "last_changed": "2026-10-15",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "finanzas",
     "status": "ok",
@@ -4634,7 +4632,7 @@
   },
   "fin:a5|imf_capital": {
     "last_changed": "2026-10-15",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "finanzas",
     "status": "ok",
@@ -4642,7 +4640,7 @@
   },
   "fin:a5|imf_interest": {
     "last_changed": "2026-10-15",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "finanzas",
     "status": "ok",
@@ -4650,7 +4648,7 @@
   },
   "fin:a5|total": {
     "last_changed": "2026-10-15",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "finanzas",
     "status": "ok",
@@ -4658,7 +4656,7 @@
   },
   "fin:a5|wb_capital": {
     "last_changed": "2026-10-15",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "finanzas",
     "status": "ok",
@@ -4666,7 +4664,7 @@
   },
   "fin:a5|wb_interest": {
     "last_changed": "2026-10-15",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "finanzas",
     "status": "ok",
@@ -4674,7 +4672,7 @@
   },
   "fin:col|breakeven": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "finanzas",
     "status": "ok",
@@ -4684,7 +4682,7 @@
   },
   "fin:col|cer": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "finanzas",
     "status": "ok",
@@ -4692,7 +4690,7 @@
   },
   "fin:col|dlinked": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "finanzas",
     "status": "ok",
@@ -4700,7 +4698,7 @@
   },
   "fin:col|dlinked_ars": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "finanzas",
     "status": "ok",
@@ -4708,7 +4706,7 @@
   },
   "fin:col|dual": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "finanzas",
     "status": "ok",
@@ -4716,7 +4714,7 @@
   },
   "fin:col|fixed": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "finanzas",
     "status": "ok",
@@ -4724,7 +4722,7 @@
   },
   "fin:col|floating": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "finanzas",
     "status": "ok",
@@ -4732,7 +4730,7 @@
   },
   "fin:col|life": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "finanzas",
     "status": "ok",
@@ -4740,7 +4738,7 @@
   },
   "fin:col|tea_fixed_m": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "finanzas",
     "status": "ok",
@@ -4748,7 +4746,7 @@
   },
   "fin:col|tem_fixed": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "finanzas",
     "status": "ok",
@@ -4756,7 +4754,7 @@
   },
   "fin:col|usd": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "finanzas",
     "status": "ok",
@@ -4764,7 +4762,7 @@
   },
   "fin:col|usd_ars": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "finanzas",
     "status": "ok",
@@ -4772,7 +4770,7 @@
   },
   "fin:hold|private": {
     "last_changed": "2026-10-07",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-06-01",
     "source": "finanzas",
     "status": "ok",
@@ -4782,7 +4780,7 @@
   },
   "fin:hold|public": {
     "last_changed": "2026-10-07",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-06-01",
     "source": "finanzas",
     "status": "ok",
@@ -4792,7 +4790,7 @@
   },
   "fin:hold|total": {
     "last_changed": "2026-10-07",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-06-01",
     "source": "finanzas",
     "status": "ok",
@@ -4802,7 +4800,7 @@
   },
   "imf_purchases": {
     "last_changed": "2026-10-06",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-05-22",
     "source": "manual",
     "status": "ok",
@@ -4810,7 +4808,7 @@
   },
   "indec_ipim_domestic": {
     "last_changed": "2026-10-18",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "datos_gob",
     "status": "ok",
@@ -4818,7 +4816,7 @@
   },
   "indec_ipim_imported": {
     "last_changed": "2026-10-18",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "datos_gob",
     "status": "ok",
@@ -4826,7 +4824,7 @@
   },
   "indec_ipim_manufactured": {
     "last_changed": "2026-10-18",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "datos_gob",
     "status": "ok",
@@ -4834,7 +4832,7 @@
   },
   "indec_ipim_primary": {
     "last_changed": "2026-10-18",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "datos_gob",
     "status": "ok",
@@ -4842,7 +4840,7 @@
   },
   "indec_poverty": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-01-01",
     "source": "manual",
     "status": "ok",
@@ -4852,7 +4850,7 @@
   },
   "indec_poverty#households": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-01-01",
     "source": "manual",
     "status": "ok",
@@ -4862,7 +4860,7 @@
   },
   "indec_poverty#indigence": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-01-01",
     "source": "manual",
     "status": "ok",
@@ -4872,7 +4870,7 @@
   },
   "indec_poverty#indigence_households": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-01-01",
     "source": "manual",
     "status": "ok",
@@ -4882,7 +4880,7 @@
   },
   "itcrm:br": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-10-16",
     "source": "itcrm",
     "source_units": "index, 17-Dec-2015 = 100",
@@ -4891,7 +4889,7 @@
   },
   "itcrm:cn": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-10-16",
     "source": "itcrm",
     "source_units": "index, 17-Dec-2015 = 100",
@@ -4900,7 +4898,7 @@
   },
   "itcrm:eu": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-10-16",
     "source": "itcrm",
     "source_units": "index, 17-Dec-2015 = 100",
@@ -4909,7 +4907,7 @@
   },
   "itcrm:m": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-10-16",
     "source": "itcrm",
     "source_units": "index, 17-Dec-2015 = 100",
@@ -4918,7 +4916,7 @@
   },
   "itcrm:us": {
     "last_changed": "2026-10-16",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-10-16",
     "source": "itcrm",
     "source_units": "index, 17-Dec-2015 = 100",
@@ -4927,7 +4925,7 @@
   },
   "lefi_period": {
     "last_changed": "2026-10-07",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2025-06-01",
     "source": "manual",
     "status": "ok",
@@ -4935,7 +4933,7 @@
   },
   "officials:bcra": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-01-01",
     "source": "officials",
     "source_units": "officials taking office per year",
@@ -4944,7 +4942,7 @@
   },
   "officials:economia": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-01-01",
     "source": "officials",
     "source_units": "officials taking office per year",
@@ -4953,7 +4951,7 @@
   },
   "poverty_cedlas": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2017-01-01",
     "source": "manual",
     "status": "ok",
@@ -4963,7 +4961,7 @@
   },
   "poverty_uca": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2024-07-01",
     "source": "manual",
     "status": "ok",
@@ -4972,7 +4970,7 @@
     ]
   },
   "rem:core_m0": {
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "rem",
     "status": "ok",
@@ -4980,7 +4978,7 @@
   },
   "rem:cpi12": {
     "last_changed": "2026-10-09",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "rem",
     "status": "ok",
@@ -4988,7 +4986,7 @@
   },
   "rem:cpi12_p10": {
     "last_changed": "2026-10-09",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "rem",
     "status": "ok",
@@ -4996,7 +4994,7 @@
   },
   "rem:cpi12_p25": {
     "last_changed": "2026-10-09",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "rem",
     "status": "ok",
@@ -5004,7 +5002,7 @@
   },
   "rem:cpi12_p75": {
     "last_changed": "2026-10-09",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "rem",
     "status": "ok",
@@ -5012,14 +5010,14 @@
   },
   "rem:cpi12_p90": {
     "last_changed": "2026-10-09",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "rem",
     "status": "ok",
     "warnings": []
   },
   "rem:cpi_m0": {
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "rem",
     "status": "ok",
@@ -5027,7 +5025,7 @@
   },
   "rem:fx12": {
     "last_changed": "2026-10-07",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-09-01",
     "source": "rem",
     "status": "ok",
@@ -5035,7 +5033,7 @@
   },
   "riesgo:embi": {
     "last_changed": "2026-10-20",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-10-19",
     "source": "riesgo",
     "source_units": "basis points",
@@ -5044,7 +5042,7 @@
   },
   "ust:52w": {
     "last_changed": "2026-10-19",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2026-10-19",
     "source": "ustreasury",
     "source_units": "percent",
@@ -5053,7 +5051,7 @@
   },
   "vdem:corruption:ARG": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2025-01-01",
     "source": "vdem",
     "source_units": "index, 0-1",
@@ -5062,7 +5060,7 @@
   },
   "vdem:corruption:AUS": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2025-01-01",
     "source": "vdem",
     "source_units": "index, 0-1",
@@ -5071,7 +5069,7 @@
   },
   "vdem:corruption:BRA": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2025-01-01",
     "source": "vdem",
     "source_units": "index, 0-1",
@@ -5080,7 +5078,7 @@
   },
   "vdem:corruption:CAN": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2025-01-01",
     "source": "vdem",
     "source_units": "index, 0-1",
@@ -5089,7 +5087,7 @@
   },
   "vdem:corruption:CHL": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2025-01-01",
     "source": "vdem",
     "source_units": "index, 0-1",
@@ -5098,7 +5096,7 @@
   },
   "vdem:corruption:COL": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2025-01-01",
     "source": "vdem",
     "source_units": "index, 0-1",
@@ -5107,7 +5105,7 @@
   },
   "vdem:corruption:ECU": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2025-01-01",
     "source": "vdem",
     "source_units": "index, 0-1",
@@ -5116,7 +5114,7 @@
   },
   "vdem:corruption:ESP": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2025-01-01",
     "source": "vdem",
     "source_units": "index, 0-1",
@@ -5125,7 +5123,7 @@
   },
   "vdem:corruption:LATAM": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2025-01-01",
     "source": "vdem",
     "source_units": "index, 0-1",
@@ -5134,7 +5132,7 @@
   },
   "vdem:corruption:MEX": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2025-01-01",
     "source": "vdem",
     "source_units": "index, 0-1",
@@ -5143,7 +5141,7 @@
   },
   "vdem:corruption:PAN": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2025-01-01",
     "source": "vdem",
     "source_units": "index, 0-1",
@@ -5152,7 +5150,7 @@
   },
   "vdem:corruption:PER": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2025-01-01",
     "source": "vdem",
     "source_units": "index, 0-1",
@@ -5161,7 +5159,7 @@
   },
   "vdem:corruption:SLV": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2025-01-01",
     "source": "vdem",
     "source_units": "index, 0-1",
@@ -5170,7 +5168,7 @@
   },
   "vdem:corruption:URY": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2025-01-01",
     "source": "vdem",
     "source_units": "index, 0-1",
@@ -5179,7 +5177,7 @@
   },
   "vdem:corruption:VEN": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2025-01-01",
     "source": "vdem",
     "source_units": "index, 0-1",
@@ -5188,7 +5186,7 @@
   },
   "vdem:electdem:ARG": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2025-01-01",
     "source": "vdem",
     "source_units": "index, 0-1",
@@ -5197,7 +5195,7 @@
   },
   "vdem:judicial:ARG": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2025-01-01",
     "source": "vdem",
     "source_units": "index, 0-1",
@@ -5206,7 +5204,7 @@
   },
   "vdem:judicial:AUS": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2025-01-01",
     "source": "vdem",
     "source_units": "index, 0-1",
@@ -5215,7 +5213,7 @@
   },
   "vdem:judicial:BRA": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2025-01-01",
     "source": "vdem",
     "source_units": "index, 0-1",
@@ -5224,7 +5222,7 @@
   },
   "vdem:judicial:CAN": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2025-01-01",
     "source": "vdem",
     "source_units": "index, 0-1",
@@ -5233,7 +5231,7 @@
   },
   "vdem:judicial:CHL": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2025-01-01",
     "source": "vdem",
     "source_units": "index, 0-1",
@@ -5242,7 +5240,7 @@
   },
   "vdem:judicial:COL": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2025-01-01",
     "source": "vdem",
     "source_units": "index, 0-1",
@@ -5251,7 +5249,7 @@
   },
   "vdem:judicial:ECU": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2025-01-01",
     "source": "vdem",
     "source_units": "index, 0-1",
@@ -5260,7 +5258,7 @@
   },
   "vdem:judicial:ESP": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2025-01-01",
     "source": "vdem",
     "source_units": "index, 0-1",
@@ -5269,7 +5267,7 @@
   },
   "vdem:judicial:LATAM": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2025-01-01",
     "source": "vdem",
     "source_units": "index, 0-1",
@@ -5278,7 +5276,7 @@
   },
   "vdem:judicial:MEX": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2025-01-01",
     "source": "vdem",
     "source_units": "index, 0-1",
@@ -5287,7 +5285,7 @@
   },
   "vdem:judicial:PAN": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2025-01-01",
     "source": "vdem",
     "source_units": "index, 0-1",
@@ -5296,7 +5294,7 @@
   },
   "vdem:judicial:PER": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2025-01-01",
     "source": "vdem",
     "source_units": "index, 0-1",
@@ -5305,7 +5303,7 @@
   },
   "vdem:judicial:SLV": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2025-01-01",
     "source": "vdem",
     "source_units": "index, 0-1",
@@ -5314,7 +5312,7 @@
   },
   "vdem:judicial:URY": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2025-01-01",
     "source": "vdem",
     "source_units": "index, 0-1",
@@ -5323,7 +5321,7 @@
   },
   "vdem:judicial:VEN": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2025-01-01",
     "source": "vdem",
     "source_units": "index, 0-1",
@@ -5332,7 +5330,7 @@
   },
   "vdem:legislative:ARG": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2025-01-01",
     "source": "vdem",
     "source_units": "index, 0-1",
@@ -5341,7 +5339,7 @@
   },
   "vdem:libdem:ARG": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2025-01-01",
     "source": "vdem",
     "source_units": "index, 0-1",
@@ -5350,7 +5348,7 @@
   },
   "vdem:libdem:AUS": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2025-01-01",
     "source": "vdem",
     "source_units": "index, 0-1",
@@ -5359,7 +5357,7 @@
   },
   "vdem:libdem:BRA": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2025-01-01",
     "source": "vdem",
     "source_units": "index, 0-1",
@@ -5368,7 +5366,7 @@
   },
   "vdem:libdem:CAN": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2025-01-01",
     "source": "vdem",
     "source_units": "index, 0-1",
@@ -5377,7 +5375,7 @@
   },
   "vdem:libdem:CHL": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2025-01-01",
     "source": "vdem",
     "source_units": "index, 0-1",
@@ -5386,7 +5384,7 @@
   },
   "vdem:libdem:COL": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2025-01-01",
     "source": "vdem",
     "source_units": "index, 0-1",
@@ -5395,7 +5393,7 @@
   },
   "vdem:libdem:ECU": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2025-01-01",
     "source": "vdem",
     "source_units": "index, 0-1",
@@ -5404,7 +5402,7 @@
   },
   "vdem:libdem:ESP": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2025-01-01",
     "source": "vdem",
     "source_units": "index, 0-1",
@@ -5413,7 +5411,7 @@
   },
   "vdem:libdem:LATAM": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2025-01-01",
     "source": "vdem",
     "source_units": "index, 0-1",
@@ -5422,7 +5420,7 @@
   },
   "vdem:libdem:MEX": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2025-01-01",
     "source": "vdem",
     "source_units": "index, 0-1",
@@ -5431,7 +5429,7 @@
   },
   "vdem:libdem:PAN": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2025-01-01",
     "source": "vdem",
     "source_units": "index, 0-1",
@@ -5440,7 +5438,7 @@
   },
   "vdem:libdem:PER": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2025-01-01",
     "source": "vdem",
     "source_units": "index, 0-1",
@@ -5449,7 +5447,7 @@
   },
   "vdem:libdem:SLV": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2025-01-01",
     "source": "vdem",
     "source_units": "index, 0-1",
@@ -5458,7 +5456,7 @@
   },
   "vdem:libdem:URY": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2025-01-01",
     "source": "vdem",
     "source_units": "index, 0-1",
@@ -5467,7 +5465,7 @@
   },
   "vdem:libdem:VEN": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2025-01-01",
     "source": "vdem",
     "source_units": "index, 0-1",
@@ -5476,7 +5474,7 @@
   },
   "vdem:rol:ARG": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2025-01-01",
     "source": "vdem",
     "source_units": "index, 0-1",
@@ -5485,7 +5483,7 @@
   },
   "vdem:rol:AUS": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2025-01-01",
     "source": "vdem",
     "source_units": "index, 0-1",
@@ -5494,7 +5492,7 @@
   },
   "vdem:rol:BRA": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2025-01-01",
     "source": "vdem",
     "source_units": "index, 0-1",
@@ -5503,7 +5501,7 @@
   },
   "vdem:rol:CAN": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2025-01-01",
     "source": "vdem",
     "source_units": "index, 0-1",
@@ -5512,7 +5510,7 @@
   },
   "vdem:rol:CHL": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2025-01-01",
     "source": "vdem",
     "source_units": "index, 0-1",
@@ -5521,7 +5519,7 @@
   },
   "vdem:rol:COL": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2025-01-01",
     "source": "vdem",
     "source_units": "index, 0-1",
@@ -5530,7 +5528,7 @@
   },
   "vdem:rol:ECU": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2025-01-01",
     "source": "vdem",
     "source_units": "index, 0-1",
@@ -5539,7 +5537,7 @@
   },
   "vdem:rol:ESP": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2025-01-01",
     "source": "vdem",
     "source_units": "index, 0-1",
@@ -5548,7 +5546,7 @@
   },
   "vdem:rol:LATAM": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2025-01-01",
     "source": "vdem",
     "source_units": "index, 0-1",
@@ -5557,7 +5555,7 @@
   },
   "vdem:rol:MEX": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2025-01-01",
     "source": "vdem",
     "source_units": "index, 0-1",
@@ -5566,7 +5564,7 @@
   },
   "vdem:rol:PAN": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2025-01-01",
     "source": "vdem",
     "source_units": "index, 0-1",
@@ -5575,7 +5573,7 @@
   },
   "vdem:rol:PER": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2025-01-01",
     "source": "vdem",
     "source_units": "index, 0-1",
@@ -5584,7 +5582,7 @@
   },
   "vdem:rol:SLV": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2025-01-01",
     "source": "vdem",
     "source_units": "index, 0-1",
@@ -5593,7 +5591,7 @@
   },
   "vdem:rol:URY": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2025-01-01",
     "source": "vdem",
     "source_units": "index, 0-1",
@@ -5602,7 +5600,7 @@
   },
   "vdem:rol:VEN": {
     "last_changed": "2026-10-08",
-    "last_checked": "2026-10-20T16:06:20+00:00",
+    "last_checked": "2026-10-20T16:13:17+00:00",
     "last_obs": "2025-01-01",
     "source": "vdem",
     "source_units": "index, 0-1",
