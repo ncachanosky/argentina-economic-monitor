@@ -131,7 +131,7 @@ copper to tell apart as a series.
 
 ## Data license
 
-Source data: INDEC (via [datos.gob.ar](https://datos.gob.ar/), CC BY 4.0), the
+Source data: INDEC (its own files and [datos.gob.ar](https://datos.gob.ar/), CC BY 4.0), the
 BCRA, the Ministry of Economy and other official agencies, under their terms.
 Market quotes (informal and bond-market dollars, dollar futures) come from
 market-data services and are marked as unofficial on the site.
@@ -139,6 +139,15 @@ market-data services and are marked as unofficial on the site.
 ## Spanish site
 
 Pages under `/es/` are built from the same template and data. Translations: `registry/i18n/es.yaml` (page texts, interface strings, patterns for texts with numbers or dates) and `registry/i18n/es/*.json` (chart titles, descriptions, notes and labels, English text -> Spanish). A new or edited English text shows in English on the Spanish site until its translation is added. `site.spanish: true` in the registry links the Spanish site from the header and opens it to search engines.
+
+## Versions and citation
+
+Releases are tagged on GitHub (`v1.0.0`, ...); see `CHANGELOG.md`. A version marks
+a change to the code or the site. The data update twice a day between versions,
+and each tag is a snapshot of the code and the stored data on that date. To cite
+the Monitor, use GitHub's "Cite this repository" box (from `CITATION.cff`) and
+name the version; for the statistics themselves, cite the original source shown
+on each chart.
 
 ## Licence
 

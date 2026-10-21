@@ -1,0 +1,30 @@
+cff-version: 1.2.0
+message: >-
+  If you use the Argentina Economic Monitor, please cite it as below. For the
+  underlying statistics, cite the original source of each series (INDEC, BCRA,
+  Ministry of Economy and others), named on every chart.
+title: "Argentina Economic Monitor"
+abstract: >-
+  A bilingual (English and Spanish) site of Argentina's official economic
+  statistics, updated twice a day from the publishers' own files, checked
+  against the stored history before publication, and kept with its full
+  revision history. Includes constructed series such as a long-run CPI
+  spliced across bases and long-run GDP chain-linked across bases.
+type: software
+authors:
+  - family-names: Cachanosky
+    given-names: Nicolás
+    orcid: "https://orcid.org/0000-0002-9685-0899"
+    affiliation: "University of Texas at El Paso"
+version: 1.0.0
+date-released: "2026-10-20"
+license: MIT
+repository-code: "https://github.com/ncachanosky/argentina-economic-monitor"
+url: "https://ncachanosky.github.io/argentina-economic-monitor/"
+keywords:
+  - Argentina
+  - macroeconomics
+  - official statistics
+  - inflation
+  - exchange rate
+  - real-time data
