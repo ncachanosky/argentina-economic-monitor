@@ -5071,6 +5071,9 @@ indicators:
     note: >-
       Estimates, not official measures. Accrual: the official balance minus
       capitalized interest (see Interest on the Debt, Paid and Capitalized).
+      Accrual, real: the official balance minus only the real component of
+      capitalized interest (the yield net of the month's inflation), the
+      adjustment the IMF uses (2026 Article IV, about 0.8% of GDP in 2025).
       Operational: the accrual balance plus the inflation component of
       interest on peso debt that is not indexed (each month's CPI inflation
       times the stock at the end of the previous month, excluding the BCRA's
@@ -5088,6 +5091,7 @@ indicators:
       vars: *interest
       variants:
         official: {label: Official (cash),                expr: "100 * sum12(fin) / gdp12(gdp, cpi)"}
+        real: {label: "Accrual, real (minus real capitalized interest)", expr: "100 * (sum12(fin) - sum12(lag((nz(cap) + nz(bcap)) * fx, 1) * ((1 + nz(tem) / 100) * lag(cpi, 1) / cpi - 1))) / gdp12(gdp, cpi)"}
         adjusted: {label: Accrual (minus capitalized interest),     expr: "100 * (sum12(fin) - sum12(lag((nz(cap) + nz(bcap)) * fx, 1) * nz(tem) / 100)) / gdp12(gdp, cpi)"}
         operational: {label: "Operational (inflation-corrected)", expr: "100 * (sum12(fin) - sum12(lag((nz(cap) + nz(bcap)) * fx, 1) * nz(tem) / 100) + sum12(lag((po - nz(adv)) * fx, 1) * (cpi / lag(cpi, 1) - 1))) / gdp12(gdp, cpi)"}
 
