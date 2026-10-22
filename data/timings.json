@@ -1,112 +1,112 @@
 [
  {
   "source": "bcra (D)",
-  "seconds": 84.8,
+  "seconds": 78.0,
   "series": 46
  },
  {
-  "source": "datos_gob (M)",
-  "seconds": 36.5,
-  "series": 146
- },
- {
-  "source": "finanzas (M)",
-  "seconds": 26.9,
-  "series": 39
- },
- {
   "source": "bcra_entities (M)",
-  "seconds": 24.6,
+  "seconds": 53.4,
   "series": 32
  },
  {
-  "source": "ustreasury (D)",
-  "seconds": 17.2,
-  "series": 1
+  "source": "finanzas (M)",
+  "seconds": 37.5,
+  "series": 39
+ },
+ {
+  "source": "datos_gob (M)",
+  "seconds": 36.8,
+  "series": 146
  },
  {
   "source": "datos_gob (Q)",
-  "seconds": 15.4,
+  "seconds": 25.2,
   "series": 101
  },
  {
-  "source": "bcra_fx (D)",
-  "seconds": 9.4,
-  "series": 1
- },
- {
-  "source": "vdem (Y)",
-  "seconds": 6.7,
-  "series": 62
- },
- {
-  "source": "itcrm (D)",
-  "seconds": 4.1,
-  "series": 5
- },
- {
   "source": "bcra_cambiario (M)",
-  "seconds": 3.9,
+  "seconds": 16.7,
   "series": 14
  },
  {
-  "source": "bcra_banks (M)",
-  "seconds": 3.3,
-  "series": 67
- },
- {
-  "source": "datos_gob (Y)",
-  "seconds": 2.3,
-  "series": 2
- },
- {
-  "source": "rem (M)",
-  "seconds": 2.2,
-  "series": 8
- },
- {
-  "source": "efw (Y)",
-  "seconds": 2.0,
-  "series": 22
- },
- {
-  "source": "dolar (D)",
-  "seconds": 1.8,
-  "series": 5
- },
- {
-  "source": "bcra_balance (M)",
-  "seconds": 1.6,
-  "series": 20
- },
- {
-  "source": "a3 (D)",
-  "seconds": 1.1,
-  "series": 3
- },
- {
-  "source": "bcra_weekly (D)",
-  "seconds": 1.1,
-  "series": 6
- },
- {
-  "source": "riesgo (D)",
-  "seconds": 0.8,
+  "source": "ustreasury (D)",
+  "seconds": 16.4,
   "series": 1
  },
  {
+  "source": "rem (M)",
+  "seconds": 14.6,
+  "series": 8
+ },
+ {
+  "source": "itcrm (D)",
+  "seconds": 11.2,
+  "series": 5
+ },
+ {
+  "source": "bcra_fx (D)",
+  "seconds": 10.2,
+  "series": 1
+ },
+ {
+  "source": "bcra_banks (M)",
+  "seconds": 8.2,
+  "series": 67
+ },
+ {
+  "source": "bcra_weekly (D)",
+  "seconds": 5.9,
+  "series": 6
+ },
+ {
+  "source": "vdem (Y)",
+  "seconds": 5.6,
+  "series": 62
+ },
+ {
+  "source": "a3 (D)",
+  "seconds": 5.0,
+  "series": 3
+ },
+ {
+  "source": "bcra_balance (M)",
+  "seconds": 4.0,
+  "series": 20
+ },
+ {
+  "source": "riesgo (D)",
+  "seconds": 3.9,
+  "series": 1
+ },
+ {
+  "source": "dolar (D)",
+  "seconds": 3.3,
+  "series": 5
+ },
+ {
+  "source": "datos_gob (Y)",
+  "seconds": 3.1,
+  "series": 2
+ },
+ {
+  "source": "efw (Y)",
+  "seconds": 2.7,
+  "series": 22
+ },
+ {
   "source": "bcra (M)",
-  "seconds": 0.5,
+  "seconds": 1.1,
   "series": 1
  },
  {
   "source": "officials (Y)",
-  "seconds": 0.2,
+  "seconds": 0.6,
   "series": 2
  },
  {
   "source": "aif (M)",
-  "seconds": 0.2,
+  "seconds": 0.1,
   "series": 35
  },
  {
