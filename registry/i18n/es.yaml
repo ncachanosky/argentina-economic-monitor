@@ -38,7 +38,7 @@ site:
   latest: Últimos datos
   switch_label: English
   skip: Ir al contenido
-  beta_note: 'El Monitor está en versión beta: los gráficos y los métodos todavía pueden cambiar. Las correcciones y sugerencias son bienvenidas <a href="__REPO__/issues" target="_blank" rel="noopener">en GitHub</a>. ¿Primera visita? Vea <a href="about/#how">cómo usar el Monitor</a>.'
+  beta_note: 'Las correcciones y sugerencias son bienvenidas <a href="__REPO__/issues" target="_blank" rel="noopener">en GitHub</a>. ¿Primera visita? Vea <a href="about/#how">cómo usar el Monitor</a>.'
   notfound_title: Página no encontrada
   notfound_text: "Esta página no existe o cambió de lugar. Pruebe con alguna de estas:"
   switch_title: View this site in English
@@ -53,6 +53,7 @@ site:
           <div>
             <h4>Datos</h4>
             <p>Cada gráfico ofrece la serie en CSV. Los historiales completos de revisiones (cada versión publicada) están en <code>data/vintages/</code>. Cómo se calcula cada número: <a href="__ROOT__methodology/">Metodología</a>. Cuándo salen los próximos datos: <a href="__ROOT__calendar/">Calendario de publicaciones</a>.</p>
+            <p class="site-version">Versión __VERSION__ · <a href="__RELEASES__" target="_blank" rel="noopener">Novedades</a></p>
           </div>
 
 topics:
@@ -69,6 +70,16 @@ topics:
   institutions: {title: Instituciones, group: Instituciones, description: "El marco institucional: la confianza en el gobierno y la confianza del consumidor, cuánto duran los presidentes del Banco Central y los ministros de Economía, la libertad económica, y la democracia y el Estado de derecho, con países de comparación. De la UTDT, el Fraser Institute y V-Dem."}
 
 ui:
+  "No data for that reference.": "No hay datos para esa referencia."
+  "needs a reference date": "requiere una fecha de referencia"
+  "CCL rate that restores A": "Tipo de cambio CCL que restablece A"
+  "Official rate that restores A": "Tipo de cambio oficial que restablece A"
+  "Required change in relative productivity": "Cambio requerido en la productividad relativa"
+  "Average of each line over each full term, regardless of the time range shown.": "Promedio de cada línea en cada mandato completo, sin importar el período que se muestra."
+  "Investment growth": "Crecimiento de la inversión"
+  "Each quarter: the change over the quarter, in percentage points of the stock at the end of the previous quarter.": "Cada trimestre: la variación en el trimestre, en puntos porcentuales del stock al final del trimestre anterior."
+  "Dashed line: the series not seasonally adjusted.": "Línea punteada: la serie sin desestacionalizar."
+  "What's new": Novedades
   Last 12 months: Últimos 12 meses
   "Change, %": "Variación, %"
   "Real change, %": "Variación real, %"
@@ -494,6 +505,14 @@ ui:
   "Nominal GDP growth": "Crecimiento del PIB nominal"
 
 patterns:
+  - ["\\*(\\d{4}): (.+), year to date\\.", "*$1: $2, en lo que va del año."]
+  - ["\\*(\\d{4}): latest, (.+)\\.", "*$1: último dato, $2."]
+  - ["total; (.+) a year over (.+) years, with α = (.+)", "total; $1 por año en $2 años, con α = $3"]
+  - ["total, with α = (.+)", "total, con α = $1"]
+  - ["Rate that restores the reference: the official \\(wholesale\\) rate on the second date × reference index / index on the second date\\. If both were equilibria, Argentina's productivity in tradables relative to non-tradables, compared with its trading partners, must have changed by (.+) for the real exchange rate to move (.+) \\(Balassa–Samuelson: Δln RER = −α × Δln relative productivity\\); other fundamentals, such as the terms of trade, would reduce or add to it\\.", "Tipo de cambio que restablece la referencia: el oficial (mayorista) de la segunda fecha × índice de referencia / índice de la segunda fecha. Si ambas fechas fueran de equilibrio, la productividad de la Argentina en transables relativa a no transables, comparada con la de sus socios comerciales, debería haber cambiado $1 para que el tipo de cambio real se moviera $2 (Balassa–Samuelson: Δln TCR = −α × Δln productividad relativa); otros fundamentos, como los términos del intercambio, la reducirían o la aumentarían."]
+  - ["Rate that restores the reference: the CCL rate on the second date × reference index / index on the second date\\. If both were equilibria, Argentina's productivity in tradables relative to non-tradables, compared with its trading partners, must have changed by (.+) for the real exchange rate to move (.+) \\(Balassa–Samuelson: Δln RER = −α × Δln relative productivity\\); other fundamentals, such as the terms of trade, would reduce or add to it\\. CCL mode: (.+)", "Tipo de cambio que restablece la referencia: el CCL de la segunda fecha × índice de referencia / índice de la segunda fecha. Si ambas fechas fueran de equilibrio, la productividad de la Argentina en transables relativa a no transables, comparada con la de sus socios comerciales, debería haber cambiado $1 para que el tipo de cambio real se moviera $2 (Balassa–Samuelson: Δln TCR = −α × Δln productividad relativa); otros fundamentos, como los términos del intercambio, la reducirían o la aumentarían. Modo CCL: el índice al tipo de cambio CCL (el índice oficial antes de noviembre de 2011, cuando no había controles)."]
+  - ["\\*Quarter in progress, through (.+)\\.", "*Trimestre en curso, hasta $1."]
+  - ["(.+) \\(not seasonally adjusted\\)", "$1 (sin desestacionalizar)"]
   - ["(.+) chart", "Gráfico: $1"]
   - ["Year-over-year change, %\\. Velocity is nominal over money growth: positive when people hold less money for the same spending\\. Dotted: proxy from (.+) \\(EMAE × CPI\\) until INDEC publishes the quarter\\.", "Variación interanual, %. La velocidad es el crecimiento nominal sobre el del dinero: positiva cuando la gente mantiene menos dinero para el mismo gasto. Punteado: estimación desde $1 (EMAE × IPC) hasta que el INDEC publique el trimestre."]
   - ["Year-over-year change, %\\. Velocity is nominal over money growth: positive when people hold less money for the same spending\\.", "Variación interanual, %. La velocidad es el crecimiento nominal sobre el del dinero: positiva cuando la gente mantiene menos dinero para el mismo gasto."]

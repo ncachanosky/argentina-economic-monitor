@@ -691,7 +691,11 @@
     });
     return { years, values: vals, partial };
   }
-  const yearlyNote = (how, partial) => (!partial ? "" : how === "mean" ? `*${partial.year}: average of the ${partial.quarterly ? "quarters" : "months"} so far.` : how === "sum"
+  // note: "ytd" (a year-to-date figure, e.g. flows so far) or "latest" (a stock at its latest date) for the year in progress.
+  const yearlyNote = (how, partial, note) => (!partial ? "" : note === "ytd"
+    ? (partial.quarterly ? `*${partial.year}: ${fmtPeriod(partial.first, "Q").split(" ")[0]}–${fmtPeriod(partial.last, "Q")}, year to date.` : `*${partial.year}: ${fmtShortMonth(partial.first).split(" ")[0]}–${fmtShortMonth(partial.last)}, year to date.`)
+    : note === "latest" ? `*${partial.year}: latest, ${partial.quarterly ? fmtPeriod(partial.last, "Q") : fmtShortMonth(partial.last)}.`
+    : how === "mean" ? `*${partial.year}: average of the ${partial.quarterly ? "quarters" : "months"} so far.` : how === "sum"
     ? (partial.quarterly ? `*${partial.year}: ${fmtPeriod(partial.first, "Q").split(" ")[0]}–${fmtPeriod(partial.last, "Q")}, year to date.`
       : `*${partial.year}: ${fmtShortMonth(partial.first).split(" ")[0]}–${fmtShortMonth(partial.last)}, year to date.`)
     : `*${partial.year}: twelve months to ${fmtShortMonth(partial.last)}.`);
@@ -786,7 +790,7 @@
     const realSeg = realSwitch(ind, () => draw());
     const remBtn = ind.forecast && ind.forecast.items && ind.forecast.items.length ? h("button", { class: "btn toggle", type: "button", "aria-pressed": "true",
       title: "Show or hide the expectations of the BCRA's survey of analysts (REM)", onclick: () => { state.rem = !state.rem; draw(); } }, "REM expectations") : null;
-    const presBtn = PRESIDENCIES.length && !ind.plain_level ? h("button", { class: "btn toggle", type: "button", "aria-pressed": "false", onclick: () => { state.byPres = !state.byPres; draw(); } }, "By presidency") : null;
+    const presBtn = PRESIDENCIES.length && !ind.plain_level && !ind.no_presidency ? h("button", { class: "btn toggle", type: "button", "aria-pressed": "false", onclick: () => { state.byPres = !state.byPres; draw(); } }, "By presidency") : null;
     let table;
     // Party key for a line colored by presidency.
     function termKey() {
@@ -844,9 +848,9 @@
     // Shaded periods (e.g. the INDEC intervention), clipped to the visible range.
     function bandShapes(x) {
       const shapes = [], annotations = [];
-      if (ind.term_shading && x.length && !state.byPres) {
+      if ((ind.term_shading ? !state.byPres : shadedPres()) && x.length) {
         // Presidential terms behind annual series: a light band in the party's color, labelled at the top.
-        const x0 = x[0], x1 = addMonths(x[x.length - 1], 12);
+        const x0 = x[0], x1 = addMonths(x[x.length - 1], ind.frequency === "Y" ? 12 : ind.frequency === "Q" ? 3 : 1);
         PRESIDENCIES.forEach((p, n) => {
           const a = p.start, b = p.end || x1;
           if (b <= x0 || a >= x1) return;
@@ -943,10 +947,17 @@
         });
         return { traces, shapes: [], annotations: [], main, t, x: xs, y: traces.length ? traces[0].y : [] };
       }
-      if (!state.byPres) {
+      if (!colorPres()) {
         const keys = overlayKeys();
         const start = viewStart(ind, state.range);
         const FAN = ind.fan || null;
+        // Faint dashed original series behind a seasonally adjusted / trend view, as context (as in the presidency view).
+        if (!ind.overlay && state.variant !== "original" && ind.variants.original && state.transform !== "mom") {
+          const o = series("original");
+          traces.push({ type: "scatter", mode: "lines", x: idx.map((i) => ind.dates[i]), y: idx.map((i) => o.y[i]), name: `${o.v.label} (not seasonally adjusted)`,
+            line: { color: cssVar("--ink-3"), width: 1.2, dash: "dash" }, opacity: 0.6, _light: "#85909A", connectgaps: false,
+            hovertemplate: `%{x|${DF}}: %{y:${yFmt()}}${sfx}<extra>${o.v.label}</extra>` });
+        }
         keys.forEach((k, slot) => {
           if (FAN && (k === FAN.lo || k === FAN.hi)) return;   // drawn as a band below
           const s = k === state.variant ? main : series(k);
@@ -1163,7 +1174,24 @@
     }
 
     function drawStats(main, t) {
-      if (!state.byPres) { statsEl.hidden = true; return; }
+      if (!presBtn) { statsEl.hidden = true; return; }   // the table by presidency shows in every view, not only "By presidency"
+      if (ind.pres_view === "shaded" && ind.overlay) {
+        // Several lines: one column per line, its average over each term.
+        const ks = overlayKeys();
+        const per = ks.map((k) => new Map(termStats(ind.dates, (k === state.variant ? main : series(k)).y, state.transform === "level", ind.measure, ind.frequency, state.transform, ind.variants[k].values).map((r) => [r.p.id, r])));
+        const terms = termStats(ind.dates, main.y, state.transform === "level", ind.measure, ind.frequency, state.transform, main.v.values).filter((r) => r.first !== r.last).slice().reverse();   // skip a term the data barely touch
+        const f = (v) => (v === null || v === undefined ? "–" : fmtNum(v, t));
+        const tbody = h("tbody", {}, terms.map((r) => {
+          const sw = h("span", { class: "sw" }); sw.style.background = termColor(r.p);
+          return h("tr", {}, h("td", { class: "pres" }, sw, r.p.short), h("td", {}, `${fP(r.first)} – ${r.ongoing ? "present" : fP(r.last)}${r.partial ? "*" : ""}`),
+            ...per.map((m) => h("td", {}, f(m.has(r.p.id) ? m.get(r.p.id).avg : null))));
+        }));
+        statsEl.replaceChildren(
+          h("div", { class: "table-scroll" }, h("table", { class: "data" }, h("thead", {}, h("tr", {}, ["Presidency", "Period", ...ks.map((k) => ind.variants[k].label)].map((x) => h("th", {}, x)))), tbody)),
+          h("p", { class: "chips-note" }, "Average of each line over each full term, regardless of the time range shown."));
+        statsEl.hidden = false;
+        return;
+      }
       const isLevel = state.transform === "level";
       const rows = termStats(ind.dates, main.y, isLevel, ind.measure, ind.frequency, state.transform, main.v.values);
       // With episodes on, m/m averages also shown without the episode months.
@@ -1218,17 +1246,18 @@
       const { traces, shapes, annotations, main, t, x, y } = build();
       const msgs = [];
       if (isRate && T[state.transform] && T[state.transform].change) msgs.push("Changes in a rate are shown in percentage points.");
+      if (!state.byPres && !ind.overlay && state.variant !== "original" && ind.variants.original && state.transform !== "mom") msgs.push("Dashed line: the series not seasonally adjusted.");
       if (state.variant === "original" && T.mom) msgs.push(`${T.mom.label.split(" ")[0]} changes are only meaningful on seasonally adjusted data.`);
       const defaultBase = ind.default.base && state.base === "custom" && state.customBase === ind.default.base;
       if (state.transform !== "level" && state.base !== "published" && !defaultBase) msgs.push("Rebasing applies to levels only; percent changes are unaffected.");
       if (state.transform === "level" && state.base !== "published" && !main.rebased) msgs.push("No data for that base month; showing the series as published.");
-      if (ind.overlay && state.byPres) msgs.push(`By presidency shows the ${main.v.label.toLowerCase()} series.`);
+      if (ind.overlay && colorPres()) msgs.push(`By presidency shows the ${main.v.label.toLowerCase()} series.`);
       if (isLog()) msgs.push("Log scale: equal distances are equal percentage changes.");
       if (ind._real) msgs.push(`Real terms: deflated by the ${ind.deflator.label}, in pesos of ${fmtMonth(ind.deflator.latest)}; months after that have no CPI yet.`);
       if (state._fcNote) { msgs.push(state._fcNote); state._fcNote = null; }
       if (ind.variant_notes && ind.variant_notes[state.variant]) msgs.push(tr(ind.variant_notes[state.variant]));
       if (partialNote(ind)) msgs.push(partialNote(ind));
-      hint.textContent = msgs.join(" ");
+      hint.textContent = (msgs.length > 1 ? msgs.map(tr) : msgs).join(" ");   // several notes: translate each one
 
       Plotly.react(chartEl, traces, baseLayout({
         pct: t,
@@ -1237,9 +1266,9 @@
           : { type: "linear", ...(ind.y_tickformat ? { tickformat: ind.y_tickformat } : {}) },
         extra: {
           bargap: 0.2, shapes, annotations, barmode: state.transform === "share" ? "stack" : "group",
-          showlegend: (state.byPres && state.transform !== "mom") || (ind.overlay && !state.byPres),
+          showlegend: (colorPres() && state.transform !== "mom") || (ind.overlay && !colorPres()),
           legend: { orientation: "h", x: 0, y: 1.02, yanchor: "bottom", font: { color: cssVar("--ink") } },
-          margin: { l: 52, r: SB ? 56 : 16, t: state.byPres ? 30 : 10, b: 36 },
+          margin: { l: 52, r: SB ? 56 : 16, t: colorPres() ? 30 : 10, b: 36 },
           ...(SB ? { yaxis2: y2Axis(false) } : {}),
         },
       }), PLOT_CONFIG);
@@ -1266,7 +1295,10 @@
     const y2Axis = (light) => ({ overlaying: "y", side: "right", showgrid: false, zeroline: false, rangemode: "tozero", ticksuffix: SB.suffix || "",
       title: { text: SB.axis || SB.label, font: { size: light ? 15 : 11, color: light ? "#85909A" : cssVar("--ink-3") } },
       tickfont: { color: light ? "#85909A" : cssVar("--ink-3") } });
-    function overlayKeys() { return ind.overlay && !state.byPres ? [state.variant, ...lineKeys.filter((k) => k !== state.variant && state.shown.has(k))] : [state.variant]; }
+    // By presidency: lines colored by term, or (pres_view: shaded) every line kept and the terms shaded behind.
+    function shadedPres() { return state.byPres && ind.pres_view === "shaded"; }
+    function colorPres() { return state.byPres && ind.pres_view !== "shaded"; }
+    function overlayKeys() { return ind.overlay && !colorPres() ? [state.variant, ...lineKeys.filter((k) => k !== state.variant && state.shown.has(k))] : [state.variant]; }
     const subtitle = (main, t) => `${overlayKeys().map((k) => ind.variants[k].label).join(" vs. ")} · ${t.change ? t.short : main.units}`;
     const fileTag = () => `${ind.id}_${state.variant}_${state.transform}${baseMonth() ? "_base" + baseMonth().slice(0, 7) : ""}${state.byPres ? "_presidencies" : ""}`;
     const onPNG = () => {
@@ -1984,26 +2016,35 @@
     const mean = (a) => a.reduce((x, y) => x + y, 0) / a.length;
     const quant = (a, q) => { const b = [...a].sort((x, y) => x - y); const p = (b.length - 1) * q, lo = Math.floor(p); return b[lo] + (b[Math.min(lo + 1, b.length - 1)] - b[lo]) * (p - lo); };
     function at(k, day) { let j = -1; for (let i = 0; i < D.length && D[i] <= day; i++) if (V(k)[i] !== null) j = i; return j; }
-    function drawTwo() {
-      const k = state.mode, a = Math.min(at(k, state.dA), at(k, state.dB)), b = Math.max(at(k, state.dA), at(k, state.dB));
-      if (a < 0 || b < 0 || a === b) { outEl.replaceChildren(h("p", { class: "hint" }, "Pick two different dates with data.")); return null; }
-      const rA = V(k)[a], rB = V(k)[b], dln = Math.log(rB / rA), al = state.alpha;
-      const years = (isoMs(D[b]) - isoMs(D[a])) / (365.25 * dayMs);
-      const g = -dln / al, total = 100 * (Math.exp(g) - 1), perYear = 100 * (Math.exp(g / years) - 1);
-      const tA = at("tot", D[a]), tB = at("tot", D[b]);
+    // The same four boxes for both questions: A is the reference (or the first date), B the second date
+    // (by default the latest observation).
+    function boxes(A, bIdx) {
+      const k = state.mode, fxk = k === "m" ? "ofx" : "ccl", fxName = k === "m" ? "official (wholesale) rate" : "CCL rate";
+      const rA = A.v, rB = V(k)[bIdx], al = state.alpha;
+      const jf = at(fxk, D[bIdx]), fxB = jf >= 0 ? V(fxk)[jf] : null;
+      const implied = rA && fxB ? fxB * rA / rB : null;
+      const rer = 100 * (rB / rA - 1), g = -Math.log(rB / rA) / al, total = 100 * (Math.exp(g) - 1);
+      const years = A.date ? (isoMs(D[bIdx]) - isoMs(A.date)) / (365.25 * dayMs) : null;
+      const perYear = years && years > 0.05 ? 100 * (Math.exp(g / years) - 1) : null;
+      const tA = A.date ? at("tot", A.date) : -1, tB = at("tot", D[bIdx]);
       const totCh = tA >= 0 && tB >= 0 && tA !== tB ? 100 * (V("tot")[tB] / V("tot")[tA] - 1) : null;
-      const rer = 100 * (rB / rA - 1);
+      const aName = A.date ? fmtDay(A.date) : tr(A.label);
       outEl.replaceChildren(
         h("div", { class: "rer-grid" },
           h("div", { class: "rer-tile" }, h("div", { class: "rer-k" }, "Real exchange rate"), h("div", { class: "rer-v" }, `${fmtR(rA, 1)} → ${fmtR(rB, 1)}`),
-            h("div", { class: "rer-s" }, `${fmtDay(D[a])} to ${fmtDay(D[b])}: ${pct(rer)} (${rer < 0 ? "real appreciation" : "real depreciation"})`)),
-          h("div", { class: "rer-tile" }, h("div", { class: "rer-k" }, "Required change in relative productivity, total"), h("div", { class: "rer-v" }, pct(total)),
-            h("div", { class: "rer-s" }, `over ${fx(years, 1)} years, with α = ${fx(al, 2)}`)),
-          h("div", { class: "rer-tile" }, h("div", { class: "rer-k" }, "Required change, per year"), h("div", { class: "rer-v" }, pct(perYear)),
-            h("div", { class: "rer-s" }, "compounded annual rate")),
+            h("div", { class: "rer-s" }, `${aName} to ${fmtDay(D[bIdx])}: ${pct(rer)} (${rer < 0 ? "real appreciation" : "real depreciation"})`)),
+          h("div", { class: "rer-tile" }, h("div", { class: "rer-k" }, `${k === "m" ? "Official" : "CCL"} rate that restores ${A.date ? "A" : "the reference"}`), h("div", { class: "rer-v" }, fmtR(implied)),
+            h("div", { class: "rer-s" }, fxB ? `Actual ${fxName} ${fmtR(fxB, 2)} on ${fmtDay(D[jf])}${implied ? `: ${pct(100 * (implied / fxB - 1))} away` : ""}` : "")),
+          h("div", { class: "rer-tile" }, h("div", { class: "rer-k" }, "Required change in relative productivity"), h("div", { class: "rer-v" }, pct(total)),
+            h("div", { class: "rer-s" }, `${perYear === null ? "total" : `total; ${pct(perYear)} a year over ${fx(years, 1)} years`}, with α = ${fx(al, 2)}`)),
           h("div", { class: "rer-tile" }, h("div", { class: "rer-k" }, "Terms of trade over the same span"), h("div", { class: "rer-v" }, totCh === null ? "–" : pct(totCh)),
-            h("div", { class: "rer-s" }, totCh === null ? "no quarterly data for these dates" : `${fmtPeriod(D[tA], "Q")} to ${fmtPeriod(D[tB], "Q")} (INDEC); a rise also supports a stronger peso`))),
-        h("p", { class: "hint" }, `If both dates were equilibria, Argentina's productivity in tradables relative to non-tradables, compared with its trading partners, must have ${g >= 0 ? "risen" : "fallen"} ${pct(Math.abs(total)).replace("+", "")} for the real exchange rate to move ${pct(rer)} (Balassa–Samuelson: Δln RER = −α × Δln relative productivity). Everything is attributed to productivity: other fundamentals, such as the terms of trade, would reduce or add to it.`));
+            h("div", { class: "rer-s" }, totCh === null ? (A.date ? "no quarterly data for these dates" : "needs a reference date") : `${fmtPeriod(D[tA], "Q")} to ${fmtPeriod(D[tB], "Q")} (INDEC); a rise also supports a stronger peso`))),
+        h("p", { class: "hint" }, `Rate that restores the reference: the ${fxName} on the second date × reference index / index on the second date. If both were equilibria, Argentina's productivity in tradables relative to non-tradables, compared with its trading partners, must have changed by ${pct(total)} for the real exchange rate to move ${pct(rer)} (Balassa–Samuelson: Δln RER = −α × Δln relative productivity); other fundamentals, such as the terms of trade, would reduce or add to it.${k === "mkt" ? " CCL mode: the index at the CCL rate (the official index before November 2011, when there were no controls)." : ""}`));
+    }
+    function drawTwo() {
+      const k = state.mode, a = Math.min(at(k, state.dA), at(k, state.dB)), b = Math.max(at(k, state.dA), at(k, state.dB));
+      if (a < 0 || b < 0 || a === b) { outEl.replaceChildren(h("p", { class: "hint" }, "Pick two different dates with data.")); return null; }
+      boxes({ v: V(k)[a], date: D[a] }, b);
       return { a, b };
     }
     function refValue(k) {
@@ -2024,19 +2065,7 @@
       const now = V(k)[i], fxNow = V(fxk)[jf];
       const ref = refValue(k);
       const s03 = sample(k, "2003-01-01"), p25 = quant(s03, 0.25), p75 = quant(s03, 0.75);
-      const implied = ref.v ? fxNow * ref.v / now : null;
-      const lo = fxNow * p25 / now, hi = fxNow * p75 / now;
-      outEl.replaceChildren(
-        h("div", { class: "rer-grid" },
-          h("div", { class: "rer-tile" }, h("div", { class: "rer-k" }, `Real exchange rate, ${fmtDay(D[i])}`), h("div", { class: "rer-v" }, fmtR(now, 1)),
-            h("div", { class: "rer-s" }, `${tr("Reference")} (${tr(ref.label)}): ${fmtR(ref.v, 1)}`)),
-          h("div", { class: "rer-tile" }, h("div", { class: "rer-k" }, "Index against the reference"), h("div", { class: "rer-v" }, ref.v ? pct(100 * (now / ref.v - 1)) : "–"),
-            h("div", { class: "rer-s" }, ref.v ? (now < ref.v ? "below it: the peso is stronger in real terms" : "above it: the peso is weaker in real terms") : "")),
-          h("div", { class: "rer-tile" }, h("div", { class: "rer-k" }, `${k === "m" ? "Official" : "CCL"} rate that restores the reference`), h("div", { class: "rer-v" }, fmtR(implied)),
-            h("div", { class: "rer-s" }, `Actual ${fxName} ${fmtR(fxNow, 2)} on ${fmtDay(D[jf])}${implied ? `: ${pct(100 * (implied / fxNow - 1))} away` : ""}`)),
-          h("div", { class: "rer-tile" }, h("div", { class: "rer-k" }, "Range: middle half of the index since 2003"), h("div", { class: "rer-v" }, `${fmtR(lo)} – ${fmtR(hi)}`),
-            h("div", { class: "rer-s" }, `Index between ${fmtR(p25, 1)} (25th percentile) and ${fmtR(p75, 1)} (75th)`))),
-        h("p", { class: "hint" }, `Today's ${fxName} × reference index / today's index. ${k === "mkt" ? "CCL mode: the index at the CCL rate (the official index before November 2011, when there were no controls), applied to the CCL rate today." : ""}`));
+      if (ref.v) boxes(ref, i); else outEl.replaceChildren(h("p", { class: "hint" }, "No data for that reference."));
       // Weekdays with data; a gap of more than a month (no CCL series, Nov 2011 - Dec 2012) breaks the line.
       const x = [], y = [];
       D.forEach((d, n) => {
@@ -2079,9 +2108,9 @@
         h("a", { href: "https://www.imf.org/en/publications/cr/issues/2026/05/22/argentina-2026-article-iv-consultation-second-review-under-the-extended-arrangement-under-576253", target: "_blank", rel: "noopener" }, "IMF Country Report, May 2026"), "."));
     const refWrap = h("label", { class: "inline-select" }, "Reference: ", refSel, dateIn);
     const twoWrap = h("div", { class: "inline-select rer-two", hidden: true },
-      h("label", {}, "A: ", inA), h("label", {}, "B: ", inB),
-      h("label", { title: "Weight of non-tradables in the price index" }, "α: ", aIn, aOut));
-    appendAll(card, h("div", { class: "controls" }, calcSeg, modeSeg, h("span", { class: "spacer" }), refWrap, twoWrap),
+      h("label", {}, "A: ", inA), h("label", {}, "B: ", inB));
+    const aWrap = h("label", { class: "inline-select", title: "Weight of non-tradables in the price index" }, "α: ", aIn, aOut);
+    appendAll(card, h("div", { class: "controls" }, calcSeg, modeSeg, h("span", { class: "spacer" }), refWrap, twoWrap, aWrap),
       outEl, chartEl, h("p", { class: "hint rer-legend" }, "Restore a reference: shaded is the middle half of the index since 2003 (25th to 75th percentile), dashed is the reference. Two dates: A and B are marked."),
       caveats, methodLine(ind),
       h("div", { class: "card-foot" }, h("span", {}, `Source: ${ind.source_label} · Latest: ${fmtDay(ind.last_obs)}`)));
@@ -2713,7 +2742,7 @@
     // and the total is a change in the stock, not y/y growth.
     const PC = !!C.precomputed;
     const yoyWord = PC ? "" : " y/y";
-    const state = { range: rangeFromDefault(ind), yearly: !!(C.yearly && ind.default && ind.default.yearly) };
+    const state = { range: rangeFromDefault(ind), yearly: !!(C.yearly && ind.default && ind.default.yearly), quarterly: false };
     const lineKeys = Object.keys(C.lines);
     // Lines keep the same color as their bar component (color follows the entity).
     const lc = (k) => C.lines[k].color || "neutral";
@@ -2731,9 +2760,13 @@
     const lineEl = h("div", { class: "chart", role: "img", "aria-label": "Components, year-over-year change" });
     const chipsEl = h("div", { class: "chips", role: "group", "aria-label": "Components to compare" });
     const rSeg = segmented(rangeKeys(ind).map((k) => [k, k]), state.range, (k) => { state.range = k; drawAll(); }, "Time range");
-    const CY = C.yearly;
-    const ySeg = CY ? segmented([["monthly", ind.frequency === "Q" ? "Quarterly" : "Monthly"], ["yearly", "Yearly"]], state.yearly ? "yearly" : "monthly", (k) => { state.yearly = k === "yearly"; ySeg.update(k); drawAll(); }, "Frequency") : null;
+    const CY = C.yearly, CQ = C.quarterly;
+    const freqKey = () => (state.yearly ? "yearly" : state.quarterly ? "quarterly" : "monthly");
+    const setFreq = (k) => { state.yearly = k === "yearly" && !!CY; state.quarterly = k === "quarterly" && !!CQ; };
+    const ySeg = CY || CQ ? segmented([["monthly", ind.frequency === "Q" ? "Quarterly" : "Monthly"], ...(CQ ? [["quarterly", "Quarterly"]] : []), ...(CY ? [["yearly", "Yearly"]] : [])],
+      freqKey(), (k) => { setFreq(k); ySeg.update(k); drawAll(); }, "Frequency") : null;
     const hintEl = h("p", { class: "hint" });
+    const lineTitleEl = lineKeys.length ? h("p", { class: "hint", style: "margin-top:14px" }, C.lines_title || "Components, year-over-year change") : null;
     let table;
 
     // Yearly view: each group's yearly value (December of the twelve-month series).
@@ -2756,6 +2789,25 @@
         hovertemplate: `<b>${tl}: %{y:,.1f}${PC && !CY.total_label ? sfx : "%"}</b><extra></extra>` });
       OV.forEach((o, n) => { if (CY.overlays && CY.overlays[n]) tr.push(ovTrace(o, x, pick(agg(CY.overlays[n])))); });
       return { tr, x, partial: tot.partial };
+    }
+
+    // Quarterly view: each quarter's last month of the quarter-so-far series; a quarter in progress is marked *.
+    function quarterlyTraces() {
+      const start = startDate(ind.last_obs, RANGES[state.range]);
+      const last = new Map();
+      CQ.dates.forEach((d, i) => { const m = Number(d.slice(5, 7)); const q = `${d.slice(0, 4)}-${String(3 * Math.ceil(m / 3) - 2).padStart(2, "0")}-01`; last.set(q, i); });
+      const qs = [...last.keys()].filter((q) => !start || q >= start).sort();
+      const done = (q) => Number(CQ.dates[last.get(q)].slice(5, 7)) % 3 === 0;
+      const x = qs.map((q) => `${fmtPeriod(q, "Q")}${done(q) ? "" : "*"}`);
+      const tr = C.groups.map((g, n) => ({ type: "bar", name: g.label, x, y: qs.map((q) => CQ.groups[n][last.get(q)]),
+        marker: { color: groupColor(g.color), line: { width: 0 } }, _lightColors: x.map(() => GROUP_LIGHT[g.color] || "#B0B7BD"),
+        hovertemplate: `${g.label}: <b>%{y:,.1f}${sfx}</b><extra></extra>` }));
+      const ink = cssVar("--ink");
+      if (!C.hide_total) tr.push({ type: "scatter", mode: "markers+lines", name: C.total.label, x, y: qs.map((q) => CQ.total[last.get(q)]),
+        line: { color: ink, width: 1 }, marker: { color: ink, size: 8, symbol: "diamond", line: { color: cssVar("--surface"), width: 1 } }, _light: "#36454F",
+        hovertemplate: `<b>${C.total.label}: %{y:,.1f}${sfx}</b><extra></extra>` });
+      const open = qs.length && !done(qs[qs.length - 1]) ? CQ.dates[last.get(qs[qs.length - 1])] : null;
+      return { tr, x, open };
     }
 
     const visible = () => {
@@ -2811,9 +2863,23 @@
     function drawAll() {
       rSeg.update(state.range);
       const legend = { orientation: "h", x: 0, y: 1.02, yanchor: "bottom", font: { color: cssVar("--ink") } };
+      // The component lines below are the monthly/quarterly view only.
+      [lineTitleEl, chipsEl, lineEl].forEach((el) => { if (el) el.hidden = state.quarterly || state.yearly; });
+      if (state.quarterly) {
+        const { tr: qtr, x, open } = quarterlyTraces();
+        hintEl.textContent = [tr("Each quarter: the change over the quarter, in percentage points of the stock at the end of the previous quarter."),
+          open ? tr(`*Quarter in progress, through ${fmtMonth(open)}.`) : ""].filter(Boolean).join(" ");
+        hintEl.hidden = false;
+        Plotly.react(barEl, qtr, baseLayout({
+          pct: pp, xaxis: { type: "category", automargin: true, tickangle: x.length > 12 ? -45 : 0 },
+          extra: { barmode: "relative", bargap: 0.25, showlegend: true, legend, margin: { l: 56, r: 16, t: 40, b: 36 } },
+        }), PLOT_CONFIG);
+        table && table.refresh(x, qtr.map((t) => ({ label: `${t.name} (${sfx.trim()})`, values: t.y })), pp, "Y");
+        return;
+      }
       if (state.yearly) {
         const { tr: ytr, x, partial } = yearlyTraces();
-        hintEl.textContent = [tr(`Calendar years${CY.how === "sum" ? ": totals" : ""}.`), tr(yearlyNote(CY.how, partial))].filter(Boolean).join(" ");
+        hintEl.textContent = [tr(`Calendar years${CY.how === "sum" ? ": totals" : ""}.`), tr(yearlyNote(CY.how, partial, CY.note))].filter(Boolean).join(" ");
         hintEl.hidden = false;
         Plotly.react(barEl, ytr, baseLayout({
           pct: pp, xaxis: yearAxis(x.length),
@@ -2857,11 +2923,16 @@
     }
 
     const latestI = C.dates.length - 1;
-    const onPNG = () => state.yearly ? (() => { const yt = yearlyTraces(); return exportPNG(ind, yt.tr, `${ind.units} · yearly${yt.partial ? " · " + yearlyNote(CY.how, yt.partial) : ""}`, pp, `${ind.id}_yearly.png`, { barmode: C.style === "area" ? "stack" : "relative", xcategory: true }); })()
+    const onPNG = () => state.quarterly ? (() => { const qt = quarterlyTraces(); return exportPNG(ind, qt.tr, `${ind.units} · quarterly${qt.open ? " · *quarter in progress" : ""}`, pp, `${ind.id}_quarterly.png`, { barmode: "relative", xcategory: true }); })()
+      : state.yearly ? (() => { const yt = yearlyTraces(); return exportPNG(ind, yt.tr, `${ind.units} · yearly${yt.partial ? " · " + yearlyNote(CY.how, yt.partial, CY.note) : ""}`, pp, `${ind.id}_yearly.png`, { barmode: C.style === "area" ? "stack" : "relative", xcategory: true }); })()
       : exportPNG(ind, barTraces(), `${PC ? ind.units : `Contributions to year-over-year ${C.total.label} growth, percentage points`} · latest: ${fP(C.dates[latestI])}`,
       pp, `${ind.id}_contributions.png`, { barmode: "relative" });
     const onLinePNG = () => exportPNG({ ...ind, title: C.lines_title || "Components, year-over-year change" }, lineTraces(), `Percent change vs. same ${ind.frequency === "Q" ? "quarter" : "month"} a year earlier · constant 2004 prices`, pct, `${ind.id}_lines_yoy.png`);
     const onCSV = () => {
+      if (state.quarterly) {
+        const qt = quarterlyTraces();
+        return downloadBlob(toCSV(["quarter", ...qt.tr.map((t) => t.name)], qt.x.map((l, i) => [l, ...qt.tr.map((t) => (t.y[i] === null || t.y[i] === undefined ? "" : +t.y[i].toFixed(4)))])), `${ind.id}_quarterly.csv`, "text/csv");
+      }
       if (state.yearly) {
         const yt = yearlyTraces();
         return downloadBlob(toCSV(["year", ...yt.tr.map((t) => t.name)], yt.x.map((l, i) => [l, ...yt.tr.map((t) => (t.y[i] === null ? "" : +t.y[i].toFixed(4)))])), `${ind.id}_yearly.csv`, "text/csv");
@@ -2880,7 +2951,7 @@
       h("div", { class: "controls" }, ySeg, h("span", { class: "spacer" }), rSeg),
       hintEl, methodLine(ind), barEl,
       lineKeys.length ? chartActions(ind, onPNG, onCSV) : null,
-      lineKeys.length ? h("p", { class: "hint", style: "margin-top:14px" }, C.lines_title || "Components, year-over-year change") : null,
+      lineTitleEl,
       lineKeys.length ? chipsEl : null, lineKeys.length ? lineEl : null);
     table = tableView([], [], pp, ind.frequency);
     const onLineCSV = () => {
@@ -2889,6 +2960,12 @@
     };
     appendAll(card, table, ind.note ? h("p", { class: "chips-note" }, ind.note) : null, lineKeys.length ? footer(ind, onLinePNG, onLineCSV) : footer(ind, onPNG, onCSV));
     card.draw = drawAll;
+    // Switch groups (exports / imports / balance) carry the frequency and range across.
+    card.getView = () => ({ freq: freqKey(), range: state.range });
+    card.setView = (v) => {
+      if (v.freq) { setFreq(v.freq); ySeg && ySeg.update(freqKey()); }
+      if (v.range && rangeKeys(ind).includes(v.range)) state.range = v.range;
+    };
     return card;
   }
 
@@ -3307,9 +3384,13 @@
     for (const members of groups.values()) {
       const els = members.map((m) => container.querySelector(`#ind-${CSS.escape(m.id)}`)).filter(Boolean);
       if (els.length < 2) continue;
+      let ready = false;
       const show = (id) => {
+        const from = ready ? els.find((e) => !e.hidden && e.id !== `ind-${id}`) : null;
+        ready = true;
         els.forEach((el) => { el.hidden = el.id !== `ind-${id}`; });
         const el = els.find((e) => e.id === `ind-${id}`);
+        if (from && from.getView && el && el.setView) el.setView(from.getView());
         segs.forEach((sg) => sg.update(id));
         if (el && el.draw) requestAnimationFrame(() => el.draw());
       };

@@ -31,7 +31,10 @@ monthly   Monthly series from daily ones: per variant, the daily sum of
 flows     Monthly sources of a stock, in percentage points of the stock at
           the end of the previous month: per variant, the month's sum of the
           daily flows in `sum_of`, over `stock` at the previous month end,
-          x 100 (e.g. the factors that explain base money).
+          x 100 (e.g. the factors that explain base money). A variant with
+          `to_date: Q` or `Y` is the quarter or year so far instead, over the
+          stock at the end of the previous quarter or year (for the quarterly
+          and yearly views).
 
 formula   Arithmetic on stored series: `vars` maps short names to series ids;
           each variant has an `expr` over those names (+ - * / and nz(x),
@@ -272,9 +275,16 @@ def flows(ind, frames: dict[str, pd.Series]) -> tuple[pd.DataFrame, dict]:
     stock = frames[spec["stock"]]
     prev_end = stock.resample("MS").last().shift(1)
     out = {}
+    month_end = stock.resample("MS").last()
     for k, v in spec["variants"].items():
         f = _daily_sum(frames, v["sum_of"]).resample("MS").sum(min_count=1)
-        out[ind.variants[k].source_id] = (f / prev_end * 100).dropna()
+        per = v.get("to_date")          # "Q" or "Y": the period so far, over the stock at the end of the previous period
+        if per:
+            start = f.index.to_period(per).to_timestamp()
+            base = month_end.reindex(start - pd.offsets.MonthBegin(1)).to_numpy()
+            out[ind.variants[k].source_id] = (f.groupby(start).cumsum() / base * 100).dropna()
+        else:
+            out[ind.variants[k].source_id] = (f / prev_end * 100).dropna()
     df = pd.DataFrame(out).sort_index()
     end = stock.resample("MS").last()
     info = {"stock_change_pct": {d.strftime("%Y-%m-%d"): round(float(v), 4)

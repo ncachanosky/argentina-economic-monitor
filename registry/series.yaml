@@ -1174,6 +1174,7 @@ indicators:
         - {key: other,    label: Other services,                color: neutral,  residual: true}
       lines: groups
       lines_title: Industry groups, year-over-year change
+    yearly: {how: levels, total_label: "GDP growth"}
     default: {variant: gdp, transform: yoy, start: "2016-01"}
 
   - id: investment
@@ -1212,6 +1213,7 @@ indicators:
       line_colors: {total: neutral, construction: copper, machinery: sky, transport: sage}
       default_lines: [construction, machinery, transport]
       lines_title: Investment components, year-over-year change
+    yearly: {how: levels, total_label: "Investment growth"}
     default: {variant: total, transform: yoy, start: "2016-01"}
 
   - id: investment_rate
@@ -1705,11 +1707,13 @@ indicators:
       total: total
       total_label: Change in base money
       units: pp
+      quarterly: {suffix: _q}
       groups:
         - {key: fx,       label: FX purchases from the private sector, add: [fx],       color: copper}
         - {key: treasury, label: Treasury,                              add: [treasury], color: sky}
         - {key: steril,   label: Sterilization (repos and BCRA notes),  add: [steril],   color: sage}
         - {key: other,    label: Other,                                 add: [other],    color: neutral}
+    yearly: {how: december, suffix: _y, note: ytd}
     default: {variant: total, transform: level, start: "2022-01"}
     derive:
       method: flows
@@ -1720,6 +1724,16 @@ indicators:
         treasury: {label: Treasury,     sum_of: ["bcra:48", "bcra:49", "bcra:50", "bcra:51"]}
         steril:   {label: Sterilization, sum_of: ["bcra:52", "bcra:53", "bcra:56", "bcra:58"]}
         other:    {label: Other,        sum_of: ["bcra:54", "bcra:55", "bcra:57", "bcra:59"]}
+        total_q: {label: "Total, quarter so far", sum_of: ["bcra:46"], to_date: Q}
+        fx_q: {label: "FX purchases, quarter so far", sum_of: ["bcra:47"], to_date: Q}
+        treasury_q: {label: "Treasury, quarter so far", sum_of: ["bcra:48", "bcra:49", "bcra:50", "bcra:51"], to_date: Q}
+        steril_q: {label: "Sterilization, quarter so far", sum_of: ["bcra:52", "bcra:53", "bcra:56", "bcra:58"], to_date: Q}
+        other_q: {label: "Other, quarter so far", sum_of: ["bcra:54", "bcra:55", "bcra:57", "bcra:59"], to_date: Q}
+        total_y: {label: "Total, year so far", sum_of: ["bcra:46"], to_date: Y}
+        fx_y: {label: "FX purchases, year so far", sum_of: ["bcra:47"], to_date: Y}
+        treasury_y: {label: "Treasury, year so far", sum_of: ["bcra:48", "bcra:49", "bcra:50", "bcra:51"], to_date: Y}
+        steril_y: {label: "Sterilization, year so far", sum_of: ["bcra:52", "bcra:53", "bcra:56", "bcra:58"], to_date: Y}
+        other_y: {label: "Other, year so far", sum_of: ["bcra:54", "bcra:55", "bcra:57", "bcra:59"], to_date: Y}
 
   - id: money_aggregates
     topic: money
@@ -4063,6 +4077,7 @@ indicators:
         - {key: ncb, label: Central bank, add: [ncb], color: gold}
         - {key: ndc, label: Banks, add: [ndc], color: sky}
         - {key: ngg, label: General government, add: [ngg], color: copper}
+    yearly: {how: december, note: latest}
     default: {variant: nos, transform: level, range: Max}
     derive:
       method: formula
@@ -4109,6 +4124,7 @@ indicators:
         - {key: oso, label: Other investment (mostly currency and deposits), add: [oso], color: sage}
         - {key: osp, label: Portfolio investment, add: [osp], color: sky}
         - {key: osd, label: Direct investment, add: [osd], color: copper}
+    yearly: {how: december, note: latest}
     default: {variant: oso, transform: level, range: Max}
     derive:
       method: formula
@@ -4324,7 +4340,7 @@ indicators:
     frequency: S
     units: "%"
     transforms: [level]
-    ranges: [Max]
+    ranges: ["Since 2016", Max]   # 2016: INDEC's new method; earlier figures are not comparable
     bands:
       - {start: "2007-01-01", end: "2013-01-01", key: "INDEC intervention: lines deflated by the intervened CPI, poverty understated"}
       - {start: "2013-07-01", end: "2016-01-01", style: outline, key: "Not published (H2 2013 - H1 2016)"}
@@ -4725,6 +4741,7 @@ indicators:
       national share, after automatic transfers to the provinces
       (coparticipación).
     yearly: {how: december}
+    pres_view: shaded      # by presidency: all four lines, terms shaded behind
     default: {variant: revenue, transform: level, range: Max}
     derive:
       method: formula
@@ -5083,6 +5100,8 @@ indicators:
       difference is a transfer from holders of peso debt to the Treasury
       through inflation, not fiscal effort.
     method_links: [{anchor: capitalized-interest, label: "How capitalized interest is estimated"}, {anchor: operational-balance, label: "The operational balance"}]
+    no_presidency: true
+    term_shading: true     # terms shaded behind the lines instead of a by-presidency view
     default: {variant: official, transform: level, range: Max}
     derive:
       method: formula

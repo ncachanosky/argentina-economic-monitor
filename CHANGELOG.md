@@ -6,6 +6,39 @@ of the data stored on that date (`data/vintages/` keeps every published value).
 Numbering: minor versions (1.1, 1.2) add cards or features; patch versions
 (1.0.1) fix errors.
 
+## Unreleased
+
+Changes since the last release, recorded as they are made. At the next release this
+section becomes its notes.
+
+### Added
+- Yearly view: GDP by industry and investment by type (contributions to annual growth),
+  the net investment position by sector and what firms and households hold abroad
+  (end-of-year stocks).
+- Quarterly and yearly views of what creates base money (each period's change, over the
+  stock at the end of the previous period).
+
+### Changed
+- The footer shows the site's version, linked to the release notes.
+- The beta label and the beta note on the home page are removed.
+- The table by presidency shows in every view of a chart, not only "By presidency"; the
+  seasonally adjusted views (EMAE, GDP, IPI, ISAC) also show the original series as a
+  faint dashed line.
+- Revenue and spending, by presidency: all four lines with the terms shaded behind, and
+  a table of each line's average by term.
+- Financial balance (cash, accrual, operational): terms shaded behind the lines instead
+  of a by-presidency view.
+- Real exchange rate calculator: both questions show the same four results (the change in
+  the real exchange rate, the rate that restores the first date or reference, the required
+  change in relative productivity, the terms of trade).
+- Poverty and indigence: ranges "Since 2016" (INDEC's current method) and "Max".
+
+### Fixed
+- Trade by partner: switching between exports, imports and the balance keeps the chosen
+  frequency and range.
+- Contribution charts: the component lines below no longer leave an empty chart in the
+  yearly view.
+
 ## 1.0.0 (2026-10-20)
 
 First release.

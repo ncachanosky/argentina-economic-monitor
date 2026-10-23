@@ -59,7 +59,7 @@ EN = {
     "switch_title": "Ver este sitio en español",
     "pending_note": "",
     "skip": "Skip to content",
-    "beta_note": ('The Monitor is in beta: charts and methods may still change. Corrections and suggestions are welcome '
+    "beta_note": ('Corrections and suggestions are welcome '
                   '<a href="__REPO__/issues" target="_blank" rel="noopener">on GitHub</a>. '
                   'New here? See <a href="about/#how">how to use the Monitor</a>.'),
     "notfound_title": "Page not found",
@@ -73,8 +73,20 @@ EN = {
       <div>
         <h4>Data</h4>
         <p>Each chart offers the series as CSV. Full revision histories (every published vintage) are in <code>data/vintages/</code>. How every number is calculated: <a href="__ROOT__methodology/">Methodology</a>. When the next figures come out: <a href="__ROOT__calendar/">Release calendar</a>.</p>
+        <p class="site-version">Version __VERSION__ · <a href="__RELEASES__" target="_blank" rel="noopener">What's new</a></p>
       </div>""",
 }
+
+def _version() -> str:
+    """The released version, from CITATION.cff (kept in step with the latest tag)."""
+    try:
+        import yaml
+        return str(yaml.safe_load((ROOT / "CITATION.cff").read_text(encoding="utf-8"))["version"])
+    except Exception:
+        return ""
+
+
+VERSION = _version()
 
 ANALYTICS = ""   # set in build() from the registry's site.goatcounter
 
@@ -113,6 +125,7 @@ def render(template: str, *, page: str, root: str, title: str, desc: str, h1: st
         "__T_SUBSCRIBE__": esc(T["subscribe"]), "__T_THEME__": esc(T["theme"]), "__T_SHARE__": esc(T["share"]), "__T_ONPAGE__": esc(T["onpage"]),
         "__T_LATEST__": esc(T["latest"]), "__T_SKIP__": esc(T["skip"]), "__BETA__": (f'      <p class="beta-note">{T["beta_note"].replace("__REPO__", repo)}</p>' if page == "home" else ""), "__JSONLD__": jsonld, "__FOOTER__": T["footer"],
         "__CONTENT__": content,
+        "__VERSION__": esc(VERSION), "__RELEASES__": esc(f"{repo}/releases" if repo else "#"),
     }
     out = template
     for key in ("__FOOTER__", "__CONTENT__"):     # blocks first: they contain __ROOT__ links
@@ -329,7 +342,7 @@ def write_404(out: Path, reg, base: str, tag: str, es: dict) -> None:
   <link rel="icon" href="{root}img/favicon-32.png" sizes="32x32" type="image/png">
 </head>
 <body>
-  <header class="site-header"><div class="wrap"><a class="brand" href="{root}"><span class="brand-name">Argentina Economic Monitor <span class="beta-tag">Beta</span></span><span class="brand-by">{EN["by"]}</span></a></div></header>
+  <header class="site-header"><div class="wrap"><a class="brand" href="{root}"><span class="brand-name">Argentina Economic Monitor</span><span class="brand-by">{EN["by"]}</span></a></div></header>
   <main class="wrap notfound">
     <h1>{EN["notfound_title"]}</h1>
     <p>{EN["notfound_text"]}</p>

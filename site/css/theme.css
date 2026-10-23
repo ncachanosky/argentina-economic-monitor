@@ -461,6 +461,8 @@ main:focus { outline: none; }
 
 /* Beta tag and note */
 .beta-tag { display: inline-block; margin-left: 6px; padding: 1px 6px; border: 1px solid var(--accent); border-radius: 4px; color: var(--accent-ink); font-family: var(--font-ui); font-size: 10px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; vertical-align: 2px; }
+.site-version { font-family: var(--font-ui); font-size: 13px; color: var(--ink-3); }
+.site-version a { color: inherit; }
 .beta-note { margin-top: 6px; font-family: var(--font-ui); font-size: 13px; color: var(--ink-3); }
 
 /* Site search */
