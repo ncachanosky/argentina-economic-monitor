@@ -1,0 +1,14 @@
+HTTP/1.1 200 OK
+Content-Type: application/vnd.ms-excel
+Last-Modified: Wed, 03 Jun 2026 19:40:01 GMT
+Accept-Ranges: bytes
+ETag: "86e7dc490f3dc1:0"
+Server:X
+X-Content-Type-Options: nosniff
+X-Frame-Options: ALLOW-FROM https://censo.gob.ar
+X-Xss-Protection: 1; mode=block
+Content-Security-Policy: default-src 'self' 'unsafe-inline'  https://www.google-analytics.com  https://www.gstatic.com http://www.google.com https://www.google.com https://www.google.com.ar; script-src  'self' 'unsafe-inline' https://www.google-analytics.com https://www.gstatic.com http://www.google.com https://www.google.com https://www.google.com.ar; img-src 'self' 'unsafe-inline' data: http://www.google-analytics.com https://www.google-analytics.com http://www.google.com https://www.google.com  https://www.google.com.ar https://stats.g.doubleclick.net https://tracker.metricool.com/; script-src-elem 'self' 'unsafe-inline' http://www.google-analytics.com https://www.google-analytics.com https://www.gstatic.com http://www.google.com https://www.google.com https://www.google.com.ar https://www.googletagmanager.com/; connect-src 'self' 'unsafe-inline' http://www.google-analytics.com https://www.google-analytics.com http://www.google.com https://www.google.com  https://www.google.com.ar https://stats.g.doubleclick.net https://analytics.google.com/;  frame-src http://preprdcarga.indec.gob.ar/ http://www.youtube.com https://www.youtube.com https://app.powerbi.com/ https://www.google-analytics.com  https://www.gstatic.com http://www.google.com https://www.google.com https://www.google.com.ar https://indecbeta.shinyapps.io/ https://open.spotify.com/ https://anchor.fm/ https://podcasters.spotify.com/ https://view.genial.ly/ https://www.indec.gob.ar/ https://embed-standalone.spotify.com/ https://shiny.indec.gob.ar/ https://view.genially.com/ https://td.doubleclick.net/;
+Date: Fri, 23 Oct 2026 15:41:05 GMT
+Content-Length: 47616
+Set-Cookie: cookiesession1=678A3F514AC182ED751C1B51BD9C2882;Expires=Sat, 23 Oct 2027 15:41:06 GMT;Path=/;HttpOnly
+
