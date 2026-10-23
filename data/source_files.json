@@ -62,20 +62,6 @@
   "status": "ok",
   "last": "2026-09-01"
  },
- "datos.gob.ar exports by partner (CSV)": {
-  "checked": "2026-10-23T15:24:35+00:00",
-  "page": null,
-  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/77/distribution/77.3/download/exportaciones-por-paises-regiones-mensual.csv",
-  "status": "ok",
-  "last": "2026-08-01"
- },
- "datos.gob.ar imports by partner (CSV)": {
-  "checked": "2026-10-23T15:24:36+00:00",
-  "page": null,
-  "url": "https://infra.datos.gob.ar/catalog/sspm/dataset/78/distribution/78.3/download/importaciones-por-paises-regiones-mensual.csv",
-  "status": "ok",
-  "last": "2026-08-01"
- },
  "datos.gob.ar trade by group and use (CSV, fallback)": {
   "status": "standby",
   "checked": "2026-10-23T15:54:31+00:00"
