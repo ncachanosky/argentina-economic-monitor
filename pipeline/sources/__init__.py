@@ -95,6 +95,10 @@ def get_adapter(name: str):
         from . import aif
 
         return aif
+    if name == "x13":
+        from . import x13
+
+        return x13
     if name == "manual":
         from . import manual
 

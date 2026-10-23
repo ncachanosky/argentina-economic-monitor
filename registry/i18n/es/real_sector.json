@@ -52,5 +52,12 @@
  "Metalworking (excl. autos)": "Metalmecánica (excl. automotores)",
  "INDEC (sh_emae_mensual_base2004.xls)": "INDEC (sh_emae_mensual_base2004.xls)",
  "INDEC (sh_emae_actividad_base2004.xls)": "INDEC (sh_emae_actividad_base2004.xls)",
- "INDEC": "INDEC"
+ "INDEC": "INDEC",
+ "EMAE sectors, adjusted": "Sectores del EMAE, desestacionalizados",
+ "Change by sector, seasonally adjusted by the Monitor: INDEC publishes the sectors only as original series. Not official data.": "Variación por sector, desestacionalizada por el Monitor: el INDEC publica los sectores solo como series originales. No son datos oficiales.",
+ "INDEC (sh_emae_actividad_base2004.xls); seasonal adjustment: Monitor estimate (X-13ARIMA-SEATS)": "INDEC (sh_emae_actividad_base2004.xls); desestacionalización: estimación del Monitor (X-13ARIMA-SEATS)",
+ "Monitor estimate, not official data: each sector's original series adjusted with X-13ARIMA-SEATS (log; trading-day and Easter effects; automatic outliers; X-11 filters), the program INDEC uses but not its exact settings, which it does not publish in full. Run on the total EMAE, the same settings track INDEC's adjusted series closely (monthly changes correlate 0.94 since 2017). Sectors are adjusted one by one, so they do not add up to the adjusted total, and past months can be revised when a new one arrives.": "Estimación del Monitor, no datos oficiales: la serie original de cada sector desestacionalizada con X-13ARIMA-SEATS (logaritmo; efectos de días hábiles y de Pascua; atípicos automáticos; filtros X-11), el programa que usa el INDEC pero no sus especificaciones exactas, que no publica en su totalidad. Aplicadas al EMAE total, las mismas especificaciones siguen de cerca la serie desestacionalizada del INDEC (las variaciones mensuales tienen una correlación de 0,94 desde 2017). Los sectores se desestacionalizan uno por uno, por lo que no suman el total desestacionalizado, y los meses pasados pueden revisarse cuando llega uno nuevo.",
+ "How the sectors are adjusted": "Cómo se desestacionalizan los sectores",
+ "Original": "Original",
+ "Seasonally adjusted (Monitor estimate)": "Desestacionalizada (estimación del Monitor)"
 }

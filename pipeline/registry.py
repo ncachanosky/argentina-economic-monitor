@@ -280,7 +280,7 @@ def load(path: Path = REGISTRY_PATH, releases_path: Path = RELEASES_PATH) -> Reg
                         raise RegistryError(f"{where}: group {g.get('key')} uses unknown variant {k}")
             if sum(1 for g in contrib.get("groups", []) if g.get("residual")) > 1:
                 raise RegistryError(f"{where}: at most one residual group")
-        if item.get("bar_transforms") and not set(item["bar_transforms"]) <= TRANSFORMS:
+        if item.get("bar_transforms") and not set(item["bar_transforms"]) <= TRANSFORMS | {"pres"}:   # pres: change over a presidential term (panels)
             raise RegistryError(f"{where}: unknown bar_transforms {item['bar_transforms']}")
         at = item.get("annual_table")
         if at and not all(at.get(k) in (item.get("variants") or {}) for k in ("accumulated", "within_year")):

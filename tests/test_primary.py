@@ -212,3 +212,19 @@ def test_catalog_providers_group_by_file():
     provs = P.catalog_providers({"43.2_ECTAT_0_T_33", "45.2_ECTDT_0_T_33", "370.3_ICG_NIVEL_RAL_0_0_17_94",
                                  "370.3_HONESTIDADDAD_0_0_10_58"})
     assert len(provs) == 3 and sorted(len(p["ids"]) for p in provs) == [1, 1, 2]
+
+
+def test_x13_removes_a_seasonal_pattern():
+    """The Monitor's seasonal adjustment (X-13ARIMA-SEATS) flattens a series with a known seasonal pattern."""
+    pytest.importorskip("x13binary")
+    import numpy as np, tempfile
+    from pathlib import Path as _P
+    from pipeline.sources import x13
+    idx = pd.date_range("2010-01-01", periods=120, freq="MS")
+    trend = np.linspace(100, 130, 120)
+    season = np.tile([0.94, 0.95, 1.03, 1.01, 1.06, 1.02, 0.99, 1.0, 0.99, 1.0, 1.01, 1.0], 10)
+    s = pd.Series(trend * season, index=idx)
+    with tempfile.TemporaryDirectory() as d:
+        sa = x13.adjust(s, _P(d))
+    assert len(sa) == 120
+    assert sa.pct_change().std() < 0.25 * s.pct_change().std()      # the monthly seasonal swings are gone

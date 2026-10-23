@@ -21,6 +21,12 @@ section becomes its notes.
   twelve months against the twelve months before the term began).
 - New chart: the BCRA's credit to the government in real terms, and how it changes.
 - Interest rates: the policy rate (until it was discontinued in July 2025).
+- EMAE by sector, seasonally adjusted by the Monitor (X-13ARIMA-SEATS; not official data),
+  with month-on-month, year-to-date, year-over-year and by-presidency views. The method is
+  on the methodology page.
+- New chart: why debt / GDP changes, split into new debt, the exchange rate, real GDP
+  growth and inflation.
+- International reserves: all three net measures drawn by default.
 
 ### Changed
 - The footer shows the site's version, linked to the release notes.

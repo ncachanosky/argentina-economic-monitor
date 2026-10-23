@@ -2513,8 +2513,13 @@
     // to the total's change in pp, when fixed-base weights exist.
     const W = ind.weights && ind.weights.values;
     const baseKind = ind.bar_transform || (isRate ? "level" : "yoy");
-    const barKinds = (ind.bar_transforms && ind.bar_transforms.length ? ind.bar_transforms : [baseKind]).filter((k) => T[k] || INDEX_TRANSFORMS[k]);
-    const specFor = (k) => T[k] || INDEX_TRANSFORMS[k];
+    // "pres": each component's change over a presidential term, from the last month before it began to its
+    // last month (or the latest, for the sitting president).
+    const PRES_T = { label: "By presidency", short: "Change over the term, %", suffix: "%", signed: true, change: true };
+    const barKinds = (ind.bar_transforms && ind.bar_transforms.length ? ind.bar_transforms : [baseKind]).filter((k) => T[k] || INDEX_TRANSFORMS[k] || (k === "pres" && PRESIDENCIES.length));
+    const specFor = (k) => (k === "pres" ? PRES_T : T[k] || INDEX_TRANSFORMS[k]);
+    const presTerms = PRESIDENCIES.filter((p) => { const w = termWindow(p, ind.frequency); return ind.dates.includes(w.base); });
+    let presPick = presTerms.length ? presTerms[presTerms.length - 1].id : null;
     const bstate = { kind: barKinds.includes(baseKind) ? baseKind : barKinds[0], inc: false };
     let barSpec = specFor(bstate.kind);
     const defaults = [].concat(ind.default.variant).slice(0, MAX_PANEL_SERIES);
@@ -2555,7 +2560,17 @@
       return out;
     }
     const cache = new Map();
+    function presMetric() {
+      const p = presTerms.find((q) => q.id === presPick); const out = Object.fromEntries(keys.map((k) => [k, ind.dates.map(() => null)]));
+      if (!p) return out;
+      const w = termWindow(p, ind.frequency), b = ind.dates.indexOf(w.base);
+      let e = w.last ? ind.dates.indexOf(w.last) : -1;
+      if (e < 0) { e = ind.dates.length - 1; while (e > b && keys.some((k) => ind.variants[k].values[e] === null)) e--; }
+      for (const k of keys) { const v = ind.variants[k].values; if (b >= 0 && v[b] && v[e] !== null) out[k][e] = (v[e] / v[b] - 1) * 100; }
+      return out;
+    }
     function metricFor(kind, inc) {
+      if (kind === "pres") return presMetric();
       const key = `${kind}:${inc}`;
       if (!cache.has(key)) cache.set(key, inc ? incidence(kind)
         : Object.fromEntries(keys.map((k) => [k, transform(ind.dates, ind.variants[k].values, kind, ind.measure, ind.frequency)])));
@@ -2571,11 +2586,12 @@
     const fmtRef = (iso) => (ind.frequency === "D" ? fmtDay(iso) : fmtMonth(iso));
     const INC = { label: "Incidence (pp)", short: "Contribution to the total's change, percentage points", suffix: " pp", signed: true, change: true };
     const totalInc = () => keys.reduce((a, k) => a + (metric[k][refIdx] || 0), 0);
-    const WORDS = { mom: ["Month-over-month change", "m/m"], yoy: ["Year-over-year change", "y/y"], ytd: ["Year-to-date change", "YTD"],
+    const WORDS = { pres: ["Change over the term", "term"], mom: ["Month-over-month change", "m/m"], yoy: ["Year-over-year change", "y/y"], ytd: ["Year-to-date change", "YTD"],
       acc: ["Accumulated change (year to date vs. same months a year earlier)", "accumulated"], level: ["Level", ""] };
     const ytdNote = () => (bstate.kind === "ytd" ? ` (since Dec ${Number(refDate.slice(0, 4)) - 1})` : "");
     const barTitleFor = () => isRate ? `${ind.units}, ${fmtRef(refDate)}`
       : bstate.inc ? `Incidence (contribution to total ${WORDS[bstate.kind][1]} change${ytdNote()}), ${fmtRef(refDate)}; total ${(totalInc() > 0 ? "+" : "") + fx(totalInc(), 2)} pp`
+      : bstate.kind === "pres" ? (() => { const p = presTerms.find((q) => q.id === presPick); return p ? `Change over ${p.name}'s term, ${fmtRef(termWindow(p, ind.frequency).base)} to ${fmtRef(refDate)}` : ""; })()
       : `${WORDS[bstate.kind][0]}${ytdNote()}, ${fmtRef(refDate)}`;
     let barTitle = barTitleFor();
     const barTitleEl = h("span", {}, `${barTitle}. `);
@@ -2585,11 +2601,15 @@
       barSpec = bstate.inc ? INC : specFor(bstate.kind);
       barTitle = barTitleFor(); barTitleEl.textContent = `${barTitle}. `;
       bSeg && bSeg.update(bstate.kind);
+      if (presSel) presSel.hidden = bstate.kind !== "pres";
+      if (incBtn) incBtn.hidden = bstate.kind === "pres";
       incBtn && incBtn.setAttribute("aria-pressed", String(bstate.inc));
       drawBars();
     }
     const bSeg = barKinds.length > 1 ? segmented(barKinds.map((k) => [k, specFor(k).label]), bstate.kind, (k) => { bstate.kind = k; setBars(); }, "Bar metric") : null;
     const realSeg = realSwitch(ind, () => { cache.clear(); setBars(); drawLines(); });
+    const presSel = barKinds.includes("pres") && presTerms.length ? h("select", { "aria-label": "Presidency", hidden: true,
+      onchange: (e) => { presPick = e.target.value; setBars(); } }, presTerms.slice().reverse().map((p) => h("option", { value: p.id, selected: p.id === presPick ? true : null }, p.name))) : null;
     const incBtn = W && !isRate ? h("button", { class: "btn toggle", type: "button", "aria-pressed": "false", title: "Show each component's contribution to the total's change",
       onclick: () => { bstate.inc = !bstate.inc; setBars(); } }, "Incidence (pp)") : null;
 
@@ -2723,7 +2743,7 @@
         h("thead", {}, h("tr", {}, h("th", {}, noun.charAt(0).toUpperCase() + noun.slice(1, -1).replace(/ie$/, "y")), h("th", {}, "Weight"))),
         h("tbody", {}, keys.filter((k) => W[k] !== undefined).sort((a, b) => W[b] - W[a]).map((k) => h("tr", {}, h("td", {}, ind.variants[k].label), h("td", {}, W[k].toFixed(1) + "%"))))))) : null;
     appendAll(card, 
-      bSeg || incBtn || realSeg ? h("div", { class: "controls" }, bSeg, incBtn, realSeg) : null,
+      bSeg || incBtn || realSeg ? h("div", { class: "controls" }, bSeg, presSel, incBtn, realSeg) : null,
       partialNote(ind) || realSeg ? (() => { const p = h("p", { class: "hint" }); card._realHint = p; p.textContent = partialNote(ind); return p; })() : null,
       h("p", { class: "hint" }, barTitleEl, barNote),
       barEl, chartActions(ind, onBarPNG, onBarCSV), weightsTable,

@@ -804,6 +804,7 @@ indicators:
   - id: emae_sectors
     topic: real_sector
     kind: panel
+    switch: {group: emae_sectors, label: "Original"}
     title: EMAE by Sector
     short_title: EMAE sectors
     description: >-
@@ -849,6 +850,54 @@ indicators:
             public_admin: public_admin, education: education, health: health,
             other_services: other_services}
 
+
+  - id: emae_sectors_sa
+    topic: real_sector
+    kind: panel
+    switch: {group: emae_sectors, label: "Seasonally adjusted (Monitor estimate)"}
+    title: EMAE by Sector
+    short_title: EMAE sectors, adjusted
+    description: >-
+      Change by sector, seasonally adjusted by the Monitor: INDEC publishes the
+      sectors only as original series. Not official data.
+    release: emae
+    source: x13
+    source_label: "INDEC (sh_emae_actividad_base2004.xls); seasonal adjustment: Monitor estimate (X-13ARIMA-SEATS)"
+    frequency: M
+    units: Index, 2004 = 100
+    transforms: [level, mom, yoy]
+    variants:
+      agro: {label: Agriculture & livestock, id: "x13:11.3_ISOM_2004_M_39"}
+      fishing: {label: Fishing, id: "x13:11.3_VIPAA_2004_M_5"}
+      mining: {label: Mining & quarrying, id: "x13:11.3_ISD_2004_M_26"}
+      manufacturing: {label: Manufacturing, id: "x13:11.3_VMASD_2004_M_23"}
+      utilities: {label: "Electricity, gas & water", id: "x13:11.3_ITC_2004_M_21"}
+      construction: {label: Construction, id: "x13:11.3_VMATC_2004_M_12"}
+      trade: {label: Wholesale & retail trade, id: "x13:11.3_AGCS_2004_M_41"}
+      hotels: {label: Hotels & restaurants, id: "x13:11.3_P_2004_M_20"}
+      transport: {label: Transport & communications, id: "x13:11.3_EMC_2004_M_25"}
+      finance: {label: Financial intermediation, id: "x13:11.3_IM_2004_M_25"}
+      real_estate: {label: Real estate & business services, id: "x13:11.3_SEGA_2004_M_48"}
+      public_admin: {label: Public administration, id: "x13:11.3_C_2004_M_60"}
+      education: {label: Education, id: "x13:11.3_CMMR_2004_M_10"}
+      health: {label: Health & social services, id: "x13:11.3_HR_2004_M_24"}
+      other_services: {label: Other community services, id: "x13:11.3_TAC_2004_M_60"}
+      net_taxes: {label: Net taxes on products, id: "x13:11.3_IF_2004_M_25"}
+    # Bars: m/m, the change since December (year to date), y/y, and the change over a
+    # presidential term (from the last month before it began).
+    bar_transforms: [mom, ytd, yoy, pres]
+    bar_transform: mom
+    note: >-
+      Monitor estimate, not official data: each sector's original series
+      adjusted with X-13ARIMA-SEATS (log; trading-day and Easter effects;
+      automatic outliers; X-11 filters), the program INDEC uses but not its
+      exact settings, which it does not publish in full. Run on the total
+      EMAE, the same settings track INDEC's adjusted series closely (monthly
+      changes correlate 0.94 since 2017). Sectors are adjusted one by one, so
+      they do not add up to the adjusted total, and past months can be revised
+      when a new one arrives.
+    method_links: [{anchor: emae-sa, label: "How the sectors are adjusted"}]
+    default: {variant: [manufacturing, construction, agro], transform: level, start: "2016-01"}
   - id: industry_construction
     topic: real_sector
     kind: variants
@@ -2022,7 +2071,7 @@ indicators:
     topic: money
     wide: true
     kind: variants
-    overlay_default: [gross, standard]
+    overlay_default: [gross, standard, liquid, imf]   # all four drawn
     emphasis: gross
     overlay: true
     plain_level: true
@@ -5345,6 +5394,70 @@ indicators:
         pesos_cer:   {label: "Pesos, CER-linked",  expr: "100 * pc * fx / gdp12(gdp, cpi)"}
         fx:          {label: Foreign currency,     expr: "100 * (usd + nz(eur) + nz(jpy) + nz(sdr) + nz(oth)) * fx / gdp12(gdp, cpi)"}
 
+
+  - id: debt_gdp_change
+    topic: fiscal
+    wide: true
+    kind: contributions
+    measure: flow
+    title: Why Debt / GDP Changes
+    short_title: Debt / GDP, changes
+    description: >-
+      The change in gross debt as a share of GDP over the last twelve months,
+      split into new debt, the exchange rate, real GDP growth and inflation.
+      Percentage points of GDP; the bars add up to the change (the marker).
+    source: derived
+    source_label: Secretaría de Finanzas (monthly debt bulletin); BCRA; INDEC
+    frequency: M
+    units: "Percentage points of GDP"
+    ranges: [5Y, Max]
+    note: >-
+      With debt D (pesos), GDP of the last twelve months Y and the ratio d = D / Y,
+      the twelve-month change is exactly Δd = ΔD / Y + d(t-12) × (Y(t-12) / Y − 1).
+      New debt: the change in peso debt plus the change in foreign-currency debt
+      at the exchange rate of twelve months earlier (it includes the CER
+      indexation of peso bonds and capitalized interest). Exchange rate: today's
+      foreign-currency debt times the change in the exchange rate. The GDP term
+      is split between real growth and inflation in proportion to their logs;
+      real growth is from the EMAE over the same twelve months. For the months
+      the national accounts have not yet covered, GDP is extended with the CPI
+      (see How debt / GDP is calculated), so the split is provisional. The chart
+      ends with the latest EMAE month and starts twelve months after the debt series.
+    method_links: [{anchor: debt-gdp-change, label: "How the change is split"}]
+    contributions:
+      precomputed: true
+      total: total
+      total_label: Change in debt / GDP
+      units: pp
+      axis_title: "pp of GDP, change over 12 months"
+      groups:
+        - {key: newdebt,   label: New debt,                 add: [newdebt],   color: copper}
+        - {key: fxeff,     label: Exchange rate,            add: [fxeff],     color: sky}
+        - {key: growth,    label: Real GDP growth,          add: [growth],    color: sage}
+        - {key: inflation, label: Inflation,                add: [inflation], color: lavender}
+    yearly: {how: december}
+    default: {variant: total, transform: level, range: Max}
+    derive:
+      method: formula
+      anchor: usd
+      vars:
+        po: "fin:a3|pesos_other"
+        pc: "fin:a3|pesos_cer"
+        usd: "fin:a3|usd"
+        eur: "fin:a3|eur"
+        jpy: "fin:a3|jpy"
+        sdr: "fin:a3|sdr"
+        oth: "fin:a3|other"
+        fx: "bcra:5"
+        gdp: 4.4_OGP_2004_T_17
+        cpi: 148.3_INIVELNAL_DICI_M_26
+        emae: 143.3_NO_PR_2004_A_21
+      variants:
+        newdebt:   {label: New debt, expr: "100 * (((po + pc) * fx - lag((po + pc) * fx, 12)) + lag(fx, 12) * ((usd + nz(eur) + nz(jpy) + nz(sdr) + nz(oth)) - lag(usd + nz(eur) + nz(jpy) + nz(sdr) + nz(oth), 12))) / gdp12(gdp, cpi) + 0 * lag(po, 12) + 0 * sum12(emae)"}
+        fxeff:     {label: Exchange rate, expr: "100 * (usd + nz(eur) + nz(jpy) + nz(sdr) + nz(oth)) * (fx - lag(fx, 12)) / gdp12(gdp, cpi) + 0 * lag(po, 12) + 0 * sum12(emae)"}
+        growth:    {label: Real GDP growth, expr: "100 * lag((po + pc + usd + nz(eur) + nz(jpy) + nz(sdr) + nz(oth)) * fx, 12) * (1 / gdp12(gdp, cpi) - 1 / lag(gdp12(gdp, cpi), 12)) * ln(sum12(emae) / lag(sum12(emae), 12)) / ln(gdp12(gdp, cpi) / lag(gdp12(gdp, cpi), 12))"}
+        inflation: {label: Inflation, expr: "100 * lag((po + pc + usd + nz(eur) + nz(jpy) + nz(sdr) + nz(oth)) * fx, 12) * (1 / gdp12(gdp, cpi) - 1 / lag(gdp12(gdp, cpi), 12)) * (1 - ln(sum12(emae) / lag(sum12(emae), 12)) / ln(gdp12(gdp, cpi) / lag(gdp12(gdp, cpi), 12)))"}
+        total:     {label: Change in debt / GDP, expr: "100 * (po + pc + usd + nz(eur) + nz(jpy) + nz(sdr) + nz(oth)) * fx / gdp12(gdp, cpi) - 100 * lag((po + pc + usd + nz(eur) + nz(jpy) + nz(sdr) + nz(oth)) * fx, 12) / lag(gdp12(gdp, cpi), 12) + 0 * lag(po, 12) + 0 * sum12(emae)"}
   - id: debt_holders
     topic: fiscal
     wide: true
