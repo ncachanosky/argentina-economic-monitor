@@ -1,97 +1,97 @@
 [
  {
   "source": "bcra (D)",
-  "seconds": 74.4,
+  "seconds": 69.9,
   "series": 46
  },
  {
-  "source": "datos_gob (M)",
-  "seconds": 34.9,
-  "series": 146
- },
- {
   "source": "finanzas (M)",
-  "seconds": 33.5,
+  "seconds": 43.4,
   "series": 39
  },
  {
+  "source": "datos_gob (M)",
+  "seconds": 42.4,
+  "series": 146
+ },
+ {
   "source": "bcra_entities (M)",
-  "seconds": 28.7,
+  "seconds": 33.6,
   "series": 32
  },
  {
+  "source": "ustreasury (D)",
+  "seconds": 18.8,
+  "series": 1
+ },
+ {
   "source": "datos_gob (Q)",
-  "seconds": 17.8,
+  "seconds": 16.8,
   "series": 101
  },
  {
-  "source": "ustreasury (D)",
-  "seconds": 17.7,
-  "series": 1
- },
- {
   "source": "bcra_fx (D)",
-  "seconds": 15.8,
+  "seconds": 11.0,
   "series": 1
  },
  {
-  "source": "vdem (Y)",
-  "seconds": 7.8,
-  "series": 62
+  "source": "a3 (D)",
+  "seconds": 8.8,
+  "series": 3
  },
  {
   "source": "itcrm (D)",
-  "seconds": 6.1,
+  "seconds": 7.8,
   "series": 5
  },
  {
-  "source": "datos_gob (Y)",
-  "seconds": 5.5,
-  "series": 2
+  "source": "vdem (Y)",
+  "seconds": 6.1,
+  "series": 62
  },
  {
   "source": "bcra_banks (M)",
-  "seconds": 4.5,
+  "seconds": 4.4,
   "series": 67
  },
  {
   "source": "bcra_cambiario (M)",
-  "seconds": 3.8,
+  "seconds": 4.4,
   "series": 14
  },
  {
-  "source": "a3 (D)",
-  "seconds": 2.7,
-  "series": 3
- },
- {
-  "source": "rem (M)",
-  "seconds": 2.6,
-  "series": 8
- },
- {
   "source": "efw (Y)",
-  "seconds": 2.4,
+  "seconds": 3.2,
   "series": 22
  },
  {
-  "source": "dolar (D)",
+  "source": "rem (M)",
   "seconds": 2.3,
+  "series": 8
+ },
+ {
+  "source": "datos_gob (Y)",
+  "seconds": 2.2,
+  "series": 2
+ },
+ {
+  "source": "dolar (D)",
+  "seconds": 1.7,
   "series": 5
  },
  {
-  "source": "bcra_weekly (D)",
-  "seconds": 1.8,
-  "series": 6
- },
- {
   "source": "bcra_balance (M)",
-  "seconds": 1.4,
+  "seconds": 1.7,
   "series": 20
  },
  {
+  "source": "bcra_weekly (D)",
+  "seconds": 1.5,
+  "series": 6
+ },
+ {
   "source": "riesgo (D)",
-  "seconds": 1.1,
+  "seconds": 0.8,
   "series": 1
  },
  {
