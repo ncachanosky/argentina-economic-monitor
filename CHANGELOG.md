@@ -29,6 +29,12 @@ section becomes its notes.
 - International reserves: all three net measures drawn by default.
 
 ### Changed
+- Trade by partner (exports, imports and balance) is read from the tables of INDEC's own
+  release (ica_cuadros and its annex) for the current and previous year, so the cards update
+  on release day instead of waiting a month for datos.gob.ar, whose file stays the source
+  for earlier months and the fallback. From January 2025 the United States includes its
+  associated territories (Puerto Rico above all), as INDEC's tables do: about 2.4% more
+  than the United States alone. Noted on the cards and in the methodology.
 - The footer shows the site's version, linked to the release notes.
 - The beta label and the beta note on the home page are removed.
 - The table by presidency shows in every view of a chart, not only "By presidency"; the

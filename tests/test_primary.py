@@ -27,6 +27,8 @@ CASES = [
     ("read_trade_totals", "balanmensual.xls", 3, "74.3_IET_0_M_16", "2026-08-01", 8882.5825),
     ("read_export_groups", "expo_grandes_rubros.xls", 4, "74.3_IEMOI_0_M_46", "2026-08-01", 2356.2457),
     ("read_import_uses", "impo_uso_economico.xls", 7, "74.3_IIBCA_0_M_32", "2026-08-01", 1310.2484),
+    ("read_ica_partners", "ica_cuadros.xls", 8, "77.3_IEB_0_A_24", "2026-09-01", 1205.694386),
+    ("read_ica_annex_partners", "ica_anexo_cuadros.xls", 4, "78.3_IIRU_0_A_23_52", "2026-09-01", 1016.544843),
     ("read_trade_indices", "sh_indices_comext_04.xls", 7, "82.2_ITI_2004_T_27", "2026-04-01", 145.1401),
     ("read_trade_1910", "balan_1910.xls", 2, "74.1_IET_0_A_16", "2025-01-01", 87111.1968),
     ("read_ipi", "sh_ipi_manufacturero.xlsx", 2, "453.1_SERIE_DESEADA_0_0_24_58", "2026-08-01", 114.286133),
@@ -129,13 +131,32 @@ def test_ica_files_are_found_on_the_page(monkeypatch):
     found = {p["name"]: p["url"]() for p in P.PROVIDERS if p.get("page") == P.ICA_PAGE}
     assert any(u.endswith("expo_grandes_rubros_2025_2026.xls") for u in found.values())
     assert any(u.endswith("balan_1910_2025.xls") for u in found.values())
+    assert any(u.endswith("ica_cuadros_18_09_26.xls") for u in found.values())
+
+
+def test_release_file_takes_the_newest_date(monkeypatch):
+    page = b'<a href="ftp/cuadros/economia/ica_cuadros_19_10_26.xls"> <a href="ftp/cuadros/economia/ica_cuadros_20_12_25.xls">'
+    monkeypatch.setattr(P, "download", lambda url, retries=3: page)
+    assert P.ica_release_file("ica_cuadros")().endswith("ica_cuadros_19_10_26.xls")
+
+
+@pytest.mark.filterwarnings("ignore")
+def test_partner_tables_read_both_years_and_stop_at_the_next_table():
+    out = P.read_ica_partners(raw("ica_cuadros.xls"))
+    br, cn = out["78.3_IIB_0_A_24"], out["78.3_IIC_0_A_23"]
+    assert br.index.min() == pd.Timestamp("2025-01-01") and len(br) == 21
+    assert br[pd.Timestamp("2025-12-01")] == pytest.approx(1137.530385)
+    assert cn[pd.Timestamp("2025-01-01")] == pytest.approx(1533.817965)   # China's block, not Brazil's
+    assert out["77.3_IET_0_A_25"][pd.Timestamp("2026-09-01")] == pytest.approx(10035.975188)
+    annex = P.read_ica_annex_partners(raw("ica_anexo_cuadros.xls"))
+    assert annex["77.3_IETM_0_A_32"][pd.Timestamp("2025-10-01")] == pytest.approx(1623.406629)
 
 
 def test_fallback_provider_only_fills_what_primary_missed(monkeypatch, tmp_path):
     """If the INDEC trade-balance file fails, its series come from the datos.gob.ar CSV;
     if it works, the CSV is not used for them."""
     monkeypatch.setattr(P, "STATUS_FILE", tmp_path / "s.json")
-    monkeypatch.setattr(P, "agreement", lambda sid, s, since=None: None)
+    monkeypatch.setattr(P, "agreement", lambda sid, s, *a: None)
     calls = []
     def fake(url, retries=3):
         calls.append(url)

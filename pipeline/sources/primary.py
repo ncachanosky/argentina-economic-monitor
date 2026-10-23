@@ -337,6 +337,113 @@ def read_import_uses(raw: bytes) -> dict[str, pd.Series]:
                              "74.3_IIR_0_M_23": r"^resto"})
 
 
+def ica_release_file(stem: str):
+    """Resolver for the release tables named after the publication day
+    (ica_cuadros_19_10_26.xls): the newest date listed on the ICA page."""
+    def resolve() -> str:
+        html = download(ICA_PAGE).decode("utf-8", "replace")
+        found = set(re.findall(rf"{stem}_(\d\d)_(\d\d)_(\d\d)\.xls", html))
+        if not found:
+            raise FileNotFound(f"no {stem}_DD_MM_YY.xls on {ICA_PAGE}")
+        d, m, y = max(found, key=lambda t: (t[2], t[1], t[0]))
+        return f"{INDEC}/economia/{stem}_{d}_{m}_{y}.xls"
+    return resolve
+
+
+def _month_year_block(df: pd.DataFrame, top: int, cats: dict[str, str]) -> dict[str, pd.Series]:
+    """A monthly table under the title in row `top`: a header row with the categories
+    (Exportaciones, Importaciones, Saldo), a row below with one column per year
+    ("2026e", "2025*" or "Año 2026e") and a row per month (Enero ... Diciembre or Ene ... Dic).
+    Rows end at the first blank stretch after the months."""
+    hrow = next((i for i in range(top, min(top + 8, len(df)))
+                 if all(any(re.search(p, norm(v)) for v in df.iloc[i]) for p in cats.values())), None)
+    if hrow is None:
+        raise LayoutChanged(f"no header with {list(cats.values())} under row {top}", preview(df.iloc[top:], 10, 12))
+    starts = {sid: find_col(df, hrow, pat) for sid, pat in cats.items()}
+    yrow = next((i for i in range(hrow + 1, min(hrow + 4, len(df)))
+                 if any(re.fullmatch(r"(a[ñn]o )?\d{4}[e*]?", norm(v)) for v in df.iloc[i])), None)
+    if yrow is None:
+        raise LayoutChanged("no year row under the category header", preview(df.iloc[top:], 10, 12))
+    edges = sorted(starts.values()) + [df.shape[1]]
+    first = min(starts.values())
+    rows, i = {}, yrow + 1
+    while i < len(df):                                   # month rows, until the next table
+        labs = [norm(v) for v in df.iloc[i, :first]]
+        lab = next((x for x in labs if x), "")
+        if lab.startswith("cuadro"):
+            break
+        mon = MONTHS.get(lab[:3]) if re.fullmatch(r"[a-z]{3}(\w*)\.?\*?", lab) and lab[:3] in MONTHS else None
+        if mon and (len(lab) <= 4 or lab in FULL_MONTHS):
+            rows[i] = mon
+        i += 1
+    if len(set(rows.values())) < 12:
+        raise LayoutChanged("fewer than twelve month rows", preview(df.iloc[top:], 20, 8))
+    out = {}
+    for sid, c in starts.items():
+        end = next(e for e in edges if e > c)
+        vals = {}
+        for j in range(c, end):
+            m = re.fullmatch(r"(?:a[ñn]o )?(\d{4})[e*]?", norm(df.iat[yrow, j]))
+            if not m:
+                continue
+            for r, mon in rows.items():
+                v = pd.to_numeric(df.iat[r, j], errors="coerce")
+                if pd.notna(v):
+                    vals[pd.Timestamp(int(m.group(1)), mon, 1)] = float(v)
+        if not vals:
+            raise LayoutChanged(f"no monthly values for {sid}", preview(df.iloc[top:], 20, 12))
+        out[sid] = pd.Series(vals).sort_index()
+    return out
+
+
+FULL_MONTHS = {"enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre",
+               "setiembre", "octubre", "noviembre", "diciembre"}
+TRADE_FLOWS = {"x": r"^exportaciones", "m": r"^importaciones", "s": r"^saldo"}
+# Monthly trade by partner in the release tables (current and previous year): ids of the
+# datos.gob.ar partner series, and the table each one is read from. INDEC's United States
+# includes its associated territories (Puerto Rico and others), about 2.4% more than
+# datos.gob.ar's United States alone, so that series changes definition in January 2025
+# (the first month of the release tables). The US alone is not published monthly elsewhere.
+ICA_PARTNERS = {    # ica_cuadros_*.xls: sheet, title of the table
+    ("c1", r"^cuadro 1\. intercambio comercial"): ("77.3_IET_0_A_25", "78.3_IIT_0_A_25"),
+    ("c22-c25", r"^cuadro \d+\. .* con brasil"): ("77.3_IEB_0_A_24", "78.3_IIB_0_A_24"),
+    ("c22-c25", r"^cuadro \d+\. .* con china"): ("77.3_IEC_0_A_23", "78.3_IIC_0_A_23"),
+    ("c22-c25", r"^cuadro \d+\. .* con ee\.? ?uu"): ("77.3_IEEU_0_A_32", "78.3_IIM_0_A_22_15"),
+}
+ICA_ANNEX_PARTNERS = {   # ica_anexo_cuadros_*.xls: sheet, title (the first block is the zone total)
+    ("cuadro 5", r"con los pa[ií]ses del mercosur"): ("77.3_IETM_0_A_32", "78.3_IITM_0_A_32"),
+    ("cuadro 7", r"con los pa[ií]ses de la uni[oó]n europea"): ("77.3_IERU_0_A_29_20", "78.3_IIRU_0_A_23_52"),
+}
+
+
+# The release tables carry INDEC's latest revisions, which datos.gob.ar's partner CSVs often
+# lack (a few percent on single months), and the US definition above adds about 2%. A wrong
+# table or column differs by far more.
+PARTNER_TOL, PARTNER_SHARE = 0.03, 0.8
+
+
+def _partner_tables(raw: bytes, tables: dict) -> dict[str, pd.Series]:
+    book = pd.read_excel(io.BytesIO(raw), sheet_name=None, header=None)
+    sheets = {norm(k): v for k, v in book.items()}
+    out = {}
+    for (sheet, title), (xid, mid) in tables.items():
+        if sheet not in sheets:
+            raise LayoutChanged(f"no sheet '{sheet}' (sheets: {list(book)})")
+        df = sheets[sheet]
+        top = find_row(df, title)
+        s = _month_year_block(df, top, TRADE_FLOWS)
+        out[xid], out[mid] = s["x"], s["m"]
+    return out
+
+
+def read_ica_partners(raw: bytes) -> dict[str, pd.Series]:
+    return _partner_tables(raw, ICA_PARTNERS)
+
+
+def read_ica_annex_partners(raw: bytes) -> dict[str, pd.Series]:
+    return _partner_tables(raw, ICA_ANNEX_PARTNERS)
+
+
 def read_trade_indices(raw: bytes) -> dict[str, pd.Series]:
     """Quarterly value, price and quantity indices (2004 = 100) and the terms of trade."""
     df = pd.read_excel(io.BytesIO(raw), sheet_name=0, header=None)
@@ -841,6 +948,12 @@ PROVIDERS = [
      "read": read_import_uses, "mode": "recent",
      "ids": ["74.3_IIBCA_0_M_32", "74.3_IIBI_0_M_36", "74.3_IICL_0_M_42", "74.3_IIPABC_0_M_50",
              "74.3_IIBCO_0_M_32", "74.3_IIVAP_0_M_49", "74.3_IIR_0_M_23"]},
+    {"name": "INDEC trade by partner, release tables (ica_cuadros_*.xls)",
+     "url": ica_release_file("ica_cuadros"), "page": ICA_PAGE, "read": read_ica_partners, "mode": "recent",
+     "agree_tol": PARTNER_TOL, "agree_share": PARTNER_SHARE, "ids": [i for pair in ICA_PARTNERS.values() for i in pair]},
+    {"name": "INDEC trade with Mercosur and the EU, release annex (ica_anexo_cuadros_*.xls)",
+     "url": ica_release_file("ica_anexo_cuadros"), "page": ICA_PAGE, "read": read_ica_annex_partners, "mode": "recent",
+     "agree_tol": PARTNER_TOL, "agree_share": PARTNER_SHARE, "ids": [i for pair in ICA_ANNEX_PARTNERS.values() for i in pair]},
     {"name": "INDEC trade price and quantity indices (sh_indices_comext_04.xls)",
      "url": f"{INDEC}/economia/sh_indices_comext_04.xls", "read": read_trade_indices, "mode": "full",
      "ids": ["80.2_IIPENG_0_T_45", "80.2_IICENG_0_T_47", "81.2_IIPING_0_T_45", "81.2_IICING_0_T_47",
@@ -888,12 +1001,13 @@ PROVIDERS = [
      "read": datos_csv(BOP_TRIM), "mode": "full", "ids": list(BOP_TRIM)},
     {"name": "datos.gob.ar national public sector revenue and spending (IMIG) (CSV)", "url": f"{DATOS}/452/distribution/452.3/download/imig-mensual.csv",
      "read": datos_csv(IMIG_MENSUAL), "mode": "full", "ids": list(IMIG_MENSUAL)},
-    # datos.gob.ar's full CSV downloads: the only monthly source by partner, and the fallback
-    # for the INDEC trade files above (series already served are skipped).
-    {"name": "datos.gob.ar exports by partner (CSV)", "url": f"{DATOS}/77/distribution/77.3/download/exportaciones-por-paises-regiones-mensual.csv",
-     "read": datos_csv(EXPO_PAISES), "mode": "full", "ids": list(EXPO_PAISES)},
-    {"name": "datos.gob.ar imports by partner (CSV)", "url": f"{DATOS}/78/distribution/78.3/download/importaciones-por-paises-regiones-mensual.csv",
-     "read": datos_csv(IMPO_PAISES), "mode": "full", "ids": list(IMPO_PAISES)},
+    # datos.gob.ar's full CSV downloads: the fallback for the INDEC trade files above (series
+    # already served are skipped). The partner CSVs hold the history before the release tables'
+    # two years, and usually trail INDEC's release by a month.
+    {"name": "datos.gob.ar exports by partner (CSV, fallback)", "url": f"{DATOS}/77/distribution/77.3/download/exportaciones-por-paises-regiones-mensual.csv",
+     "read": datos_csv(EXPO_PAISES), "mode": "full", "ids": list(EXPO_PAISES), "fallback": True},
+    {"name": "datos.gob.ar imports by partner (CSV, fallback)", "url": f"{DATOS}/78/distribution/78.3/download/importaciones-por-paises-regiones-mensual.csv",
+     "read": datos_csv(IMPO_PAISES), "mode": "full", "ids": list(IMPO_PAISES), "fallback": True},
     {"name": "datos.gob.ar trade by group and use (CSV, fallback)", "url": f"{DATOS}/74/distribution/74.3/download/intercambio-comercial-argentino-mensual.csv",
      "read": datos_csv(ICA_CSV), "mode": "full", "ids": list(ICA_CSV), "fallback": True},
 ]
@@ -911,8 +1025,11 @@ AGREE_SHARE = 0.9        # share of overlapping months that must be within 2 x t
 RECENT_EXCLUDED = 12     # latest months left out of the comparison (they get revised)
 
 
-def agreement(sid: str, new: pd.Series, since: str | None = None) -> str | None:
-    """None if `new` agrees with the stored history (from `since`, if given); else a description of the mismatch."""
+def agreement(sid: str, new: pd.Series, since: str | None = None, tol: float | None = None,
+              share: float | None = None) -> str | None:
+    """None if `new` agrees with the stored history (from `since`, if given); else a description of the mismatch.
+    `tol` and `share` override AGREE_TOL and AGREE_SHARE for files whose revisions run larger."""
+    tol, share = tol or AGREE_TOL, share or AGREE_SHARE
     old = store.as_of(sid).dropna()
     if since:
         old = old[old.index >= pd.Timestamp(since)]
@@ -924,7 +1041,7 @@ def agreement(sid: str, new: pd.Series, since: str | None = None) -> str | None:
     if len(common) < 6:
         return None
     rel = ((new[common] - old[common]).abs() / old[common].abs().clip(lower=1e-9))
-    if rel.median() > AGREE_TOL or (rel <= 2 * AGREE_TOL).mean() < AGREE_SHARE:
+    if rel.median() > tol or (rel <= 2 * tol).mean() < share:
         worst = rel.idxmax()
         return (f"{sid}: values disagree with the stored history on {len(common)} common months "
                 f"(median difference {rel.median():.2%}; worst {worst:%Y-%m}: file {new[worst]:g}, stored {old[worst]:g})")
@@ -949,7 +1066,7 @@ def run_provider(p: dict, wanted: set[str]) -> tuple[dict[str, pd.Series], dict]
         missing = [sid for sid in wanted if sid not in series or series[sid].empty]
         if missing:
             raise LayoutChanged(f"no data for {missing}")
-        bad = [msg for sid in sorted(wanted) if (msg := agreement(sid, series[sid], p.get("agree_from")))]
+        bad = [msg for sid in sorted(wanted) if (msg := agreement(sid, series[sid], p.get("agree_from"), p.get("agree_tol"), p.get("agree_share")))]
         if bad:
             raise LayoutChanged("; ".join(bad))
         if p["mode"] == "recent":

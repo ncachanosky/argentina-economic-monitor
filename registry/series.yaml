@@ -3557,7 +3557,7 @@ indicators:
       Exports of goods by destination, millions of US dollars, monthly since
       1990.
     source: derived
-    source_label: INDEC (exports by country), via datos.gob.ar
+    source_label: INDEC (Intercambio comercial argentino and exports by country)
     frequency: M
     units: Millions of US dollars
     ranges: [2Y, 5Y, 10Y, Max]
@@ -3565,7 +3565,9 @@ indicators:
       Rest of Mercosur: the bloc's other members as INDEC groups them
       (Paraguay and Uruguay above all). European Union: the series
       datos.gob.ar labels "rest of the EU-28", which matches INDEC's
-      published EU totals.
+      published EU totals. United States: from January 2025 it includes
+      the associated territories (Puerto Rico above all), about 2% more.
+      See the methodology.
     contributions:
       precomputed: true
       total: total
@@ -3606,12 +3608,13 @@ indicators:
     description: >-
       Imports of goods by origin, millions of US dollars, monthly since 1990.
     source: derived
-    source_label: INDEC (imports by country), via datos.gob.ar
+    source_label: INDEC (Intercambio comercial argentino and imports by country)
     frequency: M
     units: Millions of US dollars
     ranges: [2Y, 5Y, 10Y, Max]
     note: >-
-      Imports CIF. Rest of Mercosur and the European Union as for exports.
+      Imports CIF. Rest of Mercosur, the European Union and the United
+      States as for exports.
     contributions:
       precomputed: true
       total: total
@@ -3654,10 +3657,14 @@ indicators:
       dollars a month: where Argentina earns its trade surplus and where it
       runs deficits.
     source: derived
-    source_label: INDEC (Intercambio comercial argentino), via datos.gob.ar
+    source_label: INDEC (Intercambio comercial argentino and trade by country)
     frequency: M
     units: Millions of US dollars
     ranges: [2Y, 5Y, 10Y, Max]
+    note: >-
+      Partners as in the exports and imports cards. United States: from
+      January 2025 it includes the associated territories (Puerto Rico above
+      all). See the methodology.
     contributions:
       precomputed: true
       total: total
