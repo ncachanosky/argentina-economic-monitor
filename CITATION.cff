@@ -16,8 +16,8 @@ authors:
     given-names: Nicolás
     orcid: "https://orcid.org/0000-0002-9685-0899"
     affiliation: "University of Texas at El Paso"
-version: 1.0.0
-date-released: "2026-10-20"
+version: 1.1.0
+date-released: "2026-10-23"
 license: MIT
 repository-code: "https://github.com/ncachanosky/argentina-economic-monitor"
 url: "https://ncachanosky.github.io/argentina-economic-monitor/"

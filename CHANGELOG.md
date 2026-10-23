@@ -11,6 +11,8 @@ Numbering: minor versions (1.1, 1.2) add cards or features; patch versions
 Changes since the last release, recorded as they are made. At the next release this
 section becomes its notes.
 
+## 1.1.0 (2026-10-23)
+
 ### Added
 - Yearly view: GDP by industry and investment by type (contributions to annual growth),
   the net investment position by sector and what firms and households hold abroad
