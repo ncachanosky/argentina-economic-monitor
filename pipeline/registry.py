@@ -162,6 +162,7 @@ class Registry:
                                                  "measure": vm, "static": ind.static})
                 if m["measure"] == "flow":
                     m["measure"] = vm
+                m["static"] = bool(m.get("static")) or ind.static   # discontinued on any card that shows it
         for inp in self.inputs:
             m = out.setdefault(inp["id"], {"source": inp["source"], "frequency": inp["frequency"],
                                            "measure": inp.get("measure", "index"),

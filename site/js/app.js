@@ -1700,8 +1700,10 @@
       return [end - N + 1, end, D[end].slice(0, 4)];   // calendar year: end is the year's last period
     }
     const endChoices = () => D.map((d, i) => i).filter((i) => i <= last && (state.mode !== "year" || quarterNo(i) === N) && (state.mode === "q" || state.mode === "stock" || i >= N - 1));
-    const modeSeg = S.stock ? null : segmented([["q", MQ ? "Month" : "Quarter"], ["l4", MQ ? "Last 12 months" : "Last 4 quarters"], ["ytd", "Year to date"], ["year", "Calendar year"]], state.mode, (k) => {
-      state.mode = k; modeSeg.update(k);
+    // By presidency (monthly statements with a deflator): each term against the twelve months before it.
+    const PRES_OK = MQ && !S.stock && ind.deflator && PRESIDENCIES.length;
+    const modeSeg = S.stock ? null : segmented([["q", MQ ? "Month" : "Quarter"], ["l4", MQ ? "Last 12 months" : "Last 4 quarters"], ["ytd", "Year to date"], ["year", "Calendar year"], ...(PRES_OK ? [["pres", "By presidency"]] : [])], state.mode, (k) => {
+      state.mode = k; modeSeg.update(k); endWrap.hidden = k === "pres";
       const ok = endChoices(); if (!ok.includes(state.end)) state.end = ok[ok.length - 1];
       fillSel(); draw();
     }, "Period");
@@ -1733,9 +1735,26 @@
       draw();
     } }, "Collapse all");
     function draw() {
-      const [i0, i1, lab] = period(state.end);
+      const [i0, i1, lab] = state.mode === "pres" ? [last, last, ""] : period(state.end);
       let cols;   // [{label, get(key)}]
-      if (S.stock) {
+      if (state.mode === "pres") {
+        // Real twelve-month totals, in pesos of the latest CPI month: the last twelve months of each term (to the
+        // latest month for the sitting president) against the twelve months before the term began.
+        const DF = ind.deflator.values, L = ind.deflator.latest_value;
+        const at = (iso) => D.indexOf(iso);
+        const real12 = (k, e) => { if (e < 11) return null; let s = 0; for (let i = e - 11; i <= e; i++) { const v = V(k)[i]; if (v === null || v === undefined || !DF[i]) return null; s += v * L / DF[i]; } return s; };
+        const lastCpi = (() => { for (let i = D.length - 1; i >= 0; i--) if (DF[i]) return i; return -1; })();
+        const terms = PRESIDENCIES.map((p) => ({ p, w: termWindow(p, "M") })).map(({ p, w }) => {
+          const b = at(w.base), e = w.last ? at(w.last) : Math.min(last, lastCpi);
+          return { p, b, e: e < 0 && !w.last ? Math.min(last, lastCpi) : e };
+        }).filter((x) => x.b >= 11 && x.e > x.b).reverse();
+        cols = terms.flatMap(({ p, b, e }) => [
+          { label: `${p.short}, real %`, pct: true, get: (k) => { const a = real12(k, e), z = real12(k, b); return a !== null && z !== null && a > 0 && z > 0 ? (a / z - 1) * 100 : null; } },
+          { label: `${p.short}, change (m ${fmtShortMonth(ind.deflator.latest)} pesos)`, delta: true, get: (k) => { const a = real12(k, e), z = real12(k, b); return a !== null && z !== null ? a - z : null; } },
+        ]);
+        const w12 = LANG === "es" ? "12 meses a" : "12 months to";
+        state._presNote = terms.map(({ p, b, e }) => `${p.short}: ${w12} ${qLabel(b)} → ${w12} ${qLabel(e)}`).join("; ");
+      } else if (S.stock) {
         cols = [
           { label: qLabel(i1), get: (k) => V(k)[i1] },
           { label: i1 >= 1 ? qLabel(i1 - 1) : "–", get: (k) => (i1 >= 1 ? V(k)[i1 - 1] : null) },
@@ -1774,14 +1793,16 @@
       tableEl.replaceChildren(h("table", { class: "data statement" },
         h("thead", {}, h("tr", {}, h("th", {}, ind.units), ...cols.map((c) => h("th", {}, c.label)))), h("tbody", {}, rows.filter(Boolean))));
       foldAll.textContent = collapsed.size ? "Expand all" : "Collapse all";
-      hint.textContent = S.stock ? `End-of-quarter positions; latest: ${qLabel(last)}.`
+      hint.textContent = state.mode === "pres" ? `By presidency: twelve-month totals in real terms (each month deflated by the CPI), the last twelve months of each term against the twelve months before it began. ${state._presNote}.`
+        : S.stock ? `End-of-quarter positions; latest: ${qLabel(last)}.`
         : `Flows over the period, against the same period a year earlier. Latest ${MQ ? "month" : "quarter"}: ${qLabel(last)}.${S.pct_change && ind.deflator ? " Real change: each month deflated by the CPI." : ""}`;
       view = { header: ["item", ...cols.map((c) => c.label)],
         rows: S.rows.filter((r) => r.key).map((r) => [ind.variants[r.key].label, ...cols.map((c) => { const v = c.get(r.key); return v === null || v === undefined ? "" : +v.toFixed(1); })]) };
     }
     const onCSV = () => { if (view) downloadBlob(toCSV(view.header, view.rows), `${ind.id}_${state.mode}_${D[state.end]}.csv`, "text/csv"); };
     fillSel();
-    appendAll(card, h("div", { class: "controls" }, modeSeg, parents.length ? foldAll : null, h("span", { class: "spacer" }), h("label", { class: "inline-select" }, S.stock ? "Quarter: " : "Ending: ", sel)),
+    const endWrap = h("label", { class: "inline-select" }, S.stock ? "Quarter: " : "Ending: ", sel);
+    appendAll(card, h("div", { class: "controls" }, modeSeg, parents.length ? foldAll : null, h("span", { class: "spacer" }), endWrap),
       hint, tableEl, ind.note ? h("p", { class: "chips-note" }, ind.note) : null, methodLine(ind),
       h("div", { class: "card-foot" },
         h("span", {}, `Source: ${ind.source_label} · Latest: ${qLabel(last)}`),

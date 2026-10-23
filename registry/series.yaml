@@ -1866,7 +1866,13 @@ indicators:
       call:     {label: Interbank call (BAIBAR),                               id: "bcra:11"}
       overdraft: {label: Overdrafts,                                           id: "bcra:13"}
       personal: {label: Personal loans,                                        id: "bcra:14"}
-    default: {variant: [badlar, deposits, personal], transform: level, start: "2023-01"}
+      policy:   {label: "Policy rate (until July 2025)",                       id: "bcra:160"}
+    note: >-
+      The BCRA's policy rate was discontinued in July 2025, when the central
+      bank moved to targeting monetary aggregates; since then the interbank
+      call rate (BAIBAR) is the closest market reference for the cost of
+      overnight pesos.
+    default: {variant: [policy, badlar, deposits, personal], transform: level, start: "2023-01"}
 
   - id: tamar
     topic: money
@@ -2271,6 +2277,44 @@ indicators:
         total:    {label: Credit to the government, expr: "100 * (nz(gov_ars) + nz(gov_usd)) / (absorb + base)"}
         advances: {label: Temporary advances,       expr: "100 * nz(adv) / (absorb + base)"}
         other:    {label: Securities and other,     expr: "100 * (nz(gov_ars) - nz(adv) + nz(gov_usd)) / (absorb + base)"}
+
+  - id: bcra_government_real
+    topic: money
+    wide: true
+    kind: variants
+    overlay: true
+    title: Is the Central Bank Lending More or Less to the Government?
+    short_title: Government financing, real
+    emphasis: total
+    description: >-
+      The BCRA's credit to the government in pesos of today (deflated by the
+      CPI), and how it changes: temporary advances and the rest (Treasury
+      securities, including the non-transferable letters, and other credit).
+    source: derived
+    source_label: BCRA (Balance del Banco Central); INDEC (CPI)
+    frequency: M
+    units: Millions of pesos
+    log_level: true
+    transforms: [yoy, mom, level]
+    deflate_with: {indicator: cpi_long, variant: corrected, label: CPI}
+    ranges: [10Y, 25Y, Max]
+    note: >-
+      Real terms: deflated by the CPI (corrected for 2007-2016, see the long-run
+      CPI), in pesos of the latest month with CPI data. A rise means the BCRA
+      holds more claims on the government in real terms: new advances or
+      securities, or the revaluation of dollar-denominated letters when the
+      peso depreciates. The December 2019 revaluation of the non-transferable
+      letters (Law 27,541) and the May 2024 change to amortized-cost valuation
+      create breaks.
+    default: {variant: total, transform: yoy, real: true, range: 10Y}
+    derive:
+      method: formula
+      anchor: base
+      vars: *bal
+      variants:
+        total:    {label: Credit to the government, expr: "(nz(gov_ars) + nz(gov_usd)) / 1000"}
+        advances: {label: Temporary advances,       expr: "nz(adv) / 1000"}
+        other:    {label: Securities and other,     expr: "(nz(gov_ars) - nz(adv) + nz(gov_usd)) / 1000"}
 
   # ---------------- Banks ----------------
   - id: bank_public_exposure

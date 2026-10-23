@@ -505,6 +505,10 @@ ui:
   "Nominal GDP growth": "Crecimiento del PIB nominal"
 
 patterns:
+  - ["(.+), real %", "$1, real %"]
+  - ["(.+), change \\(m (.+) pesos\\)", "$1, variación (millones de pesos de $2)"]
+  - ["By presidency: twelve-month totals in real terms \\(each month deflated by the CPI\\), the last twelve months of each term against the twelve months before it began\\. (.+)\\.", "Por presidencia: totales de doce meses en términos reales (cada mes deflactado por el IPC), los últimos doce meses de cada mandato frente a los doce meses previos a su inicio. $1."]
+  - ["(.+): 12 months to (.+) → 12 months to ([^;]+)(.*)", "$1: 12 meses a $2 → 12 meses a $3$4"]
   - ["\\*(\\d{4}): (.+), year to date\\.", "*$1: $2, en lo que va del año."]
   - ["\\*(\\d{4}): latest, (.+)\\.", "*$1: último dato, $2."]
   - ["total; (.+) a year over (.+) years, with α = (.+)", "total; $1 por año en $2 años, con α = $3"]

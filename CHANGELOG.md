@@ -17,6 +17,10 @@ section becomes its notes.
   (end-of-year stocks).
 - Quarterly and yearly views of what creates base money (each period's change, over the
   stock at the end of the previous period).
+- The national budget by presidency: each line's real change over each term (its last
+  twelve months against the twelve months before the term began).
+- New chart: the BCRA's credit to the government in real terms, and how it changes.
+- Interest rates: the policy rate (until it was discontinued in July 2025).
 
 ### Changed
 - The footer shows the site's version, linked to the release notes.
