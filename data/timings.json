@@ -1,126 +1,126 @@
 [
  {
   "source": "bcra (D)",
-  "seconds": 70.8,
+  "seconds": 72.0,
   "series": 46
  },
  {
-  "source": "bcra_entities (M)",
-  "seconds": 53.1,
-  "series": 32
- },
- {
   "source": "datos_gob (M)",
-  "seconds": 43.5,
+  "seconds": 47.3,
   "series": 146
  },
  {
-  "source": "finanzas (M)",
-  "seconds": 36.7,
-  "series": 39
- },
- {
   "source": "x13 (M)",
-  "seconds": 33.0,
+  "seconds": 28.9,
   "series": 16
  },
  {
-  "source": "datos_gob (Q)",
-  "seconds": 24.5,
-  "series": 101
+  "source": "bcra_entities (M)",
+  "seconds": 27.1,
+  "series": 32
+ },
+ {
+  "source": "finanzas (M)",
+  "seconds": 25.3,
+  "series": 39
  },
  {
   "source": "ustreasury (D)",
-  "seconds": 19.5,
+  "seconds": 19.3,
   "series": 1
  },
  {
-  "source": "bcra_cambiario (M)",
-  "seconds": 15.3,
-  "series": 14
+  "source": "datos_gob (Q)",
+  "seconds": 18.6,
+  "series": 101
  },
  {
   "source": "bcra_fx (D)",
-  "seconds": 11.7,
+  "seconds": 10.9,
   "series": 1
  },
  {
-  "source": "itcrm (D)",
-  "seconds": 11.5,
-  "series": 5
- },
- {
-  "source": "bcra_banks (M)",
-  "seconds": 7.9,
-  "series": 67
- },
- {
-  "source": "dolar (D)",
-  "seconds": 7.5,
-  "series": 5
- },
- {
   "source": "vdem (Y)",
-  "seconds": 7.0,
+  "seconds": 6.9,
   "series": 62
  },
  {
-  "source": "rem (M)",
-  "seconds": 5.3,
-  "series": 8
+  "source": "itcrm (D)",
+  "seconds": 6.1,
+  "series": 5
  },
  {
-  "source": "bcra_weekly (D)",
-  "seconds": 5.0,
-  "series": 6
+  "source": "bcra_cambiario (M)",
+  "seconds": 4.7,
+  "series": 14
  },
  {
-  "source": "bcra_balance (M)",
-  "seconds": 3.9,
-  "series": 20
+  "source": "bcra_banks (M)",
+  "seconds": 2.3,
+  "series": 67
+ },
+ {
+  "source": "a3 (D)",
+  "seconds": 2.3,
+  "series": 3
  },
  {
   "source": "efw (Y)",
-  "seconds": 2.9,
+  "seconds": 2.3,
   "series": 22
  },
  {
   "source": "datos_gob (Y)",
-  "seconds": 2.5,
+  "seconds": 2.1,
   "series": 2
  },
  {
-  "source": "riesgo (D)",
-  "seconds": 1.2,
-  "series": 1
+  "source": "bcra_weekly (D)",
+  "seconds": 2.1,
+  "series": 6
  },
  {
-  "source": "bcra (M)",
+  "source": "bcra_balance (M)",
+  "seconds": 1.5,
+  "series": 20
+ },
+ {
+  "source": "dolar (D)",
+  "seconds": 1.4,
+  "series": 5
+ },
+ {
+  "source": "riesgo (D)",
   "seconds": 1.1,
   "series": 1
  },
  {
-  "source": "a3 (D)",
-  "seconds": 0.8,
-  "series": 3
+  "source": "rem (M)",
+  "seconds": 1.0,
+  "series": 8
+ },
+ {
+  "source": "bcra (M)",
+  "seconds": 0.5,
+  "series": 1
  },
  {
   "source": "officials (Y)",
-  "seconds": 0.6,
+  "seconds": 0.2,
   "series": 2
  },
  {
   "source": "aif (M)",
-  "seconds": 0.3,
+  "seconds": 0.1,
   "series": 35
  },
  {
-  "source": "manual (S)",
+  "source": "manual (M)",
   "seconds": 0.0,
   "series": 6
  },
  {
-  "source": "manual (M)",
+  "source": "manual (S)",
   "seconds": 0.0,
   "series": 6
  },
