@@ -11,6 +11,11 @@ Numbering: minor versions (1.1, 1.2) add cards or features; patch versions
 Changes since the last release, recorded as they are made. At the next release this
 section becomes its notes.
 
+### Fixed
+- Real exchange rate (ITCRM and bilateral indices): the BCRA renamed its workbook
+  (ITCRMSerie.xlsx to itcrm-serie.xlsx) and left the old file frozen on October 16, so
+  the series stopped updating. The link is now read from the BCRA's page.
+
 ## 1.1.0 (2026-10-23)
 
 ### Added

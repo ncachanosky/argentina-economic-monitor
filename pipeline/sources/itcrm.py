@@ -1,6 +1,6 @@
 """Adapter for the BCRA's real exchange rate indices (Índice Tipo de Cambio Real
 Multilateral, ITCRM, and bilateral indices), daily since 1997, base 17-Dec-2015 = 100,
-from the workbook ITCRMSerie.xlsx, sheet "ITCRM y bilaterales".
+from the workbook itcrm-serie.xlsx (ITCRMSerie.xlsx until October 2026), sheet "ITCRM y bilaterales".
 
 A rise is a real depreciation of the peso. The BCRA deflates with INDEC's CPI (and,
 before 2017, provincial indices) and partner-country CPIs; for the latest months, not
@@ -12,15 +12,21 @@ Series ids: "itcrm:<key>" with key in COLUMNS.
 from __future__ import annotations
 
 import io
+import re
 import time
+from urllib.parse import urljoin
 
 import pandas as pd
 import requests
 
 from . import FetchResult
 
-URLS = ["https://www.bcra.gob.ar/Pdfs/PublicacionesEstadisticas/ITCRMSerie.xlsx",
-        "https://www.bcra.gob.ar/archivos/Pdfs/PublicacionesEstadisticas/ITCRMSerie.xlsx"]
+# In October 2026 the BCRA renamed the workbook (ITCRMSerie.xlsx -> itcrm-serie.xlsx) and left
+# the old file in place, frozen on October 16. The link is read from the BCRA's page first,
+# so a future rename is followed; the URL below is the fallback. The old name is not tried:
+# it would serve stale data without an error.
+PAGE = "https://www.bcra.gob.ar/indices-de-tipo-de-cambio-multilateral/"
+URLS = ["https://www.bcra.gob.ar/archivos/Pdfs/PublicacionesEstadisticas/itcrm-serie.xlsx"]
 SHEET = 0                       # "ITCRM y bilaterales" (daily)
 TIMEOUT = 180
 USER_AGENT = "argentina-economic-monitor (+https://github.com/ncachanosky/argentina-economic-monitor)"
@@ -28,10 +34,23 @@ COLUMNS = {"m": "ITCRM", "br": "ITCRB Brasil", "us": "ITCRB Estados Unidos", "cn
            "eu": "ITCRB Zona Euro"}
 
 
+def page_url() -> str | None:
+    """The ITCRM workbook linked on the BCRA's page, if the page can be read."""
+    try:
+        r = requests.get(PAGE, timeout=60, headers={"User-Agent": USER_AGENT})
+        r.raise_for_status()
+        m = re.search(r'href="([^"]*itcrm[^"/]*\.xlsx)"', r.text, re.I)
+        return urljoin(PAGE, m.group(1)) if m else None
+    except Exception:
+        return None
+
+
 def download(retries: int = 3) -> bytes:
     last = None
+    linked = page_url()
+    urls = [linked] + [u for u in URLS if u != linked] if linked else URLS
     for attempt in range(retries):
-        for url in URLS:
+        for url in urls:
             try:
                 r = requests.get(url, timeout=TIMEOUT, headers={"User-Agent": USER_AGENT})
                 r.raise_for_status()
