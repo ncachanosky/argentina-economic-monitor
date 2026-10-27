@@ -1,0 +1,19 @@
+HTTP/2 200 
+content-type: text/html; charset=UTF-8
+x-bcra-upstream-ip: 192.168.188.36:80
+strict-transport-security: max-age=31536000
+set-cookie: __uzma=a209c2e3-d6ca-442d-b9a8-d4d5a658aaca; Domain=bcra.gob.ar; HttpOnly; path=/; Expires=Tue, 27-Apr-27 18:03:21 GMT; Max-Age=15724800; SameSite=Lax
+set-cookie: __uzmb=1793124201; Domain=bcra.gob.ar; HttpOnly; path=/; Expires=Tue, 27-Apr-27 18:03:21 GMT; Max-Age=15724800; SameSite=Lax
+set-cookie: __uzme=3307; Domain=bcra.gob.ar; HttpOnly; path=/; Expires=Tue, 27-Apr-27 18:03:21 GMT; Max-Age=15724800; SameSite=Lax
+set-cookie: __uzmc=123191081252; Domain=bcra.gob.ar; HttpOnly; path=/; Expires=Tue, 27-Apr-27 18:03:21 GMT; Max-Age=15724800; SameSite=Lax
+set-cookie: __uzmd=1793124201; Domain=bcra.gob.ar; HttpOnly; path=/; Expires=Tue, 27-Apr-27 18:03:21 GMT; Max-Age=15724800; SameSite=Lax
+date: Tue, 27 Oct 2026 18:03:23 GMT
+cache-control: public, s-maxage=86400, max-age=300
+x-tec-api-version: v1
+x-tec-api-root: https://www.bcra.gob.ar/en/wp-json/tribe/events/v1/
+x-tec-api-origin: https://www.bcra.gob.ar/en/
+x-cache: Miss from cloudfront
+via: 1.1 a32d27c7f523a7d796f2f2bdfd8ecfda.cloudfront.net (CloudFront)
+x-amz-cf-pop: ORD58-P7
+x-amz-cf-id: y2PMrbvdgj6D8GIZgFhN0LQqVXOeQgyeLuqcCHh8ONNZISLkt7F9dw==
+
