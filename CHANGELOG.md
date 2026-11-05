@@ -17,6 +17,16 @@ section becomes its notes.
   Mercados, ArgentinaDatos, the REM, the Secretaría de Finanzas and the US Treasury. Cards with their
   own layout (futures curve, balance sheets, debt schedule, placements, REM revisions,
   tenure) show the line too (issue #3).
+- Country risk: Brazil, Chile, Colombia, Mexico, Peru and Uruguay drawn with Argentina on
+  the same card (log scale), with Ecuador, Bolivia, Paraguay and Panama one click away.
+  From the Banco Central de la República Dominicana's daily file of JP Morgan's EMBI Global
+  Diversified subindices, since 2007; that file's Argentina column is also the fallback if
+  ArgentinaDatos fails. The Latin America aggregate is left out because of breaks when
+  countries enter or leave the index (issue #3).
+
+### Changed
+- Log-scale charts spanning less than three orders of magnitude label the axis at 1, 2 and
+  5 times powers of ten instead of every unit.
 
 ### Fixed
 - Real exchange rate (ITCRM and bilateral indices): the BCRA renamed its workbook

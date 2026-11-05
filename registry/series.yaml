@@ -5314,9 +5314,10 @@ indicators:
     description: >-
       "Riesgo país": the spread of Argentina's dollar bonds over US
       Treasuries in JP Morgan's EMBI index, in basis points (100 = one
-      percentage point), daily since 1999.
+      percentage point), daily since 1999. Other Latin American countries
+      can be added for comparison, from 2007.
     source: riesgo
-    source_label: "JP Morgan EMBI, as published by Ámbito Financiero, via ArgentinaDatos (market data, not an official statistic)"
+    source_label: "JP Morgan EMBI: Argentina as published by Ámbito Financiero, via ArgentinaDatos; other countries via the Banco Central de la República Dominicana (market data, not an official statistic)"
     frequency: D
     units: Basis points
     transforms: [level]
@@ -5335,10 +5336,27 @@ indicators:
       end of the month), and on 10 September 2020 it halved, from about
       2,100 to 1,100, when the restructured bonds replaced the old ones.
       Smaller breaks (for example in April 2016) may have the same origin.
-      Weekends are left out.
+      Other countries: JP Morgan's EMBI Global Diversified subindices as
+      republished by the Banco Central de la República Dominicana, from
+      October 2007 (Bolivia from 2012, Paraguay from 2013). The marked
+      breaks refer to Argentina. Weekends are left out.
     method_links: [{anchor: country-risk, label: "About country risk"}]
+    overlay: true
+    log_level: true
+    emphasis: embi
+    overlay_default: [embi, br, cl, co, mx, pe, uy]
     variants:
-      embi: {label: "Country risk (EMBI spread)", id: "riesgo:embi"}
+      embi: {label: "Argentina", id: "riesgo:embi"}
+      br: {label: "Brazil", id: "riesgo:br"}
+      cl: {label: "Chile", id: "riesgo:cl"}
+      co: {label: "Colombia", id: "riesgo:co"}
+      mx: {label: "Mexico", id: "riesgo:mx"}
+      pe: {label: "Peru", id: "riesgo:pe"}
+      uy: {label: "Uruguay", id: "riesgo:uy"}
+      ec: {label: "Ecuador", id: "riesgo:ec"}
+      bo: {label: "Bolivia", id: "riesgo:bo"}
+      py: {label: "Paraguay", id: "riesgo:py"}
+      pa: {label: "Panama", id: "riesgo:pa"}
     default: {variant: embi, transform: level, range: 5Y, rebase: false}
 
   - id: debt_gdp

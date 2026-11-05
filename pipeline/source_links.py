@@ -52,4 +52,7 @@ def finanzas_link(sid: str) -> dict:
 def link_for(adapter: str, sid: str) -> dict | None:
     if adapter == "finanzas":
         return finanzas_link(sid)
+    if adapter == "riesgo" and sid != "riesgo:embi":
+        return {"publisher": "Banco Central de la República Dominicana", "name": _file(riesgo.BCRD),
+                "url": riesgo.BCRD, "page": riesgo.BCRD_PAGE, "kind": "file"}
     return LINKS.get(adapter)

@@ -492,6 +492,19 @@
       ...links, checked ? ` · ${es ? "revisado" : "checked"} ${checked} (${es ? "hora de Buenos Aires" : "Buenos Aires time"})` : null);
   }
 
+  // Log axes spanning under three decades: ticks at 1, 2 and 5 times powers of ten, so the
+  // labels do not crowd (Plotly's default labels every unit within a decade).
+  function logTicks(values) {
+    const v = values.filter((q) => q > 0 && isFinite(q));
+    if (!v.length) return {};
+    const lo = Math.min(...v), hi = Math.max(...v);
+    if (Math.log10(hi / lo) > 3) return {};
+    const vals = [];
+    for (let e = Math.floor(Math.log10(lo)); e <= Math.ceil(Math.log10(hi)); e++)
+      [1, 2, 5].forEach((m) => { const x = m * 10 ** e; if (x >= lo / 1.5 && x <= hi * 1.5) vals.push(x); });
+    return vals.length >= 3 ? { tickmode: "array", tickvals: vals } : {};
+  }
+
   // The source line for cards with their own footer: a line break and the note, if any.
   function srcTail(ind) {
     const f = sourceFilesNote(ind);
@@ -1273,7 +1286,8 @@
       Plotly.react(chartEl, traces, baseLayout({
         pct: t,
         // Plain numbers on log axes unless the values are tiny (long-run price indices).
-        yaxis: isLog() ? { type: "log", ticksuffix: "", exponentformat: Math.min(...y.filter((q) => q > 0)) < 0.01 ? "power" : "none", tickformat: Math.min(...y.filter((q) => q > 0)) < 0.01 ? undefined : ",~r" }
+        yaxis: isLog() ? { type: "log", ticksuffix: "", exponentformat: Math.min(...y.filter((q) => q > 0)) < 0.01 ? "power" : "none", tickformat: Math.min(...y.filter((q) => q > 0)) < 0.01 ? undefined : ",~r",
+            ...logTicks(traces.flatMap((tr) => (tr.yaxis === "y2" ? [] : tr.y || []))) }
           : { type: "linear", ...(ind.y_tickformat ? { tickformat: ind.y_tickformat } : {}) },
         extra: {
           bargap: 0.2, shapes, annotations, barmode: state.transform === "share" ? "stack" : "group",
