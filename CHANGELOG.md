@@ -29,6 +29,10 @@ section becomes its notes.
   5 times powers of ten instead of every unit.
 
 ### Fixed
+- Downloaded PNGs: a long source note ran into the "Argentina Economic Monitor" brand in the
+  bottom-right corner (48 of 141 cards). The note now wraps to the space left of the brand
+  and the bottom margin grows to fit. On Spanish pages, "Latest observation" in the note
+  is now translated, and log-scale exports get the same tick labels as the page.
 - Real exchange rate (ITCRM and bilateral indices): the BCRA renamed its workbook
   (ITCRMSerie.xlsx to itcrm-serie.xlsx) and left the old file frozen on October 16, so
   the series stopped updating. The link is now read from the BCRA's page.

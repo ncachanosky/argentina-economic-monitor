@@ -264,6 +264,17 @@
   }
 
   // Render the current view as a branded 1200x800 PNG (always light theme).
+  // Greedy word wrap into lines of at most `width` characters.
+  function wrapText(text, width) {
+    const lines = [""];
+    text.split(" ").forEach((w) => {
+      const cur = lines[lines.length - 1];
+      if (cur && (cur + " " + w).length > width) lines.push(w);
+      else lines[lines.length - 1] = cur ? cur + " " + w : w;
+    });
+    return lines;
+  }
+
   async function exportPNG(ind, traces, subtitle, pct, filename, extras = {}) {
     const light = { ink: "#36454F", ink2: "#5A6872", ink3: "#85909A", grid: "#ECE9E3", rule: "#E3E0D9" };
     const lightSeries = ["#B87333", "#5B9BD5", "#87A96B", "#8E7AB5", "#C9A227", "#C96B7E", "#3E9C9A", "#6C7A89"];
@@ -279,6 +290,12 @@
       if (t._lightFill) c.fillcolor = t._lightFill;
       return c;
     });
+    // The source note shares the bottom line with the brand on the right, so a long note is
+    // wrapped to the width left of it (about 112 characters at 15 px), and the bottom margin
+    // grows by one line for each extra line.
+    const srcText = `Source: ${ind.source_label}. Latest observation: ${ind.frequency === "Q" ? fmtPeriod(ind.last_obs, "Q") : ind.frequency === "Y" ? ind.last_obs.slice(0, 4) : fmtMonth(ind.last_obs)}.${ind.source_units ? ` Source data in ${ind.source_units}.` : ""}`;
+    const srcLines = wrapText(tr(srcText), LANG === "es" ? 104 : 112);   // translated before wrapping; the Spanish brand is longer
+    const yVals = data.filter((t) => t.yaxis !== "y2").flatMap((t) => (Array.isArray(t.y) ? t.y : []));
     const layout = {
       width: EXPORT.width, height: EXPORT.height,
       paper_bgcolor: "#FFFFFF", plot_bgcolor: "#FFFFFF",
@@ -291,11 +308,11 @@
       showlegend: data.filter((t) => t.showlegend !== false).length > 1,
       legend: { orientation: "h", x: 0, y: 1.02, xanchor: "left", yanchor: "bottom", font: { size: 16, color: light.ink } },
       xaxis: { type: data[0] && data[0].orientation === "h" ? "linear" : "date", gridcolor: light.grid, linecolor: light.rule, ticks: "outside", tickcolor: light.rule },
-      yaxis: { gridcolor: light.grid, linecolor: light.rule, zerolinecolor: light.ink2, ticksuffix: specOf(pct).suffix, automargin: true, ...(extras.ylog ? { type: "log", ticksuffix: "" } : {}) },
+      yaxis: { gridcolor: light.grid, linecolor: light.rule, zerolinecolor: light.ink2, ticksuffix: specOf(pct).suffix, automargin: true, ...(extras.ylog ? { type: "log", ticksuffix: "", exponentformat: "none", tickformat: ",~r", ...logTicks(yVals) } : {}) },
       shapes: (extras.shapes || []).map((sh) => ({ ...sh, ...(sh._lightFill ? { fillcolor: sh._lightFill } : {}), line: { ...(sh.line || {}), color: (sh.line && sh.line._light) || light.ink3 } })),
       annotations: [
         ...(extras.annotations || []).map((a) => ({ ...a, font: { ...(a.font || {}), size: 15, color: light.ink2 } })),
-        { text: `Source: ${ind.source_label}. Latest observation: ${ind.frequency === "Q" ? fmtPeriod(ind.last_obs, "Q") : ind.frequency === "Y" ? ind.last_obs.slice(0, 4) : fmtMonth(ind.last_obs)}.${ind.source_units ? ` Source data in ${ind.source_units}.` : ""}`, xref: "paper", yref: "paper", x: 0, y: -0.13, xanchor: "left", yanchor: "top", showarrow: false, font: { size: 15, color: light.ink3 } },
+        { text: srcLines.join("<br>"), xref: "paper", yref: "paper", x: 0, y: -0.13, xanchor: "left", yanchor: "top", align: "left", showarrow: false, font: { size: 15, color: light.ink3 } },
         { text: "<b>Argentina Economic Monitor</b> · Economic Order", xref: "paper", yref: "paper", x: 1, y: -0.13, xanchor: "right", yanchor: "top", showarrow: false, font: { size: 15, color: "#B87333" } },
       ],
       bargap: 0.25,
@@ -311,6 +328,7 @@
       layout.annotations.slice(-2).forEach((a) => { a.y = -0.36; });
     }
     if (extras.margin) Object.assign(layout.margin, extras.margin);
+    layout.margin.b += 20 * (srcLines.length - 1);
     if (extras.sourceY !== undefined) layout.annotations.slice(-2).forEach((a) => { a.y = extras.sourceY; });
     if (data[0] && data[0].orientation === "h") { layout.xaxis.ticksuffix = (extras.xsuffix !== undefined ? extras.xsuffix : specOf(pct).suffix); if (extras.xrange) layout.xaxis.range = extras.xrange; layout.yaxis.ticksuffix = ""; layout.margin.l = 260; }
     const url = await Plotly.toImage({ data, layout }, { format: "png", width: EXPORT.width, height: EXPORT.height });
