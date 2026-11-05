@@ -723,7 +723,12 @@ def collect() -> dict:
             raise RuntimeError("no placement files found")
         pl = []
         for y, u in files.items():
-            pl += parse_placements(_get(u), y)
+            raw = _get(u)
+            try:
+                pl += parse_placements(raw, y)
+            except Exception as exc:
+                head = raw[:120].decode("latin-1", "replace").replace("\n", " ")
+                raise RuntimeError(f"{u} ({len(raw)} bytes, starts {head!r}): {exc}") from exc
         try:
             from .. import store
             add_real_yields(pl, store.as_of("bcra:30"))
