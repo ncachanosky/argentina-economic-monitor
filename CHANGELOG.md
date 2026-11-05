@@ -11,6 +11,13 @@ Numbering: minor versions (1.1, 1.2) add cards or features; patch versions
 Changes since the last release, recorded as they are made. At the next release this
 section becomes its notes.
 
+### Added
+- Cards built from sources other than INDEC and datos.gob.ar files now also say where their
+  data were read from and when they were last checked: the BCRA's API and files, A3
+  Mercados, ArgentinaDatos, the REM, the Secretaría de Finanzas and the US Treasury. Cards with their
+  own layout (futures curve, balance sheets, debt schedule, placements, REM revisions,
+  tenure) show the line too (issue #3).
+
 ### Fixed
 - Real exchange rate (ITCRM and bilateral indices): the BCRA renamed its workbook
   (ITCRMSerie.xlsx to itcrm-serie.xlsx) and left the old file frozen on October 16, so

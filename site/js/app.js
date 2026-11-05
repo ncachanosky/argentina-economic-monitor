@@ -480,11 +480,22 @@
         f.name || (es ? "página de la fuente" : "source page")));
     });
     const checked = when(files.map((f) => f.checked).filter(Boolean).sort().pop());
+    // Files only: "Source file(s)". With an API or a page among them: "Read from".
+    const allFiles = files.every((f) => (f.kind || "file") === "file" && f.name && /\.(xlsx?|csv|7z|zip)$/i.test(f.name));
+    const label = allFiles
+      ? (es ? (files.length > 1 ? "Archivos de origen: " : "Archivo de origen: ") : (files.length > 1 ? "Source files: " : "Source file: "))
+      : (es ? "Leído de: " : "Read from: ");
     return h("span", { class: "src-files", title: es
-        ? "Archivo del organismo del que el Monitor leyó estos datos. Se revisa dos veces por día y se compara con la historia guardada antes de publicarse."
-        : "The publisher's own file the Monitor read these data from. Checked twice a day and compared with the stored history before publication." },
-      es ? (files.length > 1 ? "Archivos de origen: " : "Archivo de origen: ") : (files.length > 1 ? "Source files: " : "Source file: "),
+        ? "Archivo o servicio del que el Monitor leyó estos datos, y la última vez que se revisó. Se revisa dos veces por día y se compara con la historia guardada antes de publicarse."
+        : "The file or service the Monitor read these data from, and when it was last checked. Checked twice a day and compared with the stored history before publication." },
+      label,
       ...links, checked ? ` · ${es ? "revisado" : "checked"} ${checked} (${es ? "hora de Buenos Aires" : "Buenos Aires time"})` : null);
+  }
+
+  // The source line for cards with their own footer: a line break and the note, if any.
+  function srcTail(ind) {
+    const f = sourceFilesNote(ind);
+    return f ? [h("br"), f] : [];
   }
 
   function footer(ind, onPNG, onCSV) {
@@ -1472,7 +1483,7 @@
       guide, unitsNote, grid, notesEl,
       h("div", { class: "card-foot" },
         h("span", {}, "Source: ", T.source_url ? h("a", { href: T.source_url, target: "_blank", rel: "noopener" }, ind.source_label) : ind.source_label,
-          ` · Latest: ${fD(ind.last_obs)}`),
+          ` · Latest: ${fD(ind.last_obs)}`, ...srcTail(ind)),
         h("div", { class: "actions" },
           h("button", { class: "btn", type: "button", onclick: onCSV, title: "Download the balance sheet in this view as CSV" }, "CSV"))));
     card.draw = () => render().catch((e) => { console.error(e); grid.replaceChildren(h("div", { class: "error-box" }, "The balance sheet could not be loaded.")); });
@@ -1518,7 +1529,7 @@
     appendAll(card, h("div", { class: "controls" }, h("label", { class: "base-pick" }, h("span", {}, "Date:"), dSel), h("span", { class: "spacer" }), sSeg),
       hint, tableEl, ind.note ? h("p", { class: "chips-note" }, ind.note) : null,
       h("div", { class: "card-foot" },
-        h("span", {}, "Source: ", T.source_url ? h("a", { href: T.source_url, target: "_blank", rel: "noopener" }, ind.source_label) : ind.source_label, ` · Latest: ${fmtShortMonth(ind.last_obs)}`),
+        h("span", {}, "Source: ", T.source_url ? h("a", { href: T.source_url, target: "_blank", rel: "noopener" }, ind.source_label) : ind.source_label, ` · Latest: ${fmtShortMonth(ind.last_obs)}`, ...srcTail(ind)),
         h("div", { class: "actions" }, h("button", { class: "btn", type: "button", onclick: onCSV, title: "Download this table as CSV" }, "CSV"))));
     card.draw = async () => {
       if (!data) {
@@ -1618,7 +1629,7 @@
       ind.note ? h("p", { class: "chips-note" }, ind.note) : null,
       h("div", { class: "card-foot" },
         h("span", {}, "Source: ", T.source_url ? h("a", { href: T.source_url, target: "_blank", rel: "noopener" }, ind.source_label) : ind.source_label,
-          ` · Report as of: ${ind.last_obs ? fmtDay(ind.last_obs) : "–"}`),
+          ` · Report as of: ${ind.last_obs ? fmtDay(ind.last_obs) : "–"}`, ...srcTail(ind)),
         h("div", { class: "actions" },
           h("button", { class: "btn", type: "button", onclick: onPNG, title: "Download this chart as a 1200×800 PNG" }, "PNG"),
           h("button", { class: "btn", type: "button", onclick: onCSV, title: "Download this view as CSV" }, "CSV"))));
@@ -1805,7 +1816,7 @@
     appendAll(card, h("div", { class: "controls" }, modeSeg, parents.length ? foldAll : null, h("span", { class: "spacer" }), endWrap),
       hint, tableEl, ind.note ? h("p", { class: "chips-note" }, ind.note) : null, methodLine(ind),
       h("div", { class: "card-foot" },
-        h("span", {}, `Source: ${ind.source_label} · Latest: ${qLabel(last)}`),
+        h("span", {}, `Source: ${ind.source_label} · Latest: ${qLabel(last)}`, ...srcTail(ind)),
         h("div", { class: "actions" },
           h("button", { class: "btn", type: "button", onclick: onCSV, title: "Download this view as CSV" }, "CSV"))));
     card.draw = () => draw();
@@ -2134,7 +2145,7 @@
     appendAll(card, h("div", { class: "controls" }, calcSeg, modeSeg, h("span", { class: "spacer" }), refWrap, twoWrap, aWrap),
       outEl, chartEl, h("p", { class: "hint rer-legend" }, "Restore a reference: shaded is the middle half of the index since 2003 (25th to 75th percentile), dashed is the reference. Two dates: A and B are marked."),
       caveats, methodLine(ind),
-      h("div", { class: "card-foot" }, h("span", {}, `Source: ${ind.source_label} · Latest: ${fmtDay(ind.last_obs)}`)));
+      h("div", { class: "card-foot" }, h("span", {}, `Source: ${ind.source_label} · Latest: ${fmtDay(ind.last_obs)}`, ...srcTail(ind))));
     card.draw = () => draw();
     return card;
   }
@@ -2219,7 +2230,7 @@
       ind.note ? h("p", { class: "chips-note" }, ind.note) : null, methodLine(ind),
       h("div", { class: "card-foot" },
         h("span", {}, "Source: ", T.source_url ? h("a", { href: T.source_url, target: "_blank", rel: "noopener" }, ind.source_label) : ind.source_label,
-          ` · Latest: ${ind.last_obs ? fmtDay(ind.last_obs) : "–"}`),
+          ` · Latest: ${ind.last_obs ? fmtDay(ind.last_obs) : "–"}`, ...srcTail(ind)),
         h("div", { class: "actions" },
           h("button", { class: "btn", type: "button", onclick: onPNG, title: "Download this chart as a 1200×800 PNG" }, "PNG"),
           h("button", { class: "btn", type: "button", onclick: onCSV, title: "Download the curves as CSV" }, "CSV"))));
@@ -2341,7 +2352,7 @@
     appendAll(card, h("div", { class: "controls" }, h("span", { class: "spacer" }), rSeg), hint, methodLine(ind), keyEl, chartEl, sumEl,
       ind.note ? h("p", { class: "chips-note" }, ind.note) : null,
       h("div", { class: "card-foot" },
-        h("span", {}, `Source: ${ind.source_label}`, data && data.latest ? ` · Latest change: ${fmtDay(data.latest)}` : ""),
+        h("span", {}, `Source: ${ind.source_label}`, data && data.latest ? ` · Latest change: ${fmtDay(data.latest)}` : "", ...srcTail(ind)),
         h("div", { class: "actions" },
           h("button", { class: "btn", type: "button", onclick: onPNG, title: "Download this chart as a 1200×800 PNG" }, "PNG"),
           h("button", { class: "btn", type: "button", onclick: onCSV, title: "Download the full list as CSV" }, "CSV"))));
@@ -2417,7 +2428,7 @@
     };
     appendAll(card, h("div", { class: "controls" }, vSeg, h("span", { class: "spacer" }), rSeg), hint, methodLine(ind), chartEl,
       ind.note ? h("p", { class: "chips-note" }, ind.note) : null,
-      h("div", { class: "card-foot" }, h("span", {}, `Source: ${ind.source_label} · Latest survey: ${ind.last_obs ? fmtMonth(ind.last_obs) : "–"}`),
+      h("div", { class: "card-foot" }, h("span", {}, `Source: ${ind.source_label} · Latest survey: ${ind.last_obs ? fmtMonth(ind.last_obs) : "–"}`, ...srcTail(ind)),
         h("div", { class: "actions" },
           h("button", { class: "btn", type: "button", onclick: onPNG, title: "Download this chart as a 1200×800 PNG" }, "PNG"),
           h("button", { class: "btn", type: "button", onclick: onCSV, title: "Download every survey's forecasts for this variable as CSV" }, "CSV"))));
@@ -2480,7 +2491,7 @@
       ind.note ? h("p", { class: "chips-note" }, ind.note) : null,
       h("div", { class: "card-foot" },
         h("span", {}, "Source: ", T.source_url ? h("a", { href: T.source_url, target: "_blank", rel: "noopener" }, ind.source_label) : ind.source_label,
-          ` · Latest: ${ind.last_obs ? fmtDay(ind.last_obs) : "–"}`),
+          ` · Latest: ${ind.last_obs ? fmtDay(ind.last_obs) : "–"}`, ...srcTail(ind)),
         h("div", { class: "actions" }, h("button", { class: "btn", type: "button", onclick: onCSV, title: "Download the year's placements as CSV" }, "CSV (year)"))));
     card.draw = async () => {
       if (!index) {

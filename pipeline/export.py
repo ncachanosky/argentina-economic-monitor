@@ -25,16 +25,20 @@ from .update import STATUS_PATH
 DATOS_GOB_SERIES_URL = "https://datos.gob.ar/series/api/series/?ids={id}"
 
 
-def source_files_for(ind) -> list[dict] | None:
-    """The publisher files a card's series were last read from (pipeline/sources/primary.py),
-    with the time each was checked; only files whose latest read succeeded."""
+def source_files_for(ind, meta: dict | None = None, status: dict | None = None) -> list[dict] | None:
+    """Where a card's series were last read from, with the time each was checked: the publisher
+    files of pipeline/sources/primary.py, then the files and APIs of the other adapters
+    (pipeline/source_links.py). Only sources whose latest read succeeded are listed."""
     try:
         from .sources import primary
         files = json.loads(primary.STATUS_FILE.read_text(encoding="utf-8"))
     except Exception:
-        return None
+        files = {}
     ids = set(ind.input_ids())
+    if ind.source == "table" and ind.table and ind.table.get("status_id"):
+        ids.add(ind.table["status_id"])
     out = []
+    out += _adapter_links(ids, ind, meta or {}, status or {})
     for p in primary.all_providers():
         e = files.get(p["name"]) or {}
         if not (ids & set(primary._ids(p))) or e.get("status") != "ok" or not e.get("url"):
@@ -42,8 +46,25 @@ def source_files_for(ind) -> list[dict] | None:
         url = e["url"]
         name = url.rstrip("/").rsplit("/", 1)[-1] if url.lower().split("?")[0].endswith((".xls", ".xlsx", ".csv")) else None
         out.append({"name": name, "url": url, "page": e.get("page"), "checked": e.get("checked"),
-                    "publisher": p["name"].split(" (")[0]})
+                    "publisher": p["name"].split(" (")[0], "kind": "file"})
     return out or None
+
+
+def _adapter_links(ids: set, ind, meta: dict, status: dict) -> list[dict]:
+    """One entry per non-primary source behind the card, checked at the latest successful read."""
+    from .source_links import link_for
+    seen: dict[str, dict] = {}
+    for sid in sorted(ids):
+        adapter = (meta.get(sid) or {}).get("source")
+        if not adapter and ind.source == "table" and sid == (ind.table or {}).get("status_id"):
+            adapter = ind.table.get("source")
+        link = link_for(adapter, sid) if adapter else None
+        st = status.get(sid) or {}
+        if not link or st.get("status") != "ok":
+            continue
+        e = seen.setdefault(link["url"], {**link, "checked": None})
+        e["checked"] = max(filter(None, [e["checked"], st.get("last_checked")]), default=None)
+    return list(seen.values())
 
 
 def _clean(values) -> list:
@@ -334,7 +355,7 @@ def trend_note() -> str | None:
             f"{s['n_reversed']} single signals later turned back. See \"How Fast the Trend-Cycle Calls a Turn\" below.")
 
 
-def export_table(ind, out: Path, status: dict) -> dict | None:
+def export_table(ind, out: Path, status: dict, reg_meta: dict | None = None) -> dict | None:
     """Copy a full table (data/tables/<source>/*.json) next to the site data and write the card's payload."""
     import shutil
     from .update import TABLES_DIR
@@ -364,6 +385,7 @@ def export_table(ind, out: Path, status: dict) -> dict | None:
         "years": index.get("years"), "groups": index.get("groups"), "group_labels": index.get("group_labels"),
         "status": st.get("status", "ok"), "last_obs": last,
         "last_checked": st.get("last_checked"), "last_changed": st.get("last_changed"),
+        "source_files": source_files_for(ind, reg_meta, status),
     }
     (out / f"{ind.id}.json").write_text(json.dumps(payload, separators=(",", ":")), encoding="utf-8")
     return {"id": ind.id, "topic": ind.topic, "kind": ind.kind, "title": ind.title, "short_title": ind.short_title,
@@ -418,6 +440,7 @@ def updates(reg, days_back: int = 21, days_ahead: int = 21) -> dict:
 def export(out: Path) -> None:
     reg = registry.load()
     status = json.loads(STATUS_PATH.read_text(encoding="utf-8")) if STATUS_PATH.exists() else {}
+    meta = reg.series_meta()
     out.mkdir(parents=True, exist_ok=True)
     (out / "vintages").mkdir(exist_ok=True)
 
@@ -426,7 +449,7 @@ def export(out: Path) -> None:
         if ind.hidden:
             continue
         if ind.kind in registry.TABLE_KINDS:
-            entry = export_turns(ind, out) if ind.kind == "turns" else export_ngdp(ind, out) if ind.kind == "ngdp" else export_table(ind, out, status)
+            entry = export_turns(ind, out) if ind.kind == "turns" else export_ngdp(ind, out) if ind.kind == "ngdp" else export_table(ind, out, status, meta)
             if entry:
                 manifest_inds.append(entry)
             continue
@@ -496,7 +519,7 @@ def export(out: Path) -> None:
             "fan": ind.fan,
             "secondary_bar": ind.secondary_bar,
             "source_label": ind.source_label,
-            "source_files": source_files_for(ind),
+            "source_files": source_files_for(ind, meta, status),
             "default": ind.default,
             "headline": ind.headline,
             "overlay": ind.overlay,
