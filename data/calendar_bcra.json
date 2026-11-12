@@ -1,0 +1,178 @@
+{
+ "source": "https://www.bcra.gob.ar/calendario-de-informes/",
+ "fetched": "2026-11-12T12:00:00+00:00",
+ "releases": {
+  "rem_bcra": {
+   "name": "Relevamiento de Expectativas de Mercado (REM)",
+   "publisher": "BCRA",
+   "calendar_url": "https://www.bcra.gob.ar/calendario-de-informes/",
+   "cards": [
+    "inflation_expectations",
+    "inflation_expectations_range",
+    "rem_revisions"
+   ],
+   "dates": [
+    {
+     "date": "2026-01-07",
+     "period": "2025-12"
+    },
+    {
+     "date": "2026-02-05",
+     "period": "2026-01"
+    },
+    {
+     "date": "2026-03-05",
+     "period": "2026-02"
+    },
+    {
+     "date": "2026-04-08",
+     "period": "2026-03"
+    },
+    {
+     "date": "2026-05-07",
+     "period": "2026-04"
+    },
+    {
+     "date": "2026-06-04",
+     "period": "2026-05"
+    },
+    {
+     "date": "2026-07-06",
+     "period": "2026-06"
+    },
+    {
+     "date": "2026-08-06",
+     "period": "2026-07"
+    },
+    {
+     "date": "2026-09-04",
+     "period": "2026-08"
+    },
+    {
+     "date": "2026-10-06",
+     "period": "2026-09"
+    },
+    {
+     "date": "2026-11-05",
+     "period": "2026-10"
+    }
+   ]
+  },
+  "bcra_bancos": {
+   "name": "Informe sobre Bancos",
+   "publisher": "BCRA",
+   "calendar_url": "https://www.bcra.gob.ar/calendario-de-informes/",
+   "cards": [
+    "bank_npl",
+    "bank_capital",
+    "bank_roe",
+    "bank_credit_depth"
+   ],
+   "dates": [
+    {
+     "date": "2026-01-23",
+     "period": "2025-11"
+    },
+    {
+     "date": "2026-02-20",
+     "period": "2025-12"
+    },
+    {
+     "date": "2026-03-20",
+     "period": "2026-01"
+    },
+    {
+     "date": "2026-04-24",
+     "period": "2026-02"
+    },
+    {
+     "date": "2026-05-22",
+     "period": "2026-03"
+    },
+    {
+     "date": "2026-06-19",
+     "period": "2026-04"
+    },
+    {
+     "date": "2026-07-24",
+     "period": "2026-05"
+    },
+    {
+     "date": "2026-08-21",
+     "period": "2026-06"
+    },
+    {
+     "date": "2026-09-18",
+     "period": "2026-07"
+    },
+    {
+     "date": "2026-10-16",
+     "period": "2026-08"
+    },
+    {
+     "date": "2026-11-20",
+     "period": "2026-09"
+    },
+    {
+     "date": "2026-12-18",
+     "period": "2026-10"
+    }
+   ]
+  },
+  "bcra_cambiario": {
+   "name": "Informe de Evolución del Mercado de Cambios y Balance Cambiario",
+   "publisher": "BCRA",
+   "calendar_url": "https://www.bcra.gob.ar/calendario-de-informes/",
+   "cards": [
+    "fx_balance_cambiario",
+    "bop_accrual_cash"
+   ],
+   "dates": [
+    {
+     "date": "2026-01-30",
+     "period": "2025-12"
+    },
+    {
+     "date": "2026-02-27",
+     "period": "2026-01"
+    },
+    {
+     "date": "2026-03-27",
+     "period": "2026-02"
+    },
+    {
+     "date": "2026-04-24",
+     "period": "2026-03"
+    },
+    {
+     "date": "2026-05-29",
+     "period": "2026-04"
+    },
+    {
+     "date": "2026-06-26",
+     "period": "2026-05"
+    },
+    {
+     "date": "2026-07-31",
+     "period": "2026-06"
+    },
+    {
+     "date": "2026-09-25",
+     "period": "2026-08"
+    },
+    {
+     "date": "2026-10-30",
+     "period": "2026-09"
+    },
+    {
+     "date": "2026-11-27",
+     "period": "2026-10"
+    },
+    {
+     "date": "2026-12-31",
+     "period": "2026-11"
+    }
+   ]
+  }
+ }
+}

@@ -45,5 +45,15 @@
  "score, 0 to 10 (Fraser)": "puntaje, 0 a 10 (Fraser)",
  "Liberal democracy": "Democracia liberal",
  "Goods and services": "Bienes y servicios",
- "index, 0 to 1 (V-Dem)": "índice, 0 a 1 (V-Dem)"
+ "index, 0 to 1 (V-Dem)": "índice, 0 a 1 (V-Dem)",
+ "Today's releases": "Publicaciones de hoy",
+ "On the Monitor": "Ya en el Monitor",
+ "Due today": "Se publica hoy",
+ "The new figures are already on the Monitor.": "Los nuevos datos ya están en el Monitor.",
+ "Scheduled for today. The Monitor checks every source twice a day and adds the new figures once they are out.": "Programado para hoy. El Monitor revisa todas las fuentes dos veces por día y suma los nuevos datos cuando se publican.",
+ "Coming up": "Próximas publicaciones",
+ "No scheduled releases in the next three weeks.": "No hay publicaciones programadas en las próximas tres semanas.",
+ "Market expectations survey (REM)": "Relevamiento de Expectativas de Mercado (REM)",
+ "Banking report": "Informe sobre Bancos",
+ "FX market and balance cambiario": "Mercado de cambios y balance cambiario"
 }

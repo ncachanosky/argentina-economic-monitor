@@ -130,6 +130,13 @@ def run(dry_run: bool = False, strict: bool = False) -> int:
             lines.append(f"- ⚠️ `{ind.id}`: {msg}")
             print(f"::warning title={ind.id}::{msg}")
 
+    # The BCRA's calendar of reports (REM, banks, FX market), for the home page and the calendar page.
+    if not dry_run:
+        from .sources import bcra_calendar
+        for msg in bcra_calendar.refresh():
+            lines.append(f"- ⚠️ {msg}")
+            print(f"::warning title=bcra_calendar::{msg}")
+
     # Forget series that are no longer in the registry.
     registered = {sid for ids in reg.series_by_source().values() for sid in ids}
     for sid in [k for k in status if k not in registered]:

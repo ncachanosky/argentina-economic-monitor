@@ -409,6 +409,19 @@ body[data-page="embed"] .card { border: 0; box-shadow: none; margin: 0; }
 .tl-sub { color: var(--ink-3); font-size: 12.5px; }
 .tl-none { font-family: var(--font-ui); font-size: 13px; color: var(--ink-3); margin: 0; }
 @media (max-width: 760px) { .timeline { grid-template-columns: 1fr; } }
+.tl-pub, .today-pub, .cal-pub { font-family: var(--font-ui); font-size: 10.5px; font-weight: 600; letter-spacing: .06em; color: var(--ink-3);
+  border: 1px solid var(--rule); border-radius: 3px; padding: 0 4px; line-height: 1.5; white-space: nowrap; }
+.cal-pub { margin-right: 4px; vertical-align: 1px; }
+/* Today's releases: a thin band above the dashboard, only on release days. */
+.today-strip { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 18px; margin: 12px 0 4px; padding: 10px 16px;
+  background: var(--surface); border: 1px solid var(--rule); border-left: 3px solid var(--accent); border-radius: var(--radius); font-family: var(--font-ui); }
+.today-head { display: flex; flex-direction: column; gap: 0; min-width: 0; }
+.today-kicker { font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--accent-ink); }
+.today-date { font-size: 12.5px; color: var(--ink-3); }
+.today-list { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 4px 22px; font-size: 14.5px; min-width: 0; flex: 1; }
+.today-list li { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 8px; }
+.today-list a { color: var(--ink); font-weight: 600; }
+.fresh-tag.due { background: var(--surface-2); color: var(--ink-2, var(--ink)); border: 1px solid var(--rule); }
 
 /* Narrow screens: segmented controls wrap; wide tables in text scroll inside their box */
 .seg { flex-wrap: wrap; max-width: 100%; }

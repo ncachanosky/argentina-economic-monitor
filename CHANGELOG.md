@@ -12,6 +12,15 @@ Changes since the last release, recorded as they are made. At the next release t
 section becomes its notes.
 
 ### Added
+- Today's releases: on days with a scheduled release, a strip above the home dashboard names
+  each one, its publisher and the month it covers, links to its chart and says whether the new
+  figures are already on the Monitor ("Due today" / "On the Monitor"). Buenos Aires date; no
+  time of day.
+- BCRA release dates: the update now reads the BCRA's calendar of reports
+  (bcra.gob.ar/calendario-de-informes) for the REM survey, the banking report and the FX
+  market report, stored in data/calendar_bcra.json. They appear on the home page's "Coming up"
+  list and on the release calendar page, with a publisher tag (INDEC or BCRA). They are not tied
+  to cards' freshness tags, so they never mark a chart "Late".
 - Last-value labels: line charts write each line's latest value just right of its last point,
   in the line's color, pushed apart when close (up to eight lines; none on bars or bands).
 - Summary boxes on every dashboard page: Money and Central Bank, Banks, Exchange Rate,

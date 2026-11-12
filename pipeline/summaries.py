@@ -159,14 +159,10 @@ def calendar_html(reg, status: dict, lang: str, content: dict, root: str, today:
     """Upcoming official releases (next 75 days) and the last 30 days with their status in the Monitor."""
     T = (lambda s: content.get(s, s)) if lang == "es" else (lambda s: s)
     today = today or (datetime.now(timezone.utc) - timedelta(hours=3)).date()     # Buenos Aires
-    by_release: dict[str, list] = {}
     topic_slug = {t["id"]: t["slug"] for t in reg.topics}
-    for ind in reg.indicators:
-        if ind.release and not ind.hidden and not ind.unlisted:
-            by_release.setdefault(ind.release, []).append(ind)
     rows_up, rows_past = [], []
     for key, cal in reg.releases.items():
-        inds = by_release.get(key, [])
+        inds = reg.release_cards(key)
         if not inds:
             continue
         last = max((status.get(i, {}).get("last_obs") or "" for ind in inds for i in ind.input_ids()), default="")
@@ -176,19 +172,20 @@ def calendar_html(reg, status: dict, lang: str, content: dict, root: str, today:
             dd = date.fromisoformat(d["date"])
             per = pd.Timestamp(d["period"] + "-01")
             per_s = period(per, cal.get("frequency", "M"), lang)
-            row = (dd, html.escape(cal.get("name") or key), per_s, links, last[:7] >= d["period"])
+            name = f'<span class="cal-pub">{html.escape(cal.get("publisher", "INDEC"))}</span> {html.escape(cal.get("name") or key)}'
+            row = (dd, name, per_s, links, last[:7] >= d["period"])
             if today <= dd <= today + timedelta(days=75):
                 rows_up.append(row)
             elif today - timedelta(days=30) <= dd < today:
                 rows_past.append(row)
     L = {"en": {"up": "Coming up", "past": "Last 30 days", "date": "Date", "rel": "Release", "per": "Data for",
                 "on": "In the Monitor", "in": "In the Monitor", "yes": "Published", "no": "Not yet in the Monitor",
-                "today": "today", "note": "Official release dates from INDEC's published calendar. The Monitor checks every source twice a day; "
+                "today": "today", "note": "Official release dates from INDEC's published calendar and the BCRA's calendar of reports. The Monitor checks every source twice a day; "
                 "a release usually appears within hours. If a release is marked “not yet in the Monitor” a day after its date, "
                 "the source file has not been updated or failed our checks."},
          "es": {"up": "Próximas publicaciones", "past": "Últimos 30 días", "date": "Fecha", "rel": "Publicación", "per": "Datos de",
                 "on": "En el Monitor", "in": "En el Monitor", "yes": "Publicado", "no": "Todavía no está en el Monitor",
-                "today": "hoy", "note": "Fechas oficiales del calendario de difusión del INDEC. El Monitor revisa todas las fuentes dos veces por día; "
+                "today": "hoy", "note": "Fechas oficiales del calendario de difusión del INDEC y del calendario de informes del BCRA. El Monitor revisa todas las fuentes dos veces por día; "
                 "una publicación suele aparecer en pocas horas. Si un dato figura como «todavía no está en el Monitor» un día después de su fecha, "
                 "el archivo de la fuente no se actualizó o no pasó nuestros controles."}}[lang]
 

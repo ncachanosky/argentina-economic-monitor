@@ -3287,21 +3287,50 @@
   }
 
   // ---------- home: what's new and what's coming (data/updates.json) ----------
+  // Today's date in Buenos Aires (YYYY-MM-DD): official releases follow the Argentine calendar.
+  const baToday = () => new Intl.DateTimeFormat("en-CA", { timeZone: "America/Argentina/Buenos_Aires", year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date());
+  const relPeriod = (iso, f) => (f === "Q" ? fmtPeriod(iso.slice(0, 7) + "-01", "Q") : f === "S" ? fmtPeriod(iso.slice(0, 7) + "-01", "S") : fmtMonth(iso.slice(0, 7) + "-01"));
+  const relName = (r, pageHref) => (r.indicators.length
+    ? h("a", { href: pageHref(r.indicators[0].topic, `ind-${r.indicators[0].id}`), title: r.name }, shortRelease(r.name))
+    : h("span", { title: r.name }, shortRelease(r.name)));
+
+  // "Today's releases": shown above the dashboard only on days with a scheduled release.
+  function todayStrip(U, pageHref) {
+    const today = baToday();
+    const due = U.ahead.filter((r) => r.date === today);
+    if (!due.length) return null;
+    const seenToday = new Set(U.recent.filter((r) => r.seen === today).map((r) => r.id));
+    const label = new Date(today + "T12:00:00Z").toLocaleDateString(LOCALE, { weekday: "long", month: "long", day: "numeric", timeZone: "UTC" });
+    return h("section", { class: "today-strip", "aria-label": "Today's releases" },
+      h("div", { class: "today-head" }, h("span", { class: "today-kicker" }, "Today's releases"), h("span", { class: "today-date" }, label)),
+      h("ul", { class: "today-list" }, due.map((r) => {
+        const out = r.in_monitor || r.indicators.some((i) => seenToday.has(i.id));
+        return h("li", {},
+          h("span", { class: "today-pub" }, r.publisher || "INDEC"),
+          relName(r, pageHref),
+          h("span", { class: "tl-sub" }, ` · ${relPeriod(r.period, r.frequency)}`),
+          out ? h("span", { class: "fresh-tag ok", title: "The new figures are already on the Monitor." }, "On the Monitor")
+            : h("span", { class: "fresh-tag due", title: "Scheduled for today. The Monitor checks every source twice a day and adds the new figures once they are out." }, "Due today"));
+      })));
+  }
+
   function timelineView(U, pageHref) {
     const day = (iso) => new Date(iso + "T12:00:00Z").toLocaleDateString(LOCALE, { weekday: "short", month: "short", day: "numeric", timeZone: "UTC" });
-    const per = (iso, f) => (f === "Q" ? fmtPeriod(iso.slice(0, 7) + "-01", "Q") : f === "S" ? fmtPeriod(iso.slice(0, 7) + "-01", "S") : fmtMonth(iso.slice(0, 7) + "-01"));
+    const today = baToday();
     const recent = U.recent.length ? h("ul", { class: "tl-list" }, U.recent.map((r) => h("li", {},
       h("span", { class: "tl-date" }, day(r.seen)),
-      h("a", { href: pageHref(r.topic, `ind-${r.id}`) }, r.title), h("span", { class: "tl-sub" }, ` · ${per(r.period, r.frequency)}`))))
+      h("a", { href: pageHref(r.topic, `ind-${r.id}`) }, r.title), h("span", { class: "tl-sub" }, ` · ${relPeriod(r.period, r.frequency)}`))))
       : h("p", { class: "tl-none" }, "No new monthly or quarterly releases in the last three weeks.");
-    const ahead = U.ahead.length ? h("ul", { class: "tl-list" }, U.ahead.map((r) => h("li", {},
+    const next = U.ahead.filter((r) => r.date > today);
+    const ahead = next.length ? h("ul", { class: "tl-list" }, next.map((r) => h("li", {},
       h("span", { class: "tl-date" }, day(r.date)),
-      r.indicators.length ? h("a", { href: pageHref(r.indicators[0].topic, `ind-${r.indicators[0].id}`), title: r.name }, shortRelease(r.name)) : h("span", { title: r.name }, shortRelease(r.name)),
-      h("span", { class: "tl-sub" }, ` · ${per(r.period, r.frequency)}`))))
-      : h("p", { class: "tl-none" }, "No scheduled INDEC releases in the next three weeks.");
+      h("span", { class: "tl-pub" }, r.publisher || "INDEC"),
+      relName(r, pageHref),
+      h("span", { class: "tl-sub" }, ` · ${relPeriod(r.period, r.frequency)}`))))
+      : h("p", { class: "tl-none" }, "No scheduled releases in the next three weeks.");
     return h("section", { class: "timeline", "aria-label": "Recent and upcoming releases" },
       h("div", {}, h("h3", {}, "New data"), recent),
-      h("div", {}, h("h3", {}, "Coming up (INDEC calendar)"), ahead,
+      h("div", {}, h("h3", {}, "Coming up"), ahead,
         h("p", { class: "tl-more" }, h("a", { href: `${ROOT}calendar/` }, "Full release calendar →"))));
   }
   // "Índice de precios al consumidor (IPC)" -> "CPI"; other names keep their acronym or a short form.
@@ -3317,6 +3346,9 @@
     if (/Mercado de trabajo/i.test(name)) return "Labor market (EPH)";
     if (/generaci/i.test(name)) return "Labor share of income";
     if (/distribuci/i.test(name)) return "Income distribution (EPH)";
+    if (/Expectativas de Mercado/i.test(name)) return "Market expectations survey (REM)";
+    if (/Informe sobre Bancos/i.test(name)) return "Banking report";
+    if (/Mercado de Cambios/i.test(name)) return "FX market and balance cambiario";
     return name;
   }
 
@@ -3513,7 +3545,11 @@
       let upd = null;
       try { upd = localize(await getJSON(`${DATA}updates.json`)); } catch (e) { console.error(e); }
       if (dash && dash.rows.length) { $("#tiles").className = "dash-host"; $("#tiles").replaceChildren(dashboardView(dash, pageHref)); }
-      if (upd) $("#tiles").after(timelineView(upd, pageHref));
+      if (upd) {
+        $("#tiles").after(timelineView(upd, pageHref));
+        const strip = todayStrip(upd, pageHref);
+        if (strip) $("#tiles").before(strip);
+      }
       else {
         const heads = await Promise.all(manifest.indicators.filter((m) => m.headline)
           .map((m) => getJSON(`${DATA}${m.id}.json`).catch((e) => { console.error(e); return null; })));

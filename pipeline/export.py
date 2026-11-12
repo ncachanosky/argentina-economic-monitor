@@ -428,7 +428,7 @@ def first_seen(series_id: str) -> tuple[str, str] | None:
 
 
 def updates(reg, days_back: int = 21, days_ahead: int = 21) -> dict:
-    """Recent releases (new periods seen in the last weeks) and scheduled INDEC releases ahead."""
+    """Recent releases (new periods seen in the last weeks) and scheduled releases ahead (INDEC and the BCRA's reports)."""
     today = pd.Timestamp(datetime.now(timezone.utc).date())
     recent = []
     meta = reg.series_meta()
@@ -445,17 +445,19 @@ def updates(reg, days_back: int = 21, days_ahead: int = 21) -> dict:
             recent.append({"id": ind.id, "title": ind.short_title, "topic": ind.topic, "frequency": ind.frequency,
                            "period": period, "seen": vintage})
     recent.sort(key=lambda r: (r["seen"], r["title"]), reverse=True)
-    by_release = {}
-    for ind in reg.indicators:
-        if ind.release and not ind.hidden and not ind.unlisted:
-            by_release.setdefault(ind.release, []).append({"id": ind.id, "title": ind.short_title, "topic": ind.topic})
     ahead = []
+    status = json.loads(STATUS_PATH.read_text(encoding="utf-8")) if STATUS_PATH.exists() else {}
     for key, cal in reg.releases.items():
+        inds = reg.release_cards(key)
+        cards = [{"id": i.id, "title": i.short_title, "topic": i.topic} for i in inds][:3]
+        last = max((status.get(i, {}).get("last_obs") or "" for ind in inds for i in ind.input_ids()), default="")
         for d in cal.get("dates", []):
             day = pd.Timestamp(d["date"])
-            if today <= day <= today + pd.Timedelta(days=days_ahead):
+            # From yesterday (UTC): the home page picks "today" in Buenos Aires time.
+            if today - pd.Timedelta(days=1) <= day <= today + pd.Timedelta(days=days_ahead):
                 ahead.append({"date": d["date"], "period": d["period"], "name": cal.get("name"), "frequency": cal.get("frequency", "M"),
-                              "indicators": by_release.get(key, [])[:3]})
+                              "publisher": cal.get("publisher", "INDEC"), "key": key, "indicators": cards,
+                              "in_monitor": bool(last) and last[:7] >= d["period"]})
     ahead.sort(key=lambda r: (r["date"], r["name"]))
     return {"today": today.strftime("%Y-%m-%d"), "recent": recent[:12], "ahead": ahead}
 

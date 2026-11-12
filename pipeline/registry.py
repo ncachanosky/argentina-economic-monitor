@@ -187,6 +187,14 @@ class Registry:
                         "calendar_url": cal.get("calendar_url")}
         return None
 
+    def release_cards(self, key: str) -> list["Indicator"]:
+        """Cards a release feeds: those pointing to it with `release:`, or the calendar's own `cards` list."""
+        listed = [i for i in self.indicators if i.release == key and not i.hidden and not i.unlisted]
+        if listed:
+            return listed
+        by_id = {i.id: i for i in self.indicators if not i.hidden and not i.unlisted}
+        return [by_id[c] for c in self.releases.get(key, {}).get("cards", []) if c in by_id]
+
     def series_by_source(self) -> dict[tuple[str, str], set[str]]:
         """Unique source series ids, grouped by (source adapter, frequency).
 
@@ -212,6 +220,12 @@ def load(path: Path = REGISTRY_PATH, releases_path: Path = RELEASES_PATH) -> Reg
         for key, cal in releases.items():
             for d in cal.get("dates", []):
                 d["date"], d["period"] = str(d["date"]), str(d["period"])
+    # BCRA reports, read from the BCRA's calendar page by the update (data/calendar_bcra.json).
+    from .sources import bcra_calendar
+    for key, cal in bcra_calendar.load().items():
+        releases.setdefault(key, cal)
+    for key, cal in releases.items():
+        cal.setdefault("publisher", "INDEC")
     topics = raw.get("topics", [])
     topic_ids = {t["id"] for t in topics}
     slugs = [t.get("slug") for t in topics]
