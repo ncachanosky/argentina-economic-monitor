@@ -20,7 +20,7 @@
  "Monetary Aggregates": "Agregados monetarios",
  "Aggregates": "Agregados",
  "Currency held by the public and the broader aggregates, monthly averages of daily data.": "Circulante en poder del público y agregados más amplios, promedios mensuales de datos diarios.",
- "M1 = currency held by the public + current accounts; M2 = M1 + savings accounts; M3 = currency + all peso deposits (public and private non-financial sectors). Private M2 uses private deposits only. Peso deposits only.": "M1 = circulante en poder del público + cuentas corrientes; M2 = M1 + cajas de ahorro; M3 = circulante + total de depósitos en pesos (sectores público y privado no financiero). M2 privado usa solo depósitos privados. Solo depósitos en pesos.",
+ "M1 = currency held by the public + current accounts; M2 = M1 + savings accounts; M3 = currency + all peso deposits (public and private non-financial sectors). Private M2 uses private deposits only. Peso deposits only. Dashed: the CPI's change over the same period (long-run CPI); an aggregate to its right grew faster than prices.": "M1 = circulante en poder del público + cuentas corrientes; M2 = M1 + cajas de ahorro; M3 = circulante + total de depósitos en pesos (sectores público y privado no financiero). M2 privado usa solo depósitos privados. Solo depósitos en pesos. Línea punteada: la variación del IPC en el mismo período (IPC de largo plazo); un agregado a su derecha creció más que los precios.",
  "Currency held by the public": "Circulante en poder del público",
  "Private M2": "M2 privado",
  "Private Peso Deposits": "Depósitos privados en pesos",

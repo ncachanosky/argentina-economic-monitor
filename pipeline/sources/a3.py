@@ -183,11 +183,16 @@ def curve_table(df: pd.DataFrame, spot: pd.Series | None = None, lo: pd.Series |
         prior = [d for d in dates if d <= target]
         return prior[-1] if prior else None
 
+    def num(x):
+        # A3 sometimes leaves a field out (impliedRate since November 2026): null, not NaN,
+        # which is not valid JSON and kept the card from loading.
+        return None if x is None or (isinstance(x, float) and x != x) else float(x)
+
     def curve(d):
         g = df[df.date == d].sort_values("days")
         return {"date": pd.Timestamp(d).strftime("%Y-%m-%d"),
-                "contracts": [{"symbol": r.symbol, "expiry": r.expiry.strftime("%Y-%m-%d"), "settlement": r.settlement,
-                               "implied_rate": r.implied_rate, "oi": r.oi, "volume": r.volume} for r in g.itertuples()]}
+                "contracts": [{"symbol": r.symbol, "expiry": r.expiry.strftime("%Y-%m-%d"), "settlement": num(r.settlement),
+                               "implied_rate": num(r.implied_rate), "oi": num(r.oi), "volume": num(r.volume)} for r in g.itertuples()]}
     out = {"latest": pd.Timestamp(latest).strftime("%Y-%m-%d"),
            "curves": [c for c in (curve(latest), curve(nearest(30)) if nearest(30) else None,
                                   curve(nearest(91)) if nearest(91) else None) if c]}
@@ -225,7 +230,7 @@ def write_tables(directory) -> list[str]:
     d = Path(directory)
     d.mkdir(parents=True, exist_ok=True)
     p = d / "curve.json"
-    text = json.dumps(t, separators=(",", ":"))
+    text = json.dumps(t, separators=(",", ":"), allow_nan=False)
     if not p.exists() or p.read_text(encoding="utf-8") != text:
         p.write_text(text, encoding="utf-8")
         return ["curve.json"]

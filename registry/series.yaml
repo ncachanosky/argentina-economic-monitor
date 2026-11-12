@@ -1688,7 +1688,7 @@ indicators:
     frequency: Q
     units: "% vs. the same quarter a year earlier"
     transforms: [level]
-    ranges: [10Y, Max]
+    ranges: [2Y, 5Y, 10Y, Max]
     note: >-
       The GDP deflator is nominal over real GDP; it includes investment
       goods and exports and leaves out imports, so it can move apart from
@@ -1710,6 +1710,7 @@ indicators:
     kind: variants
     title: Base Money
     short_title: Base money
+    headline: {variant: avg, transform: yoy, label: "Base money", sub: "y/y, monthly average (nominal)", good: none}
     description: >-
       Currency in circulation plus banks' current accounts at the BCRA.
       Monthly average of daily data, or the stock on the last day of the
@@ -1801,11 +1802,13 @@ indicators:
     bar_transforms: [yoy, mom, ytd]
     transforms: [yoy, mom, level]
     deflate_with: {indicator: cpi_long, variant: corrected, label: CPI}
+    inflation_ref: true
     note: >-
       M1 = currency held by the public + current accounts; M2 = M1 + savings
       accounts; M3 = currency + all peso deposits (public and private
       non-financial sectors). Private M2 uses private deposits only. Peso
-      deposits only.
+      deposits only. Dashed: the CPI's change over the same period (long-run
+      CPI); an aggregate to its right grew faster than prices.
     default: {variant: [currency, m2_private, m3], transform: yoy, start: "2016-01"}
     derive:
       method: monthly
@@ -1930,6 +1933,7 @@ indicators:
     validate_as: flow
     title: Benchmark Rate (TAMAR) and Expected Path
     short_title: TAMAR
+    headline: {variant: tamar, transform: level, label: "TAMAR rate", sub: "% nominal annual", good: none}
     description: >-
       TAMAR, the rate private banks pay on large time deposits, the
       benchmark since the policy rate was discontinued, daily, with the path
@@ -2020,6 +2024,7 @@ indicators:
     log_level: true
     title: Official Exchange Rate
     short_title: Exchange rate
+    headline: {variant: wholesale, transform: level, label: "Official rate", sub: "pesos per US$, wholesale (A 3500)", digits: 2, good: none}
     description: >-
       Pesos per US dollar: the wholesale reference rate (Communication A 3500),
       the average retail selling rate and, since 14 April 2025, the floor and
@@ -2077,6 +2082,8 @@ indicators:
     plain_level: true
     title: "International Reserves: Gross and Net"
     short_title: Reserves
+    headline: {variant: standard, transform: level, label: "Net reserves", sub: "US$ million, standard definition", digits: 0, good: up}
+    tiles: [{variant: gross, transform: level, label: "Gross reserves", sub: "US$ million", digits: 0, good: none}]
     description: >-
       Gross reserves (daily) and three estimates of net reserves (weekly):
       gross minus the BCRA's short-term foreign-currency liabilities under
@@ -2702,6 +2709,7 @@ indicators:
     measure: rate
     title: Non-Performing Loans
     short_title: Non-performing loans
+    headline: {variant: total, transform: level, label: "Non-performing loans", sub: "% of loans to the private sector", good: none}
     description: >-
       Loans to the private sector in arrears of more than 90 days or
       otherwise irregular, as a share of loans: households, firms and total.
@@ -2732,6 +2740,7 @@ indicators:
     measure: rate
     title: Bank Capital
     short_title: Capital
+    headline: {variant: system, transform: level, label: "Capital", sub: "% of risk-weighted assets", good: none}
     description: >-
       Regulatory capital as a share of risk-weighted assets (credit, market
       and operational risk), by bank group. Monthly, since February 2013.
@@ -2758,6 +2767,7 @@ indicators:
     measure: rate
     title: Bank Profitability
     short_title: Profitability
+    headline: {variant: system, transform: level, label: "Return on equity", sub: "% annualized", good: none}
     description: >-
       Return on equity, inflation-adjusted, accumulated over the year and
       annualized, by bank group. Monthly, since January 2020.
@@ -2993,6 +3003,7 @@ indicators:
     measure: rate
     title: Private Credit as a Share of GDP
     short_title: Credit / GDP
+    headline: {variant: depth, transform: level, label: "Private credit", sub: "% of GDP", good: none}
     description: >-
       Banks' loans to the private sector over nominal GDP, both averaged over
       the last four quarters. Quarterly, since 2010.
@@ -3151,6 +3162,8 @@ indicators:
     measure: flow
     title: Exports, Imports and the Trade Balance
     short_title: Trade balance
+    headline: {variant: balance, transform: level, label: "Trade balance", sub: "US$ million, latest month", digits: 0, good: up}
+    tiles: [{variant: exports, transform: yoy, label: "Exports", sub: "y/y", good: up}, {variant: imports, transform: yoy, label: "Imports", sub: "y/y", good: none}]
     description: >-
       Exports and imports of goods each month (imports shown below zero) and
       the trade balance, millions of US dollars, since 1992.
@@ -3910,6 +3923,8 @@ indicators:
     plain_level: true
     title: Current Account, % of GDP
     short_title: Current account, % GDP
+    headline: {variant: ca, transform: level, label: "Current account", sub: "% of GDP, four quarters", good: up}
+    tiles: [{variant: gs, transform: level, label: "Goods and services", sub: "% of GDP, four quarters", good: up}]
     description: >-
       The current-account balance of the last four quarters as a share of
       GDP in dollars, and the goods-and-services balance.
@@ -4246,6 +4261,7 @@ indicators:
     measure: rate
     title: Employment and Unemployment
     short_title: Labor market
+    headline: {variant: unemployment, transform: level, label: "Unemployment", sub: "% of the labor force", good: none}
     description: >-
       Activity, employment, unemployment and underemployment rates from
       INDEC's household survey (EPH), urban areas, quarterly since 2003.
@@ -4286,6 +4302,7 @@ indicators:
     overlay_default: [private]
     title: Registered Employment
     short_title: Registered jobs
+    headline: {variant: total, transform: yoy, label: "Registered workers", sub: "y/y, all categories", good: up}
     description: >-
       Workers registered in the social security system (SIPA), by type:
       private and public wage earners, domestic workers, the self-employed
@@ -4322,6 +4339,7 @@ indicators:
     overlay_default: [private]
     title: Real Wages
     short_title: Real wages
+    headline: {variant: private, transform: yoy, label: "Real wages, private registered", sub: "y/y", good: up}
     description: >-
       INDEC's wage index for registered private, public and unregistered
       workers, and the average taxable wage of stable workers (RIPTE), in
@@ -4431,6 +4449,7 @@ indicators:
     plain_level: true
     title: Poverty and Indigence
     short_title: Poverty
+    headline: {variant: persons, transform: level, label: "Poverty", sub: "% of persons, semester", good: none}
     description: >-
       Share of people and households with incomes below the poverty line
       and the indigence (extreme poverty) line, urban areas, by semester,
@@ -5915,6 +5934,7 @@ indicators:
     plain_level: true
     title: Gaps Over the Official Rate
     short_title: Exchange-rate gaps
+    headline: {variant: ccl, transform: level, label: "CCL gap", sub: "% over the official rate", good: none}
     description: >-
       How much more pesos the MEP, CCL and informal dollars cost than the
       official wholesale rate, percent. Daily.
@@ -5948,6 +5968,7 @@ indicators:
     measure: index
     title: Real Exchange Rate
     short_title: Real exchange rate
+    headline: {variant: m, transform: level, label: "Real exchange rate", sub: "multilateral, 17 Dec 2015 = 100", good: none}
     description: >-
       The BCRA's multilateral real exchange rate index (the peso against
       the currencies of Argentina's trading partners, adjusted for
@@ -6143,6 +6164,7 @@ indicators:
     plain_level: true
     title: Devaluation Priced in Futures
     short_title: Futures devaluation
+    headline: {variant: m12, transform: level, label: "Devaluation priced in futures", sub: "% a year, 12-month contract", good: none}
     description: >-
       The depreciation of the official rate implied by dollar futures: the
       futures price six and twelve months ahead over today's official rate,
@@ -6301,6 +6323,7 @@ indicators:
     emphasis: general
     title: Confidence in Government
     short_title: Confidence in government
+    headline: {variant: general, transform: level, label: "Confidence in government", sub: "index, 0 to 5 (UTDT)", digits: 2, good: up}
     description: >-
       Universidad Torcuato Di Tella's index of confidence in the national
       government (ICG), monthly since November 2001, and its five
@@ -6338,6 +6361,7 @@ indicators:
     emphasis: national
     title: Consumer Confidence
     short_title: Consumer confidence
+    headline: {variant: national, transform: level, label: "Consumer confidence", sub: "index, 0 to 100 (UTDT)", good: up}
     description: >-
       Universidad Torcuato Di Tella's consumer confidence index (ICC),
       monthly since March 2001: national, its three components, and by
@@ -6434,6 +6458,7 @@ indicators:
     measure: flow
     title: Economic Freedom of the World
     short_title: Economic freedom
+    headline: {variant: arg, transform: level, label: "Economic freedom", sub: "score, 0 to 10 (Fraser)", digits: 2, good: up}
     description: >-
       The Fraser Institute's summary rating of economic freedom, 0 (least
       free) to 10: Argentina, colored by presidency, and comparison
@@ -6518,6 +6543,7 @@ indicators:
     measure: flow
     title: "Democracy and the Rule of Law in Argentina (V-Dem)"
     short_title: V-Dem, Argentina
+    headline: {variant: libdem, transform: level, label: "Liberal democracy", sub: "index, 0 to 1 (V-Dem)", digits: 2, good: up}
     description: >-
       Six indices from the Varieties of Democracy project, 0 to 1, yearly:
       the quality of democracy, the constraints on the executive, the rule

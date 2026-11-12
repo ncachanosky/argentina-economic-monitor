@@ -185,6 +185,7 @@ ui:
   Latest:: "Último dato:"
   Next release: Próxima publicación
   Up to date: Al día
+  "The latest update (twice a day) read this series without errors, and its latest figure is as recent as its usual publication lag allows.": "La última actualización (dos veces por día) leyó esta serie sin errores y su último dato es tan reciente como permite su demora habitual de publicación."
   Calendar: Calendario
   Late: Demorado
   Full release calendar →: Calendario completo →
@@ -394,6 +395,8 @@ ui:
   TEM %: TEM %
   Show basket weights: Ver ponderaciones de la canasta
   Incidence (pp): Incidencia (pp)
+  Inflation (CPI): Inflación (IPC)
+  "The CPI's change over the same period, as a dashed reference": "La variación del IPC en el mismo período, como referencia punteada"
   "Calendar years: the December value of the twelve-month series.": "Años calendario: el valor de diciembre de la serie de doce meses."
   Calendar-year totals.: Totales por año calendario.
   Accumulated y/y: Acumulado i.a.

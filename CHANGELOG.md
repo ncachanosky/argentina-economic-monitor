@@ -12,6 +12,16 @@ Changes since the last release, recorded as they are made. At the next release t
 section becomes its notes.
 
 ### Added
+- Last-value labels: line charts write each line's latest value just right of its last point,
+  in the line's color, pushed apart when close (up to eight lines; none on bars or bands).
+- Summary boxes on every dashboard page: Money and Central Bank, Banks, Exchange Rate,
+  International Trade, Balance of Payments, Labor and Social, and Institutions now open
+  with three or four boxes, like Activity, GDP, Prices and Fiscal.
+- Monetary aggregates: the CPI's change over the same period as a dashed reference (a
+  vertical line on the bars, a line on the chart), with a button to hide it. When the
+  latest month has no CPI yet, the latest CPI month is used and named.
+- Every card now carries an update status ("Up to date" in green; "Late" or "Stale" when
+  not), including cards without an INDEC release calendar and cards with their own layout.
 - Cards built from sources other than INDEC and datos.gob.ar files now also say where their
   data were read from and when they were last checked: the BCRA's API and files, A3
   Mercados, ArgentinaDatos, the REM, the Secretaría de Finanzas and the US Treasury. Cards with their
@@ -37,6 +47,11 @@ section becomes its notes.
   when the window is narrow, such as two years of the exchange rate.
 
 ### Fixed
+- Dollar futures curve: did not load. A3 Mercados stopped sending the implied rate, and
+  the missing values were written as NaN, which is not valid JSON. They are now null.
+- CPI: the REM expectations disappeared in the "By presidency" view; they are now drawn
+  in every view.
+- Three measures of inflation: 2Y and 5Y ranges added.
 - Downloaded PNGs: a long source note ran into the "Argentina Economic Monitor" brand in the
   bottom-right corner (48 of 141 cards). The note now wraps to the space left of the brand
   and the bottom margin grows to fit. On Spanish pages, "Latest observation" in the note

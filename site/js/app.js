@@ -476,7 +476,11 @@
   function freshnessTag(ind) {
     if (ind.status === "error" || ind.status === "stale") return null;   // the title badge says it
     const nr = ind.next_release;
-    if (!nr) return null;
+    // No release calendar (market data, the BCRA's daily series, annual indices): "up to date" when
+    // the latest update read the series and its latest figure is within its usual lag (else "stale").
+    if (!nr) return ind.status === "ok"
+      ? h("span", { class: "fresh-tag ok", title: "The latest update (twice a day) read this series without errors, and its latest figure is as recent as its usual publication lag allows." }, "Up to date")
+      : null;
     const today = new Date().toLocaleDateString("en-CA", { timeZone: "America/Argentina/Buenos_Aires" });
     const late = nr.date < today && (Date.parse(today) - Date.parse(nr.date)) / 864e5 >= 1;
     return late
@@ -532,8 +536,8 @@
 
   // The source line for cards with their own footer: a line break and the note, if any.
   function srcTail(ind) {
-    const f = sourceFilesNote(ind);
-    return f ? [h("br"), f] : [];
+    const f = sourceFilesNote(ind), fresh = freshnessTag(ind);
+    return [...(fresh ? [" ", fresh] : []), ...(f ? [h("br"), f] : [])];
   }
 
   function footer(ind, onPNG, onCSV) {
@@ -996,6 +1000,40 @@
         });
         return { traces, shapes: [], annotations: [], main, t, x: xs, y: traces.length ? traces[0].y : [] };
       }
+      // The latest REM survey's expected path, after the last observation: dashed median and a
+      // 25th-75th percentile band. Drawn in every view, the presidency views included.
+      const addForecast = (keys, FAN) => {
+        const FC = ind.forecast;
+        if (FC && state.rem && !state.yearly && !ind._real) FC.items.forEach((f) => {
+          if ((f.transform || "level") !== state.transform || !keys.includes(f.variant)) return;
+          const sv = f.variant === state.variant ? main : series(f.variant);
+          if (sv.rebased) return;
+          let li = sv.y.length - 1;
+          while (li >= 0 && (sv.y[li] === null || sv.y[li] === undefined)) li--;
+          if (li < 0) return;
+          const d0 = ind.dates[li];
+          const at = (iso) => (ind.frequency === "D" ? iso.slice(0, 8) + "15" : iso);
+          const pts = f.points.filter((q) => at(q.date) > d0 && q.med !== null);
+          if (!pts.length) return;
+          const xs = [d0, ...pts.map((q) => at(q.date))];
+          const pos = keys.filter((q) => !(FAN && (q === FAN.lo || q === FAN.hi))).indexOf(f.variant);
+          const color = ind.emphasis === f.variant ? cssVar("--ink") : cssVar(SERIES_VARS[Math.max(0, pos) % SERIES_VARS.length]);
+          const light = ind.emphasis === f.variant ? "#36454F" : undefined;
+          const vl = ind.variants[f.variant].label;
+          const lab = keys.length > 1 && !f.label.toLowerCase().includes(vl.toLowerCase()) ? `${f.label}, ${vl.toLowerCase()}` : f.label;
+          if (pts.some((q) => q.p25 !== null && q.p75 !== null)) {
+            traces.push(
+              { type: "scatter", mode: "lines", x: xs, y: [sv.y[li], ...pts.map((q) => q.p25)], line: { width: 0 }, showlegend: false, hoverinfo: "skip", legendgroup: `rem-${f.variant}` },
+              { type: "scatter", mode: "lines", x: xs, y: [sv.y[li], ...pts.map((q) => q.p75)], fill: "tonexty", fillcolor: alpha(color, 0.2), line: { width: 0 },
+                showlegend: false, hoverinfo: "skip", legendgroup: `rem-${f.variant}`, _lightFill: alpha(light || ["#B87333", "#5B9BD5", "#87A96B", "#8E7AB5", "#C9A227", "#C96B7E", "#3E9C9A", "#6C7A89"][Math.max(0, pos) % 8], 0.2) });
+          }
+          traces.push({ type: "scatter", mode: "lines+markers", x: xs, y: [sv.y[li], ...pts.map((q) => q.med)], name: lab, legendgroup: `rem-${f.variant}`,
+            line: { color, width: 2, dash: "dash" }, marker: { size: [0, ...pts.map(() => 5)], color }, _light: light, _slot: light ? undefined : Math.max(0, pos) % SERIES_VARS.length,
+            customdata: [null, ...pts.map((q) => [q.p25, q.p75])],
+            hovertemplate: `%{x|${ind.frequency === "Q" ? "Q%q %Y" : "%b %Y"}}: <b>%{y:${yFmt()}}${sfx}</b> expected (middle half %{customdata[0]:.1f}–%{customdata[1]:.1f})<extra>REM</extra>` });
+          state._fcNote = `Dashed: expected in the BCRA's REM survey of ${fmtMonth(FC.survey)} (median; band: middle half of forecasters).`;
+        });
+      };
       if (!colorPres()) {
         const keys = overlayKeys();
         const start = viewStart(ind, state.range);
@@ -1065,37 +1103,7 @@
             { type: "scatter", mode: "lines", x: xs, y: ii.map((i) => hi[i]), fill: "tonexty", fillcolor: alpha(cssVar("--ink-3"), 0.3), line: { width: 0 },
               name: FAN.label, _lightFill: "rgba(133, 144, 154, 0.3)", hovertemplate: `%{x|${DF}}: <b>%{y:${yFmt()}}${sfx}</b><extra>${ind.variants[FAN.hi].label}</extra>` });
         }
-        // The latest REM survey's expected path, after the last observation: dashed median and a 25th-75th percentile band.
-        const FC = ind.forecast;
-        if (FC && state.rem && !state.yearly && !ind._real) FC.items.forEach((f) => {
-          if ((f.transform || "level") !== state.transform || !keys.includes(f.variant)) return;
-          const sv = f.variant === state.variant ? main : series(f.variant);
-          if (sv.rebased) return;
-          let li = sv.y.length - 1;
-          while (li >= 0 && (sv.y[li] === null || sv.y[li] === undefined)) li--;
-          if (li < 0) return;
-          const d0 = ind.dates[li];
-          const at = (iso) => (ind.frequency === "D" ? iso.slice(0, 8) + "15" : iso);
-          const pts = f.points.filter((q) => at(q.date) > d0 && q.med !== null);
-          if (!pts.length) return;
-          const xs = [d0, ...pts.map((q) => at(q.date))];
-          const pos = keys.filter((q) => !(FAN && (q === FAN.lo || q === FAN.hi))).indexOf(f.variant);
-          const color = ind.emphasis === f.variant ? cssVar("--ink") : cssVar(SERIES_VARS[Math.max(0, pos) % SERIES_VARS.length]);
-          const light = ind.emphasis === f.variant ? "#36454F" : undefined;
-          const vl = ind.variants[f.variant].label;
-          const lab = keys.length > 1 && !f.label.toLowerCase().includes(vl.toLowerCase()) ? `${f.label}, ${vl.toLowerCase()}` : f.label;
-          if (pts.some((q) => q.p25 !== null && q.p75 !== null)) {
-            traces.push(
-              { type: "scatter", mode: "lines", x: xs, y: [sv.y[li], ...pts.map((q) => q.p25)], line: { width: 0 }, showlegend: false, hoverinfo: "skip", legendgroup: `rem-${f.variant}` },
-              { type: "scatter", mode: "lines", x: xs, y: [sv.y[li], ...pts.map((q) => q.p75)], fill: "tonexty", fillcolor: alpha(color, 0.2), line: { width: 0 },
-                showlegend: false, hoverinfo: "skip", legendgroup: `rem-${f.variant}`, _lightFill: alpha(light || ["#B87333", "#5B9BD5", "#87A96B", "#8E7AB5", "#C9A227", "#C96B7E", "#3E9C9A", "#6C7A89"][Math.max(0, pos) % 8], 0.2) });
-          }
-          traces.push({ type: "scatter", mode: "lines+markers", x: xs, y: [sv.y[li], ...pts.map((q) => q.med)], name: lab, legendgroup: `rem-${f.variant}`,
-            line: { color, width: 2, dash: "dash" }, marker: { size: [0, ...pts.map(() => 5)], color }, _light: light, _slot: light ? undefined : Math.max(0, pos) % SERIES_VARS.length,
-            customdata: [null, ...pts.map((q) => [q.p25, q.p75])],
-            hovertemplate: `%{x|${ind.frequency === "Q" ? "Q%q %Y" : "%b %Y"}}: <b>%{y:${yFmt()}}${sfx}</b> expected (middle half %{customdata[0]:.1f}–%{customdata[1]:.1f})<extra>REM</extra>` });
-          state._fcNote = `Dashed: expected in the BCRA's REM survey of ${fmtMonth(FC.survey)} (median; band: middle half of forecasters).`;
-        });
+        addForecast(keys, FAN);
         const sbv = sbValues();
         if (sbv) {
           const vo = SB.of ? ind.variants[SB.of] : null, sbName = SB.label || ind.variants[SB.variant].label;
@@ -1183,6 +1191,7 @@
             text: `<b>${n + 1}</b>`, font: { size: 12, color: cssVar("--highlight") } });
         });
       }
+      if (colorPres()) addForecast([state.variant], null);
       return { traces, shapes: [...bs.shapes, ...shapes], annotations: [...bs.annotations, ...annotations], main, t, x, y };
     }
 
@@ -1293,6 +1302,8 @@
       for (const el of [tSeg, presBtn, baseWrap, vSeg]) if (el) el.style.display = "";
 
       const { traces, shapes, annotations, main, t, x, y } = build();
+      const ends = endLabels(traces, t, isLog());
+      annotations.push(...ends);
       const msgs = [];
       if (isRate && T[state.transform] && T[state.transform].change) msgs.push("Changes in a rate are shown in percentage points.");
       if (!state.byPres && !ind.overlay && state.variant !== "original" && ind.variants.original && state.transform !== "mom") msgs.push("Dashed line: the series not seasonally adjusted.");
@@ -1318,7 +1329,7 @@
           bargap: 0.2, shapes, annotations, barmode: state.transform === "share" ? "stack" : "group",
           showlegend: (colorPres() && state.transform !== "mom") || (ind.overlay && !colorPres()),
           legend: { orientation: "h", x: 0, y: 1.02, yanchor: "bottom", font: { color: cssVar("--ink") } },
-          margin: { l: 52, r: SB ? 56 : 16, t: colorPres() ? 30 : 10, b: 36 },
+          margin: { l: 52, r: (SB ? 56 : 16) + (ends.length ? endLabelWidth(ends) : 0), t: colorPres() ? 30 : 10, b: 36 },
           ...(SB ? { yaxis2: y2Axis(false) } : {}),
         },
       }), PLOT_CONFIG);
@@ -2572,6 +2583,23 @@
     let presPick = presTerms.length ? presTerms[presTerms.length - 1].id : null;
     const bstate = { kind: barKinds.includes(baseKind) ? baseKind : barKinds[0], inc: false };
     let barSpec = specFor(bstate.kind);
+    // `inflation_ref`: the CPI's change over the same period, as a dashed reference (a vertical
+    // line on the bars, a line on the chart), to see at a glance which series outgrow prices.
+    // Optional, on by default; not shown in real terms (already net of inflation), in incidence
+    // or level views.
+    const CPI = ind.inflation_ref && ind.deflator && ind.deflator.values ? ind.deflator.values : null;
+    let showCpi = !!CPI;
+    const cpiChange = (kind, i) => {
+      if (!CPI || i < 0) return null;
+      if (kind === "pres") {
+        const p = presTerms.find((q) => q.id === presPick); if (!p) return null;
+        const b = ind.dates.indexOf(termWindow(p, ind.frequency).base);
+        return b >= 0 && CPI[b] && CPI[i] !== null ? (CPI[i] / CPI[b] - 1) * 100 : null;
+      }
+      const s = transform(ind.dates, CPI, kind, undefined, ind.frequency);
+      return s[i] === undefined ? null : s[i];
+    };
+    const cpiOn = (kind) => showCpi && !ind._real && !bstate.inc && kind !== "level";
     const defaults = [].concat(ind.default.variant).slice(0, MAX_PANEL_SERIES);
     const slots = new Map(defaults.map((k, i) => [k, i]));   // color follows the component, not its rank
     const state = { transform: ind.default.transform || baseKind, range: rangeFromDefault(ind) };
@@ -2662,6 +2690,8 @@
       onchange: (e) => { presPick = e.target.value; setBars(); } }, presTerms.slice().reverse().map((p) => h("option", { value: p.id, selected: p.id === presPick ? true : null }, p.name))) : null;
     const incBtn = W && !isRate ? h("button", { class: "btn toggle", type: "button", "aria-pressed": "false", title: "Show each component's contribution to the total's change",
       onclick: () => { bstate.inc = !bstate.inc; setBars(); } }, "Incidence (pp)") : null;
+    const cpiBtn = CPI ? h("button", { class: "btn toggle", type: "button", "aria-pressed": "true", title: "The CPI's change over the same period, as a dashed reference",
+      onclick: () => { showCpi = !showCpi; cpiBtn.setAttribute("aria-pressed", String(showCpi)); drawBars(); drawLines(); } }, "Inflation (CPI)") : null;
 
     function freeSlot() { const used = new Set(slots.values()); for (let i = 0; i < MAX_PANEL_SERIES; i++) if (!used.has(i)) return i; return -1; }
 
@@ -2709,12 +2739,35 @@
           shapes.push({ type: "line", xref: "x", yref: "y", x0: xm + off - d, x1: xm + off + d, y0: i - 0.42, y1: i + 0.42, line: { color: bg, width: 3, _light: "#FFFFFF" } });
         }
       });
-      return { traces: [trace], shapes, range, cap };
+      const annotations = [];
+      // The CPI is published about two weeks after the month ends, so the latest month of the
+      // aggregates may not have one yet: then the CPI of the latest month available (up to two
+      // back), with its month in the label.
+      let ci = refIdx, cv = null;
+      if (cpiOn(bstate.kind)) for (; ci >= refIdx - 2 && ci >= 0; ci--) { cv = cpiChange(bstate.kind, ci); if (cv !== null && cv !== undefined) break; }
+      const cpiWhen = ci !== refIdx && cv !== null ? ` (${fmtShortMonth(ind.dates[ci])})` : "";
+      if (cv !== null && cv !== undefined) {
+        const ink2 = forExport ? "#5A6872" : cssVar("--ink-2");
+        shapes.push({ type: "line", xref: "x", yref: "paper", x0: cv, x1: cv, y0: 0, y1: 1, line: { color: ink2, width: 1.6, dash: "dash", _light: "#5A6872" } });
+        annotations.push({ xref: "x", yref: "paper", x: cv, y: 1, yanchor: "bottom", xanchor: "center", showarrow: false,
+          text: `${LANG === "es" ? "IPC" : "CPI"} ${fmtNum(cv, barSpec)}${cpiWhen}`, font: { size: forExport ? 14 : 11, color: ink2 }, _lightColor: "#5A6872" });
+        if (cv > range[1]) range[1] = cv * 1.08;
+        if (cv < range[0]) range[0] = cv * 1.08;
+      }
+      return { traces: [trace], shapes, annotations, range, cap };
     }
 
     function lineTraces() {
       const t = T[state.transform];
       const start = startDate(ind.last_obs, RANGES[state.range]);
+      const cpiLine = [];
+      if (cpiOn(state.transform)) {
+        const y = transform(ind.dates, CPI, state.transform, undefined, ind.frequency);
+        const idx = ind.dates.map((d, i) => i).filter((i) => (!start || ind.dates[i] >= start) && y[i] !== null && y[i] !== undefined);
+        cpiLine.push({ type: "scatter", mode: "lines", name: LANG === "es" ? "Precios al consumidor (IPC)" : "Consumer prices (CPI)", x: idx.map((i) => ind.dates[i]), y: idx.map((i) => y[i]),
+          line: { color: cssVar("--ink-2"), width: 1.8, dash: "dash" }, _light: "#5A6872",
+          hovertemplate: `%{y:,.1f}${t.suffix}<extra>CPI</extra>` });
+      }
       return [...slots.entries()].sort((a, b) => a[1] - b[1]).map(([k, slot]) => {
         const y = state.transform === "level" ? ind.variants[k].values : transform(ind.dates, ind.variants[k].values, state.transform, ind.measure, ind.frequency);
         const idx = ind.dates.map((d, i) => i).filter((i) => (!start || ind.dates[i] >= start) && y[i] !== null);
@@ -2724,7 +2777,7 @@
           line: { color: cssVar(SERIES_VARS[slot]), width: 2 }, _slot: slot,
           hovertemplate: `%{y:,.1f}${t.suffix}<extra>${ind.variants[k].label}</extra>`,
         };
-      });
+      }).concat(cpiLine);
     }
 
     function drawChips() {
@@ -2743,7 +2796,7 @@
       Plotly.react(barEl, b.traces, baseLayout({
         xaxis: { type: "linear", ticksuffix: barSpec.suffix, zeroline: true, zerolinecolor: cssVar("--ink-2"), range: b.range },
         yaxis: { ticksuffix: "", automargin: true, gridcolor: "rgba(0,0,0,0)" },
-        extra: { hovermode: "closest", margin: { l: 10, r: 16, t: 10, b: 36 }, bargap: 0.3, shapes: b.shapes, uniformtext: { minsize: 10, mode: "show" } },
+        extra: { hovermode: "closest", margin: { l: 10, r: 16, t: b.annotations.length ? 26 : 10, b: 36 }, bargap: 0.3, shapes: b.shapes, annotations: b.annotations, uniformtext: { minsize: 10, mode: "show" } },
       }), PLOT_CONFIG);
       barNote.textContent = b.cap ? ` Axis broken at ${fmtNum(b.cap, barSpec)}; the marked bar extends beyond it; its label shows the full value.` : "";
     }
@@ -2771,7 +2824,7 @@
           : bstate.kind === "mom" ? `Percent change vs. previous month${seriesNote}`
           : bstate.kind === "acc" ? `Year to date vs. the same months a year earlier, %${seriesNote}` : bstate.kind === "ytd" ? `Percent change vs. December of the previous year${seriesNote}` : `Percent change vs. same month a year earlier${seriesNote}`,
         barSpec, `${ind.id}_latest_${bstate.kind}${bstate.inc ? "_incidence" : ""}.png`,
-        { shapes: b.shapes, xrange: b.range, xsuffix: barSpec.suffix });
+        { shapes: b.shapes, annotations: b.annotations, xrange: b.range, xsuffix: barSpec.suffix });
     };
     const onBarCSV = () => {
       const tr0 = bars(true).traces[0];
@@ -2793,7 +2846,7 @@
         h("thead", {}, h("tr", {}, h("th", {}, noun.charAt(0).toUpperCase() + noun.slice(1, -1).replace(/ie$/, "y")), h("th", {}, "Weight"))),
         h("tbody", {}, keys.filter((k) => W[k] !== undefined).sort((a, b) => W[b] - W[a]).map((k) => h("tr", {}, h("td", {}, ind.variants[k].label), h("td", {}, W[k].toFixed(1) + "%"))))))) : null;
     appendAll(card, 
-      bSeg || incBtn || realSeg ? h("div", { class: "controls" }, bSeg, presSel, incBtn, realSeg) : null,
+      bSeg || incBtn || realSeg || cpiBtn ? h("div", { class: "controls" }, bSeg, presSel, incBtn, cpiBtn, realSeg) : null,
       partialNote(ind) || realSeg ? (() => { const p = h("p", { class: "hint" }); card._realHint = p; p.textContent = partialNote(ind); return p; })() : null,
       h("p", { class: "hint" }, barTitleEl, barNote),
       barEl, chartActions(ind, onBarPNG, onBarCSV), weightsTable,
@@ -3059,6 +3112,43 @@
     };
     return card;
   }
+
+  // ---------- last-value labels ----------
+  // The latest value of each line, written just right of its last point in the line's color, so the
+  // end of a long series can be read at a glance. Labels close together are pushed apart. Bars,
+  // bands, survey forecasts and faint context lines get none; more than eight lines, none at all.
+  function endLabels(traces, t, log) {
+    const lines = new Map();
+    traces.forEach((tr) => {
+      if (tr.type !== "scatter" || !tr.mode || !tr.mode.includes("lines") || tr.yaxis === "y2" || tr.fill) return;
+      if (tr.hoverinfo === "skip" || (tr.line && tr.line.width === 0) || (tr.legendgroup || "").startsWith("rem-")) return;
+      if (!tr.name || /not seasonally adjusted|colored by presidency/.test(tr.name) || (tr.opacity && tr.opacity < 0.62)) return;
+      let i = (tr.y || []).length - 1;
+      while (i >= 0 && (tr.y[i] === null || tr.y[i] === undefined || !Number.isFinite(tr.y[i]))) i--;
+      if (i < 0) return;
+      const prev = lines.get(tr.name);
+      if (!prev || String(tr.x[i]) >= String(prev.x)) lines.set(tr.name, { x: tr.x[i], y: tr.y[i], color: tr.line && tr.line.color, light: tr._light });
+    });
+    if (!lines.size || lines.size > 8) return [];
+    const sfx = specOf(t).suffix || "";
+    const fmt = (v) => (Math.abs(v) >= 100 ? Math.round(v).toLocaleString(LOCALE) : v.toLocaleString(LOCALE, { minimumFractionDigits: 1, maximumFractionDigits: 1 })) + sfx;
+    // Push labels apart: positions in axis units (log10 on log axes), at least 5% of the span between neighbors.
+    const pos = (v) => (log ? Math.log10(Math.max(v, 1e-9)) : v);
+    const L = [...lines.values()].map((l) => ({ ...l, p: pos(l.y) })).sort((a, b) => a.p - b.p);
+    const span = Math.max(...L.map((l) => l.p)) - Math.min(...L.map((l) => l.p));
+    const all = traces.flatMap((tr) => (tr.yaxis === "y2" ? [] : (tr.y || []).filter((v) => v !== null && Number.isFinite(v)).map(pos)));
+    const range = Math.max(span, Math.max(...all) - Math.min(...all)) || 1;
+    const gap = 0.055 * range;
+    for (let k = 1; k < L.length; k++) if (L[k].p - L[k - 1].p < gap) L[k].p = L[k - 1].p + gap;
+    return L.map((l) => ({
+      x: l.x, y: log ? Math.log10(l.y) : l.y, xref: "x", yref: "y", xanchor: "left", yanchor: "middle", showarrow: false,
+      ax: 0, ay: 0, xshift: 5, yshift: 0, _endLabel: true,
+      // the label sits at its pushed-apart position; a short shift in pixels is not known here, so move y instead
+      ...(Math.abs(l.p - pos(l.y)) > 1e-9 ? { y: l.p } : {}),
+      text: `<b>${fmt(l.y)}</b>`, font: { size: 11, color: l.color || cssVar("--ink") }, _lightColor: l.light || l.color,
+    }));
+  }
+  const endLabelWidth = (ends) => Math.min(80, 12 + 7 * Math.max(...ends.map((a) => a.text.replace(/<[^>]+>/g, "").length)));
 
   // ---------- headline tiles ----------
   // Summary boxes of a card: its headline and any extra `tiles`.
