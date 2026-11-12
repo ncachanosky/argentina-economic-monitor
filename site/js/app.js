@@ -1593,6 +1593,208 @@
     return card;
   }
 
+  // ---------- card: a cross-country index, one edition (Archbridge's Social Mobility Index) ----------
+  // Three views: a map of Latin America shaded by score, the ranking (region or world), and
+  // Argentina's profile by pillar and sub-pillar against the regional median.
+  function countryIndexCard(ind) {
+    const T = ind.table;
+    const card = cardFrame(ind, true);
+    let data = null, geo = null, M = null;
+    const state = { view: "map", measure: "overall", scope: "latam", hover: null };
+    const HOME = "ARG";
+    const vSeg = segmented([["map", "Map"], ["ranking", "Ranking"], ["profile", "Argentina"]], state.view, (k) => { state.view = k; vSeg.update(k); render(); }, "View");
+    const sSeg = segmented([["latam", "Latin America"], ["world", "All countries"]], state.scope, (k) => { state.scope = k; sSeg.update(k); render(); }, "Countries");
+    const mSel = h("select", { class: "select", "aria-label": "Measure" });
+    mSel.addEventListener("change", () => { state.measure = mSel.value; render(); });
+    const mPick = h("label", { class: "base-pick" }, h("span", {}, "Measure:"), mSel);
+    const summary = h("div", { class: "ci-summary" });
+    const hint = h("p", { class: "hint" });
+    const body = h("div", { class: "ci-body" });
+    const s2 = (v) => (v === null || v === undefined ? "–" : fx(v, 2));
+    const ord = (n) => (LANG === "es" ? `${n}.º` : n + ([11, 12, 13].includes(n % 100) ? "th" : ({ 1: "st", 2: "nd", 3: "rd" })[n % 10] || "th"));
+    const names = LANG === "es" && typeof Intl.DisplayNames === "function" ? new Intl.DisplayNames(["es"], { type: "region" }) : null;
+    const nameOf = (c) => { if (names && c.iso2) { try { return names.of(c.iso2) || c.name; } catch (e) { /* unknown code */ } } return c.name; };
+    const label = (k) => tr(M[k].label === "Overall" ? "Overall index" : M[k].label);
+    const median = (xs) => { const v = xs.filter((x) => x !== null && x !== undefined).sort((a, b) => a - b); if (!v.length) return null; const m = v.length >> 1; return v.length % 2 ? v[m] : (v[m - 1] + v[m]) / 2; };
+    const latam = () => data.countries.filter((c) => c.region === data.latam);
+    const regionRank = (c, k) => 1 + latam().filter((o) => o.score[k] > c.score[k]).length;
+    let csv = null;
+
+    function fillMeasures() {
+      M = Object.fromEntries(data.measures.map((m) => [m.key, m]));
+      const opts = [];
+      for (const m of data.measures) {
+        if (m.parent) continue;
+        opts.push(h("option", { value: m.key }, label(m.key)));
+        for (const sm of data.measures.filter((x) => x.parent === m.key)) opts.push(h("option", { value: sm.key }, ` – ${label(sm.key)}`));
+      }
+      mSel.replaceChildren(...opts);
+      mSel.value = state.measure;
+    }
+
+    function renderSummary() {
+      const a = data.countries.find((c) => c.iso === HOME), L = latam();
+      const stat = (big, small) => h("div", { class: "ci-stat" }, h("b", {}, big), h("span", {}, small));
+      summary.replaceChildren(
+        stat(s2(a.score.overall), LANG === "es" ? "puntaje general, 0 a 10" : "overall score, 0 to 10"),
+        stat(ord(a.rank.overall), LANG === "es" ? `de ${data.count} países` : `of ${data.count} countries`),
+        stat(ord(a.region_rank), LANG === "es" ? `de ${L.length} en América Latina y el Caribe` : `of ${L.length} in Latin America and the Caribbean`),
+        stat(s2(median(L.map((c) => c.score.overall))), LANG === "es" ? "mediana regional" : "regional median"));
+    }
+
+    // Shade: the measure's range within the region, pale (low) to the accent (high).
+    function shader(k) {
+      const v = latam().map((c) => c.score[k]).filter((x) => x !== null);
+      const lo = Math.min(...v), hi = Math.max(...v);
+      return { lo, hi, fill: (x) => (x === null || x === undefined ? "var(--grid)" : `color-mix(in srgb, var(--series-1) ${Math.round(12 + 88 * (hi > lo ? (x - lo) / (hi - lo) : 1))}%, var(--surface))`) };
+    }
+
+    function infoPanel(c, k) {
+      if (!c) return h("p", { class: "hint" }, "Not covered by the index.");
+      const L = latam();
+      const rows = data.measures.filter((m) => !m.parent).map((m) => h("div", { class: "ci-mini" },
+        h("span", {}, label(m.key)), h("span", { class: "ci-track" }, h("i", { style: `--w:${(c.score[m.key] || 0) / 10}` })), h("b", {}, s2(c.score[m.key]))));
+      return h("div", { class: "ci-info" },
+        h("h4", {}, nameOf(c)),
+        h("p", { class: "ci-big" }, s2(c.score[k]), h("small", {}, ` ${label(k)}`)),
+        h("p", { class: "ci-ranks" }, LANG === "es"
+          ? `${ord(c.rank[k])} de ${data.count} en el mundo · ${ord(regionRank(c, k))} de ${L.length} en la región`
+          : `${ord(c.rank[k])} of ${data.count} in the world · ${ord(regionRank(c, k))} of ${L.length} in the region`),
+        ...rows);
+    }
+
+    function mapView() {
+      const k = state.measure, sh = shader(k);
+      const by = Object.fromEntries(data.countries.map((c) => [c.iso, c]));
+      const ns = "http://www.w3.org/2000/svg";
+      const svg = document.createElementNS(ns, "svg");
+      svg.setAttribute("viewBox", `0 0 ${geo.width} ${geo.height}`);
+      svg.setAttribute("class", "ci-map");
+      svg.setAttribute("role", "img");
+      svg.setAttribute("aria-label", `${label(k)}: map of Latin America and the Caribbean`);
+      const info = h("div", { class: "ci-side" });
+      const show = (iso) => { info.replaceChildren(infoPanel(by[iso], k)); };
+      const order = Object.keys(geo.paths).sort((a, b) => (a === HOME) - (b === HOME));   // Argentina's outline on top
+      for (const iso of order) {
+        const c = by[iso];
+        const p = document.createElementNS(ns, "path");
+        p.setAttribute("d", geo.paths[iso]);
+        p.setAttribute("class", "ci-c" + (iso === HOME ? " home" : "") + (c ? "" : " none"));
+        p.style.fill = c ? sh.fill(c.score[k]) : "var(--grid)";
+        if (c) {
+          const t = document.createElementNS(ns, "title");
+          t.textContent = `${nameOf(c)}: ${s2(c.score[k])} (${ord(c.rank[k])})`;
+          p.append(t);
+          p.addEventListener("mouseenter", () => show(iso));
+          p.addEventListener("click", () => show(iso));
+          p.addEventListener("mouseleave", () => show(HOME));
+        }
+        svg.append(p);
+      }
+      show(HOME);
+      const legend = h("div", { class: "ci-legend" }, h("span", {}, s2(sh.lo)), h("i", {}), h("span", {}, s2(sh.hi)),
+        h("span", { class: "ci-na" }, h("i", {}), "Not covered"));
+      hint.textContent = LANG === "es"
+        ? `${label(k)}, 0 a 10. El color va del puntaje más bajo al más alto de la región. Pase el cursor (o toque) un país para ver sus datos.`
+        : `${label(k)}, 0 to 10. Shading runs from the region's lowest score to its highest. Hover over (or tap) a country for its figures.`;
+      const L = latam().slice().sort((a, b) => a.rank[k] - b.rank[k]);
+      csv = { name: `${ind.id}_map_${k}`, header: ["country", "iso3", "score", "world_rank", "region_rank"],
+        rows: L.map((c) => [c.name, c.iso, c.score[k], c.rank[k], regionRank(c, k)]) };
+      return h("div", { class: "ci-mapwrap" }, h("div", { class: "ci-mapcol" }, svg, legend), info);
+    }
+
+    function rankingView() {
+      const k = state.measure;
+      const list = (state.scope === "latam" ? latam() : data.countries).slice().sort((a, b) => a.rank[k] - b.rank[k] || a.name.localeCompare(b.name));
+      const pillars = data.measures.filter((m) => !m.parent && m.key !== "overall");
+      const cols = [k, ...(k === "overall" ? pillars.map((m) => m.key) : ["overall"])];
+      const L = latam();
+      const head = h("tr", {}, h("th", {}, state.scope === "latam" ? "Region" : "World"), state.scope === "latam" ? h("th", {}, "World") : null,
+        h("th", { class: "ci-l" }, "Country"), state.scope === "world" ? h("th", { class: "ci-l" }, "Region") : null,
+        h("th", { class: "ci-barh" }, label(k)), cols.slice(1).map((c) => h("th", { title: label(c) }, label(c))));
+      const row = (c, i) => h("tr", { class: c.iso === HOME ? "ci-home" : null },
+        h("td", {}, String(state.scope === "latam" ? regionRank(c, k) : c.rank[k])), state.scope === "latam" ? h("td", { class: "ci-dim" }, String(c.rank[k])) : null,
+        h("td", { class: "ci-name" }, nameOf(c)), state.scope === "world" ? h("td", { class: "ci-dim ci-reg" }, tr(c.region)) : null,
+        h("td", { class: "ci-barcell" }, h("span", { class: "ci-bar" }, h("i", { style: `--w:${(c.score[k] || 0) / 10}` })), h("b", {}, s2(c.score[k]))),
+        cols.slice(1).map((m) => h("td", {}, s2(c.score[m]), h("span", { class: "ci-dim" }, ` (${c.rank[m]})`))));
+      const med = h("tr", { class: "bench first" }, h("td", {}, ""), state.scope === "latam" ? h("td", {}, "") : null,
+        h("td", { class: "ci-name" }, h("b", {}, "Latin America (median)")), state.scope === "world" ? h("td", {}, "") : null,
+        h("td", { class: "ci-barcell" }, h("b", {}, s2(median(L.map((c) => c.score[k]))))), cols.slice(1).map((m) => h("td", {}, s2(median(L.map((c) => c.score[m]))))));
+      hint.textContent = LANG === "es"
+        ? `Ordenado por ${label(k).toLowerCase()}. Puntajes de 0 a 10; entre paréntesis, el puesto mundial (de ${data.count}). La mediana es la de los ${L.length} países de América Latina y el Caribe.`
+        : `Sorted by ${label(k).toLowerCase()}. Scores 0 to 10; world rank (of ${data.count}) in parentheses. The median is over the ${L.length} countries of Latin America and the Caribbean.`;
+      csv = { name: `${ind.id}_ranking_${state.scope}_${k}`, header: ["world_rank", "country", "region", ...cols.flatMap((m) => [`${m}_score`, `${m}_rank`])],
+        rows: list.map((c) => [c.rank[k], c.name, c.region, ...cols.flatMap((m) => [c.score[m], c.rank[m]])]) };
+      const wrap = h("div", { class: "table-scroll ci-rank" }, h("table", { class: "data" }, h("thead", {}, head), h("tbody", {}, list.map(row), med)));
+      // In the world ranking, open with Argentina's row in view.
+      if (state.scope === "world") requestAnimationFrame(() => { const r = wrap.querySelector(".ci-home"); if (r) wrap.scrollTop = Math.max(0, r.offsetTop - wrap.clientHeight / 2); });
+      return wrap;
+    }
+
+    function profileView() {
+      const a = data.countries.find((c) => c.iso === HOME), L = latam();
+      const rows = [], out = [];
+      const line = (k, level) => {
+        const med = median(L.map((c) => c.score[k]));
+        const r = a.rank[k];
+        out.push([label(k), a.score[k], r, regionRank(a, k), med]);
+        return h("div", { class: `ci-prow lvl${level}` },
+          h("span", { class: "ci-plabel" }, label(k)),
+          h("span", { class: "ci-pbar", title: LANG === "es" ? `Mediana regional: ${s2(med)}` : `Regional median: ${s2(med)}` },
+            h("i", { style: `--w:${(a.score[k] || 0) / 10}` }), med !== null ? h("u", { style: `--m:${med / 10}` }) : null),
+          h("b", {}, s2(a.score[k])),
+          h("span", { class: "ci-prank" + (r > data.count * 0.75 ? " low" : r <= data.count * 0.25 ? " high" : "") },
+            LANG === "es" ? `${ord(r)} de ${data.count}` : `${ord(r)} of ${data.count}`));
+      };
+      rows.push(line("overall", 0));
+      for (const p of data.measures.filter((m) => !m.parent && m.key !== "overall")) {
+        rows.push(line(p.key, 1));
+        for (const sp of data.measures.filter((m) => m.parent === p.key)) {
+          rows.push(line(sp.key, 2));
+          const labels = data.components[sp.key];
+          const comp = h("details", { class: "ci-comp" }, h("summary", {}, LANG === "es" ? `Componentes (${labels.length})` : `Components (${labels.length})`),
+            h("table", { class: "data" }, h("thead", {}, h("tr", {}, h("th", {}, "Component"), h("th", {}, "Argentina"), h("th", {}, "Latin America (median)"))),
+              h("tbody", {}, labels.map((lab, j) => {
+                const med = median(L.map((c) => c.comp[sp.key][j]));
+                out.push([`${label(sp.key)}: ${tr(lab)}`, a.comp[sp.key][j], "", "", med]);
+                return h("tr", {}, h("td", {}, tr(lab)), h("td", {}, s2(a.comp[sp.key][j])), h("td", {}, s2(med)));
+              }))));
+          rows.push(comp);
+        }
+      }
+      hint.textContent = LANG === "es"
+        ? `Puntajes de Argentina, 0 a 10, y su puesto entre ${data.count} países. La marca vertical es la mediana de América Latina y el Caribe. Abra «Componentes» para ver de qué está hecho cada subpilar.`
+        : `Argentina's scores, 0 to 10, and its rank among ${data.count} countries. The tick is the median for Latin America and the Caribbean. Open "Components" to see what each sub-pillar is made of.`;
+      csv = { name: `${ind.id}_argentina`, header: ["measure", "score", "world_rank", "region_rank", "latam_median"], rows: out };
+      return h("div", { class: "ci-profile" }, rows);
+    }
+
+    function render() {
+      if (!data) return;
+      mPick.style.display = state.view === "profile" ? "none" : "";
+      sSeg.style.display = state.view === "ranking" ? "" : "none";
+      body.replaceChildren(state.view === "map" ? mapView() : state.view === "ranking" ? rankingView() : profileView());
+    }
+    const onCSV = () => { if (csv) downloadBlob(toCSV(csv.header, csv.rows), `${csv.name}.csv`, "text/csv"); };
+    appendAll(card, summary, h("div", { class: "controls" }, vSeg, mPick, h("span", { class: "spacer" }), sSeg), hint, body,
+      ind.note ? h("p", { class: "chips-note" }, ind.note) : null,
+      h("div", { class: "card-foot" },
+        h("span", {}, "Source: ", T.source_url ? h("a", { href: T.source_url, target: "_blank", rel: "noopener" }, ind.source_label) : ind.source_label,
+          LANG === "es" ? ` · Datos de ${String(ind.last_obs).slice(0, 4)}` : ` · Data for ${String(ind.last_obs).slice(0, 4)}`, ...srcTail(ind)),
+        h("div", { class: "actions" }, h("button", { class: "btn", type: "button", onclick: onCSV, title: "Download the data in this view as CSV" }, "CSV"),
+          h("a", { class: "btn", href: `${DATA}${T.path}${T.file}`, download: `${ind.id}_all.json`, title: "All countries, every measure and component (JSON)" }, "All data"))));
+    card.draw = async () => {
+      if (!data) {
+        try {
+          [data, geo] = await Promise.all([getJSON(`${DATA}${T.path}${T.file}`), getJSON(`${DATA}${T.path}latam_map.json`)]);
+        } catch (e) { console.error(e); body.replaceChildren(h("div", { class: "error-box" }, "The index could not be loaded.")); return; }
+        fillMeasures(); renderSummary();
+      }
+      render();
+    };
+    return card;
+  }
+
   // ---------- card: debt maturity profile (Finance Secretariat, quarterly) ----------
   function scheduleCard(ind) {
     const T = ind.table;
@@ -3653,6 +3855,7 @@
         : ind.kind === "rer_calc" ? rerCalcCard(ind)
         : ind.kind === "turns" ? turnsCard(ind)
         : ind.kind === "ngdp" ? ngdpCard(ind)
+        : ind.kind === "country_index" ? countryIndexCard(ind)
         : variantsCard(ind, !ind.half);
   }
 

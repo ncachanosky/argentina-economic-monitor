@@ -2,6 +2,7 @@
 
     python -m pipeline.update            # all sources
     python -m pipeline.update --dry-run  # fetch and validate, write nothing
+    python -m pipeline.update --only smi # one source (adapter) only
 
 Failures are soft: a series that fails to fetch or validate keeps its last
 good data and is marked in data/status.json. The run only exits non-zero
@@ -32,7 +33,7 @@ def _load_status() -> dict:
     return {}
 
 
-def run(dry_run: bool = False, strict: bool = False) -> int:
+def run(dry_run: bool = False, strict: bool = False, only: set[str] | None = None) -> int:
     reg = registry.load()
     now = datetime.now(timezone.utc)
     vintage = now.strftime("%Y-%m-%d")
@@ -47,6 +48,8 @@ def run(dry_run: bool = False, strict: bool = False) -> int:
 
     timings: list[tuple[float, str, int]] = []
     for (source, _freq), ids in reg.series_by_source().items():
+        if only and source not in only:
+            continue
         adapter = get_adapter(source)
         t0 = time.monotonic()
         try:
@@ -131,7 +134,7 @@ def run(dry_run: bool = False, strict: bool = False) -> int:
             print(f"::warning title={ind.id}::{msg}")
 
     # The BCRA's calendar of reports (REM, banks, FX market), for the home page and the calendar page.
-    if not dry_run:
+    if not dry_run and not only:
         from .sources import bcra_calendar
         for msg in bcra_calendar.refresh():
             lines.append(f"- ⚠️ {msg}")
@@ -148,7 +151,7 @@ def run(dry_run: bool = False, strict: bool = False) -> int:
     lines += [f"- {name}: {secs:.0f}s, {n} series" for secs, name, n in timings]
     lines.append(f"- total: {sum(t[0] for t in timings):.0f}s\n</details>")
     (STATUS_PATH.parent / "timings.json").write_text(json.dumps(
-        [{"source": name, "seconds": round(secs, 1), "series": n} for secs, name, n in timings], indent=1) + "\n", encoding="utf-8") if not dry_run else None
+        [{"source": name, "seconds": round(secs, 1), "series": n} for secs, name, n in timings], indent=1) + "\n", encoding="utf-8") if not (dry_run or only) else None
 
     header = (
         f"## Data update {vintage}\n\n"
@@ -171,8 +174,9 @@ def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--dry-run", action="store_true")
     ap.add_argument("--strict", action="store_true", help="exit non-zero if any series failed")
+    ap.add_argument("--only", nargs="+", metavar="SOURCE", help="fetch only these sources (adapters), e.g. --only smi")
     args = ap.parse_args(argv)
-    return run(dry_run=args.dry_run, strict=args.strict)
+    return run(dry_run=args.dry_run, strict=args.strict, only=set(args.only) if args.only else None)
 
 
 if __name__ == "__main__":

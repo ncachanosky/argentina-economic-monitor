@@ -512,3 +512,56 @@ kbd { font-family: var(--font-ui); font-size: .85em; padding: 1px 5px; border: 1
 
 .card-foot .src-files { font-size: .92em; }
 .card-foot .src-files a { color: inherit; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 2px; }
+
+/* Cross-country index card (Social Mobility Index): summary, map, ranking, Argentina's profile. */
+.ci-summary { display: flex; flex-wrap: wrap; gap: 8px 28px; margin: 4px 0 12px; font-family: var(--font-ui); }
+.ci-stat { display: flex; flex-direction: column; min-width: 0; }
+.ci-stat b { font-size: 24px; line-height: 1.15; font-variant-numeric: tabular-nums; }
+.ci-stat span { font-size: 12.5px; color: var(--ink-3); }
+.ci-mapwrap { display: grid; grid-template-columns: minmax(0, 460px) minmax(0, 1fr); gap: 20px; align-items: start; }
+.ci-mapcol { min-width: 0; }
+.ci-map { width: 100%; height: auto; max-height: 560px; display: block; }
+.ci-c { stroke: var(--surface); stroke-width: .6; cursor: pointer; transition: opacity .15s; }
+.ci-c.none { cursor: default; }
+.ci-c:not(.none):hover { stroke: var(--ink-2); stroke-width: 1.2; }
+.ci-c.home { stroke: var(--ink); stroke-width: 1.6; }
+.ci-legend { display: flex; align-items: center; gap: 8px; font-family: var(--font-ui); font-size: 12px; color: var(--ink-3); margin-top: 6px; flex-wrap: wrap; }
+.ci-legend > i { display: inline-block; width: 140px; max-width: 40vw; height: 10px; border-radius: 2px;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--series-1) 12%, var(--surface)), var(--series-1)); }
+.ci-na { display: inline-flex; align-items: center; gap: 4px; margin-left: 10px; }
+.ci-na i { display: inline-block; width: 10px; height: 10px; background: var(--grid); border-radius: 2px; }
+.ci-side { min-width: 0; font-family: var(--font-ui); }
+.ci-info h4 { margin: 0 0 2px; font-size: 18px; }
+.ci-big { margin: 0; font-size: 28px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.ci-big small { font-size: 13px; font-weight: 400; color: var(--ink-3); }
+.ci-ranks { margin: 2px 0 12px; font-size: 13px; color: var(--ink-2); }
+.ci-mini { display: grid; grid-template-columns: minmax(0, 1fr) 90px 38px; gap: 8px; align-items: center; font-size: 13px; padding: 3px 0; }
+.ci-mini i, .ci-bar i, .ci-pbar i { display: block; height: 8px; width: calc(var(--w) * 100%); background: var(--series-1); border-radius: 2px; }
+.ci-track { display: block; background: var(--grid); border-radius: 2px; }
+.ci-side { max-width: 380px; }
+.ci-mini b { text-align: right; font-variant-numeric: tabular-nums; }
+.ci-rank { max-height: 560px; }
+.ci-rank tr.ci-home td { background: color-mix(in srgb, var(--accent) 14%, transparent); font-weight: 600; }
+.ci-dim { color: var(--ink-3); font-size: .9em; }
+table.data td.ci-name, table.data td.ci-reg, table.data th.ci-l { text-align: left; }
+.ci-barcell { display: flex; align-items: center; gap: 8px; justify-content: flex-end; }
+.ci-bar { display: inline-block; width: 110px; background: var(--grid); border-radius: 2px; }
+.ci-profile { font-family: var(--font-ui); max-width: 760px; }
+.ci-prow { display: grid; grid-template-columns: minmax(0, 300px) minmax(80px, 1fr) 44px 92px; gap: 10px; align-items: center; padding: 5px 0; border-bottom: 1px solid var(--grid); font-size: 14px; }
+.ci-prow.lvl0 { font-weight: 700; }
+.ci-prow.lvl1 { font-weight: 600; padding-top: 10px; }
+.ci-prow.lvl2 .ci-plabel { padding-left: 18px; color: var(--ink-2); }
+.ci-prow b { text-align: right; font-variant-numeric: tabular-nums; }
+.ci-pbar { position: relative; background: var(--grid); border-radius: 2px; height: 10px; }
+.ci-pbar i { height: 10px; }
+.ci-pbar u { position: absolute; top: -3px; bottom: -3px; left: calc(var(--m) * 100%); width: 2px; background: var(--ink); text-decoration: none; }
+.ci-prank { font-size: 12.5px; color: var(--ink-3); text-align: right; font-variant-numeric: tabular-nums; }
+.ci-prank.low { color: var(--accent-ink); font-weight: 600; }
+.ci-comp { margin: 2px 0 6px 18px; font-size: 13px; }
+.ci-comp summary { cursor: pointer; color: var(--ink-3); }
+.ci-comp table { max-width: 520px; margin-top: 4px; }
+@media (max-width: 760px) {
+  .ci-mapwrap { grid-template-columns: 1fr; }
+  .ci-prow { grid-template-columns: minmax(0, 1fr) 44px 74px; }
+  .ci-prow .ci-pbar { grid-column: 1 / -1; grid-row: 2; }
+}

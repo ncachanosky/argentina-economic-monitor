@@ -69,6 +69,9 @@ def link_for(adapter: str, sid: str, st: dict | None = None) -> dict | None:
                 "url": url or "https://www.bcra.gob.ar/", "kind": "file"} if url else None
     if adapter == "efw":
         return {"publisher": "Fraser Institute", "name": efw.URL.rsplit("/", 1)[-1], "url": efw.URL, "kind": "file"}
+    if adapter == "smi":
+        return {"publisher": "Archbridge Institute", "name": "Social Mobility Index (edition file kept in the repository)",
+                "url": f"{REPO_FILES}data/manual/", "page": "https://www.archbridgeinstitute.org/social-mobility-index/", "kind": "file"}
     if adapter == "vdem":
         # One entry for all the indices (a file each), so cards with several stay short.
         return {"publisher": "V-Dem, via Our World in Data", "name": "V-Dem indices (Our World in Data)",

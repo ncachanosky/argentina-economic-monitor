@@ -5132,6 +5132,24 @@
     "status": "ok",
     "warnings": []
   },
+  "smi:ARG:overall": {
+    "last_changed": "2026-11-12",
+    "last_checked": "2026-11-12T17:46:23+00:00",
+    "last_obs": "2024-01-01",
+    "source": "smi",
+    "source_units": "score, 0-10",
+    "status": "ok",
+    "warnings": []
+  },
+  "smi:ARG:rank": {
+    "last_changed": "2026-11-12",
+    "last_checked": "2026-11-12T17:46:23+00:00",
+    "last_obs": "2024-01-01",
+    "source": "smi",
+    "source_units": "rank of 132",
+    "status": "ok",
+    "warnings": []
+  },
   "ust:52w": {
     "last_changed": "2026-11-11",
     "last_checked": "2026-11-12T16:38:31+00:00",

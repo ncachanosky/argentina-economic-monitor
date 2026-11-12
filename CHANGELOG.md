@@ -12,6 +12,14 @@ Changes since the last release, recorded as they are made. At the next release t
 section becomes its notes.
 
 ### Added
+- Institutions: Conditions for Social Mobility, the Archbridge Institute's Social Mobility Index
+  (2026 edition, 132 countries, data for 2024). Three views: a map of Latin America shaded by
+  any of the index's ten measures (overall, three pillars, six sub-pillars), the ranking for
+  the region or the world, and Argentina's profile by sub-pillar against the regional median,
+  with the 25 components. Argentina: 5.75 of 10, 61st of 132, 10th of 21 in the region. The
+  edition file is kept in data/manual; the update warns when Archbridge publishes a newer one.
+  Framed as conditions for mobility, not mobility outcomes.
+- `python -m pipeline.update --only <source>` updates a single source (for local runs).
 - Today's releases: on days with a scheduled release, a strip above the home dashboard names
   each one, its publisher and the month it covers, links to its chart and says whether the new
   figures are already on the Monitor ("Due today" / "On the Monitor"). Buenos Aires date; no

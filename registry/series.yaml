@@ -465,6 +465,9 @@ inputs:
   - {id: 370.3_HONESTIDADDAD_0_0_10_58, source: datos_gob, frequency: M, measure: index, allow_gaps: true, label: "UTDT ICG: honesty"}
   - {id: 370.3_CAPACIDADDAD_0_0_9_83, source: datos_gob, frequency: M, measure: index, allow_gaps: true, label: "UTDT ICG: capacity to solve problems"}
   # Economic Freedom of the World (Fraser Institute), 0-10; 1970-2000 every five years.
+  # Institutions. Archbridge Institute's Social Mobility Index: hand-kept edition file (data/manual/social_mobility_<edition>.csv).
+  - {id: "smi:ARG:overall", source: smi, frequency: Y, measure: flow, stale_days: 1100, label: "Social Mobility Index, Argentina: overall score"}
+  - {id: "smi:ARG:rank", source: smi, frequency: Y, measure: flow, stale_days: 1100, label: "Social Mobility Index, Argentina: rank"}
   - {id: "efw:ARG:summary", source: efw, frequency: Y, measure: flow, allow_gaps: true, stale_days: 1400, label: "EFW, Argentina: summary"}
   - {id: "efw:ARG:rank", source: efw, frequency: Y, measure: flow, allow_gaps: true, stale_days: 1400, label: "EFW, Argentina: rank"}
   - {id: "efw:ARG:a1", source: efw, frequency: Y, measure: flow, allow_gaps: true, stale_days: 1400, label: "EFW, Argentina: a1"}
@@ -6532,6 +6535,39 @@ indicators:
       a4: {label: "Area 4: Freedom to trade internationally", id: "efw:ARG:a4"}
       a5: {label: "Area 5: Regulation", id: "efw:ARG:a5"}
     default: {variant: summary, transform: level, range: Max}
+
+  - id: inst_smi
+    topic: institutions
+    kind: country_index
+    wide: true
+    title: "Conditions for Social Mobility (Archbridge Institute)"
+    short_title: Mobility conditions
+    description: >-
+      The Archbridge Institute's Social Mobility Index scores 132 countries
+      from 0 to 10 on the conditions that let people move up: open markets,
+      institutions and the rule of law, and education and civil society. A
+      map of Latin America, the ranking, and Argentina's profile by
+      sub-pillar.
+    source: table
+    source_label: "Archbridge Institute, Social Mobility Around the World: 2026 Edition (Callais and Martinez)"
+    frequency: Y
+    units: Score, 0-10
+    default: {}
+    table:
+      source: smi
+      file: index.json
+      status_id: "smi:ARG:overall"
+      source_url: https://www.archbridgeinstitute.org/social-mobility-index/
+    note: >-
+      The index measures conditions for mobility, not mobility itself: it
+      does not track how people's incomes or occupations compare with their
+      parents'. Each pillar averages two sub-pillars built from 25
+      components, many taken from the same sources as the Economic Freedom
+      of the World index and V-Dem on this page (regulation, property
+      rights, corruption, judicial independence), so the three move
+      together. One edition so far (data for 2024); scores from future
+      editions may not be comparable if the method changes.
+    method_links: [{anchor: smi, label: "About the Social Mobility Index"}]
 
   - id: inst_vdem
     topic: institutions
