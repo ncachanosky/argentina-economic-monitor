@@ -11,6 +11,8 @@ Numbering: minor versions (1.1, 1.2) add cards or features; patch versions
 Changes since the last release, recorded as they are made. At the next release this
 section becomes its notes.
 
+## 1.2.0 (2026-11-12)
+
 ### Added
 - Institutions: Conditions for Social Mobility, the Archbridge Institute's Social Mobility Index
   (2026 edition, 132 countries, data for 2024). Three views: a map of Latin America shaded by
@@ -20,7 +22,6 @@ section becomes its notes.
   edition file is kept in data/manual; the update warns when Archbridge publishes a newer one.
   Framed as conditions for mobility, not mobility outcomes. A tile at the top of the
   Institutions page shows Argentina's score and ranks.
-- `python -m pipeline.update --only <source>` updates a single source (for local runs).
 - Today's releases: on days with a scheduled release, a strip above the home dashboard names
   each one, its publisher and the month it covers, links to its chart and says whether the new
   figures are already on the Monitor ("Due today" / "On the Monitor"). Buenos Aires date; no
@@ -54,6 +55,8 @@ section becomes its notes.
   Diversified subindices, since 2007; that file's Argentina column is also the fallback if
   ArgentinaDatos fails. The Latin America aggregate is left out because of breaks when
   countries enter or leave the index (issue #3).
+- Three measures of inflation: 2Y and 5Y ranges.
+- `python -m pipeline.update --only <source>` updates a single source (for local runs).
 
 ### Changed
 - Institutions: simpler defaults for first-time readers. Consumer confidence opens with the
@@ -77,7 +80,6 @@ section becomes its notes.
   the missing values were written as NaN, which is not valid JSON. They are now null.
 - CPI: the REM expectations disappeared in the "By presidency" view; they are now drawn
   in every view.
-- Three measures of inflation: 2Y and 5Y ranges added.
 - Downloaded PNGs: a long source note ran into the "Argentina Economic Monitor" brand in the
   bottom-right corner (48 of 141 cards). The note now wraps to the space left of the brand
   and the bottom margin grows to fit. On Spanish pages, "Latest observation" in the note
