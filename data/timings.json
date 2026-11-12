@@ -1,112 +1,112 @@
 [
  {
   "source": "bcra (D)",
-  "seconds": 74.2,
+  "seconds": 72.5,
   "series": 46
  },
  {
-  "source": "bcra_entities (M)",
-  "seconds": 52.6,
-  "series": 32
- },
- {
   "source": "datos_gob (M)",
-  "seconds": 52.5,
+  "seconds": 36.9,
   "series": 146
  },
  {
   "source": "finanzas (M)",
-  "seconds": 40.8,
+  "seconds": 34.6,
   "series": 39
  },
  {
   "source": "x13 (M)",
-  "seconds": 29.0,
+  "seconds": 30.5,
   "series": 16
  },
  {
-  "source": "datos_gob (Q)",
-  "seconds": 21.9,
-  "series": 101
+  "source": "bcra_entities (M)",
+  "seconds": 25.0,
+  "series": 32
  },
  {
   "source": "ustreasury (D)",
-  "seconds": 19.5,
+  "seconds": 20.4,
   "series": 1
+ },
+ {
+  "source": "datos_gob (Q)",
+  "seconds": 16.5,
+  "series": 101
  },
  {
   "source": "bcra_fx (D)",
-  "seconds": 11.5,
+  "seconds": 8.1,
   "series": 1
  },
  {
-  "source": "vdem (Y)",
-  "seconds": 6.4,
-  "series": 62
- },
- {
   "source": "itcrm (D)",
-  "seconds": 5.8,
+  "seconds": 6.1,
   "series": 5
  },
  {
-  "source": "bcra_weekly (D)",
+  "source": "vdem (Y)",
   "seconds": 3.7,
-  "series": 6
- },
- {
-  "source": "bcra_banks (M)",
-  "seconds": 3.4,
-  "series": 67
+  "series": 62
  },
  {
   "source": "datos_gob (Y)",
-  "seconds": 3.3,
+  "seconds": 2.7,
   "series": 2
  },
  {
+  "source": "bcra_banks (M)",
+  "seconds": 2.7,
+  "series": 67
+ },
+ {
   "source": "efw (Y)",
-  "seconds": 3.0,
+  "seconds": 2.6,
   "series": 22
  },
  {
   "source": "dolar (D)",
-  "seconds": 2.6,
+  "seconds": 1.9,
   "series": 5
  },
  {
   "source": "riesgo (D)",
-  "seconds": 1.5,
+  "seconds": 1.7,
   "series": 11
  },
  {
-  "source": "bcra_cambiario (M)",
-  "seconds": 1.2,
-  "series": 14
- },
- {
-  "source": "bcra (M)",
-  "seconds": 1.1,
-  "series": 1
- },
- {
-  "source": "bcra_balance (M)",
-  "seconds": 1.1,
-  "series": 20
- },
- {
   "source": "rem (M)",
-  "seconds": 0.9,
+  "seconds": 1.6,
   "series": 8
  },
  {
+  "source": "bcra_weekly (D)",
+  "seconds": 1.1,
+  "series": 6
+ },
+ {
+  "source": "bcra_cambiario (M)",
+  "seconds": 1.1,
+  "series": 14
+ },
+ {
+  "source": "bcra_balance (M)",
+  "seconds": 0.9,
+  "series": 20
+ },
+ {
+  "source": "bcra (M)",
+  "seconds": 0.5,
+  "series": 1
+ },
+ {
   "source": "a3 (D)",
-  "seconds": 0.8,
+  "seconds": 0.5,
   "series": 3
  },
  {
   "source": "officials (Y)",
-  "seconds": 0.4,
+  "seconds": 0.2,
   "series": 2
  },
  {
