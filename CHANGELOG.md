@@ -38,6 +38,11 @@ section becomes its notes.
   countries enter or leave the index (issue #3).
 
 ### Changed
+- Institutions: simpler defaults for first-time readers. Consumer confidence opens with the
+  national index only; Economic Freedom with Argentina and the Latin American median;
+  V-Dem (Argentina) with liberal democracy only; the four V-Dem comparison cards with
+  Argentina only. The other lines stay one click away.
+- Last-value labels show two decimals for indices below 1 (V-Dem).
 - Home table: every row now has a number in "Latest", in bold with its date below: the level
   where the series has one, otherwise the latest change in the view shown (m/m, q/q or
   y/y). On phones the sparkline column gives way so the latest month stays in view, and

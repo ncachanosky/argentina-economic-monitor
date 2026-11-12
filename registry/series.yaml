@@ -6357,7 +6357,7 @@ indicators:
     wide: true
     kind: variants
     overlay: true
-    overlay_default: [national, macro, personal, durables]
+    overlay_default: [national]
     emphasis: national
     title: Consumer Confidence
     short_title: Consumer confidence
@@ -6449,7 +6449,7 @@ indicators:
     wide: true
     kind: variants
     overlay: true
-    overlay_default: [arg, chl, ury, bra, latam]
+    overlay_default: [arg, latam]
     muted: [latam]
     emphasis: arg
     term_colored: true
@@ -6538,7 +6538,7 @@ indicators:
     wide: true
     kind: variants
     overlay: true
-    overlay_default: [libdem, electdem, rol]
+    overlay_default: [libdem]
     plain_level: true
     measure: flow
     title: "Democracy and the Rule of Law in Argentina (V-Dem)"
@@ -6576,7 +6576,7 @@ indicators:
     wide: true
     kind: variants
     overlay: true
-    overlay_default: [arg, chl, ury, bra, latam]
+    overlay_default: [arg]
     muted: [latam]
     emphasis: arg
     term_colored: true
@@ -6620,7 +6620,7 @@ indicators:
     wide: true
     kind: variants
     overlay: true
-    overlay_default: [arg, chl, ury, bra, latam]
+    overlay_default: [arg]
     muted: [latam]
     emphasis: arg
     term_colored: true
@@ -6664,7 +6664,7 @@ indicators:
     wide: true
     kind: variants
     overlay: true
-    overlay_default: [arg, chl, ury, bra, latam]
+    overlay_default: [arg]
     muted: [latam]
     emphasis: arg
     term_colored: true
@@ -6708,7 +6708,7 @@ indicators:
     wide: true
     kind: variants
     overlay: true
-    overlay_default: [arg, chl, ury, bra, latam]
+    overlay_default: [arg]
     muted: [latam]
     emphasis: arg
     term_colored: true

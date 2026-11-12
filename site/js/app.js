@@ -3131,7 +3131,9 @@
     });
     if (!lines.size || lines.size > 8) return [];
     const sfx = specOf(t).suffix || "";
-    const fmt = (v) => (Math.abs(v) >= 100 ? Math.round(v).toLocaleString(LOCALE) : v.toLocaleString(LOCALE, { minimumFractionDigits: 1, maximumFractionDigits: 1 })) + sfx;
+    // Decimals by size: two below 1 (0-1 indices such as V-Dem's), one below 100, none above.
+    const fmt = (v) => { const d = Math.abs(v) >= 100 ? 0 : Math.abs(v) < 1 ? 2 : 1;
+      return v.toLocaleString(LOCALE, { minimumFractionDigits: d, maximumFractionDigits: d }) + sfx; };
     // Push labels apart: positions in axis units (log10 on log axes), at least 5% of the span between neighbors.
     const pos = (v) => (log ? Math.log10(Math.max(v, 1e-9)) : v);
     const L = [...lines.values()].map((l) => ({ ...l, p: pos(l.y) })).sort((a, b) => a.p - b.p);
