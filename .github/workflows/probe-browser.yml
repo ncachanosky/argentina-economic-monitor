@@ -1,5 +1,6 @@
 # Manual helper: open URLs in a headless Chromium on GitHub's network (for sites
-# that block plain HTTP clients) and push status, title and any download to `inspect`.
+# that block plain HTTP clients) and push status, title, the rendered page (HTML, text,
+# full-page screenshot) and any download to `inspect`.
 name: Probe with a browser
 on:
   workflow_dispatch:
@@ -35,6 +36,11 @@ jobs:
                           r = await pg.goto(url, wait_until="load", timeout=60000)
                           await pg.wait_for_timeout(5000)
                           res[url] = {"status": r.status if r else None, "title": await pg.title(), "html": (await pg.content())[:400]}
+                          # full rendered page, its text and a full-page screenshot, for reading JS-built sites
+                          open(f"page{i}.html", "w").write(await pg.content())
+                          open(f"page{i}.txt", "w").write(await pg.inner_text("body"))
+                          await pg.set_viewport_size({"width": 1400, "height": 900})
+                          await pg.screenshot(path=f"page{i}.png", full_page=True)
                       except Exception as e:
                           if "Download is starting" in str(e):
                               async with pg.expect_download(timeout=60000) as d:
