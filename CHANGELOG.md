@@ -16,7 +16,10 @@ section becomes its notes.
   data were read from and when they were last checked: the BCRA's API and files, A3
   Mercados, ArgentinaDatos, the REM, the Secretaría de Finanzas and the US Treasury. Cards with their
   own layout (futures curve, balance sheets, debt schedule, placements, REM revisions,
-  tenure) show the line too (issue #3).
+  tenure) show the line too (issue #3). The remaining cards now have it as well: bank
+  archives, hand-kept files (linked on GitHub), the Fraser Institute and V-Dem files, and
+  the cards the Monitor computes (monthly nominal GDP, EMAE turning points, seasonally
+  adjusted EMAE by sector), which name the files they are built from.
 - Country risk: Brazil, Chile, Colombia, Mexico, Peru and Uruguay drawn with Argentina on
   the same card (log scale), with Ecuador, Bolivia, Paraguay and Panama one click away.
   From the Banco Central de la República Dominicana's daily file of JP Morgan's EMBI Global

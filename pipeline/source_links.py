@@ -8,8 +8,10 @@ vdem, x13) have no entry: their cards already say where the data come from.
 """
 from __future__ import annotations
 
-from .sources import (a3, bcra, bcra_balance, bcra_banks, bcra_cambiario, bcra_fx, bcra_weekly,
-                      finanzas, itcrm, rem, riesgo)
+from .sources import (a3, bcra, bcra_balance, bcra_banks, bcra_cambiario, bcra_entities, bcra_fx, bcra_weekly,
+                      efw, finanzas, itcrm, rem, riesgo, vdem)
+
+REPO_FILES = "https://github.com/ncachanosky/argentina-economic-monitor/blob/main/"
 
 ARGDATOS = "https://argentinadatos.com/"
 
@@ -49,9 +51,28 @@ def finanzas_link(sid: str) -> dict:
     return {"publisher": "Secretaría de Finanzas", "name": name, "url": page, "kind": "file"}
 
 
-def link_for(adapter: str, sid: str) -> dict | None:
+def link_for(adapter: str, sid: str, st: dict | None = None) -> dict | None:
+    """The file or service behind one series; `st` is its entry in data/status.json."""
+    st = st or {}
     if adapter == "finanzas":
         return finanzas_link(sid)
+    if adapter in ("manual", "officials"):
+        # Hand-kept files in the repository: link to the file on GitHub.
+        name = "officials" if adapter == "officials" else sid.partition("#")[0]
+        return {"publisher": "Argentina Economic Monitor (hand-kept file)", "name": f"{name}.csv",
+                "url": f"{REPO_FILES}data/manual/{name}.csv", "kind": "file"}
+    if adapter == "bcra_entities":
+        # One archive per month; the latest month read is the one named.
+        ym = (st.get("last_obs") or "")[:7].replace("-", "")
+        url = bcra_entities.BASE.format(ym=ym) if ym else None
+        return {"publisher": "BCRA", "name": url.rsplit("/", 1)[-1] if url else "Entidades (monthly archive)",
+                "url": url or "https://www.bcra.gob.ar/", "kind": "file"} if url else None
+    if adapter == "efw":
+        return {"publisher": "Fraser Institute", "name": efw.URL.rsplit("/", 1)[-1], "url": efw.URL, "kind": "file"}
+    if adapter == "vdem":
+        # One entry for all the indices (a file each), so cards with several stay short.
+        return {"publisher": "V-Dem, via Our World in Data", "name": "V-Dem indices (Our World in Data)",
+                "url": "https://ourworldindata.org/grapher/" + vdem.INDICES["libdem"], "kind": "api"}
     if adapter == "riesgo" and sid != "riesgo:embi":
         return {"publisher": "Banco Central de la República Dominicana", "name": _file(riesgo.BCRD),
                 "url": riesgo.BCRD, "page": riesgo.BCRD_PAGE, "kind": "file"}

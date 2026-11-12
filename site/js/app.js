@@ -1965,7 +1965,7 @@
       h("div", { class: "controls" }, modeSeg, h("span", { class: "spacer" }), rSeg),
       hintEl, methodLine(ind), chartEl, velTitle, velEl,
       ind.note ? h("p", { class: "chips-note" }, ind.note) : null,
-      h("div", { class: "card-foot" }, h("span", {}, `Source: ${ind.source_label} · Latest: ${fmtShortMonth(D[D.length - 1])}${N.proxy_from ? " (proxy)" : ""}`),
+      h("div", { class: "card-foot" }, h("span", {}, `Source: ${ind.source_label} · Latest: ${fmtShortMonth(D[D.length - 1])}${N.proxy_from ? " (proxy)" : ""}`, ...srcTail(ind)),
         h("div", { class: "actions" }, h("button", { class: "btn", type: "button", onclick: onPNG }, "PNG"), h("button", { class: "btn", type: "button", onclick: onCSV }, "CSV"))));
     card.draw = draw;
     return card;
@@ -2038,7 +2038,7 @@
     const onCSV = () => downloadBlob(toCSV(["release", "latest_month", "trend_mom_as_published", "trend_mom_today"], R.releases.map((r) => [r.release, r.data_to, r.mom, r.final ?? ""])), `${ind.id}_releases.csv`, "text/csv");
     appendAll(card, sumEl, tableEl, h("div", { class: "controls", style: "margin-top:14px" }, h("span", { class: "hint" }, "Latest month of each release against today's trend-cycle."), h("span", { class: "spacer" }), rSeg),
       chartEl, ind.note ? h("p", { class: "chips-note" }, ind.note) : null, methodLine(ind),
-      h("div", { class: "card-foot" }, h("span", {}, `Source: ${ind.source_label} · Latest release: ${fmtDay(S.last_release)}`),
+      h("div", { class: "card-foot" }, h("span", {}, `Source: ${ind.source_label} · Latest release: ${fmtDay(S.last_release)}`, ...srcTail(ind)),
         h("div", { class: "actions" }, h("button", { class: "btn", type: "button", onclick: onPNG }, "PNG"), h("button", { class: "btn", type: "button", onclick: onCSV }, "CSV"))));
     card.draw = draw;
     return card;

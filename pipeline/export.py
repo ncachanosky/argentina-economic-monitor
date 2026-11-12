@@ -25,7 +25,8 @@ from .update import STATUS_PATH
 DATOS_GOB_SERIES_URL = "https://datos.gob.ar/series/api/series/?ids={id}"
 
 
-def source_files_for(ind, meta: dict | None = None, status: dict | None = None) -> list[dict] | None:
+def source_files_for(ind, meta: dict | None = None, status: dict | None = None,
+                     extra_ids=()) -> list[dict] | None:
     """Where a card's series were last read from, with the time each was checked: the publisher
     files of pipeline/sources/primary.py, then the files and APIs of the other adapters
     (pipeline/source_links.py). Only sources whose latest read succeeded are listed."""
@@ -34,9 +35,10 @@ def source_files_for(ind, meta: dict | None = None, status: dict | None = None) 
         files = json.loads(primary.STATUS_FILE.read_text(encoding="utf-8"))
     except Exception:
         files = {}
-    ids = set(ind.input_ids())
+    ids = set(ind.input_ids()) | set(extra_ids)
     if ind.source == "table" and ind.table and ind.table.get("status_id"):
         ids.add(ind.table["status_id"])
+    ids |= {i.split(":", 1)[1] for i in ids if i.startswith("x13:")}     # Monitor's adjustment: the series it adjusts
     out = []
     out += _adapter_links(ids, ind, meta or {}, status or {})
     for p in primary.all_providers():
@@ -58,8 +60,8 @@ def _adapter_links(ids: set, ind, meta: dict, status: dict) -> list[dict]:
         adapter = (meta.get(sid) or {}).get("source")
         if not adapter and ind.source == "table" and sid == (ind.table or {}).get("status_id"):
             adapter = ind.table.get("source")
-        link = link_for(adapter, sid) if adapter else None
         st = status.get(sid) or {}
+        link = link_for(adapter, sid, st) if adapter else None
         if not link or st.get("status") != "ok":
             continue
         e = seen.setdefault(link["url"], {**link, "checked": None})
@@ -306,6 +308,12 @@ def rem_outcomes() -> dict:
     return {k: {y: float(v) for y, v in d.items()} for k, d in out.items()}
 
 
+def _meta_status() -> tuple[dict, dict]:
+    """Series metadata and status, for cards built outside the main loop."""
+    status = json.loads(STATUS_PATH.read_text(encoding="utf-8")) if STATUS_PATH.exists() else {}
+    return registry.load().series_meta(), status
+
+
 def export_turns(ind, out: Path) -> dict | None:
     """The EMAE trend-cycle in real time (pipeline/emae_turns.py)."""
     from . import emae_turns
@@ -318,7 +326,7 @@ def export_turns(ind, out: Path) -> dict | None:
     payload = {"id": ind.id, "topic": ind.topic, "kind": ind.kind, "title": ind.title, "short_title": ind.short_title,
                "description": ind.description, "note": ind.note, "source_label": ind.source_label, "wide": True,
                "frequency": "M", "units": ind.units, "method_links": ind.method_links, "status": "ok", "last_obs": last,
-               "turns": res}
+               "turns": res, "source_files": source_files_for(ind, *_meta_status(), extra_ids=[emae_turns.SID])}
     (out / f"{ind.id}.json").write_text(json.dumps(payload, separators=(",", ":")), encoding="utf-8")
     return {"id": ind.id, "topic": ind.topic, "kind": ind.kind, "title": ind.title, "short_title": ind.short_title,
             "status": "ok", "last_obs": last, "headline": False}
@@ -336,7 +344,9 @@ def export_ngdp(ind, out: Path) -> dict | None:
     payload = {"id": ind.id, "topic": ind.topic, "kind": ind.kind, "title": ind.title, "short_title": ind.short_title,
                "description": ind.description, "note": ind.note, "source_label": ind.source_label, "wide": True,
                "frequency": "M", "units": ind.units, "method_links": ind.method_links, "status": "ok", "last_obs": last,
-               "ngdp": {**res, **(ind.table.get("params") or {})}}
+               "ngdp": {**res, **(ind.table.get("params") or {})},
+               "source_files": source_files_for(ind, *_meta_status(), extra_ids=[ngdp.REAL_SA, ngdp.REAL, ngdp.NOM, ngdp.EMAE_SA,
+                                                                             *ngdp.M2_PRIVATE, "rem:cpi12"])}
     (out / f"{ind.id}.json").write_text(json.dumps(payload, separators=(",", ":")), encoding="utf-8")
     return {"id": ind.id, "topic": ind.topic, "kind": ind.kind, "title": ind.title, "short_title": ind.short_title,
             "status": "ok", "last_obs": last, "headline": False}
