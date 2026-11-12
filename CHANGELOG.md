@@ -28,6 +28,10 @@ section becomes its notes.
   countries enter or leave the index (issue #3).
 
 ### Changed
+- Home table: every row now has a number in "Latest", in bold with its date below: the level
+  where the series has one, otherwise the latest change in the view shown (m/m, q/q or
+  y/y). On phones the sparkline column gives way so the latest month stays in view, and
+  the group names (Activity, Prices...) stay visible when the table is scrolled sideways.
 - Log-scale charts spanning less than three orders of magnitude label the axis at 1, 2 and
   5 times powers of ten instead of every unit, with finer steps (1,000, 1,200, 1,500...)
   when the window is narrow, such as two years of the exchange rate.

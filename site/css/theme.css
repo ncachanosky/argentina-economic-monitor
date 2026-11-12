@@ -364,7 +364,9 @@ table.data.sched tr.total td { font-weight: 700; border-top: 2px solid var(--ink
 .dash-table td.na { color: var(--ink-3); font-size: 12px; }
 .dash-table .dash-q { font-size: 10px; color: var(--ink-3); margin-left: 3px; vertical-align: super; }
 .dash-table .dash-level { color: var(--ink); border-left: 1px solid var(--rule); }
+.dash-table .dash-latest { display: block; font-weight: 700; color: var(--ink); }
 .dash-table .dash-date { display: block; font-size: 11px; color: var(--ink-3); }
+.dash-table .dash-group th span { position: sticky; left: 8px; }
 .dash-table .dash-spark { color: var(--ink-2); padding-right: 0; }
 .dash-tag { font-size: 10.5px; color: var(--ink-3); border: 1px solid var(--rule); border-radius: 4px; padding: 0 4px; margin-left: 6px; }
 .dash-tag.warn { color: var(--neg); border-color: var(--neg); }
@@ -375,6 +377,8 @@ table.data.sched tr.total td { font-weight: 700; border-top: 2px solid var(--ink
   .dash { padding: 12px 10px; }
   .dash-table { font-size: 12.5px; }
   .dash-table .dash-name { min-width: 130px; max-width: 150px; }
+  /* phones: the sparkline gives way so the latest month stays next to "Latest" */
+  .dash-table .dash-spark, .dash-table thead th:last-child { display: none; }
 }
 
 /* Embeds: one card, no site chrome */

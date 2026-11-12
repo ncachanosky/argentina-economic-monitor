@@ -3145,7 +3145,8 @@
       const body = [];
       let group = null, anyFb = false;
       for (const r of D.rows) {
-        if (r.group !== group) { group = r.group; body.push(h("tr", { class: "dash-group" }, h("th", { colspan: cols.length + 3, scope: "colgroup" }, group))); }
+        // The group name sits in a sticky span so it stays in view when the table is scrolled sideways (phones).
+        if (r.group !== group) { group = r.group; body.push(h("tr", { class: "dash-group" }, h("th", { colspan: cols.length + 3, scope: "colgroup" }, h("span", {}, group)))); }
         const fb = mode === "mm" && !r.mm && !!r.yy;   // no s.a. series: the 12-month change stands in
         const V = fb ? r.yy : r[mode];
         if (fb) anyFb = true;
@@ -3164,8 +3165,15 @@
           return h("td", { class: fb ? "dash-fb" : null, style: cellStyle(r, z), title: tip }, fmtChange(r, V.kind, v), r.freq === "Q" ? h("span", { class: "dash-q" }, QN(c)) : null);
         });
         const lvlDate = r.freq === "Q" ? `${QN(r.level_date)} ${r.level_date.slice(0, 4)}` : `${MON(r.level_date)} ${r.level_date.slice(0, 4)}`;
+        // Latest: the level when the series has one (reserves, rates), otherwise the latest change in
+        // the view shown, so every row has a number even where the month columns are off screen.
+        const lastCol = V ? [...cols].reverse().find((c) => V.values[c]) : null;
+        const lvl = fmtLevel(r);
+        const latestMain = lvl || (lastCol ? fmtChange(r, V.kind, V.values[lastCol][0]) : "");
+        const latestDate = lvl || !lastCol ? lvlDate
+          : (r.freq === "Q" ? `${QN(lastCol)} ${lastCol.slice(0, 4)}` : `${MON(lastCol)} ${lastCol.slice(0, 4)}`) + " · " + tr(mode === "mm" && !fb ? (r.freq === "Q" ? "q/q" : "m/m") : "y/y");
         body.push(h("tr", {}, h("th", { class: "dash-name", scope: "row" }, label, ...marks), cells,
-          h("td", { class: "dash-level" }, fmtLevel(r), h("span", { class: "dash-date" }, lvlDate)),
+          h("td", { class: "dash-level" }, h("span", { class: "dash-latest" }, latestMain), h("span", { class: "dash-date" }, latestDate)),
           h("td", { class: "dash-spark" }, spark(r))));
       }
       tableWrap.replaceChildren(h("table", { class: "dash-table" }, h("thead", {}, head), h("tbody", {}, body)));
