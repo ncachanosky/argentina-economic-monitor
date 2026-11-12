@@ -517,10 +517,17 @@
     if (!v.length) return {};
     const lo = Math.min(...v), hi = Math.max(...v);
     if (Math.log10(hi / lo) > 3) return {};
-    const vals = [];
-    for (let e = Math.floor(Math.log10(lo)); e <= Math.ceil(Math.log10(hi)); e++)
-      [1, 2, 5].forEach((m) => { const x = m * 10 ** e; if (x >= lo / 1.5 && x <= hi * 1.5) vals.push(x); });
-    return vals.length >= 3 ? { tickmode: "array", tickvals: vals } : {};
+    // Finer steps for narrow windows (e.g. two years of the exchange rate): the first set that
+    // puts at least four ticks inside the data.
+    const sets = [[1, 2, 5], [1, 1.5, 2, 3, 5, 7], [1, 1.2, 1.5, 2, 2.5, 3, 4, 5, 6, 8],
+      [1, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.8, 2, 2.2, 2.4, 2.6, 2.8, 3, 3.5, 4, 4.5, 5, 6, 7, 8, 9]];
+    for (const ms of sets) {
+      const vals = [];
+      for (let e = Math.floor(Math.log10(lo)) - 1; e <= Math.ceil(Math.log10(hi)); e++)
+        ms.forEach((m) => { const x = +(m * 10 ** e).toPrecision(6); if (x >= lo / 1.5 && x <= hi * 1.5) vals.push(x); });
+      if (vals.filter((x) => x >= lo && x <= hi).length >= 4 || ms === sets[sets.length - 1]) return { tickmode: "array", tickvals: vals };
+    }
+    return {};
   }
 
   // The source line for cards with their own footer: a line break and the note, if any.

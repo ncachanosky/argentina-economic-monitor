@@ -29,7 +29,8 @@ section becomes its notes.
 
 ### Changed
 - Log-scale charts spanning less than three orders of magnitude label the axis at 1, 2 and
-  5 times powers of ten instead of every unit.
+  5 times powers of ten instead of every unit, with finer steps (1,000, 1,200, 1,500...)
+  when the window is narrow, such as two years of the exchange rate.
 
 ### Fixed
 - Downloaded PNGs: a long source note ran into the "Argentina Economic Monitor" brand in the
