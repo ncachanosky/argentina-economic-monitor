@@ -11,6 +11,10 @@ Numbering: minor versions (1.1, 1.2) add cards or features; patch versions
 Changes since the last release, recorded as they are made. At the next release this
 section becomes its notes.
 
+### Changed
+- Where would the exchange rate be (two dates): the span behind the yearly productivity
+  change reads in years and months ("10 years and 10 months") instead of decimal years.
+
 ## 1.2.0 (2026-11-12)
 
 ### Added

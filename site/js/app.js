@@ -2313,6 +2313,19 @@
       const tA = A.date ? at("tot", A.date) : -1, tB = at("tot", D[bIdx]);
       const totCh = tA >= 0 && tB >= 0 && tA !== tB ? 100 * (V("tot")[tB] / V("tot")[tA] - 1) : null;
       const aName = A.date ? fmtDay(A.date) : tr(A.label);
+      // The span between the dates in calendar terms: "10 years and 10 months".
+      const span = (() => {
+        if (!A.date) return null;
+        const a = new Date(A.date + "T00:00:00Z"), b = new Date(D[bIdx] + "T00:00:00Z");
+        let m = (b.getUTCFullYear() - a.getUTCFullYear()) * 12 + b.getUTCMonth() - a.getUTCMonth();
+        if (b.getUTCDate() < a.getUTCDate()) m -= 1;
+        const es = LANG === "es", y = Math.floor(m / 12), r = m % 12;
+        const yy = y ? `${y} ${es ? (y === 1 ? "año" : "años") : (y === 1 ? "year" : "years")}` : "";
+        const mm = r ? `${r} ${es ? (r === 1 ? "mes" : "meses") : (r === 1 ? "month" : "months")}` : "";
+        if (yy || mm) return [yy, mm].filter(Boolean).join(es ? " y " : " and ");
+        const d = Math.round((b - a) / dayMs);
+        return `${d} ${es ? (d === 1 ? "día" : "días") : (d === 1 ? "day" : "days")}`;
+      })();
       outEl.replaceChildren(
         h("div", { class: "rer-grid" },
           h("div", { class: "rer-tile" }, h("div", { class: "rer-k" }, "Real exchange rate"), h("div", { class: "rer-v" }, `${fmtR(rA, 1)} → ${fmtR(rB, 1)}`),
@@ -2320,7 +2333,7 @@
           h("div", { class: "rer-tile" }, h("div", { class: "rer-k" }, `${k === "m" ? "Official" : "CCL"} rate that restores ${A.date ? "A" : "the reference"}`), h("div", { class: "rer-v" }, fmtR(implied)),
             h("div", { class: "rer-s" }, fxB ? `Actual ${fxName} ${fmtR(fxB, 2)} on ${fmtDay(D[jf])}${implied ? `: ${pct(100 * (implied / fxB - 1))} away` : ""}` : "")),
           h("div", { class: "rer-tile" }, h("div", { class: "rer-k" }, "Required change in relative productivity"), h("div", { class: "rer-v" }, pct(total)),
-            h("div", { class: "rer-s" }, `${perYear === null ? "total" : `total; ${pct(perYear)} a year over ${fx(years, 1)} years`}, with α = ${fx(al, 2)}`)),
+            h("div", { class: "rer-s" }, `${perYear === null ? "total" : `total; ${pct(perYear)} a year over ${span}`}, with α = ${fx(al, 2)}`)),
           h("div", { class: "rer-tile" }, h("div", { class: "rer-k" }, "Terms of trade over the same span"), h("div", { class: "rer-v" }, totCh === null ? "–" : pct(totCh)),
             h("div", { class: "rer-s" }, totCh === null ? (A.date ? "no quarterly data for these dates" : "needs a reference date") : `${fmtPeriod(D[tA], "Q")} to ${fmtPeriod(D[tB], "Q")} (INDEC); a rise also supports a stronger peso`))),
         h("p", { class: "hint" }, `Rate that restores the reference: the ${fxName} on the second date × reference index / index on the second date. If both were equilibria, Argentina's productivity in tradables relative to non-tradables, compared with its trading partners, must have changed by ${pct(total)} for the real exchange rate to move ${pct(rer)} (Balassa–Samuelson: Δln RER = −α × Δln relative productivity); other fundamentals, such as the terms of trade, would reduce or add to it.${k === "mkt" ? " CCL mode: the index at the CCL rate (the official index before November 2011, when there were no controls)." : ""}`));
