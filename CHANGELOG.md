@@ -18,7 +18,8 @@ section becomes its notes.
   the region or the world, and Argentina's profile by sub-pillar against the regional median,
   with the 25 components. Argentina: 5.75 of 10, 61st of 132, 10th of 21 in the region. The
   edition file is kept in data/manual; the update warns when Archbridge publishes a newer one.
-  Framed as conditions for mobility, not mobility outcomes.
+  Framed as conditions for mobility, not mobility outcomes. A tile at the top of the
+  Institutions page shows Argentina's score and ranks.
 - `python -m pipeline.update --only <source>` updates a single source (for local runs).
 - Today's releases: on days with a scheduled release, a strip above the home dashboard names
   each one, its publisher and the month it covers, links to its chart and says whether the new

@@ -3356,7 +3356,20 @@
 
   // ---------- headline tiles ----------
   // Summary boxes of a card: its headline and any extra `tiles`.
-  const tilesOf = (ind, href) => [ind.headline, ...(ind.tiles || [])].filter(Boolean).map((spec) => tile(ind, href, spec)).filter(Boolean);
+  const tilesOf = (ind, href) => (ind.kind === "country_index" ? [indexTile(ind, href)].filter(Boolean)
+    : [ind.headline, ...(ind.tiles || [])].filter(Boolean).map((spec) => tile(ind, href, spec)).filter(Boolean));
+  // A cross-country index (one edition): Argentina's score and ranks.
+  function indexTile(ind, href) {
+    const S = ind.summary;
+    if (!S) return null;
+    const ord = (n) => (LANG === "es" ? `${n}.º` : n + ([11, 12, 13].includes(n % 100) ? "th" : ({ 1: "st", 2: "nd", 3: "rd" })[n % 10] || "th"));
+    return h("a", { class: "tile", href: href || `#ind-${ind.id}` },
+      h("div", { class: "tile-label" }, ind.short_title),
+      h("div", { class: "tile-value" }, Number(S.score).toLocaleString(LOCALE, { minimumFractionDigits: 2, maximumFractionDigits: 2 })),
+      h("div", { class: "tile-sub" }, LANG === "es" ? `${S.year} · puntaje 0 a 10 (Archbridge)` : `${S.year} · score, 0 to 10 (Archbridge)`),
+      h("div", { class: "tile-sub" }, LANG === "es" ? `${ord(S.rank)} de ${S.count} países; ${ord(S.region_rank)} de ${S.region_count} en la región`
+        : `${ord(S.rank)} of ${S.count} countries; ${ord(S.region_rank)} of ${S.region_count} in the region`));
+  }
   function tile(ind, href, spec) {
     const hl = spec || ind.headline;
     const T = tfs(ind);

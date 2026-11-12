@@ -409,10 +409,21 @@ def export_table(ind, out: Path, status: dict, reg_meta: dict | None = None) -> 
         "status": st.get("status", "ok"), "last_obs": last,
         "last_checked": st.get("last_checked"), "last_changed": st.get("last_changed"),
         "source_files": source_files_for(ind, reg_meta, status),
+        "summary": country_summary(index) if ind.kind == "country_index" else None,
     }
     (out / f"{ind.id}.json").write_text(json.dumps(payload, separators=(",", ":")), encoding="utf-8")
     return {"id": ind.id, "topic": ind.topic, "kind": ind.kind, "title": ind.title, "short_title": ind.short_title,
             "status": payload["status"], "last_obs": last, "headline": False}
+
+
+def country_summary(index: dict, iso: str = "ARG") -> dict | None:
+    """Argentina's overall score and ranks in a cross-country index, for the page's tile."""
+    c = next((x for x in index.get("countries", []) if x["iso"] == iso), None)
+    if not c:
+        return None
+    region = [x for x in index["countries"] if x["region"] == c["region"]]
+    return {"score": c["score"]["overall"], "rank": c["rank"]["overall"], "count": index["count"],
+            "region_rank": c["region_rank"], "region_count": len(region), "year": c["year"]}
 
 
 def first_seen(series_id: str) -> tuple[str, str] | None:
