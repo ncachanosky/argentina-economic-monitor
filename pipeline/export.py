@@ -308,6 +308,19 @@ def rem_outcomes() -> dict:
     return {k: {y: float(v) for y, v in d.items()} for k, d in out.items()}
 
 
+def release_last_obs(ind, wide) -> str:
+    """The latest period the card's release calendar has delivered. Usually the card's own last
+    date; the quarter tracker is quarterly but follows the monthly EMAE calendar, and its last
+    quarter is dated by its first month, so it would always look a month or two behind."""
+    last = wide.dropna(how="all").index.max()
+    m = (ind.derive or {}).get("monthly_sa") if (ind.derive or {}).get("method") == "tracker" else None
+    if m:
+        s = store.as_of(m).dropna()
+        if len(s):
+            last = max(last, s.index.max())
+    return last.strftime("%Y-%m-%d")
+
+
 def _meta_status() -> tuple[dict, dict]:
     """Series metadata and status, for cards built outside the main loop."""
     status = json.loads(STATUS_PATH.read_text(encoding="utf-8")) if STATUS_PATH.exists() else {}
@@ -548,7 +561,7 @@ def export(out: Path) -> None:
             "last_obs": wide.dropna(how="all").index.max().strftime("%Y-%m-%d"),
             "last_changed": max(changed) if changed else None,
             "last_checked": max(checked) if checked else None,
-            "next_release": reg.next_release(ind, wide.dropna(how="all").index.max().strftime("%Y-%m-%d")),
+            "next_release": reg.next_release(ind, release_last_obs(ind, wide)),
             "dates": [d.strftime("%Y-%m-%d") for d in wide.index],
             "variants": {
                 k: {

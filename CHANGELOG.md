@@ -47,6 +47,9 @@ section becomes its notes.
   when the window is narrow, such as two years of the exchange rate.
 
 ### Fixed
+- Tracking the current quarter: marked "Late" although it had August's EMAE. The card is
+  quarterly and its last quarter is dated by its first month (July), so the release check
+  thought August was missing; it now uses the latest EMAE month.
 - Dollar futures curve: did not load. A3 Mercados stopped sending the implied rate, and
   the missing values were written as NaN, which is not valid JSON. They are now null.
 - CPI: the REM expectations disappeared in the "By presidency" view; they are now drawn
