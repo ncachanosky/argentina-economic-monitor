@@ -6907,6 +6907,7 @@ indicators:
     muted: [latam]
     emphasis: arg
     term_colored: true
+    term_toggle: true
     plain_level: true
     measure: flow
     title: "Liberal democracy: Argentina and Comparison Countries"
@@ -6953,6 +6954,7 @@ indicators:
     muted: [latam]
     emphasis: arg
     term_colored: true
+    term_toggle: true
     plain_level: true
     measure: flow
     title: "Electoral democracy: Argentina and Comparison Countries"
@@ -6997,6 +6999,7 @@ indicators:
     muted: [latam]
     emphasis: arg
     term_colored: true
+    term_toggle: true
     plain_level: true
     measure: flow
     title: "Judicial constraints on the executive: Argentina and Comparison Countries"
@@ -7043,6 +7046,7 @@ indicators:
     muted: [latam]
     emphasis: arg
     term_colored: true
+    term_toggle: true
     plain_level: true
     measure: flow
     title: "Legislative constraints on the executive: Argentina and Comparison Countries"
@@ -7087,6 +7091,7 @@ indicators:
     muted: [latam]
     emphasis: arg
     term_colored: true
+    term_toggle: true
     plain_level: true
     measure: flow
     title: "Rule of law: Argentina and Comparison Countries"
@@ -7133,6 +7138,7 @@ indicators:
     muted: [latam]
     emphasis: arg
     term_colored: true
+    term_toggle: true
     plain_level: true
     measure: flow
     title: "Political corruption: Argentina and Comparison Countries"

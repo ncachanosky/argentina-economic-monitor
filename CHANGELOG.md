@@ -89,7 +89,7 @@ section becomes its notes.
   each term since December 1983, from the cards' own data and the site's term convention (the
   handover month belongs to the outgoing president, explained in the card's note). No score,
   ranking or colors. Each row links to its card. Methodology: "The economy under each presidency".
-- Economic freedom cards: Argentina's line in one color by default; "Color by president" turns the
+- Economic freedom and V-Dem cards: Argentina's line in one color by default; "Color by president" turns the
   presidency colors on (and stays on across the card's views). Registry option `term_toggle`.
 
 ## 1.2.0 (2026-11-12)
