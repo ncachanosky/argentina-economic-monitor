@@ -555,17 +555,26 @@
         h("a", { class: "btn", href: `${DATA}${ind.id}${LANG === "es" ? ".es" : ""}.csv`, download: `${ind.id}_all.csv`, title: "All variants, levels, as published" }, "All data")));
   }
 
-  function tableView(dates, cols, pct, freq) {
+  // opts: { asc: oldest first, yearMarks: a rule above each year's first period }.
+  function tableView(dates, cols, pct, freq, opts = {}) {
     const details = h("details", { class: "table-view" }, h("summary", {}, "Show data table"));
     const fill = () => {
       if (details.dataset.filled) return;
       const n = dates.length, start = Math.max(0, n - 36);
       const tbody = h("tbody");
-      for (let i = n - 1; i >= start; i--) {
-        tbody.append(h("tr", {}, h("td", {}, fmtPeriod(dates[i], freq)), ...cols.map((c) => h("td", {}, fmtNum(c.values[i], pct)))));
-      }
-      details.append(h("div", { class: "table-scroll" }, h("table", { class: "data" },
-        h("thead", {}, h("tr", {}, h("th", {}, freq === "Q" ? "Quarter" : freq === "Y" ? "Year" : "Month"), ...cols.map((c) => h("th", {}, c.label)))), tbody)));
+      const idx = [];
+      for (let i = start; i < n; i++) idx.push(i);
+      if (!opts.asc) idx.reverse();
+      idx.forEach((i, k) => {
+        const newYear = opts.yearMarks && k > 0 && dates[i].slice(0, 4) !== dates[idx[k - 1]].slice(0, 4);
+        tbody.append(h("tr", { class: newYear ? "year-start" : null }, h("td", {}, fmtPeriod(dates[i], freq)),
+          ...cols.map((c) => h("td", {}, fmtNum(c.values[i], c.pct || pct)))));
+      });
+      const scroll = h("div", { class: "table-scroll" }, h("table", { class: "data" },
+        h("thead", {}, h("tr", {}, h("th", {}, freq === "Q" ? "Quarter" : freq === "Y" ? "Year" : "Month"), ...cols.map((c) => h("th", {}, c.label)))), tbody));
+      details.append(scroll);
+      // Oldest first: open at the latest rows.
+      if (opts.asc) requestAnimationFrame(() => { scroll.scrollTop = scroll.scrollHeight; });
       details.dataset.filled = "1";
     };
     details.addEventListener("toggle", fill);
@@ -1366,6 +1375,17 @@
         const s = k === state.variant ? main : series(k);
         return { label: `${s.v.label}${suffix}`, values: x.map((d) => s.y[ind.dates.indexOf(d)]) };
       });
+      // Extra columns for the main line in the m/m view (data_table.extra), e.g. the CPI's year to date and 12-month rates.
+      const DT = ind.data_table || {};
+      if (DT.extra && state.transform === "mom" && !main.rebased) {
+        const lv = ind.variants[state.variant].values;
+        DT.extra.filter((k) => k !== state.transform).forEach((k) => {
+          const spec = T[k] || (ind.measure === "rate" ? RATE_TRANSFORMS : INDEX_TRANSFORMS)[k];
+          if (!spec) return;
+          const vals = transform(ind.dates, lv, k, ind.measure, ind.frequency);
+          cols.push({ label: `${ind.variants[state.variant].label} (${tr(spec.label)})`, values: x.map((d) => vals[ind.dates.indexOf(d)]), pct: spec });
+        });
+      }
       table && table.refresh(x, cols, t, ind.frequency);
     }
 
@@ -1413,7 +1433,7 @@
       ind.caveat ? h("p", { class: "caveat" }, ind.caveat) : null,
       trackerLine(), summaryEl, hint, methodLine(ind), bandKey, termKey(), epKey, chartEl, chipRow, statsEl);
     drawSummary();
-    table = tableView([], [], false, ind.frequency);
+    table = tableView([], [], false, ind.frequency, { asc: (ind.data_table || {}).order === "asc", yearMarks: !!(ind.data_table || {}).year_marks });
     appendAll(card, breakdownTable(ind), table, annualTable(ind), weightsTable(ind), ind.note ? h("p", { class: "chips-note" }, ind.note) : null,
       ind.recession ? recessionNote(ind.recession) : null, footer(ind, onPNG, onCSV));
     card.draw = draw;

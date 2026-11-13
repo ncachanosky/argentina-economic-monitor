@@ -1442,6 +1442,7 @@ indicators:
       core:      {label: Core,      id: 148.3_INUCLEONAL_DICI_M_19}
       regulated: {label: Regulated, id: 148.3_IREGULANAL_DICI_M_22}
       seasonal:  {label: Seasonal,  id: 148.3_IESTACINAL_DICI_M_25}
+    data_table: {order: asc, year_marks: true, extra: [ytd, yoy]}
     default: {variant: headline, transform: mom, start: "2017-01"}
     forecast:
       - {variant: headline, rem: cpi, transform: mom}
