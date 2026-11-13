@@ -1673,7 +1673,7 @@
     const keys = Object.keys(ind.variants);
     const state = { variant: ind.default.variant || keys[0], rate: "mom" };
     const vSeg = segmented(keys.map((k) => [k, ind.variants[k].label]), state.variant, (k) => { state.variant = k; vSeg.update(k); draw(); }, "Series");
-    const rSeg = segmented([["mom", ES ? "m/m %" : "m/m %"], ["yoy", ES ? "i.a. %" : "y/y %"]], state.rate, (k) => { state.rate = k; rSeg.update(k); draw(); }, "Rate");
+    const rSeg = segmented([["mom", ES ? "m/m %" : "m/m %"], ["ytd", ES ? "acum. %" : "YTD %"], ["yoy", ES ? "i.a. %" : "y/y %"]], state.rate, (k) => { state.rate = k; rSeg.update(k); draw(); }, "Rate");
     const wrap = h("div", { class: "ym-wrap" });
     const note = h("p", { class: "chips-note" });
     const MONTH = (m) => new Date(Date.UTC(2001, m, 1)).toLocaleString(LOCALE, { month: "short", timeZone: "UTC" }).replace(".", "");
@@ -1689,7 +1689,8 @@
       const lag = state.rate === "mom" ? 1 : 12;
       const rows = new Map();
       ind.dates.forEach((d, i) => {
-        const prev = ind.dates[i - lag] && monthIndex(ind.dates[i - lag]) === monthIndex(d) - lag ? vals[i - lag] : null;
+        const prev = state.rate === "ytd" ? lv.get(`${+d.slice(0, 4) - 1}-12-01`) ?? null   // since the previous December
+          : ind.dates[i - lag] && monthIndex(ind.dates[i - lag]) === monthIndex(d) - lag ? vals[i - lag] : null;
         const r = vals[i] !== null && prev ? 100 * (vals[i] / prev - 1) : null;
         const y = +d.slice(0, 4);
         if (!rows.has(y)) rows.set(y, new Array(12).fill(null));
@@ -1722,9 +1723,13 @@
       wrap.replaceChildren(h("table", { class: "ym-table" },
         h("thead", {}, h("tr", {}, header.map((c, i) => h("th", { class: i === 0 ? "ym-y" : i === 13 ? "ym-tot" : null }, c)))),
         h("tbody", {}, body)));
-      note.textContent = ES ? (state.rate === "mom"
+      note.textContent = ES ? (state.rate === "ytd"
+        ? "Cada celda es la inflación acumulada desde el diciembre anterior, de modo que diciembre coincide con dic/dic. El sombreado crece con la tasa en escala logarítmica. La celda recuadrada es el último mes. Prom/prom: el índice promedio del año sobre el del año anterior."
+        : state.rate === "mom"
         ? "Cada celda es la variación del mes respecto del mes anterior (serie original). El sombreado crece con la tasa en escala logarítmica, para que se lean tanto 2% como 25%. La celda recuadrada es el último mes. Dic/dic: la inflación del año (acumulada en el año en curso). Prom/prom: el índice promedio del año sobre el del año anterior."
         : "Cada celda es la variación respecto del mismo mes del año anterior. El sombreado crece con la tasa en escala logarítmica. La celda recuadrada es el último mes. Dic/dic: la inflación del año (acumulada en el año en curso). Prom/prom: el índice promedio del año sobre el del año anterior.")
+        : state.rate === "ytd"
+        ? "Each cell is inflation accumulated since the previous December (year to date), so December equals Dec/Dec. Shading grows with the rate on a log scale. The outlined cell is the latest month. Avg/Avg: the year's average index over the previous year's."
         : state.rate === "mom"
         ? "Each cell is the month's change over the previous month (original series). Shading grows with the rate on a log scale, so 2% and 25% both read. The outlined cell is the latest month. Dec/Dec: the year's inflation (year to date for the current year). Avg/Avg: the year's average index over the previous year's."
         : "Each cell is the change over the same month a year earlier. Shading grows with the rate on a log scale. The outlined cell is the latest month. Dec/Dec: the year's inflation (year to date for the current year). Avg/Avg: the year's average index over the previous year's.";
