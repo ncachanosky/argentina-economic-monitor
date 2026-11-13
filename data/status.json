@@ -4931,6 +4931,15 @@
     "status": "ok",
     "warnings": []
   },
+  "maddison:ARG": {
+    "last_changed": "2026-11-13",
+    "last_checked": "2026-11-13T03:55:14+00:00",
+    "last_obs": "2025-01-01",
+    "source": "maddison",
+    "source_units": "2011 international dollars",
+    "status": "ok",
+    "warnings": []
+  },
   "officials:bcra": {
     "last_changed": "2026-10-08",
     "last_checked": "2026-11-13T03:37:24+00:00",

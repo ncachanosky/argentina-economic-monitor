@@ -12,6 +12,14 @@ Changes since the last release, recorded as they are made. At the next release t
 section becomes its notes.
 
 ### Added
+- Long Run page: GDP per capita since 1820, Argentina and the world, from the Maddison Project
+  Database (releases 2023, 2020, 2018 and 2013, the latest by default; a second release can be
+  drawn for comparison). Views: level (log scale), world percentile (share of countries or of
+  world population poorer than Argentina; all countries with data, or fixed samples with data
+  since 1950 or since 1913) and relative to selected countries and regions (Western Europe 12,
+  Latin America); optional base year = 100. Sixteen numbered events of Argentina's economic
+  history. Argentina extended past 2022 with INDEC's real GDP growth (dotted). Original
+  sources listed for the countries drawn, as the releases' citation policy asks.
 - Revision tracker: "How Much GDP Gets Revised" (GDP page) and "How Much EMAE Gets Revised"
   (Monthly Activity). First print against today's figure for every quarter or month since
   mid-2016 (q/q or m/m seasonally adjusted, or y/y original), one period's path across

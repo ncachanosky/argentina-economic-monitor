@@ -69,6 +69,9 @@ def link_for(adapter: str, sid: str, st: dict | None = None) -> dict | None:
                 "url": url or "https://www.bcra.gob.ar/", "kind": "file"} if url else None
     if adapter == "efw":
         return {"publisher": "Fraser Institute", "name": efw.URL.rsplit("/", 1)[-1], "url": efw.URL, "kind": "file"}
+    if adapter == "maddison":
+        return {"publisher": "Maddison Project (University of Groningen)", "name": "Maddison Project Database releases (kept in the repository)",
+                "url": f"{REPO_FILES}data/manual/maddison/", "page": "https://www.rug.nl/ggdc/historicaldevelopment/maddison/", "kind": "file"}
     if adapter == "revisions":
         return {"publisher": "INDEC (each release, as published)", "name": "gdp_vintages.csv, emae_trend_vintages.csv",
                 "url": f"{REPO_FILES}data/manual/", "kind": "file"}

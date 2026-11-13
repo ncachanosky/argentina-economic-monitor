@@ -569,3 +569,12 @@ table.data td.ci-name, table.data td.ci-reg, table.data th.ci-l { text-align: le
 
 /* Revision tracker: four statistics under the chart. */
 .rev-stats { margin-top: 10px; }
+
+/* Long-run card (Maddison): events list, country chips, sources. */
+.lr-events { columns: 2 260px; column-gap: 28px; margin: 8px 0 4px; padding-left: 22px; font-family: var(--font-ui); font-size: 12.5px; color: var(--ink-2); }
+.lr-events li { break-inside: avoid; margin-bottom: 2px; }
+.lr-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.lr-year { width: 5.5em; }
+.lr-sources { font-family: var(--font-ui); font-size: 12.5px; color: var(--ink-2); margin-top: 6px; }
+.lr-sources summary { cursor: pointer; }
+.lr-sources ul { padding-left: 18px; }

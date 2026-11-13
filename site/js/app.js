@@ -1760,6 +1760,204 @@
     return card;
   }
 
+  // ---------- card: GDP per capita since 1820 (Maddison Project), by release ----------
+  function maddisonCard(ind) {
+    const T = ind.table;
+    const card = cardFrame(ind, true);
+    const ES = LANG === "es";
+    const EVENTS = [
+      [1890, "Baring crisis", "Crisis Baring"], [1914, "First World War: the export boom ends", "Primera Guerra Mundial: termina el auge exportador"],
+      [1930, "Coup; the Great Depression", "Golpe de Estado; la Gran Depresión"], [1946, "Perón takes office", "Asume Perón"],
+      [1955, "Coup ends Perón's government", "Un golpe termina el gobierno de Perón"], [1966, "Onganía coup", "Golpe de Onganía"],
+      [1975, "Rodrigazo", "Rodrigazo"], [1976, "Coup; Martínez de Hoz program", "Golpe de Estado; programa de Martínez de Hoz"],
+      [1982, "Malvinas war; debt crisis", "Guerra de Malvinas; crisis de la deuda"], [1985, "Plan Austral", "Plan Austral"],
+      [1989, "Hyperinflation", "Hiperinflación"], [1991, "Convertibility", "Convertibilidad"],
+      [2001, "Crisis, default and end of Convertibility (2001-02)", "Crisis, default y fin de la Convertibilidad (2001-02)"],
+      [2018, "Exchange-rate crisis; IMF program", "Crisis cambiaria; programa con el FMI"], [2020, "Pandemic", "Pandemia"], [2023, "Milei takes office", "Asume Milei"],
+    ];
+    const BENCH = ["USA", "we12", "latam", "AUS", "CAN", "ESP", "ITA", "CHL", "BRA"];
+    const state = { view: "level", release: null, compare: "", base: false, baseYear: 1950, picks: new Set(["USA", "we12"]),
+      sample: "all", weight: "countries", events: true, from: 1870 };
+    let index = null, csv = null;
+    const cache = {};
+    const load = async (rel) => (cache[rel] = cache[rel] || await getJSON(`${DATA}${T.path}mpd${rel}.json`));
+    const names = ES && typeof Intl.DisplayNames === "function" ? new Intl.DisplayNames(["es"], { type: "region" }) : null;
+    const cname = (D, k) => {
+      if (D.regions[k]) return tr(D.regions[k].label);
+      const c = D.countries[k]; if (!c) return k;
+      if (names && c.a2) { try { return names.of(c.a2) || c.n; } catch (e) { /* unknown */ } }
+      return c.n;
+    };
+    const vals = (D, k) => (D.regions[k] ? D.regions[k].g : D.countries[k] ? D.countries[k].g : null);
+
+    const chartEl = h("div", { class: "chart tall", role: "img", "aria-label": "GDP per capita since 1820" });
+    const hint = h("p", { class: "hint" });
+    const evList = h("ol", { class: "lr-events" });
+    const srcEl = h("details", { class: "lr-sources" });
+    const vSeg = segmented([["level", "Level (log scale)"], ["pct", "World percentile"], ["rel", "Relative to"]], state.view, (k) => { state.view = k; vSeg.update(k); draw(); }, "View");
+    const relSel = h("select", { class: "select", "aria-label": "Release" });
+    const cmpSel = h("select", { class: "select", "aria-label": "Compare with release" });
+    relSel.addEventListener("change", () => { state.release = relSel.value; draw(); });
+    cmpSel.addEventListener("change", () => { state.compare = cmpSel.value; if (state.compare && state.view === "level") { state.base = true; baseChk.checked = true; } draw(); });
+    const baseChk = h("input", { type: "checkbox", "aria-label": "Base year = 100" });
+    const baseIn = h("input", { type: "number", class: "select lr-year", min: "1820", max: "2025", step: "1", value: String(state.baseYear), "aria-label": "Base year" });
+    baseChk.addEventListener("change", () => { state.base = baseChk.checked; draw(); });
+    baseIn.addEventListener("change", () => { state.baseYear = +baseIn.value || 1950; draw(); });
+    const fromSel = h("select", { class: "select", "aria-label": "From" }, [1820, 1870, 1900, 1950, 1990].map((y) => h("option", { value: String(y) }, String(y))));
+    fromSel.value = String(state.from);
+    fromSel.addEventListener("change", () => { state.from = +fromSel.value; draw(); });
+    const sSeg = segmented([["all", "All countries with data"], ["s1950", "Countries with data since 1950"], ["s1913", "Since 1913"]], state.sample, (k) => { state.sample = k; sSeg.update(k); draw(); }, "Sample");
+    const wSeg = segmented([["countries", "Share of countries"], ["pop", "Share of world population"]], state.weight, (k) => { state.weight = k; wSeg.update(k); draw(); }, "Weight");
+    const evBtn = h("button", { class: "btn toggle", type: "button", "aria-pressed": "true", onclick: () => { state.events = !state.events; evBtn.setAttribute("aria-pressed", String(state.events)); draw(); } }, "Events");
+    const chips = h("div", { class: "chips lr-chips" });
+    const addSel = h("select", { class: "select", "aria-label": "Add a country" });
+    addSel.addEventListener("change", () => { if (addSel.value) { state.picks.add(addSel.value); addSel.value = ""; draw(); } });
+    const lab = (t, el) => h("label", { class: "base-pick" }, h("span", {}, t), el);
+    const rowA = h("div", { class: "controls" }, vSeg, lab("Release:", relSel), lab("Compare with:", cmpSel), h("span", { class: "spacer" }), lab("From:", fromSel), evBtn);
+    const baseWrap = h("label", { class: "base-pick" }, baseChk, h("span", {}, "Base year = 100:"), baseIn);
+    const rowB = h("div", { class: "controls" }, baseWrap, sSeg, wSeg);
+    const rowC = h("div", { class: "controls" }, chips, addSel);
+
+    function fillChips(D) {
+      chips.replaceChildren(...BENCH.filter((k) => vals(D, k)).map((k) => {
+        const on = state.picks.has(k);
+        return h("button", { class: "chip" + (on ? " on" : ""), type: "button", "aria-pressed": String(on),
+          onclick: () => { on ? state.picks.delete(k) : state.picks.add(k); draw(); } }, cname(D, k));
+      }), ...[...state.picks].filter((k) => !BENCH.includes(k)).map((k) => h("button", { class: "chip on", type: "button", "aria-pressed": "true",
+        onclick: () => { state.picks.delete(k); draw(); } }, `${cname(D, k)} ×`)));
+      const all = Object.keys(D.countries).filter((k) => k !== "ARG" && !BENCH.includes(k)).sort((a, b) => cname(D, a).localeCompare(cname(D, b), LOCALE));
+      addSel.replaceChildren(h("option", { value: "" }, ES ? "Agregar un país…" : "Add a country…"), ...all.map((k) => h("option", { value: k }, cname(D, k))));
+    }
+
+    // Percentile of Argentina among a sample of countries, each year.
+    function percentile(D) {
+      const Y = D.years, C = D.countries, i50 = Y.indexOf(1950), i13 = Y.indexOf(1913);
+      let members = Object.keys(C).filter((k) => k !== "ARG");
+      if (state.sample !== "all") members = members.filter((k) => { const g = C[k].g; for (let i = i50; i < Y.length; i++) if (g[i] === null) return false; return state.sample === "s1950" || g[i13] !== null; });
+      const fixed = state.sample !== "all";
+      const out = [], cnt = [];
+      Y.forEach((y, i) => {
+        const a = C.ARG.g[i];
+        let ms = members.filter((k) => C[k].g[i] !== null);
+        if (a === null || (fixed && ms.length < members.length) || ms.length < 10) { out.push(null); cnt.push(ms.length); return; }
+        if (state.weight === "pop") {
+          ms = ms.filter((k) => C[k].p[i] !== null);
+          const tot = ms.reduce((s, k) => s + C[k].p[i], 0), below = ms.reduce((s, k) => s + (C[k].g[i] < a ? C[k].p[i] : 0), 0);
+          out.push(tot ? 100 * below / tot : null);
+        } else out.push(100 * ms.filter((k) => C[k].g[i] < a).length / ms.length);
+        cnt.push(ms.length);
+      });
+      return { y: out, n: cnt, members: fixed ? members.length : null };
+    }
+
+    function series(D, dashed, suffix) {
+      const Y = D.years, iB = Y.indexOf(state.baseYear);
+      const lines = [];
+      const arg = D.countries.ARG.g.slice();
+      const ext = D.extension && !dashed ? D.extension : null;
+      const scale = (arr) => (state.base && iB >= 0 ? (arr[iB] ? arr.map((v) => (v === null ? null : 100 * v / arr[iB])) : arr.map(() => null)) : arr);
+      if (state.view === "level") {
+        lines.push({ key: "ARG", name: cname(D, "ARG"), y: scale(arg), x: Y, ext });
+        [...state.picks].forEach((k) => { const v = vals(D, k); if (v) lines.push({ key: k, name: cname(D, k), y: scale(v), x: Y }); });
+      } else if (state.view === "rel") {
+        [...state.picks].forEach((k) => {
+          const v = vals(D, k); if (!v) return;
+          const r = arg.map((a, i) => (a !== null && v[i] ? 100 * a / v[i] : null));
+          lines.push({ key: k, name: ES ? `Argentina / ${cname(D, k)}` : `Argentina / ${cname(D, k)}`, y: state.base && iB >= 0 ? (r[iB] ? r.map((x) => (x === null ? null : 100 * x / r[iB])) : r.map(() => null)) : r, x: Y });
+        });
+      } else {
+        const P = percentile(D);
+        lines.push({ key: "pct", name: ES ? "Percentil de la Argentina" : "Argentina's percentile", y: P.y, x: Y, n: P.n, members: P.members });
+      }
+      return lines.map((l) => ({ ...l, dashed, suffix }));
+    }
+
+    async function draw() {
+      if (!index) return;
+      const D = await load(state.release);
+      const D2 = state.compare && state.view !== "pct" ? await load(state.compare) : null;
+      relSel.value = state.release;
+      cmpSel.replaceChildren(h("option", { value: "" }, ES ? "ninguna" : "none"), ...index.releases.filter((r) => r !== state.release).map((r) => h("option", { value: r }, r)));
+      cmpSel.value = state.compare && state.compare !== state.release ? state.compare : "";
+      fillChips(D);
+      baseWrap.style.display = state.view === "pct" ? "none" : "";
+      sSeg.style.display = wSeg.style.display = state.view === "pct" ? "" : "none";
+      rowC.style.display = state.view === "pct" ? "none" : "";
+      cmpSel.parentElement.style.display = state.view === "pct" ? "none" : "";
+      let lines = series(D, false, "");
+      if (D2) lines = lines.concat(series(D2, true, ` (${state.compare})`));
+      const colorOf = {}; let slot = 0;
+      const traces = [];
+      lines.forEach((l) => {
+        if (colorOf[l.key] === undefined) colorOf[l.key] = l.key === "ARG" || l.key === "pct" ? 0 : (++slot);
+        const c = cssVar(SERIES_VARS[colorOf[l.key] % SERIES_VARS.length]);
+        const fmt = state.view === "pct" ? "%{y:.0f}" : state.view === "rel" || state.base ? "%{y:.1f}" : "%{y:,.0f}";
+        traces.push({ type: "scatter", mode: "lines", name: `${l.name}${l.suffix}`, x: l.x.map((y) => `${y}-07-01`), y: l.y, connectgaps: false,
+          line: { color: c, width: l.key === "ARG" || l.key === "pct" ? 2.6 : 1.8, dash: l.dashed ? "dash" : "solid" }, _slot: colorOf[l.key],
+          customdata: l.n ? l.n : undefined,
+          hovertemplate: `${l.name}${l.suffix}: <b>${fmt}</b>${l.n ? (ES ? " (%{customdata} países)" : " (%{customdata} countries)") : ""}<extra></extra>` });
+        if (l.ext) {
+          const x0 = l.x.indexOf(l.ext.from), base = l.y[x0], raw = D.countries.ARG.g[x0];
+          traces.push({ type: "scatter", mode: "lines", name: ES ? "Argentina, extendida con datos del INDEC" : "Argentina, extended with INDEC data",
+            x: [l.ext.from, ...l.ext.years].map((y) => `${y}-07-01`), y: [base, ...l.ext.values.map((v) => (state.base ? base * v / raw : v))],
+            line: { color: c, width: 2.2, dash: "dot" }, _slot: 0, hovertemplate: `%{x|%Y}: <b>${fmt}</b><extra></extra>` });
+        }
+      });
+      const shapes = [], annotations = [];
+      const x1 = `${(D.extension ? D.extension.years.slice(-1)[0] : D.last)}-12-31`;
+      if (state.events) EVENTS.forEach(([y], n) => {
+        if (y < state.from) return;
+        shapes.push({ type: "line", xref: "x", yref: "paper", x0: `${y}-07-01`, x1: `${y}-07-01`, y0: 0, y1: 1, line: { color: cssVar("--ink-3"), width: 1, dash: "dot" }, _light: "#85909A" });
+        annotations.push({ xref: "x", yref: "paper", x: `${y}-07-01`, y: 1.0, yanchor: "bottom", showarrow: false, text: `<b>${n + 1}</b>`, font: { size: 11, color: cssVar("--accent-ink") } });
+      });
+      if (state.view === "pct" || state.view === "rel" || state.base) shapes.push({ type: "line", xref: "paper", yref: "y", x0: 0, x1: 1,
+        y0: state.view === "pct" ? 50 : 100, y1: state.view === "pct" ? 50 : 100, line: { color: cssVar("--ink-2"), width: 1, dash: "dash" }, _light: "#5A6872" });
+      const ylog = state.view === "level";
+      Plotly.react(chartEl, traces, baseLayout({
+        xaxis: { range: [`${state.from}-01-01`, x1], hoverformat: "%Y" },
+        yaxis: ylog ? { type: "log", tickformat: ",.0f" } : state.view === "pct" ? { range: [0, 100], ticksuffix: "" } : {},
+        extra: { showlegend: true, legend: { orientation: "h", x: 0, y: 1.08, yanchor: "bottom", font: { color: cssVar("--ink") } }, hovermode: "x unified",
+          shapes, annotations, margin: { l: 60, r: 16, t: 56, b: 36 } },
+      }), PLOT_CONFIG);
+      evList.replaceChildren(...(state.events ? EVENTS.filter(([y]) => y >= state.from).map(([y, en, es_]) => h("li", { value: String(EVENTS.findIndex((e) => e[0] === y) + 1) }, h("b", {}, `${y} `), ES ? es_ : en)) : []));
+      // Hint: what is shown, in which units.
+      const unit = tr(D.unit);
+      const P = lines.find((l) => l.key === "pct");
+      hint.textContent = state.view === "level"
+        ? (state.base ? (ES ? `PIB per cápita, ${state.baseYear} = 100 (escala logarítmica). Versión ${state.release}.` : `GDP per capita, ${state.baseYear} = 100 (log scale). ${state.release} release.`)
+          : (ES ? `PIB per cápita en ${unit} (escala logarítmica). Versión ${state.release}.` : `GDP per capita in ${unit} (log scale). ${state.release} release.`))
+          + (D.extension && !state.compare ? (ES ? ` Punteado: la Argentina después de ${D.extension.from}, con el crecimiento del PIB real del INDEC y un crecimiento de la población de ${fx(D.extension.pop_growth, 2)}% anual.` : ` Dotted: Argentina after ${D.extension.from}, with INDEC's real GDP growth and population growth of ${fx(D.extension.pop_growth, 2)}% a year.`) : "")
+          + (D2 ? (ES ? ` Discontinuas: versión ${state.compare}.` : ` Dashed: ${state.compare} release.`) : "")
+        : state.view === "rel"
+          ? (ES ? `PIB per cápita de la Argentina como % del de cada país o región${state.base ? `, ${state.baseYear} = 100` : ""}. Las regiones son promedios ponderados por población de los países de la versión, solo en años con todos sus miembros.`
+              : `Argentina's GDP per capita as % of each country's or region's${state.base ? `, ${state.baseYear} = 100` : ""}. Regions are population-weighted averages of the release's countries, only in years with every member present.`)
+            + (D2 ? (ES ? ` Discontinuas: versión ${state.compare}.` : ` Dashed: ${state.compare} release.`) : "")
+          : (ES ? `Porcentaje de ${state.weight === "pop" ? "la población mundial que vive en países" : "los países"} con un PIB per cápita menor que el de la Argentina. ${state.sample === "all" ? "Muestra: todos los países con datos cada año (la cobertura crece: pase el cursor para ver cuántos)." : `Muestra fija: ${P.members} países con datos ${state.sample === "s1913" ? "en 1913 y " : ""}cada año desde 1950; antes de 1950, solo los años en que todos tienen datos.`}`
+            : `Share of ${state.weight === "pop" ? "the world's population living in countries" : "countries"} with a lower GDP per capita than Argentina. ${state.sample === "all" ? "Sample: every country with data each year (coverage grows over time: hover for the count)." : `Fixed sample: ${P.members} countries with data ${state.sample === "s1913" ? "in 1913 and " : ""}every year since 1950; before 1950, only the years when all of them have data.`}`);
+      csv = { header: ["year", ...traces.map((t) => t.name)], rows: D.years.map((y, i) => [y, ...lines.map((l) => l.y[i])]) };
+      // Citation: the release, and the original sources of the countries shown (the release's citation policy).
+      const shown = state.view === "pct" ? [] : ["ARG", ...[...state.picks].flatMap((k) => (D.regions[k] ? D.regions[k].members : [k]))];
+      const S = D.sources || {};
+      srcEl.replaceChildren(h("summary", {}, ES ? "Fuentes y cita" : "Sources and citation"), h("p", {}, D.citation),
+        ...(state.view === "pct" ? [h("p", {}, ES ? "La vista de percentiles usa todos los países de la versión: ver las fuentes de cada país en la hoja Sources de la base." : "The percentile view uses every country in the release: see each country's sources in the database's Sources sheet.")]
+          : Object.keys(S).length ? [h("ul", {}, [...new Set(shown)].filter((k) => S[k]).map((k) => h("li", {}, h("b", {}, cname(D, k)), ": ", S[k].map((r) => `${r[0]}: ${r[1]}`).join("; "))))] : []));
+    }
+    const onCSV = () => { if (csv) downloadBlob(toCSV(csv.header, csv.rows), `${ind.id}_${state.view}_${state.release}.csv`, "text/csv"); };
+    appendAll(card, rowA, rowB, rowC, hint, chartEl, evList, ind.note ? h("p", { class: "chips-note" }, ind.note) : null, srcEl, methodLine(ind),
+      h("div", { class: "card-foot" },
+        h("span", {}, "Source: ", T.source_url ? h("a", { href: T.source_url, target: "_blank", rel: "noopener" }, ind.source_label) : ind.source_label, ...srcTail(ind)),
+        h("div", { class: "actions" }, h("button", { class: "btn", type: "button", onclick: onCSV, title: "Download the data in this view as CSV" }, "CSV"))));
+    card.draw = async () => {
+      if (!index) {
+        try { index = await getJSON(`${DATA}${T.path}${T.file}`); } catch (e) { console.error(e); chartEl.replaceChildren(h("div", { class: "error-box" }, "The data could not be loaded.")); return; }
+        state.release = index.releases[0];
+        relSel.replaceChildren(...index.releases.map((r) => h("option", { value: r }, r)));
+      }
+      draw();
+    };
+    return card;
+  }
+
   // ---------- card: a cross-country index, one edition (Archbridge's Social Mobility Index) ----------
   // Three views: a map of Latin America shaded by score, the ranking (region or world), and
   // Argentina's profile by pillar and sub-pillar against the regional median.
@@ -4050,6 +4248,7 @@
         : ind.kind === "ngdp" ? ngdpCard(ind)
         : ind.kind === "country_index" ? countryIndexCard(ind)
         : ind.kind === "revisions" ? revisionsCard(ind)
+        : ind.kind === "maddison" ? maddisonCard(ind)
         : variantsCard(ind, !ind.half);
   }
 

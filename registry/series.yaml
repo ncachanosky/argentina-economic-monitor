@@ -465,6 +465,8 @@ inputs:
   - {id: 370.3_HONESTIDADDAD_0_0_10_58, source: datos_gob, frequency: M, measure: index, allow_gaps: true, label: "UTDT ICG: honesty"}
   - {id: 370.3_CAPACIDADDAD_0_0_9_83, source: datos_gob, frequency: M, measure: index, allow_gaps: true, label: "UTDT ICG: capacity to solve problems"}
   # Economic Freedom of the World (Fraser Institute), 0-10; 1970-2000 every five years.
+  # Long run: Maddison Project GDP per capita (pipeline/sources/maddison.py; hand-kept release files).
+  - {id: "maddison:ARG", source: maddison, frequency: Y, measure: flow, stale_days: 800, allow_gaps: true, label: "GDP per capita, Argentina (Maddison Project, latest release, extended with INDEC)"}
   # Revision tracker: first prints of GDP and EMAE growth (pipeline/sources/revisions.py).
   - {id: "revisions:gdp_first_qq", source: revisions, frequency: Q, measure: flow, stale_days: 300, label: "GDP q/q (SA), first print"}
   - {id: "revisions:emae_first_mm", source: revisions, frequency: M, measure: flow, stale_days: 120, label: "EMAE m/m (SA), first print"}
@@ -757,6 +759,15 @@ topics:
       confidence, how long central bank presidents and economy ministers
       last, economic freedom, and democracy and the rule of law, with
       comparison countries. From UTDT, the Fraser Institute and V-Dem.
+
+  - id: long_run
+    slug: long-run
+    group: Long Run
+    title: Long Run
+    description: >-
+      Argentina over two centuries: GDP per capita since 1820 against the
+      world and selected countries, from the Maddison Project, in every
+      release, with the main turning points of its economic history.
 
 indicators:
   - id: emae
@@ -6887,3 +6898,36 @@ indicators:
       can: {label: "Canada", id: "vdem:corruption:CAN"}
       esp: {label: "Spain", id: "vdem:corruption:ESP"}
     default: {variant: arg, transform: level, range: Since 1946}
+
+  - id: lr_gdp_pc
+    topic: long_run
+    kind: maddison
+    wide: true
+    title: "GDP per Capita since 1820: Argentina and the World"
+    short_title: GDP per capita since 1820
+    description: >-
+      Argentina's GDP per capita from the Maddison Project, as a level, as
+      its rank among the world's countries, or relative to other countries
+      and regions, in any of the project's releases.
+    source: table
+    source_label: "Maddison Project Database (University of Groningen), releases 2013-2023; Argentina after 2022: INDEC"
+    frequency: Y
+    units: GDP per capita
+    default: {}
+    table:
+      source: maddison
+      file: index.json
+      status_id: "maddison:ARG"
+      source_url: https://www.rug.nl/ggdc/historicaldevelopment/maddison/
+    note: >-
+      Each release revises history, sometimes by a lot: Argentina's GDP per
+      capita relative to the United States in 1913 is about 72% in the 2013
+      release, 80% in 2018 and 60% in 2020 and 2023. Releases also differ in
+      units (1990 Geary-Khamis dollars in 2013, 2011 dollars since 2018), so
+      to compare them, rebase both to the same year. Coverage grows over
+      time, from a few dozen countries before 1900 to about 170 after 1950;
+      the percentile view can hold the sample fixed. Argentina after 2022:
+      the 2023 release's level carried forward with INDEC's real GDP growth
+      and the release's last population growth (dotted).
+    method_links: [{anchor: maddison, label: "About the long-run data"}]
+
