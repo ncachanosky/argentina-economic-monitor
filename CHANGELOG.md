@@ -19,10 +19,13 @@ section becomes its notes.
   since 1950 or since 1913) and relative to selected countries and regions (Western Europe 12,
   Latin America); optional base year = 100. Sixteen numbered events of Argentina's economic
   history. Argentina extended past 2022 with INDEC's real GDP growth (dotted). Original
-  sources listed for the countries drawn, as the releases' citation policy asks. The page also
-  shows five long series from other pages, in menu order (they stay on their own pages too):
-  trade since 1910, consumer prices since 1943, Central Bank financing of the government (two
-  cards) and the minimum wage since 1965. Registry: `also_on` shows a card on a second page.
+  sources listed for the countries drawn, as the releases' citation policy asks. Five long series
+  moved here from other pages, in menu order: trade since 1910 (from International Trade),
+  consumer prices since 1943 (Prices), Central Bank financing of the government, two cards
+  (Money & Central Bank), and the minimum wage since 1965 (Labor). Their old pages end with a
+  line pointing to Long Run, and old links to them (/prices/#ind-cpi_long) go to their new
+  place. Registry: `also_on` can show a card on a second page; `see_also` adds a pointer to a
+  page.
 - Revision tracker: "How Much GDP Gets Revised" (GDP page) and "How Much EMAE Gets Revised"
   (Monthly Activity). First print against today's figure for every quarter or month since
   mid-2016 (q/q or m/m seasonally adjusted, or y/y original), one period's path across

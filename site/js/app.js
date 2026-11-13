@@ -4180,6 +4180,15 @@
     }
 
     const topic = manifest.topics.find((t) => t.id === PAGE);
+    // A link to a card that has moved to another page (e.g. /prices/#ind-cpi_long): go there.
+    const movedTo = () => {
+      const hashId = (location.hash.match(/^#ind-([\w-]+)/) || [])[1];
+      const m = hashId && manifest.indicators.find((x) => x.id === hashId && x.topic !== PAGE && !(x.also_on || []).includes(PAGE));
+      if (m) location.replace(pageHref(m.topic, `ind-${m.id}`));
+      return !!m;
+    };
+    window.addEventListener("hashchange", movedTo);
+    if (movedTo()) return;
     // The page's own cards, then cards from other pages shown here too (also_on), in menu order.
     const order = new Map(manifest.topics.map((t, i) => [t.id, i]));
     const guests = manifest.indicators.filter((m) => m.topic !== PAGE && (m.also_on || []).includes(PAGE))
@@ -4192,7 +4201,10 @@
     // Registry order; panels and cards flagged `wide` span the full row.
     const cards = h("div", { class: "cards" }, inds.map(makeCard));
     linkSwitchGroups(cards, inds);
-    topicsEl2.replaceChildren(h("section", { class: "topic", id: `topic-${topic.id}` }, cards));
+    // A pointer to cards that moved to another page.
+    const SA = topic.see_also;
+    const pointer = SA ? h("p", { class: "page-pointer" }, tr(SA.text), " ", h("a", { href: pageHref(SA.page) }, `${tr((manifest.topics.find((t) => t.id === SA.page) || {}).title || "")} →`)) : null;
+    topicsEl2.replaceChildren(h("section", { class: "topic", id: `topic-${topic.id}` }, cards, pointer));
     addEmbedButtons(cards, topic);
     $("#tiles").replaceChildren(...inds.filter((i) => i.topic === PAGE).flatMap((i) => tilesOf(i)));
     const sn = $("#section-nav");
