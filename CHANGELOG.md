@@ -12,6 +12,9 @@ Changes since the last release, recorded as they are made. At the next release t
 section becomes its notes.
 
 ### Added
+- `python -m pipeline.gdp_vintages`: reads INDEC's quarterly national-accounts workbooks as
+  published at each release since September 2016 (seasonally adjusted GDP and components, and
+  original GDP), for the planned revision tracker. Not yet used by any card.
 - RSS feeds, in English and Spanish: a weekly summary every Monday at about 07:30 Buenos Aires
   time (`feed.xml`: last week's new data grouped by page, with the latest m/m and y/y changes
   where the home table has them, the cards that are late, and the coming week's releases) and
