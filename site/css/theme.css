@@ -605,3 +605,12 @@ table.data td.ci-name, table.data td.ci-reg, table.data th.ci-l { text-align: le
 .sc-table .sc-label a:hover { text-decoration: underline; }
 .sc-table tr.sc-sec td { text-align: left; font-weight: 700; font-size: 11px; letter-spacing: .04em; text-transform: uppercase; color: var(--ink-2); padding-top: 14px; border-bottom: 1px solid var(--ink-3); position: sticky; left: 0; }
 .sc-table td.sc-na { color: var(--ink-3); }
+
+/* Maddison benchmark table */
+.lr-bench .ev { display: block; font-weight: 400; font-size: 11px; color: var(--ink-3); white-space: normal; }
+.lr-bench td.grp, .lr-bench th.grp { border-left: 2px solid var(--ink-3); }
+.lr-bench td.hi { font-weight: 700; }
+.lr-bench select.lr-col { font-size: 11px; width: 80px; padding: 2px 1px; }
+.lr-bench .sc-label { min-width: 110px; max-width: 150px; }
+.lr-bench th, .lr-bench td { padding: 5px 4px; }
+.lr-bench thead th { vertical-align: bottom; }

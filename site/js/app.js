@@ -1925,7 +1925,9 @@
     ];
     const BENCH = ["USA", "we12", "latam", "AUS", "CAN", "ESP", "ITA", "CHL", "BRA"];
     const state = { view: "level", release: null, compare: "", base: false, baseYear: 1950, picks: new Set(["USA", "we12"]),
-      sample: "all", weight: "countries", events: true, from: 1870 };
+      sample: "all", weight: "countries", events: true, from: 1870, mode: "chart", tunits: "pct",
+      cols: ["USA", "we12", "AUS", "CAN", "ESP", "ITA", "CHL", "BRA", "latam"] };
+    const TABLE_YEARS = [1870, 1913, 1929, 1950, 1975, 2000, 2015];
     let index = null, csv = null;
     const cache = {};
     const load = async (rel) => (cache[rel] = cache[rel] || await getJSON(`${DATA}${T.path}mpd${rel}.json`));
@@ -1961,7 +1963,11 @@
     const addSel = h("select", { class: "select", "aria-label": "Add a country" });
     addSel.addEventListener("change", () => { if (addSel.value) { state.picks.add(addSel.value); addSel.value = ""; draw(); } });
     const lab = (t, el) => h("label", { class: "base-pick" }, h("span", {}, t), el);
-    const rowA = h("div", { class: "controls" }, vSeg, lab("Release:", relSel), lab("Compare with:", cmpSel), h("span", { class: "spacer" }), lab("From:", fromSel), evBtn);
+    const mSeg = segmented([["chart", "Chart"], ["table", "Table"]], state.mode, (k) => { state.mode = k; mSeg.update(k); draw(); }, "View");
+    mSeg.classList.add("card-switch");
+    const tuSeg = segmented([["pct", "% of each"], ["level", "Levels"]], state.tunits, (k) => { state.tunits = k; tuSeg.update(k); draw(); }, "Units");
+    const tableWrap = h("div", { class: "sc-wrap lr-bench" });
+    const rowA = h("div", { class: "controls" }, vSeg, tuSeg, lab("Release:", relSel), lab("Compare with:", cmpSel), h("span", { class: "spacer" }), lab("From:", fromSel), evBtn);
     const baseWrap = h("label", { class: "base-pick" }, baseChk, h("span", {}, "Base year = 100:"), baseIn);
     const rowB = h("div", { class: "controls" }, baseWrap, sSeg, wSeg);
     const rowC = h("div", { class: "controls" }, chips, addSel);
@@ -2020,11 +2026,66 @@
       return lines.map((l) => ({ ...l, dashed, suffix }));
     }
 
+    // Benchmark years: Argentina's GDP per capita, world rank, and as % of the columns' countries or regions (each column picks its own).
+    function benchTable(D) {
+      const Y = D.years, iy = (y) => Y.indexOf(y);
+      const years = TABLE_YEARS.filter((y) => y >= D.first && y <= D.last);
+      if (!years.includes(D.last)) years.push(D.last);
+      const ext = D.extension ? D.extension.years.slice(-1)[0] : null;
+      const evOf = (y) => { if (y === D.last) return null; const n = EVENTS.findIndex((e) => e[0] === y || e[0] === y + 1); if (n < 0) return null;
+        const e = EVENTS[n]; return `${e[0] === y ? "" : (ES ? "antes de " : "before ")}(${n + 1}) ${ES ? e[2] : e[1]}`; };
+      const opts = [...Object.keys(D.regions), ...Object.keys(D.countries).filter((k) => k !== "ARG").sort((a, b) => cname(D, a).localeCompare(cname(D, b), LOCALE))];
+      const colSel = (j) => {
+        const s = h("select", { class: "select lr-col", "aria-label": ES ? "País o región" : "Country or region" },
+          h("optgroup", { label: ES ? "Regiones" : "Regions" }, Object.keys(D.regions).map((k) => h("option", { value: k }, cname(D, k)))),
+          h("optgroup", { label: ES ? "Países" : "Countries" }, opts.filter((k) => !D.regions[k]).map((k) => h("option", { value: k }, cname(D, k)))));
+        s.value = opts.includes(state.cols[j]) ? state.cols[j] : opts[0];
+        s.addEventListener("change", () => { state.cols[j] = s.value; draw(); });
+        return s;
+      };
+      const num = (v) => (v === null || v === undefined ? "–" : Math.round(v).toLocaleString(LOCALE));
+      const rows = [], csvRows = [];
+      const rowFor = (y, a, isExt) => {
+        const i = iy(y);
+        const all = isExt ? [] : Object.keys(D.countries).map((k) => D.countries[k].g[i]).filter((v) => v !== null && v !== undefined);
+        const rank = a !== null && all.length ? `${all.filter((v) => v > a).length + 1} ${ES ? "de" : "of"} ${all.length}` : "–";
+        const cells = state.cols.map((k) => {
+          const v = isExt ? null : (vals(D, k) || [])[i] ?? null;
+          if (state.tunits === "level") return { t: num(v), v };
+          const r = a !== null && v ? 100 * a / v : null;
+          return { t: r === null ? "–" : `${Math.round(r)}%`, v: r, rich: r !== null && r >= 100 };
+        });
+        const ev = isExt ? (ES ? "Extendido con datos del INDEC" : "Extended with INDEC data") : evOf(y);
+        rows.push(h("tr", {}, h("td", { class: "sc-label" }, h("b", {}, String(y) + (isExt ? "‡" : "")), ev ? h("span", { class: "ev" }, ev) : null),
+          h("td", {}, num(a)), h("td", {}, rank), cells.map((c, j) => h("td", { class: (j === 0 ? "grp" : "") + (c.rich ? " hi" : "") }, c.t))));
+        csvRows.push([y + (isExt ? " (extension)" : ""), a === null ? "" : Math.round(a), rank, ...cells.map((c) => (c.v === null ? "" : state.tunits === "level" ? Math.round(c.v) : c.v.toFixed(1)))]);
+      };
+      years.forEach((y) => rowFor(y, D.countries.ARG.g[iy(y)], false));
+      if (ext && ext > D.last) rowFor(ext, D.extension.values.slice(-1)[0], true);
+      tableWrap.replaceChildren(h("table", { class: "sc-table" },
+        h("thead", {}, h("tr", {}, h("th", { class: "sc-label" }, ES ? "Año" : "Year"),
+          h("th", {}, "Argentina", h("span", { class: "ev" }, tr(D.unit))), h("th", {}, ES ? "Posición mundial" : "World rank", h("span", { class: "ev" }, ES ? "entre los países con datos" : "of countries with data")),
+          state.cols.map((k, j) => h("th", { class: j === 0 ? "grp" : "" }, colSel(j))))),
+        h("tbody", {}, rows)));
+      hint.style.display = "";
+      hint.textContent = (state.tunits === "pct"
+        ? (ES ? `PIB per cápita de la Argentina como % del de cada país o región elegido en los encabezados; en negrita, donde la Argentina era más rica. ` : `Argentina's GDP per capita as % of each country or region chosen in the column headers; bold where Argentina was richer. `)
+        : (ES ? `PIB per cápita en ${tr(D.unit)}. ` : `GDP per capita in ${tr(D.unit)}. `))
+        + (ES ? `Versión ${state.release}. Las regiones son promedios ponderados por población de los países de la versión. Posición mundial: entre los países que la versión cubre ese año, que varían, de modo que posiciones muy alejadas en el tiempo no son estrictamente comparables.`
+          : `${state.release} release. Regions are population-weighted averages of the release's own country figures. World rank: among the countries the release covers that year, which vary, so ranks far apart in time are not strictly comparable.`)
+        + (ext && ext > D.last ? (ES ? ` ‡ Solo la Argentina: extendida con el crecimiento del PIB real del INDEC; los demás países terminan en ${D.last}.` : ` ‡ Argentina only: extended with INDEC's real GDP growth; the other countries end in ${D.last}.`) : "");
+      csv = { header: ["year", "Argentina", "world rank", ...state.cols.map((k) => cname(D, k))], rows: csvRows };
+    }
+
     async function draw() {
       if (!index) return;
       const D = await load(state.release);
       const D2 = state.compare && state.view !== "pct" ? await load(state.compare) : null;
       relSel.value = state.release;
+      const TB = state.mode === "table";
+      for (const el of [vSeg, cmpSel.parentElement, fromSel.parentElement, evBtn, rowB, rowC, chartEl, evList]) el.style.display = TB ? "none" : "";
+      tuSeg.style.display = tableWrap.style.display = TB ? "" : "none";
+      if (TB) { benchTable(D); return; }
       cmpSel.replaceChildren(h("option", { value: "" }, ES ? "ninguna" : "none"), ...index.releases.filter((r) => r !== state.release).map((r) => h("option", { value: r }, r)));
       cmpSel.value = state.compare && state.compare !== state.release ? state.compare : "";
       fillChips(D);
@@ -2090,8 +2151,8 @@
         ...(state.view === "pct" ? [h("p", {}, ES ? "La vista de percentiles usa todos los países de la versión: ver las fuentes de cada país en la hoja Sources de la base." : "The percentile view uses every country in the release: see each country's sources in the database's Sources sheet.")]
           : Object.keys(S).length ? [h("ul", {}, [...new Set(shown)].filter((k) => S[k]).map((k) => h("li", {}, h("b", {}, cname(D, k)), ": ", S[k].map((r) => `${r[0]}: ${r[1]}`).join("; "))))] : []));
     }
-    const onCSV = () => { if (csv) downloadBlob(toCSV(csv.header, csv.rows), `${ind.id}_${state.view}_${state.release}.csv`, "text/csv"); };
-    appendAll(card, rowA, rowB, rowC, hint, chartEl, evList, ind.note ? h("p", { class: "chips-note" }, ind.note) : null, srcEl, methodLine(ind),
+    const onCSV = () => { if (csv) downloadBlob(toCSV(csv.header, csv.rows), `${ind.id}_${state.mode === "table" ? "table_" + state.tunits : state.view}_${state.release}.csv`, "text/csv"); };
+    appendAll(card, mSeg, rowA, rowB, rowC, hint, chartEl, tableWrap, evList, ind.note ? h("p", { class: "chips-note" }, ind.note) : null, srcEl, methodLine(ind),
       h("div", { class: "card-foot" },
         h("span", {}, "Source: ", T.source_url ? h("a", { href: T.source_url, target: "_blank", rel: "noopener" }, ind.source_label) : ind.source_label, ...srcTail(ind)),
         h("div", { class: "actions" }, h("button", { class: "btn", type: "button", onclick: onCSV, title: "Download the data in this view as CSV" }, "CSV"))));

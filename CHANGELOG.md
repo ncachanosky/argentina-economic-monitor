@@ -89,6 +89,11 @@ section becomes its notes.
   each term since December 1983, from the cards' own data and the site's term convention (the
   handover month belongs to the outgoing president, explained in the card's note). No score,
   ranking or colors. Each row links to its card. Methodology: "The economy under each presidency".
+- Long Run: a Table view on the GDP per capita card: Argentina's GDP per capita and world rank in
+  benchmark years (1870, 1913, 1929, 1950, 1975, 2000, 2015, the release's last year, and the
+  latest year of the INDEC extension), as % of nine comparison countries or regions, each column
+  chosen from a menu; or levels. Shares the card's release selector; years are tagged with the
+  chart's numbered events.
 - Economic freedom and V-Dem cards: Argentina's line in one color by default; "Color by president" turns the
   presidency colors on (and stays on across the card's views). Registry option `term_toggle`.
 
