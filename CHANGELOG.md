@@ -19,6 +19,12 @@ section becomes its notes.
   all 41 releases of INDEC's national-accounts workbooks since September 2016, read once
   (`pipeline/gdp_vintages.py`, stored in data/manual); EMAE from the 121 archived reports;
   later releases from the series the update stores. New methodology section.
+- Tracking the current quarter: before GDP is published, an error bar on the quarter in
+  progress and a line saying how close INDEC's first GDP print has landed to the EMAE bar
+  with as many months published (two quarters in three, nine in ten), from the archived EMAE
+  releases since 2016 (about ±1.0, ±0.8 and ±0.4 points with one, two and three months). A
+  factor-model nowcast was tested and did no better against the first print, so it was not
+  added. The card's summary line is now translated on Spanish pages.
 - Recession probability: the real-time line is now the model as it read when each EMAE
   release came out, estimated on that release's data as published (since August 2016), each
   reading kept as it was. Its track record (a median of five months of data to signal a

@@ -143,3 +143,39 @@ def write_tables(directory) -> list[str]:
             p.write_text(text, encoding="utf-8")
             changed.append(p.name)
     return changed
+
+
+def tracker_errors() -> dict:
+    """How far INDEC's first GDP print has been from the quarter-tracker figure, by EMAE months published.
+
+    For each EMAE release (as published), the quarter in progress: EMAE's average over the months
+    published so far against the previous quarter's average (the tracker's bar), compared with
+    the first print of GDP q/q (seasonally adjusted) for that quarter. 2020 is left out.
+    Returns {months published: {"p68", "p90", "n", "bias"}} in percentage points.
+    """
+    from .recession import releases
+    gv = pd.read_csv(GDP_CSV, parse_dates=["period"]).sort_values(["vintage", "period"])
+    gv["qq"] = gv.groupby("vintage")["gdp_sa"].pct_change() * 100
+    first = gv.groupby("period").first()["qq"]
+    for vin in store.vintages(GDP_SA):                       # later releases, from the stored copies
+        sa = store.as_of(GDP_SA, vin).dropna()
+        q = sa.index.max()
+        if q not in first.index and len(sa) > 1:
+            first.loc[q] = 100 * (sa.iloc[-1] / sa.iloc[-2] - 1)
+    rows = []
+    for _, lv in releases():
+        lv = lv.sort_index()
+        last = lv.index.max()
+        q = last.to_period("Q").start_time
+        pq = q - pd.DateOffset(months=3)
+        prev, cur = lv.loc[pq:pq + pd.DateOffset(months=2)], lv.loc[q:]
+        if len(prev) < 3 or q not in first.index or q.year == 2020:
+            continue
+        rows.append({"n": len(cur), "err": 100 * (cur.mean() / prev.mean() - 1) - first[q]})
+    d = pd.DataFrame(rows)
+    out = {}
+    for n, g in d.groupby("n"):
+        e = g["err"].abs()
+        out[int(n)] = {"p68": round(float(e.quantile(0.68)), 2), "p90": round(float(e.quantile(0.9)), 2),
+                       "n": int(len(g)), "bias": round(float(g["err"].mean()), 2)}
+    return out

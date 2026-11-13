@@ -21,3 +21,9 @@ def test_archives_load():
     assert len(g) >= 41 and g[0][0] == "2016-09"
     e = revisions.emae_vintages()
     assert len(e) >= 121
+
+
+def test_tracker_error_band_narrows_with_months_published():
+    b = revisions.tracker_errors()
+    assert set(b) == {1, 2, 3}
+    assert b[1]["p68"] >= b[2]["p68"] > b[3]["p68"] > 0

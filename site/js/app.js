@@ -941,12 +941,22 @@
       const mName = (iso) => fmtShortMonth(iso).split(" ")[0];
       const span = tk.months.length > 1 ? `${mName(tk.months[0])}–${mName(tk.months[tk.months.length - 1])}` : mName(tk.months[0]);
       const sp = INDEX_TRANSFORMS.yoy;
-      const parts = [h("b", {}, `${fmtPeriod(tk.quarter, "Q")}${tk.complete ? "" : ` so far (${span})`}: `)];
-      if (tk.qoq !== undefined) parts.push(`EMAE ${fmtNum(tk.qoq, sp)} q/q, seasonally adjusted`);
-      if (!tk.complete && tk.qoq_if_flat !== undefined && tk.months.length > 1) parts.push(` (${fmtNum(tk.qoq_if_flat, sp)} if the rest of the quarter stays at ${mName(tk.months[tk.months.length - 1])}'s level)`);
-      if (tk.yoy_original !== undefined) parts.push(` · ${fmtNum(tk.yoy_original, sp)} y/y, original series`);
-      parts.push(tk.gdp_published ? " · GDP for the quarter is published." : " · GDP not yet published.");
-      return h("p", { class: "summary-line" }, ...parts);
+      const ES = LANG === "es";
+      const parts = [h("b", {}, `${fmtPeriod(tk.quarter, "Q")}${tk.complete ? "" : ES ? ` hasta ahora (${span})` : ` so far (${span})`}: `)];
+      if (tk.qoq !== undefined) parts.push(ES ? `EMAE ${fmtNum(tk.qoq, sp)} t/t, desestacionalizado` : `EMAE ${fmtNum(tk.qoq, sp)} q/q, seasonally adjusted`);
+      if (!tk.complete && tk.qoq_if_flat !== undefined && tk.months.length > 1) parts.push(ES
+        ? ` (${fmtNum(tk.qoq_if_flat, sp)} si el resto del trimestre se mantiene en el nivel de ${mName(tk.months[tk.months.length - 1])})`
+        : ` (${fmtNum(tk.qoq_if_flat, sp)} if the rest of the quarter stays at ${mName(tk.months[tk.months.length - 1])}'s level)`);
+      if (tk.yoy_original !== undefined) parts.push(ES ? ` · ${fmtNum(tk.yoy_original, sp)} i.a., serie original` : ` · ${fmtNum(tk.yoy_original, sp)} y/y, original series`);
+      parts.push(tk.gdp_published ? (ES ? " · El PIB del trimestre ya se publicó." : " · GDP for the quarter is published.") : (ES ? " · El PIB todavía no se publicó." : " · GDP not yet published."));
+      const line = h("p", { class: "summary-line no-tr" }, ...parts);
+      const B = tk.band;
+      if (!B || tk.gdp_published) return line;
+      const nm = tk.months.length, es = LANG === "es";
+      const band = h("p", { class: "summary-line band-line no-tr" }, es
+        ? `Con ${nm} ${nm === 1 ? "mes publicado" : "meses publicados"} del EMAE, la primera estimación del PIB (t/t, desestacionalizado) quedó a menos de ±${fx(B.p68, 1)} pp de la barra del EMAE en dos de cada tres trimestres desde 2016, y a menos de ±${fx(B.p90, 1)} pp en nueve de cada diez (${B.n} trimestres, con el EMAE tal como se publicaba; sin 2020). La barra de error marca el primer rango.`
+        : `With ${nm} EMAE ${nm === 1 ? "month" : "months"} published, INDEC's first GDP print (q/q, seasonally adjusted) has landed within ±${fx(B.p68, 1)} pp of the EMAE bar in two quarters out of three since 2016, and within ±${fx(B.p90, 1)} pp in nine out of ten (${B.n} quarters, EMAE as published at the time; 2020 excluded). The error bar shows the first range.`);
+      return h("div", {}, line, band);
     }
 
     // Cumulative change of each variant over fixed windows, on the levels.
@@ -1180,6 +1190,12 @@
       const tk = ind.derived && ind.derived.tracker;
       if (tk && !tk.complete) traces.forEach((tr) => {
         if (tr.type === "bar" && tr.name === ind.variants.emae.label) tr.marker = { ...tr.marker, opacity: tr.x.map((d) => (d === tk.quarter ? 0.45 : 1)) };
+      });
+      // Error bar on the quarter in progress: where the first GDP print has usually landed (q/q view only).
+      if (tk && tk.band && !tk.gdp_published && state.transform === "mom") traces.forEach((tr) => {
+        if (tr.name !== ind.variants.emae.label) return;
+        const arr = tr.x.map((d) => (d === tk.quarter ? tk.band.p68 : NaN));
+        tr.error_y = { type: "data", array: arr, visible: true, color: cssVar("--ink-2"), thickness: 1.5, width: 6 };
       });
       const bs = bandShapes(x);
       if (state.episodes && x.length) {

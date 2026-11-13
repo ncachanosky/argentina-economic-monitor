@@ -241,6 +241,15 @@ def tracker(ind, frames: dict[str, pd.Series]) -> tuple[pd.DataFrame, dict]:
     if len(d):
         info["fit_max_pp"] = round(float(d.abs().max()), 3)
         info["fit_since"] = d.index.min().strftime("%Y-%m-%d")
+    # How far the first GDP print has landed from this figure, with as many EMAE months published (real time, since 2016).
+    if not info["gdp_published"]:
+        try:
+            from .sources.revisions import tracker_errors
+            band = tracker_errors().get(n)
+            if band:
+                info["band"] = band
+        except Exception as exc:
+            print(f"tracker: no error band ({exc})")
     df = pd.DataFrame({ind.variants["emae"].source_id: q_sa, ind.variants["gdp"].source_id: gdp})
     return df.sort_index(), {"tracker": info}
 
