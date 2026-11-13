@@ -4971,16 +4971,18 @@
   },
   "recession:realtime": {
     "last_changed": "2026-11-13",
-    "last_checked": "2026-11-13T02:24:47+00:00",
+    "last_checked": "2026-11-13T02:38:46+00:00",
     "last_obs": "2026-08-01",
     "source": "recession",
     "source_units": "probability, %",
     "status": "ok",
-    "warnings": []
+    "warnings": [
+      "1 missing period(s), first 2018-07"
+    ]
   },
   "recession:smoothed": {
     "last_changed": "2026-11-13",
-    "last_checked": "2026-11-13T02:24:47+00:00",
+    "last_checked": "2026-11-13T02:38:46+00:00",
     "last_obs": "2026-08-01",
     "source": "recession",
     "source_units": "probability, %",
@@ -5048,6 +5050,22 @@
     "last_checked": "2026-11-13T02:24:47+00:00",
     "last_obs": "2026-10-01",
     "source": "rem",
+    "status": "ok",
+    "warnings": []
+  },
+  "revisions:emae_first_mm": {
+    "last_checked": "2026-11-13T02:38:46+00:00",
+    "last_obs": "2026-08-01",
+    "source": "revisions",
+    "source_units": "%, first print",
+    "status": "ok",
+    "warnings": []
+  },
+  "revisions:gdp_first_qq": {
+    "last_checked": "2026-11-13T02:38:46+00:00",
+    "last_obs": "2026-04-01",
+    "source": "revisions",
+    "source_units": "%, first print",
     "status": "ok",
     "warnings": []
   },
