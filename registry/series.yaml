@@ -475,6 +475,19 @@ inputs:
   - {id: "recession:smoothed", source: recession, frequency: M, measure: flow, stale_days: 120, label: "Recession probability (EMAE-based): full-sample estimate"}
   # Institutions. Archbridge Institute's Social Mobility Index: hand-kept edition file (data/manual/social_mobility_<edition>.csv).
   - {id: "smi:ARG:overall", source: smi, frequency: Y, measure: flow, stale_days: 1100, label: "Social Mobility Index, Argentina: overall score"}
+  - {id: "intl:ARG:growth", source: intl, frequency: Y, measure: flow, allow_gaps: true, stale_days: 800, label: "International: growth, Argentina"}
+  - {id: "intl:ARG:gdppc", source: intl, frequency: Y, measure: flow, allow_gaps: true, stale_days: 800, label: "International: gdppc, Argentina"}
+  - {id: "intl:ARG:inflation", source: intl, frequency: Y, measure: flow, allow_gaps: true, stale_days: 800, label: "International: inflation, Argentina"}
+  - {id: "intl:ARG:investment", source: intl, frequency: Y, measure: flow, allow_gaps: true, stale_days: 800, label: "International: investment, Argentina"}
+  - {id: "intl:ARG:revenue", source: intl, frequency: Y, measure: flow, allow_gaps: true, stale_days: 800, label: "International: revenue, Argentina"}
+  - {id: "intl:ARG:expenditure", source: intl, frequency: Y, measure: flow, allow_gaps: true, stale_days: 800, label: "International: expenditure, Argentina"}
+  - {id: "intl:ARG:balance", source: intl, frequency: Y, measure: flow, allow_gaps: true, stale_days: 800, label: "International: balance, Argentina"}
+  - {id: "intl:ARG:debt", source: intl, frequency: Y, measure: flow, allow_gaps: true, stale_days: 800, label: "International: debt, Argentina"}
+  - {id: "intl:ARG:current_account", source: intl, frequency: Y, measure: flow, allow_gaps: true, stale_days: 800, label: "International: current_account, Argentina"}
+  - {id: "intl:ARG:unemployment", source: intl, frequency: Y, measure: flow, allow_gaps: true, stale_days: 800, label: "International: unemployment, Argentina"}
+  - {id: "intl:ARG:openness", source: intl, frequency: Y, measure: flow, allow_gaps: true, stale_days: 1100, label: "International: openness, Argentina"}
+  - {id: "intl:ARG:fdi", source: intl, frequency: Y, measure: flow, allow_gaps: true, stale_days: 1100, label: "International: fdi, Argentina"}
+  - {id: "intl:ARG:gini", source: intl, frequency: Y, measure: flow, allow_gaps: true, stale_days: 1100, label: "International: gini, Argentina"}
   - {id: "lallpi:ARG:pop", source: lallpi, frequency: Y, measure: flow, allow_gaps: true, stale_days: 4000, label: "Latin American Left-Leaning Populism Index, Argentina"}
   - {id: "smi:ARG:rank", source: smi, frequency: Y, measure: flow, stale_days: 1100, label: "Social Mobility Index, Argentina: rank"}
   - {id: "efw:ARG:summary", source: efw, frequency: Y, measure: flow, allow_gaps: true, stale_days: 1400, label: "EFW, Argentina: summary"}
@@ -872,6 +885,16 @@ topics:
       release), trade since 1910, consumer prices since 1943, Central
       Bank financing of the government since 1940 and the minimum wage
       since 1965, with the main turning points of its economic history.
+
+  - id: international
+    slug: international
+    group: International
+    title: International
+    description: >-
+      Argentina against the world: growth, prices, the public sector, the
+      external accounts, jobs and institutions, for every country the IMF
+      and the World Bank cover, compared by region, sub-region or bloc, with
+      the IMF's projections.
 
 indicators:
   - id: emae
@@ -7487,3 +7510,463 @@ indicators:
       variants:
         smvm:    {label: Minimum wage,    expr: "ars(w)"}
         pension: {label: Minimum pension, expr: "ars(p)"}
+
+  - id: intl_snapshot
+    topic: international
+    kind: intl_snapshot
+    wide: true
+    title: "Argentina against the World: Snapshot"
+    short_title: "International snapshot"
+    description: >-
+      Argentina against the median of a region, sub-region or bloc, the
+      latest year of each indicator, and the group's largest economies.
+      Choose the group on any card; every card on the page follows.
+    source: table
+    source_label: "IMF, World Economic Outlook; World Bank; Fraser Institute; V-Dem; Archbridge Institute"
+    frequency: Y
+    units: various
+    default: {}
+    table:
+      source: intl
+      file: index.json
+      status_id: "intl:ARG:growth"
+    note: >-
+      Groups use today's membership for every year (Mercosur without
+      Venezuela, the euro area with Bulgaria, BRICS after its 2024-25
+      enlargement). The median is taken each year over the members with
+      data, so it is not weighted by size: each country counts once.
+    method_links: [{anchor: international, label: "About the international comparisons"}]
+    rows:
+      - {source: intl, file: growth.json, card: intl_growth, section: "Growth and prices"}
+      - {source: intl, file: gdppc.json, card: intl_gdppc, section: "Growth and prices"}
+      - {source: intl, file: inflation.json, card: intl_inflation, section: "Growth and prices"}
+      - {source: intl, file: investment.json, card: intl_investment, section: "Growth and prices"}
+      - {source: intl, file: revenue.json, card: intl_revenue, section: "The public sector"}
+      - {source: intl, file: expenditure.json, card: intl_expenditure, section: "The public sector"}
+      - {source: intl, file: balance.json, card: intl_balance, section: "The public sector"}
+      - {source: intl, file: debt.json, card: intl_debt, section: "The public sector"}
+      - {source: intl, file: current_account.json, card: intl_current_account, section: "External accounts"}
+      - {source: intl, file: openness.json, card: intl_openness, section: "External accounts"}
+      - {source: intl, file: fdi.json, card: intl_fdi, section: "External accounts"}
+      - {source: intl, file: unemployment.json, card: intl_unemployment, section: "Jobs and incomes"}
+      - {source: intl, file: gini.json, card: intl_gini, section: "Jobs and incomes"}
+      - {source: efw, file: world_summary.json, card: intl_efw, section: "Institutions"}
+      - {source: efw, file: world_a2.json, card: intl_efw_a2, section: "Institutions"}
+      - {source: efw, file: world_a3.json, card: intl_efw_a3, section: "Institutions"}
+      - {source: vdem, file: world_libdem.json, card: intl_vdem_libdem, section: "Institutions"}
+      - {source: vdem, file: world_rol.json, card: intl_vdem_rol, section: "Institutions"}
+      - {source: vdem, file: world_corruption.json, card: intl_vdem_corruption, section: "Institutions"}
+      - {source: smi, file: world_overall.json, card: intl_smi, section: "Institutions"}
+
+  - id: intl_growth
+    topic: international
+    kind: intl
+    wide: true
+    title: "Real GDP Growth"
+    short_title: "Real GDP growth"
+    heading: "Growth and prices"
+    description: >-
+      Annual change in real GDP, %, with the IMF's projections.
+    source: table
+    source_label: "IMF, World Economic Outlook"
+    frequency: Y
+    units: various
+    default: {}
+    table:
+      source: intl
+      file: growth.json
+      status_id: "intl:ARG:growth"
+      source_url: https://www.imf.org/en/Publications/WEO
+    method_links: [{anchor: international, label: "About the international comparisons"}]
+
+  - id: intl_gdppc
+    topic: international
+    kind: intl
+    wide: true
+    title: "GDP per Capita (PPP)"
+    short_title: "GDP per capita, PPP"
+    description: >-
+      GDP per capita in current international dollars at purchasing power parity, with the IMF's projections.
+    source: table
+    source_label: "IMF, World Economic Outlook"
+    frequency: Y
+    units: various
+    default: {}
+    table:
+      source: intl
+      file: gdppc.json
+      status_id: "intl:ARG:gdppc"
+      source_url: https://www.imf.org/en/Publications/WEO
+    method_links: [{anchor: international, label: "About the international comparisons"}]
+
+  - id: intl_inflation
+    topic: international
+    kind: intl
+    wide: true
+    title: "Inflation"
+    short_title: "Inflation"
+    description: >-
+      Annual average consumer price inflation, %, with the IMF's projections.
+    source: table
+    source_label: "IMF, World Economic Outlook"
+    frequency: Y
+    units: various
+    default: {}
+    table:
+      source: intl
+      file: inflation.json
+      status_id: "intl:ARG:inflation"
+      source_url: https://www.imf.org/en/Publications/WEO
+    note: >-
+      As published by the IMF. For Argentina the WEO has no inflation figures for 2014-2016, after the IMF's 2013 declaration of censure over INDEC's CPI; earlier years are INDEC's official figures, including those of the intervention (2007-2013). The Prices and Long Run pages show the corrected series.
+    method_links: [{anchor: international, label: "About the international comparisons"}]
+
+  - id: intl_investment
+    topic: international
+    kind: intl
+    wide: true
+    title: "Investment"
+    short_title: "Investment"
+    description: >-
+      Total investment (gross capital formation), % of GDP, with the IMF's projections.
+    source: table
+    source_label: "IMF, World Economic Outlook"
+    frequency: Y
+    units: various
+    default: {}
+    table:
+      source: intl
+      file: investment.json
+      status_id: "intl:ARG:investment"
+      source_url: https://www.imf.org/en/Publications/WEO
+    method_links: [{anchor: international, label: "About the international comparisons"}]
+
+  - id: intl_revenue
+    topic: international
+    kind: intl
+    wide: true
+    title: "General Government Revenue"
+    short_title: "Government revenue"
+    heading: "The public sector"
+    description: >-
+      General government revenue, % of GDP, with the IMF's projections.
+    source: table
+    source_label: "IMF, World Economic Outlook"
+    frequency: Y
+    units: various
+    default: {}
+    table:
+      source: intl
+      file: revenue.json
+      status_id: "intl:ARG:revenue"
+      source_url: https://www.imf.org/en/Publications/WEO
+    note: >-
+      General government: national, provincial and local governments and social security, so wider than the national budget on the Fiscal page. Definitions follow each country's reporting to the IMF and are not always fully comparable.
+    method_links: [{anchor: international, label: "About the international comparisons"}]
+
+  - id: intl_expenditure
+    topic: international
+    kind: intl
+    wide: true
+    title: "General Government Expenditure"
+    short_title: "Government expenditure"
+    description: >-
+      General government total expenditure, % of GDP, with the IMF's projections.
+    source: table
+    source_label: "IMF, World Economic Outlook"
+    frequency: Y
+    units: various
+    default: {}
+    table:
+      source: intl
+      file: expenditure.json
+      status_id: "intl:ARG:expenditure"
+      source_url: https://www.imf.org/en/Publications/WEO
+    method_links: [{anchor: international, label: "About the international comparisons"}]
+
+  - id: intl_balance
+    topic: international
+    kind: intl
+    wide: true
+    title: "General Government Balance"
+    short_title: "Government balance"
+    description: >-
+      General government net lending (+) or borrowing (−), revenue less expenditure, % of GDP, with the IMF's projections.
+    source: table
+    source_label: "IMF, World Economic Outlook"
+    frequency: Y
+    units: various
+    default: {}
+    table:
+      source: intl
+      file: balance.json
+      status_id: "intl:ARG:balance"
+      source_url: https://www.imf.org/en/Publications/WEO
+    method_links: [{anchor: international, label: "About the international comparisons"}]
+
+  - id: intl_debt
+    topic: international
+    kind: intl
+    wide: true
+    title: "General Government Gross Debt"
+    short_title: "Government debt"
+    description: >-
+      General government gross debt, % of GDP, with the IMF's projections.
+    source: table
+    source_label: "IMF, World Economic Outlook"
+    frequency: Y
+    units: various
+    default: {}
+    table:
+      source: intl
+      file: debt.json
+      status_id: "intl:ARG:debt"
+      source_url: https://www.imf.org/en/Publications/WEO
+    method_links: [{anchor: international, label: "About the international comparisons"}]
+
+  - id: intl_current_account
+    topic: international
+    kind: intl
+    wide: true
+    title: "Current Account"
+    short_title: "Current account"
+    heading: "External accounts"
+    description: >-
+      Current account balance, % of GDP, with the IMF's projections.
+    source: table
+    source_label: "IMF, World Economic Outlook"
+    frequency: Y
+    units: various
+    default: {}
+    table:
+      source: intl
+      file: current_account.json
+      status_id: "intl:ARG:current_account"
+      source_url: https://www.imf.org/en/Publications/WEO
+    method_links: [{anchor: international, label: "About the international comparisons"}]
+
+  - id: intl_openness
+    topic: international
+    kind: intl
+    wide: true
+    title: "Trade Openness"
+    short_title: "Trade openness"
+    description: >-
+      Exports plus imports of goods and services, % of GDP.
+    source: table
+    source_label: "World Bank, World Development Indicators"
+    frequency: Y
+    units: various
+    default: {}
+    table:
+      source: intl
+      file: openness.json
+      status_id: "intl:ARG:openness"
+      source_url: https://databank.worldbank.org/source/world-development-indicators
+    method_links: [{anchor: international, label: "About the international comparisons"}]
+
+  - id: intl_fdi
+    topic: international
+    kind: intl
+    wide: true
+    title: "Foreign Direct Investment"
+    short_title: "FDI inflows"
+    description: >-
+      Foreign direct investment, net inflows, % of GDP.
+    source: table
+    source_label: "World Bank, World Development Indicators"
+    frequency: Y
+    units: various
+    default: {}
+    table:
+      source: intl
+      file: fdi.json
+      status_id: "intl:ARG:fdi"
+      source_url: https://databank.worldbank.org/source/world-development-indicators
+    method_links: [{anchor: international, label: "About the international comparisons"}]
+
+  - id: intl_unemployment
+    topic: international
+    kind: intl
+    wide: true
+    title: "Unemployment"
+    short_title: "Unemployment"
+    heading: "Jobs and incomes"
+    description: >-
+      Unemployment rate, % of the labor force, with the IMF's projections.
+    source: table
+    source_label: "IMF, World Economic Outlook"
+    frequency: Y
+    units: various
+    default: {}
+    table:
+      source: intl
+      file: unemployment.json
+      status_id: "intl:ARG:unemployment"
+      source_url: https://www.imf.org/en/Publications/WEO
+    note: >-
+      National definitions; for Argentina, INDEC's urban survey (EPH). The IMF does not report unemployment for many low-income countries.
+    method_links: [{anchor: international, label: "About the international comparisons"}]
+
+  - id: intl_gini
+    topic: international
+    kind: intl
+    wide: true
+    title: "Income Inequality (Gini)"
+    short_title: "Gini index"
+    description: >-
+      The Gini index of income or consumption, 0 (equal) to 100, from household surveys.
+    source: table
+    source_label: "World Bank, World Development Indicators"
+    frequency: Y
+    units: various
+    default: {}
+    table:
+      source: intl
+      file: gini.json
+      status_id: "intl:ARG:gini"
+      source_url: https://databank.worldbank.org/source/world-development-indicators
+    note: >-
+      Survey years vary by country and some countries measure consumption rather than income, which yields lower values; for Argentina, urban areas only. Compare levels with care.
+    method_links: [{anchor: international, label: "About the international comparisons"}]
+
+  - id: intl_efw
+    topic: international
+    kind: intl
+    wide: true
+    title: "Economic Freedom"
+    short_title: "Economic freedom"
+    heading: "Institutions"
+    description: >-
+      The Fraser Institute's summary rating of economic freedom, 0 (least free) to 10. 1970-2000 every five years, annual since.
+    source: table
+    source_label: "Fraser Institute, Economic Freedom of the World"
+    frequency: Y
+    units: various
+    default: {}
+    table:
+      source: efw
+      file: world_summary.json
+      status_id: "efw:ARG:summary"
+      source_url: https://www.fraserinstitute.org/economic-freedom
+    method_links: [{anchor: international, label: "About the international comparisons"}]
+
+  - id: intl_efw_a2
+    topic: international
+    kind: intl
+    wide: true
+    title: "Legal System and Property Rights"
+    short_title: "EFW: legal system"
+    description: >-
+      EFW Area 2, legal system and property rights, 0 to 10.
+    source: table
+    source_label: "Fraser Institute, Economic Freedom of the World"
+    frequency: Y
+    units: various
+    default: {}
+    table:
+      source: efw
+      file: world_a2.json
+      status_id: "efw:ARG:a2"
+      source_url: https://www.fraserinstitute.org/economic-freedom
+    method_links: [{anchor: international, label: "About the international comparisons"}]
+
+  - id: intl_efw_a3
+    topic: international
+    kind: intl
+    wide: true
+    title: "Sound Money"
+    short_title: "EFW: sound money"
+    description: >-
+      EFW Area 3, sound money, 0 to 10.
+    source: table
+    source_label: "Fraser Institute, Economic Freedom of the World"
+    frequency: Y
+    units: various
+    default: {}
+    table:
+      source: efw
+      file: world_a3.json
+      status_id: "efw:ARG:a3"
+      source_url: https://www.fraserinstitute.org/economic-freedom
+    method_links: [{anchor: international, label: "About the international comparisons"}]
+
+  - id: intl_vdem_libdem
+    topic: international
+    kind: intl
+    wide: true
+    title: "Liberal Democracy"
+    short_title: "Liberal democracy"
+    description: >-
+      V-Dem's liberal democracy index, 0 to 1.
+    source: table
+    source_label: "V-Dem Institute, Varieties of Democracy (v16), via Our World in Data"
+    frequency: Y
+    units: various
+    default: {}
+    table:
+      source: vdem
+      file: world_libdem.json
+      status_id: "vdem:libdem:ARG"
+      source_url: https://v-dem.net
+    method_links: [{anchor: international, label: "About the international comparisons"}]
+
+  - id: intl_vdem_rol
+    topic: international
+    kind: intl
+    wide: true
+    title: "Rule of Law"
+    short_title: "Rule of law"
+    description: >-
+      V-Dem's rule of law index, 0 to 1.
+    source: table
+    source_label: "V-Dem Institute, Varieties of Democracy (v16), via Our World in Data"
+    frequency: Y
+    units: various
+    default: {}
+    table:
+      source: vdem
+      file: world_rol.json
+      status_id: "vdem:rol:ARG"
+      source_url: https://v-dem.net
+    method_links: [{anchor: international, label: "About the international comparisons"}]
+
+  - id: intl_vdem_corruption
+    topic: international
+    kind: intl
+    wide: true
+    title: "Political Corruption"
+    short_title: "Political corruption"
+    description: >-
+      V-Dem's political corruption index, 0 to 1 (higher is more corrupt).
+    source: table
+    source_label: "V-Dem Institute, Varieties of Democracy (v16), via Our World in Data"
+    frequency: Y
+    units: various
+    default: {}
+    table:
+      source: vdem
+      file: world_corruption.json
+      status_id: "vdem:corruption:ARG"
+      source_url: https://v-dem.net
+    method_links: [{anchor: international, label: "About the international comparisons"}]
+
+  - id: intl_smi
+    topic: international
+    kind: intl
+    wide: true
+    title: "Conditions for Social Mobility"
+    short_title: "Social mobility"
+    description: >-
+      The Archbridge Institute's Social Mobility Index, 0 to 10 (2026 edition, data for 2024): one year, so a ranking only.
+    source: table
+    source_label: "Archbridge Institute, Social Mobility Index (2026 edition)"
+    frequency: Y
+    units: various
+    default: {}
+    table:
+      source: smi
+      file: world_overall.json
+      status_id: "smi:ARG:overall"
+      source_url: https://www.archbridgeinstitute.org/social-mobility-index/
+    method_links: [{anchor: international, label: "About the international comparisons"}]

@@ -431,6 +431,8 @@ def export_table(ind, out: Path, status: dict, reg_meta: dict | None = None) -> 
         "source_files": source_files_for(ind, reg_meta, status),
         "summary": country_summary(index) if ind.kind == "country_index" else None,
     }
+    if ind.display:
+        payload.update(ind.display)
     (out / f"{ind.id}.json").write_text(json.dumps(payload, separators=(",", ":")), encoding="utf-8")
     return {"id": ind.id, "topic": ind.topic, "kind": ind.kind, "title": ind.title, "short_title": ind.short_title,
             "status": payload["status"], "last_obs": last, "headline": False}

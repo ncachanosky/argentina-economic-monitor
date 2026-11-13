@@ -1,0 +1,54 @@
+# Country groups for the International page: regions (with sub-regions) and blocs.
+# ISO3 codes. Membership is today's for the whole series (stated on the page): a group's
+# median each year is taken over its members with data that year. Codes not covered by the
+# IMF's World Economic Outlook or the World Bank are dropped when the table is built.
+# Blocs as of November 2026: Mercosur without Venezuela (suspended since 2016) and with
+# Bolivia (full member since 2024); euro area with Bulgaria (2026); BRICS after the 2024-25
+# enlargement; ASEAN with Timor-Leste (2025).
+
+regions:
+  - key: latam
+    label: Latin America & Caribbean
+    sub:
+      - {key: south_america, label: South America, members: [ARG, BOL, BRA, CHL, COL, ECU, GUY, PRY, PER, SUR, URY, VEN]}
+      - {key: central_america, label: Central America & Mexico, members: [MEX, GTM, BLZ, HND, SLV, NIC, CRI, PAN]}
+      - {key: caribbean, label: Caribbean, members: [ATG, BHS, BRB, DMA, DOM, GRD, HTI, JAM, KNA, LCA, VCT, TTO, ABW, PRI]}
+  - key: north_america
+    label: North America
+    members: [USA, CAN]
+  - key: europe
+    label: Europe
+    sub:
+      - {key: western_europe, label: Western Europe, members: [AUT, BEL, FRA, DEU, LUX, NLD, CHE, IRL, GBR, LIE]}
+      - {key: northern_europe, label: Northern Europe, members: [DNK, FIN, ISL, NOR, SWE, EST, LVA, LTU]}
+      - {key: southern_europe, label: Southern Europe, members: [ESP, PRT, ITA, GRC, MLT, CYP, SVN, HRV, ALB, BIH, MNE, MKD, SRB, SMR, AND]}
+      - {key: eastern_europe, label: Central & Eastern Europe, members: [POL, CZE, SVK, HUN, ROU, BGR, MDA, UKR, BLR, RUS, TUR]}
+  - key: asia
+    label: Asia
+    sub:
+      - {key: east_asia, label: East Asia, members: [CHN, JPN, KOR, MNG, HKG, MAC, TWN]}
+      - {key: southeast_asia, label: Southeast Asia, members: [IDN, MYS, PHL, SGP, THA, VNM, KHM, LAO, MMR, BRN, TLS]}
+      - {key: south_asia, label: South Asia, members: [IND, PAK, BGD, LKA, NPL, BTN, MDV, AFG]}
+      - {key: central_asia, label: Central Asia & Caucasus, members: [KAZ, KGZ, TJK, TKM, UZB, ARM, AZE, GEO]}
+  - key: mena
+    label: Middle East & North Africa
+    members: [SAU, ARE, QAT, KWT, BHR, OMN, IRN, IRQ, ISR, JOR, LBN, SYR, YEM, PSE, EGY, LBY, TUN, DZA, MAR]
+  - key: ssa
+    label: Sub-Saharan Africa
+    members: [AGO, BEN, BWA, BFA, BDI, CPV, CMR, CAF, TCD, COM, COD, COG, CIV, DJI, GNQ, ERI, SWZ, ETH, GAB, GMB, GHA, GIN, GNB, KEN, LSO, LBR, MDG, MWI, MLI, MRT, MUS, MOZ, NAM, NER, NGA, RWA, STP, SEN, SYC, SLE, SOM, ZAF, SSD, SDN, TZA, TGO, UGA, ZMB, ZWE]
+  - key: oceania
+    label: Oceania
+    members: [AUS, NZL, FJI, PNG, WSM, TON, VUT, SLB, KIR, FSM, MHL, PLW, NRU, TUV]
+
+blocs:
+  - {key: mercosur, label: Mercosur, members: [ARG, BRA, PRY, URY, BOL]}
+  - {key: pacific_alliance, label: Pacific Alliance, members: [CHL, COL, MEX, PER]}
+  - {key: usmca, label: USMCA, members: [USA, CAN, MEX]}
+  - {key: eu, label: European Union, members: [AUT, BEL, BGR, HRV, CYP, CZE, DNK, EST, FIN, FRA, DEU, GRC, HUN, IRL, ITA, LVA, LTU, LUX, MLT, NLD, POL, PRT, ROU, SVK, SVN, ESP, SWE]}
+  - {key: euro, label: Euro area, members: [AUT, BEL, BGR, HRV, CYP, EST, FIN, FRA, DEU, GRC, IRL, ITA, LVA, LTU, LUX, MLT, NLD, PRT, SVK, SVN, ESP]}
+  - {key: g7, label: G7, members: [CAN, FRA, DEU, ITA, JPN, GBR, USA]}
+  - {key: g20, label: G20 (countries), members: [ARG, AUS, BRA, CAN, CHN, FRA, DEU, IND, IDN, ITA, JPN, KOR, MEX, RUS, SAU, ZAF, TUR, GBR, USA]}
+  - {key: oecd, label: OECD, members: [AUS, AUT, BEL, CAN, CHL, COL, CRI, CZE, DNK, EST, FIN, FRA, DEU, GRC, HUN, ISL, IRL, ISR, ITA, JPN, KOR, LVA, LTU, LUX, MEX, NLD, NZL, NOR, POL, PRT, SVK, SVN, ESP, SWE, CHE, TUR, GBR, USA]}
+  - {key: brics, label: BRICS, members: [BRA, RUS, IND, CHN, ZAF, EGY, ETH, IRN, ARE, IDN]}
+  - {key: asean, label: ASEAN, members: [BRN, KHM, IDN, LAO, MYS, MMR, PHL, SGP, THA, VNM, TLS]}
+  - {key: gcc, label: Gulf Cooperation Council, members: [SAU, ARE, QAT, KWT, BHR, OMN]}

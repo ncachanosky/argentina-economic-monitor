@@ -94,6 +94,14 @@ section becomes its notes.
   latest year of the INDEC extension), as % of nine comparison countries or regions, each column
   chosen from a menu; or levels. Shares the card's release selector; years are tagged with the
   chart's numbered events.
+- International page: Argentina against every country covered by the IMF's World Economic Outlook
+  and the World Bank (about 195), annual: growth, GDP per capita (PPP), inflation, investment,
+  general government revenue, expenditure, balance and debt, current account, trade openness, FDI,
+  unemployment, Gini, and an institutions section (economic freedom, V-Dem, Social Mobility Index).
+  IMF projections dashed. Compare with a region, sub-region or bloc (its median and largest
+  economies, any country addable); the choice applies to every card. A snapshot table at the top;
+  each card also ranks the group for a chosen year. New sources: IMF SDMX API, World Bank API;
+  the EFW, V-Dem and SMI adapters also write all-country tables.
 - Institutions: the Latin American Left-Leaning Populism Index (Cachanosky, Bastos and Padilla,
   V2025.1), 22 countries, 2000-2019. Three views: over time (any measure, Argentina and chosen
   countries, regional median), a map of the region by year with a year slider and Play, and a

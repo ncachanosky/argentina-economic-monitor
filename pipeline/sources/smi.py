@@ -154,6 +154,13 @@ def write_tables(directory) -> list[str]:
     if not p.exists() or p.read_text(encoding="utf-8") != text:
         p.write_text(text, encoding="utf-8")
         changed.append("index.json")
+    # Every country's overall score and pillars, for the International page (world_<key>.json).
+    from .world import table, write
+    year = max(c["year"] for c in LAST["countries"])
+    for m_ in [m_ for m_ in LAST["measures"] if not m_.get("parent")]:
+        wide = pd.DataFrame({c["iso"]: [c["score"].get(m_["key"])] for c in LAST["countries"]}, index=[year])
+        changed += write(d, {f"world_{m_['key']}.json": table(f"smi_{m_['key']}", m_["label"] if m_["key"] != "overall" else "Social Mobility Index",
+                                                                "score, 0-10", 2, "Archbridge Institute, Social Mobility Index", wide)})
     m = d / "latam_map.json"
     if not m.exists() or m.read_bytes() != MAP_FILE.read_bytes():
         shutil.copyfile(MAP_FILE, m)

@@ -2167,6 +2167,194 @@
     return card;
   }
 
+  // ---------- International page: groups of countries and annual indicators ----------
+  // Shared state: the country group chosen on any card applies to every card on the page.
+  const INTL = { index: null, group: "latam", listeners: new Set(), loading: null };
+  INTL.load = () => (INTL.loading = INTL.loading || getJSON(`${DATA}tables/intl/index.json`).then((x) => (INTL.index = x)));
+  INTL.setGroup = (g) => { INTL.group = g; INTL.listeners.forEach((f) => f()); };
+  const intlNames = LANG === "es" && typeof Intl.DisplayNames === "function" ? new Intl.DisplayNames(["es"], { type: "region" }) : null;
+  const intlName = (iso) => { const c = INTL.index && INTL.index.countries[iso]; if (!c) return iso; if (intlNames && c.a2) { try { return intlNames.of(c.a2) || c.n; } catch (e) { /* unknown */ } } return c.n; };
+  function intlGroups() {
+    const G = INTL.index.groups, out = [["world", G.world]];
+    G.regions.forEach((r) => { out.push([r.key, r]); (r.sub || []).forEach((s) => out.push([s.key, s, true])); });
+    G.blocs.forEach((b) => out.push([b.key, b, false, true]));
+    return out;
+  }
+  const intlGroup = (key) => (intlGroups().find((g) => g[0] === key) || intlGroups()[0])[1];
+  function intlGroupSelect() {
+    const sel = h("select", { class: "select", "aria-label": "Country group" });
+    const G = intlGroups();
+    sel.append(h("option", { value: "world" }, tr("World (all countries)")),
+      h("optgroup", { label: LANG === "es" ? "Regiones" : "Regions" }, G.filter((g) => !g[3] && g[0] !== "world").map(([k, g, sub]) => h("option", { value: k }, (sub ? "  · " : "") + tr(g.label)))),
+      h("optgroup", { label: LANG === "es" ? "Bloques" : "Blocs" }, G.filter((g) => g[3]).map(([k, g]) => h("option", { value: k }, tr(g.label)))));
+    sel.value = INTL.group;
+    sel.addEventListener("change", () => INTL.setGroup(sel.value));
+    const wrap = h("label", { class: "base-pick" }, h("span", {}, "Compare with:"), sel);
+    wrap.sync = () => { sel.value = INTL.group; };
+    return wrap;
+  }
+  const intlMedian = (xs) => { const v = xs.filter((x) => x !== null && x !== undefined).sort((a, b) => a - b); if (!v.length) return null; const m = v.length >> 1; return v.length % 2 ? v[m] : (v[m - 1] + v[m]) / 2; };
+
+  function intlCard(ind) {
+    const T = ind.table;
+    const card = cardFrame(ind, true);
+    const ES = LANG === "es", HOME = "ARG";
+    let D = null, csv = null;
+    const state = { view: "time", year: null, picks: null, pickGroup: null, from: 2000 };
+    let gPick = h("span");
+    const rSeg = segmented([["2000", "Since 2000"], ["max", "Max"]], "2000", (k) => { state.from = k === "max" ? null : 2000; rSeg.update(k); draw(); }, "Range");
+    const vSeg = segmented([["time", "Over time"], ["rank", "Ranking"]], state.view, (k) => { state.view = k; vSeg.update(k); draw(); }, "View");
+    const ySel = h("select", { class: "select", "aria-label": "Year" });
+    ySel.addEventListener("change", () => { state.year = +ySel.value; draw(); });
+    const yPick = h("label", { class: "base-pick" }, h("span", {}, "Year:"), ySel);
+    const chips = h("div", { class: "chip-row" });
+    const addSel = h("select", { class: "select", "aria-label": "Add a country" });
+    addSel.addEventListener("change", () => { if (addSel.value) { state.picks.add(addSel.value); addSel.value = ""; draw(); } });
+    const chartEl = h("div", { class: "chart tall-ish", role: "img", "aria-label": ind.title });
+    const hint = h("p", { class: "hint" });
+    const nd = () => D.decimals;
+    const fmt = (v) => (v === null || v === undefined ? "–" : fx(v, nd()));
+    const lastActual = () => { const pf = D.proj_from || 1e9; const a = D.values[HOME] || []; let y = null; D.years.forEach((yy, i) => { if (yy < pf && a[i] !== null) y = yy; }); return y || Math.min(pf - 1, D.years[D.years.length - 1]); };
+    function draw() {
+      if (!D || !INTL.index) return;
+      gPick.sync && gPick.sync();
+      const g = intlGroup(INTL.group);
+      if (state.pickGroup !== INTL.group) { state.picks = new Set(g.main.filter((c) => c !== HOME && D.values[c]).slice(0, 4)); state.pickGroup = INTL.group; }
+      const single = D.years.length === 1;
+      if (single) state.view = "rank";
+      vSeg.style.display = single ? "none" : "";
+      const Y = D.years, pf = D.proj_from;
+      const yrs = Y.filter((y) => !pf || y < pf).slice().reverse();
+      if (!state.year || !yrs.includes(state.year)) state.year = lastActual();
+      ySel.replaceChildren(...yrs.map((y) => h("option", { value: String(y) }, String(y)))); ySel.value = String(state.year);
+      yPick.style.display = state.view === "rank" && !single ? "" : "none";
+      chips.style.display = addSel.style.display = rSeg.style.display = state.view === "time" ? "" : "none";
+      const members = g.members.filter((c) => D.values[c]);
+      const med = Y.map((y, i) => intlMedian(members.map((c) => D.values[c][i])));
+      const gname = tr(g.label);
+      if (state.view === "time") {
+        chips.replaceChildren(h("span", { class: "chip-label" }, ES ? "Mostrar:" : "Show:"),
+          ...[...state.picks].map((c) => h("button", { type: "button", class: "chip", "aria-pressed": "true", onclick: () => { state.picks.delete(c); draw(); } }, `${intlName(c)} ×`)));
+        const others = Object.keys(D.values).filter((c) => c !== HOME && !state.picks.has(c)).sort((a, b) => intlName(a).localeCompare(intlName(b), LOCALE));
+        addSel.replaceChildren(h("option", { value: "" }, ES ? "Agregar un país…" : "Add a country…"),
+          h("optgroup", { label: gname }, others.filter((c) => members.includes(c)).map((c) => h("option", { value: c }, intlName(c)))),
+          h("optgroup", { label: ES ? "Otros países" : "Other countries" }, others.filter((c) => !members.includes(c)).map((c) => h("option", { value: c }, intlName(c)))));
+        const x = Y.map((y) => `${y}-07-01`);
+        const split = (arr) => { if (!pf) return [arr, null]; const i0 = Y.indexOf(pf); if (i0 < 0) return [arr, null]; return [arr.map((v, i) => (i < i0 ? v : null)), arr.map((v, i) => (i >= i0 - 1 ? v : null))]; };
+        const traces = [];
+        const line = (name, arr, style, extra = {}) => {
+          const [a, p] = split(arr);
+          traces.push({ type: "scatter", mode: "lines", name, x, y: a, connectgaps: false, line: style, legendgroup: name, hovertemplate: `${name} %{x|%Y}: <b>%{y:,.${nd()}f}</b><extra></extra>`, ...extra });
+          if (p) traces.push({ type: "scatter", mode: "lines", name: `${name} (${ES ? "proyección" : "projection"})`, x, y: p, connectgaps: false, showlegend: false, legendgroup: name, line: { ...style, dash: "dash" },
+            hovertemplate: `${name} %{x|%Y} (${ES ? "FMI, proyección" : "IMF projection"}): <b>%{y:,.${nd()}f}</b><extra></extra>` });
+        };
+        line(ES ? `Mediana: ${gname}` : `Median: ${gname}`, med, { color: cssVar("--ink-3"), width: 2, dash: "dot" });
+        let slot = 0;
+        for (const c of state.picks) if (D.values[c]) line(intlName(c), D.values[c], { color: cssVar(SERIES_VARS[slot++ % SERIES_VARS.length]), width: 1.6 });
+        if (D.values[HOME]) line(intlName(HOME), D.values[HOME], { color: cssVar("--ink"), width: 3 });
+        const shapes = pf && Y.includes(pf) ? [{ type: "rect", xref: "x", yref: "paper", x0: `${pf}-01-01`, x1: `${Y[Y.length - 1]}-12-31`, y0: 0, y1: 1, fillcolor: cssVar("--grid"), opacity: 0.35, line: { width: 0 }, layer: "below" }] : [];
+        const ann = shapes.length ? [{ xref: "x", yref: "paper", x: `${pf}-01-01`, y: 1, xanchor: "left", yanchor: "bottom", showarrow: false, text: ES ? `Proyecciones del FMI (WEO ${D.edition.replace("April", "abril").replace("October", "octubre")})` : `IMF projections (WEO, ${D.edition})`, font: { size: 11, color: cssVar("--ink-2") } }] : [];
+        chartEl.style.height = "";
+        Plotly.react(chartEl, traces, baseLayout({ xaxis: { hoverformat: "%Y", range: [`${state.from && state.from > Y[0] ? state.from : Y[0]}-01-01`, `${Y[Y.length - 1]}-12-31`] }, yaxis: { tickformat: nd() === 0 ? ",.0f" : undefined },
+          extra: { showlegend: true, legend: { orientation: "h", x: 0, y: 1.1, yanchor: "bottom", font: { color: cssVar("--ink") } }, hovermode: "x unified", shapes, annotations: ann, margin: { l: 56, r: 16, t: 56, b: 36 } } }), PLOT_CONFIG);
+        hint.textContent = (ES ? `${tr(D.label)}, ${tr(D.unit)}. La Argentina, la mediana de ${gname} (${members.length} países, cada año sobre los que tienen datos) y países elegidos.` : `${tr(D.label)}, ${tr(D.unit)}. Argentina, the median of ${gname} (${members.length} countries; each year over those with data) and chosen countries.`)
+          + (pf ? (ES ? ` Desde ${pf}, estimaciones y proyecciones del FMI (líneas discontinuas).` : ` From ${pf}, IMF estimates and projections (dashed).`) : "");
+        csv = { name: `${ind.id}_${INTL.group}`, header: ["year", intlName(HOME), `median ${g.label}`, ...[...state.picks].map(intlName)],
+          rows: Y.map((y, i) => [y, (D.values[HOME] || [])[i], med[i], ...[...state.picks].map((c) => D.values[c][i])]) };
+      } else {
+        const i = Y.indexOf(state.year);
+        const set = [...new Set([...members, HOME])].filter((c) => D.values[c] && D.values[c][i] !== null && D.values[c][i] !== undefined);
+        set.sort((a, b) => D.values[b][i] - D.values[a][i]);
+        const m = med[i];
+        const tall = Math.max(260, 20 * set.length + 50);
+        chartEl.style.height = `${tall}px`;
+        Plotly.react(chartEl, [{ type: "bar", orientation: "h", y: set.map(intlName), x: set.map((c) => D.values[c][i]),
+          marker: { color: set.map((c) => (c === HOME ? cssVar("--accent") : members.includes(c) ? cssVar("--ink-3") : cssVar("--grid"))) },
+          hovertemplate: `%{y}: <b>%{x:,.${nd()}f}</b><extra></extra>`, text: set.map((c) => fmt(D.values[c][i])), textposition: "outside", cliponaxis: false }],
+          baseLayout({ xaxis: { type: "linear", zeroline: true }, yaxis: { autorange: "reversed", type: "category", automargin: true, tickfont: { size: 11 }, dtick: 1 },
+            extra: { height: tall, hovermode: "closest", margin: { l: 120, r: 48, t: 10, b: 30 }, shapes: m === null ? [] : [{ type: "line", xref: "x", yref: "paper", x0: m, x1: m, y0: 0, y1: 1, line: { color: cssVar("--ink-2"), width: 1.5, dash: "dot" } }] } }), PLOT_CONFIG);
+        const r = set.indexOf(HOME) + 1;
+        hint.textContent = ES ? `${tr(D.label)}, ${state.year}: ${gname}${members.includes(HOME) ? "" : " y la Argentina"}, de mayor a menor. Línea punteada: la mediana del grupo (${fmt(m)}). ${r ? `La Argentina: ${r}.ª de ${set.length}.` : "La Argentina: sin dato."}`
+          : `${tr(D.label)}, ${state.year}: ${gname}${members.includes(HOME) ? "" : " and Argentina"}, highest first. Dotted line: the group median (${fmt(m)}). ${r ? `Argentina: ${r} of ${set.length}.` : "Argentina: no data."}`;
+        csv = { name: `${ind.id}_${INTL.group}_${state.year}`, header: ["country", "iso3", "value"], rows: set.map((c) => [intlName(c), c, D.values[c][i]]) };
+      }
+    }
+    INTL.listeners.add(() => draw());
+    const onCSV = () => { if (csv) downloadBlob(toCSV(csv.header, csv.rows), `${csv.name}.csv`, "text/csv"); };
+    appendAll(card, h("div", { class: "controls" }, vSeg, gPick, yPick, h("span", { class: "spacer" }), rSeg), hint, chartEl, h("div", { class: "controls" }, chips, addSel),
+      ind.note ? h("p", { class: "chips-note" }, ind.note) : null, methodLine(ind),
+      h("div", { class: "card-foot" },
+        h("span", {}, "Source: ", T.source_url ? h("a", { href: T.source_url, target: "_blank", rel: "noopener" }, ind.source_label) : ind.source_label, ...srcTail(ind)),
+        h("div", { class: "actions" }, h("button", { class: "btn", type: "button", onclick: onCSV, title: "Download the data in this view as CSV" }, "CSV"),
+          h("a", { class: "btn", href: `${DATA}${T.path}${T.file}`, download: `${ind.id}_all.json`, title: "Every country and year (JSON)" }, "All data"))));
+    card.draw = async () => {
+      if (!D) {
+        try { [D] = await Promise.all([getJSON(`${DATA}${T.path}${T.file}`), INTL.load()]); }
+        catch (e) { console.error(e); chartEl.replaceChildren(h("div", { class: "error-box" }, "The data could not be loaded.")); return; }
+        const g = intlGroupSelect(); gPick.replaceWith(g); gPick = g;
+      }
+      draw();
+    };
+    return card;
+  }
+
+  // The snapshot: Argentina against the chosen group, latest year of each indicator.
+  function intlSnapshotCard(ind) {
+    const card = cardFrame(ind, true);
+    const ES = LANG === "es", HOME = "ARG";
+    const rowsDef = ind.rows || [];
+    let tables = null, csv = null;
+    let gPick = h("span");
+    const wrap = h("div", { class: "sc-wrap" });
+    const hint = h("p", { class: "hint" });
+    function draw() {
+      if (!tables || !INTL.index) return;
+      gPick.sync && gPick.sync();
+      const g = intlGroup(INTL.group), gname = tr(g.label);
+      const main = g.main.filter((c) => c !== HOME).slice(0, 4);
+      const head = h("tr", {}, h("th", { class: "sc-label" }, ""), h("th", {}, ES ? "Año" : "Year"), h("th", {}, "Argentina"), h("th", {}, ES ? "Mediana" : "Median"),
+        h("th", {}, ES ? "Posición" : "Rank"), ...main.map((c) => h("th", {}, intlName(c))));
+      const body = [], csvRows = [];
+      let sec = null;
+      rowsDef.forEach((r, n) => {
+        const D = tables[n]; if (!D) return;
+        if (r.section && r.section !== sec) { sec = r.section; body.push(h("tr", { class: "sc-sec" }, h("td", { colspan: 5 + main.length }, tr(sec)))); }
+        const pf = D.proj_from || 1e9, a = D.values[HOME] || [];
+        let i = -1; D.years.forEach((y, k) => { if (y < pf && a[k] !== null && a[k] !== undefined) i = k; });
+        const members = g.members.filter((c) => D.values[c]);
+        const val = (c) => (i >= 0 && D.values[c] ? D.values[c][i] : null);
+        const med = i >= 0 ? intlMedian(members.map(val)) : null;
+        const pool = [...new Set([...members, HOME])].map((c) => [c, val(c)]).filter((x) => x[1] !== null && x[1] !== undefined);
+        pool.sort((x, y) => y[1] - x[1]);
+        const rank = pool.findIndex((x) => x[0] === HOME) + 1;
+        const f = (v) => (v === null || v === undefined ? "–" : Number(v).toLocaleString(LOCALE, { minimumFractionDigits: D.decimals, maximumFractionDigits: D.decimals }));
+        body.push(h("tr", {}, h("td", { class: "sc-label" }, h("a", { href: `#ind-${r.card}` }, tr(D.label)), h("span", { class: "ev" }, tr(D.unit))),
+          h("td", {}, i >= 0 ? String(D.years[i]) : "–"), h("td", { class: "sc-arg" }, f(val(HOME))), h("td", {}, f(med)),
+          h("td", {}, rank ? `${rank} ${ES ? "de" : "of"} ${pool.length}` : "–"), ...main.map((c) => h("td", {}, f(val(c))))));
+        csvRows.push([D.label, i >= 0 ? D.years[i] : "", val(HOME), med, rank ? `${rank}/${pool.length}` : "", ...main.map(val)]);
+      });
+      wrap.replaceChildren(h("table", { class: "sc-table" }, h("thead", {}, head), h("tbody", {}, body)));
+      hint.textContent = ES ? `La Argentina frente a ${gname}: el último año con dato publicado de la Argentina en cada indicador (sin proyecciones), la mediana del grupo ese año y la posición de la Argentina (1 = el valor más alto). A la derecha, las mayores economías del grupo. Cada fila lleva a su tarjeta.`
+        : `Argentina against ${gname}: the latest year with published data for Argentina in each indicator (no projections), the group's median that year, and Argentina's rank (1 = highest value). On the right, the group's largest economies. Each row links to its card.`;
+      csv = { header: ["indicator", "year", "Argentina", "median", "rank", ...main], rows: csvRows };
+    }
+    INTL.listeners.add(() => draw());
+    const onCSV = () => { if (csv) downloadBlob(toCSV(csv.header, csv.rows), `${ind.id}_${INTL.group}.csv`, "text/csv"); };
+    const ctl = h("div", { class: "controls" }, gPick);
+    appendAll(card, ctl, hint, wrap, ind.note ? h("p", { class: "chips-note" }, ind.note) : null, methodLine(ind),
+      h("div", { class: "card-foot" }, h("span", {}, "Source: ", ind.source_label),
+        h("div", { class: "actions" }, h("button", { class: "btn", type: "button", onclick: onCSV, title: "Download the table as CSV" }, "CSV"))));
+    card.draw = async () => {
+      if (!tables) {
+        try { [tables] = await Promise.all([Promise.all(rowsDef.map((r) => getJSON(`${DATA}tables/${r.source}/${r.file}`).catch(() => null))), INTL.load()]); }
+        catch (e) { console.error(e); wrap.replaceChildren(h("div", { class: "error-box" }, "The data could not be loaded.")); return; }
+        gPick = intlGroupSelect(); ctl.replaceChildren(gPick);
+      }
+      draw();
+    };
+    return card;
+  }
+
   // ---------- card: the Latin American Left-Leaning Populism Index ----------
   // Three views: over time (one measure, Argentina and chosen countries), a map by year (slider), and
   // a country's path of institutional against economic populist policy, colored by head of government.
@@ -4634,7 +4822,7 @@
     const inds = (await Promise.all(list.map((m) => getJSON(`${DATA}${m.id}.json`).then(localize).catch((e) => { console.error(e); return null; })))).filter(Boolean);
 
     // Registry order; panels and cards flagged `wide` span the full row.
-    const cards = h("div", { class: "cards" }, inds.map(makeCard));
+    const cards = h("div", { class: "cards" }, inds.flatMap((x) => [x.heading ? h("h2", { class: "cards-heading", id: `sec-${x.heading.toLowerCase().replace(/[^a-z]+/g, "-")}` }, tr(x.heading)) : null, makeCard(x)].filter(Boolean)));
     linkSwitchGroups(cards, inds);
     // A pointer to cards that moved to another page.
     const SA = topic.see_also;
@@ -4713,6 +4901,8 @@
         : ind.kind === "ngdp" ? ngdpCard(ind)
         : ind.kind === "country_index" ? countryIndexCard(ind)
         : ind.kind === "lallpi" ? lallpiCard(ind)
+        : ind.kind === "intl" ? intlCard(ind)
+        : ind.kind === "intl_snapshot" ? intlSnapshotCard(ind)
         : ind.kind === "revisions" ? revisionsCard(ind)
         : ind.kind === "year_month" ? yearMonthCard(ind)
         : ind.kind === "scorecard" ? scorecardCard(ind)

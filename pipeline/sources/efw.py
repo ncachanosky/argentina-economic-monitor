@@ -99,9 +99,16 @@ def series(df: pd.DataFrame, iso: str, key: str) -> pd.Series:
     return s
 
 
+WORLD: pd.DataFrame | None = None
+AREAS = {"summary": "Economic freedom, summary rating", "a1": "Area 1: Size of government", "a2": "Area 2: Legal system and property rights",
+         "a3": "Area 3: Sound money", "a4": "Area 4: Freedom to trade internationally", "a5": "Area 5: Regulation"}
+
+
 def fetch(ids) -> FetchResult:
+    global WORLD
     try:
         df = parse(download())
+        WORLD = df
     except Exception as exc:
         return FetchResult(data=pd.DataFrame(columns=["date", "series_id", "value"]), errors={sid: str(exc) for sid in ids})
     frames, meta, errors = [], {}, {}
@@ -116,3 +123,15 @@ def fetch(ids) -> FetchResult:
                      "time_index_end": s.index.max().strftime("%Y-%m-%d")}
     data = pd.concat(frames, ignore_index=True) if frames else pd.DataFrame(columns=["date", "series_id", "value"])
     return FetchResult(data=data, meta=meta, errors=errors)
+
+
+def write_tables(directory) -> list[str]:
+    """Every country's summary and area ratings, for the International page (world_<key>.json)."""
+    if WORLD is None:
+        return []
+    from .world import table, write
+    out = {}
+    for key, label in AREAS.items():
+        wide = WORLD[WORLD.key == key].pivot_table(index="year", columns="iso", values="value", aggfunc="last")
+        out[f"world_{key}.json"] = table(f"efw_{key}", label, "rating, 0-10", 2, "Fraser Institute, Economic Freedom of the World", wide)
+    return write(directory, out)

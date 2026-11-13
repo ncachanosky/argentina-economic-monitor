@@ -5438,6 +5438,123 @@
       "7 missing semester(s), first 2007-07"
     ]
   },
+  "intl:ARG:balance": {
+    "last_changed": "2026-11-13",
+    "last_checked": "2026-11-13T15:34:57+00:00",
+    "last_obs": "2025-01-01",
+    "source": "intl",
+    "source_units": "% of GDP",
+    "status": "ok",
+    "warnings": []
+  },
+  "intl:ARG:current_account": {
+    "last_changed": "2026-11-13",
+    "last_checked": "2026-11-13T15:34:57+00:00",
+    "last_obs": "2025-01-01",
+    "source": "intl",
+    "source_units": "% of GDP",
+    "status": "ok",
+    "warnings": []
+  },
+  "intl:ARG:debt": {
+    "last_changed": "2026-11-13",
+    "last_checked": "2026-11-13T15:34:57+00:00",
+    "last_obs": "2025-01-01",
+    "source": "intl",
+    "source_units": "% of GDP",
+    "status": "ok",
+    "warnings": []
+  },
+  "intl:ARG:expenditure": {
+    "last_changed": "2026-11-13",
+    "last_checked": "2026-11-13T15:34:57+00:00",
+    "last_obs": "2025-01-01",
+    "source": "intl",
+    "source_units": "% of GDP",
+    "status": "ok",
+    "warnings": []
+  },
+  "intl:ARG:fdi": {
+    "last_changed": "2026-11-13",
+    "last_checked": "2026-11-13T15:34:57+00:00",
+    "last_obs": "2025-01-01",
+    "source": "intl",
+    "source_units": "% of GDP",
+    "status": "ok",
+    "warnings": []
+  },
+  "intl:ARG:gdppc": {
+    "last_changed": "2026-11-13",
+    "last_checked": "2026-11-13T15:34:57+00:00",
+    "last_obs": "2025-01-01",
+    "source": "intl",
+    "source_units": "current international dollars",
+    "status": "ok",
+    "warnings": []
+  },
+  "intl:ARG:gini": {
+    "last_changed": "2026-11-13",
+    "last_checked": "2026-11-13T15:34:57+00:00",
+    "last_obs": "2024-01-01",
+    "source": "intl",
+    "source_units": "0-100",
+    "status": "ok",
+    "warnings": []
+  },
+  "intl:ARG:growth": {
+    "last_changed": "2026-11-13",
+    "last_checked": "2026-11-13T15:34:57+00:00",
+    "last_obs": "2025-01-01",
+    "source": "intl",
+    "source_units": "%",
+    "status": "ok",
+    "warnings": []
+  },
+  "intl:ARG:inflation": {
+    "last_changed": "2026-11-13",
+    "last_checked": "2026-11-13T15:34:57+00:00",
+    "last_obs": "2025-01-01",
+    "source": "intl",
+    "source_units": "%",
+    "status": "ok",
+    "warnings": []
+  },
+  "intl:ARG:investment": {
+    "last_changed": "2026-11-13",
+    "last_checked": "2026-11-13T15:34:57+00:00",
+    "last_obs": "2025-01-01",
+    "source": "intl",
+    "source_units": "% of GDP",
+    "status": "ok",
+    "warnings": []
+  },
+  "intl:ARG:openness": {
+    "last_changed": "2026-11-13",
+    "last_checked": "2026-11-13T15:34:57+00:00",
+    "last_obs": "2025-01-01",
+    "source": "intl",
+    "source_units": "% of GDP",
+    "status": "ok",
+    "warnings": []
+  },
+  "intl:ARG:revenue": {
+    "last_changed": "2026-11-13",
+    "last_checked": "2026-11-13T15:34:57+00:00",
+    "last_obs": "2025-01-01",
+    "source": "intl",
+    "source_units": "% of GDP",
+    "status": "ok",
+    "warnings": []
+  },
+  "intl:ARG:unemployment": {
+    "last_changed": "2026-11-13",
+    "last_checked": "2026-11-13T15:34:57+00:00",
+    "last_obs": "2025-01-01",
+    "source": "intl",
+    "source_units": "% of labor force",
+    "status": "ok",
+    "warnings": []
+  },
   "itcrm:br": {
     "last_changed": "2026-11-12",
     "last_checked": "2026-11-13T14:09:21+00:00",

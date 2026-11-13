@@ -624,3 +624,8 @@ table.statement th.st-cur, table.statement td.st-cur { border-left: 2px solid va
 .lp-ylab { min-width: 3em; font-variant-numeric: tabular-nums; }
 .lp-who { margin: 2px 0; font-size: 13px; color: var(--ink-2); }
 .ci-map .lp-dot { stroke: var(--ink-2); stroke-width: 1; cursor: pointer; }
+
+/* International page */
+.cards-heading { grid-column: 1 / -1; margin: 18px 0 0; font-size: 18px; color: var(--ink); border-bottom: 2px solid var(--ink-3); padding-bottom: 4px; }
+.sc-table td.sc-arg { font-weight: 700; }
+.sc-table .sc-label .ev { display: block; font-size: 11px; color: var(--ink-3); }

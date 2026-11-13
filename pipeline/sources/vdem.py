@@ -64,6 +64,11 @@ def parse(content: bytes) -> pd.DataFrame:
     return wide.sort_index()
 
 
+WORLD: dict = {}
+LABELS = {"libdem": "Liberal democracy", "electdem": "Electoral democracy", "judicial": "Judicial constraints on the executive",
+          "legislative": "Legislative constraints on the executive", "rol": "Rule of law", "corruption": "Political corruption"}
+
+
 def fetch(ids) -> FetchResult:
     frames, meta, errors = [], {}, {}
     by_key: dict[str, list[str]] = {}
@@ -74,6 +79,7 @@ def fetch(ids) -> FetchResult:
             if key not in INDICES:
                 raise KeyError(f"unknown V-Dem index {key!r}")
             wide = parse(download(INDICES[key]))
+            WORLD[key] = wide
         except Exception as exc:
             errors.update({sid: str(exc) for sid in sids})
             continue
@@ -91,3 +97,12 @@ def fetch(ids) -> FetchResult:
             meta[sid] = {"units": "index, 0-1", "time_index_end": s.index.max().strftime("%Y-%m-%d")}
     data = pd.concat(frames, ignore_index=True) if frames else pd.DataFrame(columns=["date", "series_id", "value"])
     return FetchResult(data=data, meta=meta, errors=errors)
+
+
+def write_tables(directory) -> list[str]:
+    """Every country's index since 1950, for the International page (world_<key>.json)."""
+    if not WORLD:
+        return []
+    from .world import table, write
+    return write(directory, {f"world_{k}.json": table(f"vdem_{k}", LABELS[k], "index, 0-1", 3, "V-Dem Institute, via Our World in Data", w, first=1950)
+                             for k, w in WORLD.items()})

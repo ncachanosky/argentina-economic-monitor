@@ -10,8 +10,8 @@ ROOT = Path(__file__).resolve().parents[1]
 REGISTRY_PATH = ROOT / "registry" / "series.yaml"
 RELEASES_PATH = ROOT / "registry" / "releases.yaml"
 
-KINDS = {"ngdp", "turns", "variants", "panel", "contributions", "balance_sheet", "top10", "schedule", "placements", "curve", "statement", "rer_calc", "tenure", "rem_revisions", "country_index", "revisions", "maddison", "year_month", "scorecard", "lallpi"}
-TABLE_KINDS = {"balance_sheet", "top10", "schedule", "placements", "curve", "tenure", "rem_revisions", "turns", "ngdp", "country_index", "revisions", "maddison", "scorecard", "lallpi"}   # cards that read a full table (data/tables/<source>), no series
+KINDS = {"ngdp", "turns", "variants", "panel", "contributions", "balance_sheet", "top10", "schedule", "placements", "curve", "statement", "rer_calc", "tenure", "rem_revisions", "country_index", "revisions", "maddison", "year_month", "scorecard", "lallpi", "intl", "intl_snapshot"}
+TABLE_KINDS = {"balance_sheet", "top10", "schedule", "placements", "curve", "tenure", "rem_revisions", "turns", "ngdp", "country_index", "revisions", "maddison", "scorecard", "lallpi", "intl", "intl_snapshot"}   # cards that read a full table (data/tables/<source>), no series
 DERIVE_METHODS = {"splice", "reweight", "ratio", "tracker", "monthly", "flows", "expectations", "formula", "net_reserves"}
 RANGE_KEYS = {"2Y", "5Y", "10Y", "25Y", "50Y", "Max"}
 
@@ -38,6 +38,8 @@ class Variant:
 #   line_styles   overlay lines {variant: {slot, dash}}: shared colors, dashed pairs
 #   switch        {group, label, section}: cards of one group share a card with a switch between them
 #                 (a dropdown, grouped by section, when the group has more than four cards)
+#   heading       a section heading on the page before the card
+#   rows          intl_snapshot: [{source, file, card, section}] the indicators in the table
 #   year_table    statement cards: a Year by year view; {gdp_ratio: {card, variant, row}} gives GDP over 12
 #                 months as sum12(row) / (that card's ratio of row to GDP / 100)
 #   term_toggle   term_colored cards: presidency colors off by default, with a button to turn them on
@@ -47,7 +49,7 @@ class Variant:
 #                 its home page, links, search and feeds stay with `topic`
 #   data_table    the "Show data table" view: {order: asc, year_marks: true, columns: [mom, ytd, yoy]}
 #                 (columns: a fixed table of these rates of the default line, whatever the chart shows)
-DISPLAY_KEYS = ("half", "tiles", "line_styles", "switch", "y_tickformat", "pres_view", "inflation_ref", "no_presidency", "data_table", "also_on", "break_gaps", "term_toggle", "year_table")
+DISPLAY_KEYS = ("half", "tiles", "line_styles", "switch", "y_tickformat", "pres_view", "inflation_ref", "no_presidency", "data_table", "also_on", "break_gaps", "term_toggle", "year_table", "heading", "rows")
 
 
 @dataclass

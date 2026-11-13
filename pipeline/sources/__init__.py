@@ -87,6 +87,9 @@ def get_adapter(name: str):
         from . import recession
 
         return recession
+    if name == "intl":
+        from . import intl
+        return intl
     if name == "lallpi":
         from . import lallpi
         return lallpi
