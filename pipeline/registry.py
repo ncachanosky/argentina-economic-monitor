@@ -38,9 +38,11 @@ class Variant:
 #   line_styles   overlay lines {variant: {slot, dash}}: shared colors, dashed pairs
 #   switch        {group, label}: cards of one group share a card with a switch between them
 #   y_tickformat  Plotly tick format for the left axis (e.g. ".1f")
+#   also_on       other pages (topic ids) that also show the card, after their own cards in menu order;
+#                 its home page, links, search and feeds stay with `topic`
 #   data_table    the "Show data table" view: {order: asc, year_marks: true, columns: [mom, ytd, yoy]}
 #                 (columns: a fixed table of these rates of the default line, whatever the chart shows)
-DISPLAY_KEYS = ("half", "tiles", "line_styles", "switch", "y_tickformat", "pres_view", "inflation_ref", "no_presidency", "data_table")
+DISPLAY_KEYS = ("half", "tiles", "line_styles", "switch", "y_tickformat", "pres_view", "inflation_ref", "no_presidency", "data_table", "also_on")
 
 
 @dataclass
@@ -324,6 +326,9 @@ def load(path: Path = REGISTRY_PATH, releases_path: Path = RELEASES_PATH) -> Reg
             if item.get(fld) and not set(item[fld]) <= set(variants):
                 raise RegistryError(f"{where}: {fld} names unknown variants")
 
+        for t in item.get("also_on") or []:
+            if t not in {x["id"] for x in topics}:
+                raise RegistryError(f"{where}: also_on names an unknown page {t!r}")
         indicators.append(
             Indicator(
                 id=iid,

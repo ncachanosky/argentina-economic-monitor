@@ -4150,7 +4150,7 @@
       }
       redraw = () => { if (dash && dash.rows.length) $("#tiles").replaceChildren(dashboardView(dash, pageHref)); };
       topicsEl2.replaceChildren(h("h2", { class: "home-sub" }, "Dashboards"), h("div", { class: "topic-grid" }, manifest.topics.map((t) => {
-        const list = manifest.indicators.filter((m) => m.topic === t.id);
+        const list = manifest.indicators.filter((m) => m.topic === t.id || (m.also_on || []).includes(t.id));
         if (!list.length) return null;
         return h("a", { class: "topic-card", href: pageHref(t.id) },
           h("h2", {}, t.title), h("p", {}, t.description || ""),
@@ -4180,7 +4180,12 @@
     }
 
     const topic = manifest.topics.find((t) => t.id === PAGE);
-    const list = manifest.indicators.filter((m) => m.topic === PAGE);
+    // The page's own cards, then cards from other pages shown here too (also_on), in menu order.
+    const order = new Map(manifest.topics.map((t, i) => [t.id, i]));
+    const guests = manifest.indicators.filter((m) => m.topic !== PAGE && (m.also_on || []).includes(PAGE))
+      .map((m, i) => [m, i]).sort((a, b) => order.get(a[0].topic) - order.get(b[0].topic) || a[1] - b[1]).map((x) => x[0]);
+    const own = manifest.indicators.filter((m) => m.topic === PAGE);
+    const list = [...own, ...guests];
     if (!topic || !list.length) { topicsEl2.replaceChildren(h("div", { class: "error-box" }, "Nothing to show on this page yet.")); return; }
     const inds = (await Promise.all(list.map((m) => getJSON(`${DATA}${m.id}.json`).then(localize).catch((e) => { console.error(e); return null; })))).filter(Boolean);
 
@@ -4189,7 +4194,7 @@
     linkSwitchGroups(cards, inds);
     topicsEl2.replaceChildren(h("section", { class: "topic", id: `topic-${topic.id}` }, cards));
     addEmbedButtons(cards, topic);
-    $("#tiles").replaceChildren(...inds.flatMap((i) => tilesOf(i)));
+    $("#tiles").replaceChildren(...inds.filter((i) => i.topic === PAGE).flatMap((i) => tilesOf(i)));
     const sn = $("#section-nav");
     sn.replaceChildren(...inds.filter((i) => !i.switch || inds.find((j) => j.switch && j.switch.group === i.switch.group) === i).map((i) => h("a", { href: `#ind-${i.id}` }, i.short_title)));
     sn.hidden = false;

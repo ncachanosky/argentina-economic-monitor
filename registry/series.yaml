@@ -1465,6 +1465,7 @@ indicators:
 
   - id: cpi_long
     topic: prices
+    also_on: [long_run]
     wide: true
     kind: variants
     overlay: true
@@ -2418,6 +2419,7 @@ indicators:
 
   - id: bcra_government
     topic: money
+    also_on: [long_run]
     wide: true
     kind: variants
     overlay: true
@@ -2455,6 +2457,7 @@ indicators:
 
   - id: bcra_government_real
     topic: money
+    also_on: [long_run]
     wide: true
     kind: variants
     overlay: true
@@ -3319,6 +3322,7 @@ indicators:
 
   - id: trade_long
     topic: trade
+    also_on: [long_run]
     wide: true
     kind: variants
     overlay: true
@@ -4489,6 +4493,7 @@ indicators:
 
   - id: labor_minimum_wage
     topic: labor
+    also_on: [long_run]
     wide: true
     kind: variants
     log_level: false

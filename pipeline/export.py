@@ -508,6 +508,8 @@ def export(out: Path) -> None:
         if ind.kind in registry.TABLE_KINDS:
             entry = export_turns(ind, out) if ind.kind == "turns" else export_ngdp(ind, out) if ind.kind == "ngdp" else export_table(ind, out, status, meta)
             if entry:
+                if ind.display and ind.display.get("also_on"):
+                    entry["also_on"] = ind.display["also_on"]
                 manifest_inds.append(entry)
             continue
         ids = [v.source_id for v in ind.variants.values()]
@@ -645,6 +647,7 @@ def export(out: Path) -> None:
             "id": ind.id, "topic": ind.topic, "kind": ind.kind, "title": ind.title,
             "short_title": ind.short_title, "status": worst, "last_obs": payload["last_obs"],
             "headline": bool(ind.headline),
+            **({"also_on": ind.display["also_on"]} if ind.display and ind.display.get("also_on") else {}),
         })
 
     # Each card's description, for the site search (site/js/app.js, setupSearch).
