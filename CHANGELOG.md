@@ -47,9 +47,9 @@ section becomes its notes.
   Re-estimated only when EMAE changes; statsmodels added to the requirements.
 
 ### Changed
-- CPI data table: oldest month first (it opens at the latest months), a rule at each year
-  change, and two more columns for the headline in the m/m view: year to date and 12-month
-  inflation. Other cards can opt in with `data_table` in the registry.
+- CPI data table: a fixed table of the headline's monthly, year-to-date and 12-month inflation,
+  the same whatever the chart shows; oldest month first (it opens at the latest months), with
+  a rule at each year change. Other cards can opt in with `data_table` in the registry.
 - Where would the exchange rate be (two dates): the span behind the yearly productivity
   change reads in years and months ("10 years and 10 months") instead of decimal years.
 

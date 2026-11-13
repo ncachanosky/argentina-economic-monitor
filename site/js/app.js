@@ -1375,18 +1375,21 @@
         const s = k === state.variant ? main : series(k);
         return { label: `${s.v.label}${suffix}`, values: x.map((d) => s.y[ind.dates.indexOf(d)]) };
       });
-      // Extra columns for the main line in the m/m view (data_table.extra), e.g. the CPI's year to date and 12-month rates.
+      // A fixed table (data_table.columns): the same rates of the card's default line whatever the chart shows.
       const DT = ind.data_table || {};
-      if (DT.extra && state.transform === "mom" && !main.rebased) {
-        const lv = ind.variants[state.variant].values;
-        DT.extra.filter((k) => k !== state.transform).forEach((k) => {
-          const spec = T[k] || (ind.measure === "rate" ? RATE_TRANSFORMS : INDEX_TRANSFORMS)[k];
-          if (!spec) return;
-          const vals = transform(ind.dates, lv, k, ind.measure, ind.frequency);
-          cols.push({ label: `${ind.variants[state.variant].label} (${tr(spec.label)})`, values: x.map((d) => vals[ind.dates.indexOf(d)]), pct: spec });
-        });
+      if (DT.columns) {
+        if (!table.dataset.fixed) {
+          const v = ind.variants[ind.default.variant];
+          const fixed = DT.columns.map((k) => {
+            const spec = (ind.measure === "rate" ? RATE_TRANSFORMS : INDEX_TRANSFORMS)[k];
+            return { label: `${v.label} (${tr(spec.label)})`, values: transform(ind.dates, v.values, k, ind.measure, ind.frequency), pct: spec };
+          });
+          table.refresh(ind.dates, fixed, null, ind.frequency);
+          table.dataset.fixed = "1";
+        }
+      } else {
+        table && table.refresh(x, cols, t, ind.frequency);
       }
-      table && table.refresh(x, cols, t, ind.frequency);
     }
 
     const y2Axis = (light) => ({ overlaying: "y", side: "right", showgrid: false, zeroline: false, rangemode: "tozero", ticksuffix: SB.suffix || "",

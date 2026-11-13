@@ -38,8 +38,8 @@ class Variant:
 #   line_styles   overlay lines {variant: {slot, dash}}: shared colors, dashed pairs
 #   switch        {group, label}: cards of one group share a card with a switch between them
 #   y_tickformat  Plotly tick format for the left axis (e.g. ".1f")
-#   data_table    the "Show data table" view: {order: asc, year_marks: true, extra: [ytd, yoy]}
-#                 (extra: more rates of the main line, shown in the m/m view)
+#   data_table    the "Show data table" view: {order: asc, year_marks: true, columns: [mom, ytd, yoy]}
+#                 (columns: a fixed table of these rates of the default line, whatever the chart shows)
 DISPLAY_KEYS = ("half", "tiles", "line_styles", "switch", "y_tickformat", "pres_view", "inflation_ref", "no_presidency", "data_table")
 
 
