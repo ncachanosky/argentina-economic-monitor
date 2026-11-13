@@ -66,6 +66,13 @@ section becomes its notes.
   a rule at each year change. Other cards can opt in with `data_table` in the registry.
 - Where would the exchange rate be (two dates): the span behind the yearly productivity
   change reads in years and months ("10 years and 10 months") instead of decimal years.
+- Institutions: the V-Dem cards are one card with a View menu: Argentina's six indices, or any
+  one index for Argentina and the comparison countries (electoral democracy and legislative
+  constraints on the executive are new in this view). The economic freedom cards are likewise
+  one card: the summary rating by country (with Argentina's rank), Argentina's summary and five
+  areas, or any one area by country (new). Switching views keeps the time range and the
+  countries shown. V-Dem lines now break at missing years (no legislature under military rule)
+  instead of joining across them. Links to the old cards still open the right view.
 
 ## 1.2.0 (2026-11-12)
 

@@ -1073,6 +1073,7 @@
           let xx = ii.map((i) => ind.dates[i]), yy = ii.map((i) => s.y[i]);
           if (ind.frequency === "D") [xx, yy] = breakGaps(xx, yy);
           if (ind.frequency === "S") [xx, yy] = breakGaps(xx, yy, 400);
+          if (ind.frequency === "Y" && ind.break_gaps) [xx, yy] = breakGaps(xx, yy, 400);   // e.g. no legislature under military rule
           // With chips, each series keeps the color of its place in the full list, so adding one does not recolor the rest.
           const cslot = ind.overlay_default ? lineKeys.filter((q) => q !== ind.emphasis && !(ind.muted || []).includes(q)).indexOf(k) : slot;
           const LS = (ind.line_styles || {})[k];
@@ -1085,13 +1086,14 @@
             // The emphasized series (e.g. Argentina) colored by presidency; before December 1983 in ink.
             const at = (d) => termOf(ind.frequency === "Y" ? d.slice(0, 4) + "-07-01" : d, ind.frequency === "Y" ? "M" : ind.frequency);
             const segs = [];
-            xx.forEach((d, j) => { if (yy[j] === null) return; const p = at(d); const last = segs[segs.length - 1];
-              if (last && last.p === p) { last.x.push(d); last.y.push(yy[j]); } else segs.push({ p, x: [d], y: [yy[j]] }); });
+            let brk = false;   // a missing stretch (break_gaps): no connector across it
+            xx.forEach((d, j) => { if (yy[j] === null) { brk = true; return; } const p = at(d); const last = segs[segs.length - 1];
+              if (last && last.p === p && !brk) { last.x.push(d); last.y.push(yy[j]); } else segs.push({ p, x: [d], y: [yy[j]], gap: brk }); brk = false; });
             const ink = cssVar("--ink");
             traces.push({ type: "scatter", mode: "lines", x: [null], y: [null], name: `${s.v.label} (colored by presidency)`, line: { color: ink, width: 3.2 }, _light: "#36454F", hoverinfo: "skip" });
             segs.forEach((g, n) => {
               const c = g.p ? termColor(g.p) : ink, cl = g.p ? termLight(g.p) : "#36454F";
-              if (n) { const pv = segs[n - 1]; traces.push({ type: "scatter", mode: "lines", x: [pv.x[pv.x.length - 1], g.x[0]], y: [pv.y[pv.y.length - 1], g.y[0]], line: { color: c, width: 3.2 }, _light: cl, showlegend: false, hoverinfo: "skip" }); }
+              if (n && !g.gap) { const pv = segs[n - 1]; traces.push({ type: "scatter", mode: "lines", x: [pv.x[pv.x.length - 1], g.x[0]], y: [pv.y[pv.y.length - 1], g.y[0]], line: { color: c, width: 3.2 }, _light: cl, showlegend: false, hoverinfo: "skip" }); }
               traces.push({ type: "scatter", mode: marks ? "lines+markers" : "lines", x: g.x, y: g.y, name: s.v.label, showlegend: false,
                 line: { color: c, width: 3.2 }, marker: { size: 5, color: c }, _light: cl,
                 hovertemplate: `%{x|${DF}}: <b>%{y:${yFmt()}}${sfx}</b><extra>${s.v.label}${g.p ? " · " + g.p.short : ""}</extra>` });
@@ -1440,6 +1442,18 @@
     appendAll(card, breakdownTable(ind), table, annualTable(ind), weightsTable(ind), ind.note ? h("p", { class: "chips-note" }, ind.note) : null,
       ind.recession ? recessionNote(ind.recession) : null, footer(ind, onPNG, onCSV));
     card.draw = draw;
+    // Switch groups (e.g. one V-Dem index after another): the time range and the countries shown carry over.
+    card.getView = () => ({ range: state.range, shown: chipRow ? [...state.shown] : null });
+    card.setView = (v) => {
+      if (v.range && rangeKeys(ind).includes(v.range)) state.range = v.range;
+      if (chipRow && v.shown) {
+        const keep = v.shown.filter((k) => lineKeys.includes(k));
+        if (keep.length) {
+          state.shown = new Set([ind.default.variant, ...keep]);
+          for (const [k, b] of Object.entries(chipButtons)) b.setAttribute("aria-pressed", String(state.shown.has(k)));
+        }
+      }
+    };
     return card;
   }
 
@@ -4232,7 +4246,7 @@
         if (el && el.draw) requestAnimationFrame(() => el.draw());
       };
       const segs = els.map((el) => {
-        const sg = segmented(members.map((m) => [m.id, m.switch.label]), members[0].id, (k) => show(k), "View");
+        const sg = members.length > 4 ? switchSelect(members, (k) => show(k)) : segmented(members.map((m) => [m.id, m.switch.label]), members[0].id, (k) => show(k), "View");
         sg.classList.add("card-switch");
         el.querySelector(".desc").after(sg);
         return sg;
@@ -4242,6 +4256,19 @@
       const fromHash = members.find((m) => location.hash === `#ind-${m.id}`);
       show((fromHash || members[0]).id);
     }
+  }
+
+  // A switch with many views: a dropdown, grouped by `switch.section` (in order of first appearance).
+  function switchSelect(members, onChange) {
+    const sections = [];
+    members.forEach((m) => { const s = m.switch.section || ""; if (!sections.includes(s)) sections.push(s); });
+    const opt = (m) => h("option", { value: m.id }, m.switch.label);
+    const sel = h("select", { class: "select", "aria-label": tr("View") },
+      sections.map((s) => { const ms = members.filter((m) => (m.switch.section || "") === s); return s ? h("optgroup", { label: s }, ms.map(opt)) : ms.map(opt); }));
+    sel.addEventListener("change", () => onChange(sel.value));
+    const wrap = h("label", { class: "base-pick switch-pick" }, h("span", {}, tr("View:")), sel);
+    wrap.update = (cur) => { sel.value = cur; };
+    return wrap;
   }
 
   function makeCard(ind) {

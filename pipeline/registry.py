@@ -36,13 +36,15 @@ class Variant:
 #   tiles         extra summary boxes [{variant, transform, label, good, orig, sub}]
 #   good          direction that counts as an improvement for the headline box: up, down, none
 #   line_styles   overlay lines {variant: {slot, dash}}: shared colors, dashed pairs
-#   switch        {group, label}: cards of one group share a card with a switch between them
+#   switch        {group, label, section}: cards of one group share a card with a switch between them
+#                 (a dropdown, grouped by section, when the group has more than four cards)
+#   break_gaps    annual cards: break lines at missing years instead of joining across them
 #   y_tickformat  Plotly tick format for the left axis (e.g. ".1f")
 #   also_on       other pages (topic ids) that also show the card, after their own cards in menu order;
 #                 its home page, links, search and feeds stay with `topic`
 #   data_table    the "Show data table" view: {order: asc, year_marks: true, columns: [mom, ytd, yoy]}
 #                 (columns: a fixed table of these rates of the default line, whatever the chart shows)
-DISPLAY_KEYS = ("half", "tiles", "line_styles", "switch", "y_tickformat", "pres_view", "inflation_ref", "no_presidency", "data_table", "also_on")
+DISPLAY_KEYS = ("half", "tiles", "line_styles", "switch", "y_tickformat", "pres_view", "inflation_ref", "no_presidency", "data_table", "also_on", "break_gaps")
 
 
 @dataclass
