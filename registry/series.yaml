@@ -1166,6 +1166,7 @@ indicators:
     transforms: [level, yoy]
     title: Industrial Capacity Utilization (UCII)
     short_title: Capacity utilization
+    switch: {group: ucii, label: "Total"}
     description: >-
       Share of installed manufacturing capacity in use, from INDEC's monthly
       survey. Not seasonally adjusted, so compare against the same month of
@@ -1181,6 +1182,7 @@ indicators:
     headline: {variant: total, transform: level}
 
   - id: ucii_blocks
+    wide: true
     topic: real_sector
     kind: panel
     measure: rate
@@ -1188,6 +1190,7 @@ indicators:
     component_noun: industries
     title: Capacity Utilization by Industry
     short_title: UCII by industry
+    switch: {group: ucii, label: "By industry"}
     description: >-
       Capacity utilization in each of INDEC's twelve industry blocks, latest
       month. Select industries to compare their paths.
@@ -1218,6 +1221,7 @@ indicators:
     kind: variants
     title: Gross Domestic Product (GDP)
     short_title: GDP
+    switch: {group: gdp_main, label: "Quarterly, since 2004"}
     description: >-
       Real GDP at constant 2004 prices. The seasonally adjusted series is the
       standard read on quarter-to-quarter momentum.
@@ -1310,6 +1314,7 @@ indicators:
     kind: variants
     title: Real GDP since 1993
     short_title: GDP, long run
+    switch: {group: gdp_main, label: "Since 1993"}
     description: >-
       INDEC's national accounts at 1993 prices (1993-2003) and 2004 prices
       (from 2004), chain-linked by their quarterly growth rates into one
@@ -2465,6 +2470,7 @@ indicators:
     emphasis: total
     title: Banks' Exposure to the Public Sector
     short_title: Public-sector exposure
+    switch: {group: bank_exposure, label: "Whole system"}
     description: >-
       Claims of the financial system on the public sector as a share of its
       assets: on the Treasury and the rest of the non-financial public sector
@@ -2504,12 +2510,14 @@ indicators:
         bcra:     {label: Central bank (BCRA),              expr: "100 * (nz(lel) + (l2 - l3) / 100 * dep * (1 - nz(lefi))) / act"}
 
   - id: bank_public_exposure_groups
+    wide: true
     topic: banks
     kind: variants
     overlay: true
     measure: rate
     title: Public-Sector Exposure by Bank Group
     short_title: Exposure by group
+    switch: {group: bank_exposure, label: "By bank group"}
     description: >-
       Claims on the Treasury, the rest of the public sector and the BCRA, as
       a share of assets: public banks, private banks and the whole system.
@@ -2952,12 +2960,14 @@ indicators:
         other:      {label: Other,                expr: "avg12(ofin + div + inc)"}
 
   - id: bank_concentration
+    wide: true
     topic: banks
     kind: variants
     overlay: true
     measure: rate
     title: Concentration of the Financial System
     short_title: Concentration
+    switch: {group: bank_conc, label: "Ten largest"}
     description: >-
       Combined share of the ten largest institutions in the system's assets,
       deposits and loans. Monthly, since June 1996.
@@ -2982,11 +2992,13 @@ indicators:
     default: {variant: assets, transform: level, range: Max}
 
   - id: bank_concentration_hhi
+    wide: true
     topic: banks
     kind: variants
     overlay: true
     title: Concentration Index and Number of Institutions
     short_title: HHI
+    switch: {group: bank_conc, label: "HHI and number of institutions"}
     description: >-
       Herfindahl-Hirschman index of assets, deposits and loans, and of the
       banks' claims on the Treasury and on the BCRA (sum of squared shares,
@@ -3289,6 +3301,7 @@ indicators:
     measure: flow
     title: What Argentina Exports
     short_title: Exports by type
+    switch: {group: exports, label: "Level by type"}
     description: >-
       Exports of goods by INDEC's four broad types, millions of US dollars,
       monthly since 1992.
@@ -3336,6 +3349,7 @@ indicators:
     measure: flow
     title: What Drives Export Growth
     short_title: Export growth
+    switch: {group: exports, label: "Growth by type"}
     description: >-
       Change in exports over the last twelve months against the twelve
       before, and the contribution of each type, in percentage points.
@@ -3380,6 +3394,7 @@ indicators:
     measure: flow
     title: What Argentina Imports
     short_title: Imports by use
+    switch: {group: imports, label: "Level by use"}
     description: >-
       Imports of goods by economic use, millions of US dollars, monthly since
       1992.
@@ -3431,6 +3446,7 @@ indicators:
     measure: flow
     title: What Drives Import Growth
     short_title: Import growth
+    switch: {group: imports, label: "Growth by use"}
     description: >-
       Change in imports over the last twelve months against the twelve
       before, and the contribution of each use, in percentage points.
@@ -3511,11 +3527,13 @@ indicators:
         balance: {label: Balance, expr: "e - f"}
 
   - id: trade_prices_exports
+    wide: true
     topic: trade
     kind: contributions
     measure: flow
     title: "Exports: Prices against Volumes"
     short_title: Export prices and volumes
+    switch: {group: trade_prices, label: "Exports"}
     description: >-
       Change in the dollar value of exports from the same quarter a year
       earlier, split into prices and quantities, percentage points.
@@ -3549,11 +3567,13 @@ indicators:
         qty:   {label: Quantities, expr: "100 * (q / lag(q, 4) - 1) * (1 + p / lag(p, 4)) / 2"}
 
   - id: trade_prices_imports
+    wide: true
     topic: trade
     kind: contributions
     measure: flow
     title: "Imports: Prices against Volumes"
     short_title: Import prices and volumes
+    switch: {group: trade_prices, label: "Imports"}
     description: >-
       Change in the dollar value of imports from the same quarter a year
       earlier, split into prices and quantities, percentage points.
@@ -4394,6 +4414,7 @@ indicators:
     overlay_default: [private]
     title: Real Wages
     short_title: Real wages
+    switch: {group: wages, label: "Real"}
     headline: {variant: private, transform: yoy, label: "Real wages, private registered", sub: "y/y", good: up}
     description: >-
       INDEC's wage index for registered private, public and unregistered
@@ -4424,6 +4445,7 @@ indicators:
     default: {variant: private, transform: level, range: 10Y, real: true, base: "2023-11-01"}
 
   - id: labor_wages_usd
+    wide: true
     topic: labor
     kind: variants
     overlay: true
@@ -4431,6 +4453,7 @@ indicators:
     plain_level: true
     title: Wages in Dollars
     short_title: Dollar wages
+    switch: {group: wages, label: "In dollars"}
     description: >-
       The average wage (RIPTE) converted to US dollars at the month's
       average official rate and at the CCL rate, US dollars per month,
@@ -4898,6 +4921,7 @@ indicators:
     measure: flow
     title: What Drives Primary Spending
     short_title: Spending by item
+    switch: {group: fiscal_drivers, label: "Spending"}
     description: >-
       Change in real primary spending from the same month a year earlier, and
       the contribution of each item, in percentage points. Monthly.
@@ -4964,6 +4988,7 @@ indicators:
     measure: flow
     title: What Drives Revenue
     short_title: Revenue by tax
+    switch: {group: fiscal_drivers, label: "Revenue"}
     description: >-
       Change in real total revenue from the same month a year earlier, and
       the contribution of each tax, in percentage points. Monthly.
@@ -5404,6 +5429,7 @@ indicators:
     measure: flow
     title: Gross Debt as a Share of GDP
     short_title: Debt / GDP
+    switch: {group: debt_gdp, label: "Ratio"}
     description: >-
       Gross debt of the central administration in normal payment status, by
       currency, as a share of GDP: the stock at the end of each month, at
@@ -5465,6 +5491,7 @@ indicators:
     measure: flow
     title: Why Debt / GDP Changes
     short_title: Debt / GDP, changes
+    switch: {group: debt_gdp, label: "Why it changes"}
     description: >-
       The change in gross debt as a share of GDP over the last twelve months,
       split into new debt, the exchange rate, real GDP growth and inflation.
@@ -7245,6 +7272,7 @@ indicators:
     measure: rate
     title: Central Bank Financing of the Government
     short_title: Government financing
+    switch: {group: bcra_gov, label: "Share of assets"}
     emphasis: total                       # drawn as a thick dark line
     composition: [advances, other]        # "Composition" view: shares of the total
     description: >-
@@ -7281,6 +7309,7 @@ indicators:
     overlay: true
     title: Is the Central Bank Lending More or Less to the Government?
     short_title: Government financing, real
+    switch: {group: bcra_gov, label: "In real pesos"}
     emphasis: total
     description: >-
       The BCRA's credit to the government in pesos of today (deflated by the

@@ -73,6 +73,11 @@ section becomes its notes.
   areas, or any one area by country (new). Switching views keeps the time range and the
   countries shown. V-Dem lines now break at missing years (no legislature under military rule)
   instead of joining across them. Links to the old cards still open the right view.
+- Eleven pairs of related cards share one card with a switch: capacity utilization (total, by
+  industry), GDP (quarterly, since 1993), banks' public-sector exposure (system, by bank
+  group), concentration (ten largest, HHI), real and dollar wages, Central Bank financing of the
+  government (share of assets, real pesos), exports and imports (level, growth), trade prices
+  (exports, imports), spending and revenue drivers, and debt / GDP (ratio, why it changes).
 
 ## 1.2.0 (2026-11-12)
 
