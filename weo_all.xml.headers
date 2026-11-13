@@ -1,0 +1,18 @@
+HTTP/2 200 
+date: Fri, 13 Nov 2026 15:29:40 GMT
+content-type: application/xml
+set-cookie: ApplicationGatewayAffinityCORS=dca9138616203b0df55300d07b8e6a61; Path=/; SameSite=None; Secure
+set-cookie: ApplicationGatewayAffinity=dca9138616203b0df55300d07b8e6a61; Path=/
+x-correlation-id: 6549c8f3cdbb36aa0bbd8b3900d99818
+x-content-type-options: nosniff
+x-xss-protection: 0
+cache-control: no-cache, no-store, max-age=0, must-revalidate
+pragma: no-cache
+expires: 0
+strict-transport-security: max-age=31536000 ; includeSubDomains
+x-frame-options: DENY
+vary: accept-encoding
+x-envoy-upstream-service-time: 299
+server: istio-envoy
+request-context: appId=cid-v1:e4518baf-f7f4-42d7-900e-7dd820548dc8
+
