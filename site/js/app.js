@@ -854,14 +854,21 @@
       title: "Show or hide the expectations of the BCRA's survey of analysts (REM)", onclick: () => { state.rem = !state.rem; draw(); } }, "REM expectations") : null;
     const presBtn = PRESIDENCIES.length && !ind.plain_level && !ind.no_presidency ? h("button", { class: "btn toggle", type: "button", "aria-pressed": "false", onclick: () => { state.byPres = !state.byPres; draw(); } }, "By presidency") : null;
     let table;
+    // Presidency colors on the emphasized line: always on, or (term_toggle) off by default with a button.
+    let termOn = ind.term_colored && !ind.term_toggle;
+    const TC = () => ind.term_colored && termOn;
+    const termBtn = ind.term_colored && ind.term_toggle ? h("button", { class: "btn toggle", type: "button", "aria-pressed": "false",
+      title: "Color Argentina's line by presidency", onclick: () => setTerm(!termOn) }, "Color by president") : null;
+    const setTerm = (on) => { termOn = on; if (termBtn) termBtn.setAttribute("aria-pressed", String(on)); termKeyEl.replaceChildren(...[termKey()].filter(Boolean)); draw(); };
     // Party key for a line colored by presidency.
     function termKey() {
-      if (!ind.term_colored) return null;
+      if (!TC()) return null;
       const seen = new Map(); PRESIDENCIES.forEach((p) => { if (!seen.has(p.party)) seen.set(p.party, p); });
-      return h("p", { class: "band-key" },
+      return h("p", { class: "band-key term-key" },
         h("span", {}, h("span", { class: "band-sw", style: `background:${cssVar("--ink")}` }), "Before December 1983"),
         [...seen.values()].map((p) => h("span", {}, h("span", { class: "band-sw", style: `background:${termColor(p)}` }), (PARTY_COLORS[p.party] || {}).label || p.party)));
     }
+    const termKeyEl = h("div", { class: "term-key-wrap" }, termKey());
     // Chips: add or remove overlay series (e.g. comparison countries); the default series always stays.
     const chipButtons = {};
     const chipRow = ind.overlay && ind.overlay_default ? h("div", { class: "chip-row", role: "group", "aria-label": "Series shown" },
@@ -1082,7 +1089,7 @@
           const emph = ind.emphasis === k;   // e.g. a total: thick and dark
           const muted = (ind.muted || []).includes(k);   // e.g. a regional median: grey reference
           const marks = ind.frequency === "S" || ind.frequency === "Y";
-          if (emph && ind.term_colored && state.transform !== "mom") {
+          if (emph && TC() && state.transform !== "mom") {
             // The emphasized series (e.g. Argentina) colored by presidency; before December 1983 in ink.
             const at = (d) => termOf(ind.frequency === "Y" ? d.slice(0, 4) + "-07-01" : d, ind.frequency === "Y" ? "M" : ind.frequency);
             const segs = [];
@@ -1100,7 +1107,7 @@
             });
             return;
           }
-          const lighter = ind.term_colored && !emph && !muted;   // comparison lines recede behind the emphasized one
+          const lighter = TC() && !emph && !muted;   // comparison lines recede behind the emphasized one
           traces.push(state.transform === "mom"
             ? { type: "bar", x: xx, y: yy, name: s.v.label, marker: { color }, hovertemplate: hover, _slot: slot }
             : { type: "scatter", mode: marks ? "lines+markers" : "lines", x: xx, y: yy, name: s.v.label, connectgaps: false,
@@ -1434,18 +1441,19 @@
     appendAll(card, 
       h("div", { class: "controls" }, ySeg, vSeg, tSeg, h("span", { class: "spacer" }), ind.view_start ? null : rSeg),
       // A short fixed window (view_start) has no use for rebasing or presidencies.
-      ind.view_start ? (remBtn ? h("div", { class: "controls" }, remBtn) : null) : h("div", { class: "controls" }, realSeg, baseWrap, presBtn, epBtn, remBtn),
+      ind.view_start ? (remBtn ? h("div", { class: "controls" }, remBtn) : null) : h("div", { class: "controls" }, realSeg, baseWrap, presBtn, epBtn, remBtn, termBtn),
       ind.caveat ? h("p", { class: "caveat" }, ind.caveat) : null,
-      trackerLine(), summaryEl, hint, methodLine(ind), bandKey, termKey(), epKey, chartEl, chipRow, statsEl);
+      trackerLine(), summaryEl, hint, methodLine(ind), bandKey, termKeyEl, epKey, chartEl, chipRow, statsEl);
     drawSummary();
     table = tableView([], [], false, ind.frequency, { asc: (ind.data_table || {}).order === "asc", yearMarks: !!(ind.data_table || {}).year_marks });
     appendAll(card, breakdownTable(ind), table, annualTable(ind), weightsTable(ind), ind.note ? h("p", { class: "chips-note" }, ind.note) : null,
       ind.recession ? recessionNote(ind.recession) : null, footer(ind, onPNG, onCSV));
     card.draw = draw;
     // Switch groups (e.g. one V-Dem index after another): the time range and the countries shown carry over.
-    card.getView = () => ({ range: state.range, shown: chipRow ? [...state.shown] : null });
+    card.getView = () => ({ range: state.range, shown: chipRow ? [...state.shown] : null, termOn: termBtn ? termOn : undefined });
     card.setView = (v) => {
       if (v.range && rangeKeys(ind).includes(v.range)) state.range = v.range;
+      if (termBtn && v.termOn !== undefined && v.termOn !== termOn) { termOn = v.termOn; termBtn.setAttribute("aria-pressed", String(termOn)); termKeyEl.replaceChildren(...[termKey()].filter(Boolean)); }
       if (chipRow && v.shown) {
         const keep = v.shown.filter((k) => lineKeys.includes(k));
         if (keep.length) {
@@ -1702,7 +1710,7 @@
       const last = ind.dates.filter((d, i) => vals[i] !== null).pop();
       const at = (y, m) => lv.get(`${y}-${String(m).padStart(2, "0")}-01`) ?? null;
       const f1 = (v) => (v === null ? "" : fx(v, 1));
-      const header = [ES ? "Año" : "Year", ...Array.from({ length: 12 }, (_, m) => MONTH(m)), ES ? "Dic/dic" : "Dec/Dec", ES ? "Prom/prom" : "Avg/Avg"];
+      const header = [ES ? "Año" : "Year", ...Array.from({ length: 12 }, (_, m) => MONTH(m)), ES ? "Dic/dic" : "Dec/Dec", ES ? "Prom. mensual" : "Monthly avg."];
       const csvRows = [];
       const body = years.map((y) => {
         const r = rows.get(y);
@@ -1710,8 +1718,11 @@
         let tot = null, ytd = false;
         if (dec !== null && pdec !== null) tot = 100 * (dec / pdec - 1);
         else if (pdec !== null) { const k = r.reduce((a, v, i) => (v !== null ? i : a), -1); if (k >= 0 && at(y, k + 1) !== null) { tot = 100 * (at(y, k + 1) / pdec - 1); ytd = true; } }
-        const cur = Array.from({ length: 12 }, (_, m) => at(y, m + 1)), prv = Array.from({ length: 12 }, (_, m) => at(y - 1, m + 1));
-        const avg = cur.every((v) => v !== null) && prv.every((v) => v !== null) ? 100 * (cur.reduce((a, b) => a + b) / prv.reduce((a, b) => a + b) - 1) : null;
+        // Average monthly rate: the geometric mean of the year's monthly rates, (1 + Dec/Dec)^(1/12) - 1 (year to date: over the months published).
+        const have = Array.from({ length: 12 }, (_, m) => at(y, m + 1)).map((v, m) => (v !== null ? m + 1 : 0)).filter(Boolean);
+        const nMonths = have.length ? have[have.length - 1] : 0;
+        const ytdLevel = nMonths ? at(y, nMonths) : null;
+        const avg = pdec !== null && ytdLevel !== null && nMonths ? 100 * (Math.pow(ytdLevel / pdec, 1 / nMonths) - 1) : null;
         csvRows.push([y, ...r.map((v) => (v === null ? "" : v.toFixed(2))), tot === null ? "" : tot.toFixed(2), avg === null ? "" : avg.toFixed(2)]);
         return h("tr", {},
           h("td", { class: "ym-y" }, String(y)),
@@ -1724,15 +1735,15 @@
         h("thead", {}, h("tr", {}, header.map((c, i) => h("th", { class: i === 0 ? "ym-y" : i === 13 ? "ym-tot" : null }, c)))),
         h("tbody", {}, body)));
       note.textContent = ES ? (state.rate === "ytd"
-        ? "Cada celda es la inflación acumulada desde el diciembre anterior, de modo que diciembre coincide con dic/dic. El sombreado crece con la tasa en escala logarítmica. La celda recuadrada es el último mes. Prom/prom: el índice promedio del año sobre el del año anterior."
+        ? "Cada celda es la inflación acumulada desde el diciembre anterior, de modo que diciembre coincide con dic/dic. El sombreado crece con la tasa en escala logarítmica. La celda recuadrada es el último mes. Prom. mensual: la tasa mensual constante que, compuesta, da la inflación dic/dic del año (media geométrica; en el año en curso, sobre los meses publicados)."
         : state.rate === "mom"
-        ? "Cada celda es la variación del mes respecto del mes anterior (serie original). El sombreado crece con la tasa en escala logarítmica, para que se lean tanto 2% como 25%. La celda recuadrada es el último mes. Dic/dic: la inflación del año (acumulada en el año en curso). Prom/prom: el índice promedio del año sobre el del año anterior."
-        : "Cada celda es la variación respecto del mismo mes del año anterior. El sombreado crece con la tasa en escala logarítmica. La celda recuadrada es el último mes. Dic/dic: la inflación del año (acumulada en el año en curso). Prom/prom: el índice promedio del año sobre el del año anterior.")
+        ? "Cada celda es la variación del mes respecto del mes anterior (serie original). El sombreado crece con la tasa en escala logarítmica, para que se lean tanto 2% como 25%. La celda recuadrada es el último mes. Dic/dic: la inflación del año (acumulada en el año en curso). Prom. mensual: la tasa mensual constante que, compuesta, da la inflación dic/dic del año (media geométrica; en el año en curso, sobre los meses publicados)."
+        : "Cada celda es la variación respecto del mismo mes del año anterior. El sombreado crece con la tasa en escala logarítmica. La celda recuadrada es el último mes. Dic/dic: la inflación del año (acumulada en el año en curso). Prom. mensual: la tasa mensual constante que, compuesta, da la inflación dic/dic del año (media geométrica; en el año en curso, sobre los meses publicados).")
         : state.rate === "ytd"
-        ? "Each cell is inflation accumulated since the previous December (year to date), so December equals Dec/Dec. Shading grows with the rate on a log scale. The outlined cell is the latest month. Avg/Avg: the year's average index over the previous year's."
+        ? "Each cell is inflation accumulated since the previous December (year to date), so December equals Dec/Dec. Shading grows with the rate on a log scale. The outlined cell is the latest month. Monthly avg.: the constant monthly rate that compounds to the year's Dec/Dec (geometric mean; months published so far for the current year)."
         : state.rate === "mom"
-        ? "Each cell is the month's change over the previous month (original series). Shading grows with the rate on a log scale, so 2% and 25% both read. The outlined cell is the latest month. Dec/Dec: the year's inflation (year to date for the current year). Avg/Avg: the year's average index over the previous year's."
-        : "Each cell is the change over the same month a year earlier. Shading grows with the rate on a log scale. The outlined cell is the latest month. Dec/Dec: the year's inflation (year to date for the current year). Avg/Avg: the year's average index over the previous year's.";
+        ? "Each cell is the month's change over the previous month (original series). Shading grows with the rate on a log scale, so 2% and 25% both read. The outlined cell is the latest month. Dec/Dec: the year's inflation (year to date for the current year). Monthly avg.: the constant monthly rate that compounds to the year's Dec/Dec (geometric mean; months published so far for the current year)."
+        : "Each cell is the change over the same month a year earlier. Shading grows with the rate on a log scale. The outlined cell is the latest month. Dec/Dec: the year's inflation (year to date for the current year). Monthly avg.: the constant monthly rate that compounds to the year's Dec/Dec (geometric mean; months published so far for the current year).";
     }
     const onCSV = () => { if (csv) downloadBlob(toCSV(csv.header, csv.rows), `${ind.id}_${state.variant}_${state.rate}.csv`, "text/csv"); };
     appendAll(card, h("div", { class: "controls" }, vSeg, rSeg), wrap, note, methodLine(ind),

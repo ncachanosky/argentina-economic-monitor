@@ -280,5 +280,10 @@
  "Primary balance, % of GDP (12 months)": "Resultado primario, % del PIB (12 meses)",
  "Economic freedom (EFW), 0-10": "Libertad económica (EFW), 0-10",
  "Liberal democracy (V-Dem), 0-1": "Democracia liberal (V-Dem), 0-1",
- "Download the table as CSV": "Descargar la tabla como CSV"
+ "Download the table as CSV": "Descargar la tabla como CSV",
+ "Table": "Tabla",
+ "Color by president": "Color por presidente",
+ "Color Argentina's line by presidency": "Colorear la línea de Argentina por presidencia",
+ "Monthly inflation for each year and month, with each year's December to December inflation and its average monthly rate.": "Inflación mensual por año y mes, con la inflación de diciembre a diciembre de cada año y su tasa mensual promedio.",
+ "The Fraser Institute's summary rating of economic freedom, 0 (least free) to 10: Argentina and comparison countries; the bars are Argentina's world rank. 1970-2000 every five years, annual since. Add countries with the buttons below the chart.": "Calificación general de libertad económica del Fraser Institute, de 0 (menos libre) a 10: la Argentina y países de comparación; las barras son la posición mundial de la Argentina. 1970-2000 cada cinco años, anual desde entonces. Se pueden agregar países con los botones debajo del gráfico."
 }

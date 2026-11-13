@@ -1578,10 +1578,10 @@ indicators:
     kind: year_month
     title: Consumer Price Index (CPI), Year by Month
     short_title: CPI by month
-    switch: {group: cpi_main, label: "Year × month"}
+    switch: {group: cpi_main, label: "Table"}
     description: >-
       Monthly inflation for each year and month, with each year's December to
-      December and average inflation.
+      December inflation and its average monthly rate.
     release: ipc
     source: datos_gob
     source_label: INDEC (CPI release file serie_ipc_divisiones.csv)
@@ -6522,6 +6522,7 @@ indicators:
     muted: [latam]
     emphasis: arg
     term_colored: true
+    term_toggle: true
     secondary_bar: {variant: rank, of: count, label: "Argentina's world rank (bars, right axis)", axis: "World rank (1 = most free)"}
     plain_level: true
     measure: flow
@@ -6531,7 +6532,7 @@ indicators:
     headline: {variant: arg, transform: level, label: "Economic freedom", sub: "score, 0 to 10 (Fraser)", digits: 2, good: up}
     description: >-
       The Fraser Institute's summary rating of economic freedom, 0 (least
-      free) to 10: Argentina, colored by presidency, and comparison
+      free) to 10: Argentina and comparison
       countries; the bars are Argentina's world rank. 1970-2000 every five
       years, annual since. Add countries with the buttons below the chart.
     source: efw
@@ -6613,6 +6614,7 @@ indicators:
     muted: [latam]
     emphasis: arg
     term_colored: true
+    term_toggle: true
     plain_level: true
     measure: flow
     title: "Economic Freedom, Size of Government (Area 1): Argentina and Comparison Countries"
@@ -6656,6 +6658,7 @@ indicators:
     muted: [latam]
     emphasis: arg
     term_colored: true
+    term_toggle: true
     plain_level: true
     measure: flow
     title: "Economic Freedom, Legal System and Property Rights (Area 2): Argentina and Comparison Countries"
@@ -6699,6 +6702,7 @@ indicators:
     muted: [latam]
     emphasis: arg
     term_colored: true
+    term_toggle: true
     plain_level: true
     measure: flow
     title: "Economic Freedom, Sound Money (Area 3): Argentina and Comparison Countries"
@@ -6742,6 +6746,7 @@ indicators:
     muted: [latam]
     emphasis: arg
     term_colored: true
+    term_toggle: true
     plain_level: true
     measure: flow
     title: "Economic Freedom, Freedom to Trade Internationally (Area 4): Argentina and Comparison Countries"
@@ -6785,6 +6790,7 @@ indicators:
     muted: [latam]
     emphasis: arg
     term_colored: true
+    term_toggle: true
     plain_level: true
     measure: flow
     title: "Economic Freedom, Regulation (Area 5): Argentina and Comparison Countries"
