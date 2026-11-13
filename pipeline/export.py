@@ -414,7 +414,7 @@ def export_table(ind, out: Path, status: dict, reg_meta: dict | None = None) -> 
         target.parent.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(f, target)
     index = json.loads(main.read_text(encoding="utf-8"))
-    if "years" in index:
+    if isinstance(index.get("years"), dict):
         last = max(d for ds in index["years"].values() for d in ds)
     else:
         last = index.get("latest")
@@ -425,7 +425,7 @@ def export_table(ind, out: Path, status: dict, reg_meta: dict | None = None) -> 
         "frequency": ind.frequency, "units": ind.units, "table": {**ind.table, "path": f"tables/{ind.table['source']}/"},
         "method_links": ind.method_links, "forecast": rem_forecast(ind),
         "outcomes": rem_outcomes() if ind.kind == "rem_revisions" else None,
-        "years": index.get("years"), "groups": index.get("groups"), "group_labels": index.get("group_labels"),
+        "years": index.get("years") if isinstance(index.get("years"), dict) else None, "groups": index.get("groups"), "group_labels": index.get("group_labels"),
         "status": st.get("status", "ok"), "last_obs": last,
         "last_checked": st.get("last_checked"), "last_changed": st.get("last_changed"),
         "source_files": source_files_for(ind, reg_meta, status),

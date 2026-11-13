@@ -475,6 +475,7 @@ inputs:
   - {id: "recession:smoothed", source: recession, frequency: M, measure: flow, stale_days: 120, label: "Recession probability (EMAE-based): full-sample estimate"}
   # Institutions. Archbridge Institute's Social Mobility Index: hand-kept edition file (data/manual/social_mobility_<edition>.csv).
   - {id: "smi:ARG:overall", source: smi, frequency: Y, measure: flow, stale_days: 1100, label: "Social Mobility Index, Argentina: overall score"}
+  - {id: "lallpi:ARG:pop", source: lallpi, frequency: Y, measure: flow, allow_gaps: true, stale_days: 4000, label: "Latin American Left-Leaning Populism Index, Argentina"}
   - {id: "smi:ARG:rank", source: smi, frequency: Y, measure: flow, stale_days: 1100, label: "Social Mobility Index, Argentina: rank"}
   - {id: "efw:ARG:summary", source: efw, frequency: Y, measure: flow, allow_gaps: true, stale_days: 1400, label: "EFW, Argentina: summary"}
   - {id: "efw:ARG:rank", source: efw, frequency: Y, measure: flow, allow_gaps: true, stale_days: 1400, label: "EFW, Argentina: rank"}
@@ -6858,6 +6859,45 @@ indicators:
       together. One edition so far (data for 2024); scores from future
       editions may not be comparable if the method changes.
     method_links: [{anchor: smi, label: "About the Social Mobility Index"}]
+
+  - id: inst_lallpi
+    topic: institutions
+    kind: lallpi
+    wide: true
+    title: "Left-Leaning Populism in Latin America (LALLPI)"
+    short_title: Populism index
+    description: >-
+      The Latin American Left-Leaning Populism Index scores populist
+      governments in 22 countries, 2000-2019: populist rhetoric (the
+      governing party's) times populist policy, institutional and economic.
+      Argentina over time, a map of the region by year, and each country's
+      path of institutional against economic policy.
+    source: table
+    source_label: "Cachanosky, Bastos and Padilla (2026), Latin American Left-Leaning Populism Index, V2025.1"
+    frequency: Y
+    units: Index, 0-100
+    default: {}
+    table:
+      source: lallpi
+      file: index.json
+      status_id: "lallpi:ARG:pop"
+      source_url: https://lallpi.netlify.app
+    note: >-
+      Rhetoric is V-Party's populism score (anti-elitism and people-centrism)
+      of the head of government's party, 0 to 1; it is missing when the
+      president had no party in V-Party's data, and for 2020, so the series
+      end in 2019. Institutional policy averages six components (rule of law,
+      corruption, legislative constraints, neopatrimonialism, property rights;
+      V-Dem and the Heritage Foundation); economic policy averages four
+      (regulation, government interference, monetary and financial freedom,
+      freedom to trade; the Fraser Institute and Heritage). The index is
+      rhetoric times the average of the two policy indices, so a government
+      that talks populist but does not govern that way scores low, and the
+      reverse. Each year is assigned to the head of government who served the
+      longer part of it; the names come from public records, not the dataset.
+      The index was developed by Nicolas Cachanosky (who edits this site),
+      João Pedro Bastos and Alexandre Padilla.
+    method_links: [{anchor: lallpi, label: "About the populism index"}]
 
   - id: inst_vdem
     topic: institutions

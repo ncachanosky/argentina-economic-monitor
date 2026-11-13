@@ -5483,6 +5483,15 @@
     "status": "ok",
     "warnings": []
   },
+  "lallpi:ARG:pop": {
+    "last_changed": "2026-11-13",
+    "last_checked": "2026-11-13T14:00:51+00:00",
+    "last_obs": "2019-01-01",
+    "source": "lallpi",
+    "source_units": "index, 0-100",
+    "status": "ok",
+    "warnings": []
+  },
   "lefi_period": {
     "last_changed": "2026-10-07",
     "last_checked": "2026-11-13T13:48:35+00:00",

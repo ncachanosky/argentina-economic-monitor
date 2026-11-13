@@ -617,3 +617,10 @@ table.data td.ci-name, table.data td.ci-reg, table.data th.ci-l { text-align: le
 
 /* Statement, year by year: the latest twelve months set apart */
 table.statement th.st-cur, table.statement td.st-cur { border-left: 2px solid var(--ink-3); background: color-mix(in srgb, var(--ink-3) 8%, transparent); }
+
+/* Populism index (LALLPI) */
+.lp-ypick { gap: 8px; align-items: center; }
+.lp-year { width: min(320px, 50vw); accent-color: var(--accent); }
+.lp-ylab { min-width: 3em; font-variant-numeric: tabular-nums; }
+.lp-who { margin: 2px 0; font-size: 13px; color: var(--ink-2); }
+.ci-map .lp-dot { stroke: var(--ink-2); stroke-width: 1; cursor: pointer; }

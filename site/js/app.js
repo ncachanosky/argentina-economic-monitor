@@ -2167,6 +2167,197 @@
     return card;
   }
 
+  // ---------- card: the Latin American Left-Leaning Populism Index ----------
+  // Three views: over time (one measure, Argentina and chosen countries), a map by year (slider), and
+  // a country's path of institutional against economic populist policy, colored by head of government.
+  function lallpiCard(ind) {
+    const T = ind.table;
+    const card = cardFrame(ind, true);
+    const ES = LANG === "es";
+    let data = null, geo = null, csv = null, timer = null;
+    const state = { view: "time", measure: "pop", year: null, shown: new Set(["median"]), country: "ARG" };
+    const HOME = "ARG";
+    const names = ES && typeof Intl.DisplayNames === "function" ? new Intl.DisplayNames(["es"], { type: "region" }) : null;
+    const cname = (iso) => { const c = data.countries[iso]; if (!c) return iso; if (names && c.a2) { try { return names.of(c.a2) || c.n; } catch (e) { /* unknown */ } } return c.n; };
+    const mlabel = (k) => tr((data.measures.find((m) => m.key === k) || {}).label || k);
+    const nd = (k) => (k === "r" ? 2 : 1);
+    const fv = (v, k) => (v === null || v === undefined ? "–" : fx(v, nd(k)));
+    const role = (r) => (ES ? ({ "President": "Presidente", "Prime Minister": "Primer ministro", "President (interim)": "Presidente interino", "President (de facto)": "Presidente de facto" })[r] || r : r);
+    const who = (c, i) => [c.leader[i] ? `${role(c.role[i])}: ${c.leader[i]}` : null, c.party[i] ? `${ES ? "Partido" : "Party"}: ${c.party_name[i] ? tr(c.party_name[i]) : c.party[i]} (${c.party[i]})` : (ES ? "Sin partido en V-Party" : "No party in V-Party's data"), c.leader_note[i] ? `(${c.leader_note[i]})` : null].filter(Boolean);
+    const vSeg = segmented([["time", "Over time"], ["map", "Map"], ["path", "Policy path"]], state.view, (k) => { state.view = k; vSeg.update(k); stop(); render(); }, "View");
+    const mSel = h("select", { class: "select", "aria-label": "Measure" });
+    mSel.addEventListener("change", () => { state.measure = mSel.value; render(); });
+    const mPick = h("label", { class: "base-pick" }, h("span", {}, "Measure:"), mSel);
+    const yIn = h("input", { type: "range", class: "lp-year", step: "1", "aria-label": "Year" });
+    const yLab = h("b", { class: "lp-ylab" });
+    yIn.addEventListener("input", () => { state.year = +yIn.value; stop(); render(); });
+    const playBtn = h("button", { class: "btn", type: "button", onclick: () => (timer ? stop() : play()) }, "▶ Play");
+    const yPick = h("label", { class: "base-pick lp-ypick" }, h("span", {}, "Year:"), yIn, yLab, playBtn);
+    const cSel = h("select", { class: "select", "aria-label": "Country" });
+    cSel.addEventListener("change", () => { state.country = cSel.value; render(); });
+    const cPick = h("label", { class: "base-pick" }, h("span", {}, "Country:"), cSel);
+    const chips = h("div", { class: "chip-row" });
+    const hint = h("p", { class: "hint" });
+    const body = h("div", { class: "lp-body" });
+    function stop() { if (timer) { clearInterval(timer); timer = null; playBtn.textContent = ES ? "▶ Reproducir" : "▶ Play"; } }
+    function play() {
+      const Y = data.years; if (state.year >= Y[Y.length - 1]) state.year = Y[0];
+      playBtn.textContent = ES ? "❚❚ Pausa" : "❚❚ Pause";
+      timer = setInterval(() => { if (state.year >= Y[Y.length - 1]) { stop(); return; } state.year += 1; render(); }, 900);
+    }
+
+    function timeView() {
+      const Y = data.years, k = state.measure, isos = Object.keys(data.countries).sort((a, b) => cname(a).localeCompare(cname(b), LOCALE));
+      chips.replaceChildren(h("span", { class: "chip-label" }, ES ? "Mostrar:" : "Show:"),
+        ...["median", ...isos.filter((x) => x !== HOME)].map((key) => h("button", { type: "button", class: "chip", "aria-pressed": String(state.shown.has(key)),
+          onclick: () => { state.shown.has(key) ? state.shown.delete(key) : state.shown.add(key); render(); } }, key === "median" ? (ES ? "Mediana de la región" : "Regional median") : cname(key))));
+      const el = h("div", { class: "chart tall-ish", role: "img", "aria-label": mlabel(k) });
+      const x = Y.map((y) => `${y}-07-01`);
+      const c = data.countries[HOME];
+      const traces = [{ type: "scatter", mode: "lines+markers", name: cname(HOME), x, y: c[k], line: { color: cssVar("--ink"), width: 3 }, marker: { size: 5, color: cssVar("--ink") },
+        customdata: Y.map((y, i) => who(c, i).join("<br>")), hovertemplate: `<b>${cname(HOME)}</b> %{x|%Y}: <b>%{y:.${nd(k)}f}</b><br>%{customdata}<extra></extra>` }];
+      let slot = 0;
+      for (const key of state.shown) {
+        if (key === "median") { traces.push({ type: "scatter", mode: "lines", name: ES ? "Mediana de la región" : "Regional median", x, y: data.median[k], line: { color: cssVar("--ink-3"), width: 2, dash: "dot" }, hovertemplate: `${ES ? "Mediana" : "Median"} %{x|%Y}: %{y:.${nd(k)}f}<extra></extra>` }); continue; }
+        const o = data.countries[key]; if (!o) continue;
+        const col = cssVar(SERIES_VARS[slot++ % SERIES_VARS.length]);
+        traces.push({ type: "scatter", mode: "lines+markers", name: cname(key), x, y: o[k], line: { color: col, width: 1.8 }, marker: { size: 4, color: col },
+          customdata: Y.map((y, i) => who(o, i).join("<br>")), hovertemplate: `<b>${cname(key)}</b> %{x|%Y}: <b>%{y:.${nd(k)}f}</b><br>%{customdata}<extra></extra>` });
+      }
+      requestAnimationFrame(() => Plotly.react(el, traces, baseLayout({ xaxis: { hoverformat: "%Y" }, yaxis: k === "r" ? { range: [0, 1] } : { rangemode: "tozero" },
+        extra: { showlegend: true, legend: { orientation: "h", x: 0, y: 1.08, yanchor: "bottom", font: { color: cssVar("--ink") } }, hovermode: "closest", margin: { l: 52, r: 16, t: 40, b: 36 } } }), PLOT_CONFIG));
+      hint.textContent = ES ? `${mlabel(k)}, ${k === "r" ? "0 a 1" : "0 a 100"}; más alto es más populista. Pase el cursor por un punto para ver el gobierno de ese año.`
+        : `${mlabel(k)}, ${k === "r" ? "0 to 1" : "0 to 100"}; higher is more populist. Hover over a point for that year's government.`;
+      csv = { name: `${ind.id}_${k}`, header: ["year", cname(HOME), ...[...state.shown].map((s) => (s === "median" ? "median" : cname(s)))],
+        rows: Y.map((y, i) => [y, c[k][i], ...[...state.shown].map((s) => (s === "median" ? data.median[k][i] : data.countries[s][k][i]))]) };
+      return h("div", {}, el, chips);
+    }
+
+    function mapView() {
+      const Y = data.years, k = state.measure, i = Y.indexOf(state.year);
+      yIn.value = String(state.year); yLab.textContent = String(state.year);
+      const vals = Object.values(data.countries).map((c) => c[k][i]).filter((v) => v !== null);
+      const all = Object.values(data.countries).flatMap((c) => c[k]).filter((v) => v !== null);
+      const lo = 0, hi = k === "r" ? 1 : Math.max(...all);
+      const fill = (v) => (v === null || v === undefined ? "var(--grid)" : `color-mix(in srgb, var(--series-1) ${Math.round(8 + 92 * (v - lo) / (hi - lo))}%, var(--surface))`);
+      const rankOf = (v) => (v === null ? null : vals.filter((x) => x > v).length + 1);
+      const ns = "http://www.w3.org/2000/svg";
+      const svg = document.createElementNS(ns, "svg");
+      svg.setAttribute("viewBox", `0 0 ${geo.width} ${geo.height}`); svg.setAttribute("class", "ci-map"); svg.setAttribute("role", "img");
+      svg.setAttribute("aria-label", `${mlabel(k)}, ${state.year}`);
+      const info = h("div", { class: "ci-side" });
+      const show = (iso) => {
+        const c = data.countries[iso];
+        if (!c) { info.replaceChildren(h("p", { class: "hint" }, ES ? "No cubierto por el índice." : "Not covered by the index.")); return; }
+        const v = c[k][i];
+        info.replaceChildren(h("div", { class: "ci-info" }, h("h4", {}, `${cname(iso)}, ${state.year}`),
+          h("p", { class: "ci-big" }, fv(v, k), h("small", {}, ` ${mlabel(k)}`)),
+          h("p", { class: "ci-ranks" }, v === null ? (ES ? "Sin dato este año" : "No score this year") : (ES ? `${rankOf(v)}.º de ${vals.length} (1 = más populista)` : `${rankOf(v)} of ${vals.length} (1 = most populist)`)),
+          ...who(c, i).map((s) => h("p", { class: "lp-who" }, s)),
+          ...data.measures.filter((m) => m.key !== k).map((m) => h("div", { class: "ci-mini" }, h("span", {}, mlabel(m.key)),
+            h("span", { class: "ci-track" }, h("i", { style: `--w:${(c[m.key][i] || 0) / (m.key === "r" ? 1 : 100)}` })), h("b", {}, fv(c[m.key][i], m.key))))));
+      };
+      const order = Object.keys(geo.paths).sort((a, b) => (a === HOME) - (b === HOME));
+      for (const iso of order) {
+        const c = data.countries[iso];
+        const p = document.createElementNS(ns, "path");
+        p.setAttribute("d", geo.paths[iso]);
+        p.setAttribute("class", "ci-c" + (iso === HOME ? " home" : "") + (c ? "" : " none"));
+        p.style.fill = c ? fill(c[k][i]) : "var(--grid)";
+        p.dataset.iso = iso;
+        if (c) {
+          const t = document.createElementNS(ns, "title"); t.textContent = `${cname(iso)} ${state.year}: ${fv(c[k][i], k)}${c.leader[i] ? " · " + c.leader[i] : ""}`; p.append(t);
+          p.addEventListener("mouseenter", () => show(iso)); p.addEventListener("click", () => show(iso)); p.addEventListener("mouseleave", () => show(state.hover || HOME));
+        }
+        svg.append(p);
+      }
+      // Small islands get a marker so they can be found and hovered.
+      requestAnimationFrame(() => ["BRB", "TTO", "JAM"].forEach((iso) => {
+        const p = svg.querySelector(`path[data-iso="${iso}"]`), c = data.countries[iso]; if (!p || !c) return;
+        const b = p.getBBox(), dot = document.createElementNS(ns, "circle");
+        dot.setAttribute("cx", b.x + b.width / 2); dot.setAttribute("cy", b.y + b.height / 2); dot.setAttribute("r", String(Math.max(6, geo.width / 140)));
+        dot.setAttribute("class", "ci-c lp-dot"); dot.style.fill = fill(c[k][i]);
+        const t = document.createElementNS(ns, "title"); t.textContent = `${cname(iso)} ${state.year}: ${fv(c[k][i], k)}`; dot.append(t);
+        dot.addEventListener("mouseenter", () => show(iso)); dot.addEventListener("click", () => show(iso)); dot.addEventListener("mouseleave", () => show(HOME));
+        svg.append(dot);
+      }));
+      show(HOME);
+      const legend = h("div", { class: "ci-legend" }, h("span", {}, fv(lo, k)), h("i", {}), h("span", {}, fv(hi, k)), h("span", { class: "ci-na" }, h("i", {}), ES ? "Sin dato" : "No score"));
+      hint.textContent = ES ? `${mlabel(k)} en ${state.year}. La escala de color es la misma para todos los años (de 0 al máximo de la serie), así que los cambios de color son cambios del índice. Mueva el control del año o use Reproducir; pase el cursor por un país.`
+        : `${mlabel(k)} in ${state.year}. The color scale is the same for every year (0 to the series' maximum), so a change of color is a change in the index. Move the year control or press Play; hover over a country.`;
+      csv = { name: `${ind.id}_map_${k}_${state.year}`, header: ["country", "iso3", "year", k, "rank", "head_of_government", "party"],
+        rows: Object.entries(data.countries).map(([iso, c]) => [c.n, iso, state.year, c[k][i], rankOf(c[k][i]), c.leader[i], c.party[i]]) };
+      return h("div", { class: "ci-mapwrap" }, h("div", { class: "ci-mapcol" }, svg, legend), info);
+    }
+
+    function pathView() {
+      const Y = data.years, c = data.countries[state.country];
+      const el = h("div", { class: "chart tall", role: "img", "aria-label": "Policy path" });
+      const segs = []; // consecutive years with the same head of government
+      Y.forEach((y, i) => { if (c.ip[i] === null || c.ep[i] === null) return; const L = c.leader[i] || "?"; const last = segs[segs.length - 1];
+        if (last && last.leader === L && last.i[last.i.length - 1] === i - 1) last.i.push(i); else segs.push({ leader: L, i: [i] }); });
+      const colorOf = new Map(); let slot = 0;
+      segs.forEach((s) => { if (!colorOf.has(s.leader)) colorOf.set(s.leader, SERIES_VARS[slot++ % SERIES_VARS.length]); });
+      const traces = [];
+      segs.forEach((s, n) => {
+        const col = cssVar(colorOf.get(s.leader));
+        const idx = n ? [segs[n - 1].i[segs[n - 1].i.length - 1], ...s.i] : s.i;   // join from the previous year
+        const first = segs.findIndex((q) => q.leader === s.leader) === n;
+        const yrs = s.i.map((i) => Y[i]);
+        traces.push({ type: "scatter", mode: "lines+markers+text", x: idx.map((i) => c.ep[i]), y: idx.map((i) => c.ip[i]),
+          name: `${s.leader} (${yrs[0]}${yrs.length > 1 ? "–" + yrs[yrs.length - 1] : ""})`, legendgroup: s.leader, showlegend: true,
+          line: { color: col, width: 2.2 }, marker: { size: idx.map((i, j) => (n && j === 0 ? 0 : 7)), color: col },
+          text: idx.map((i, j) => (n && j === 0 ? "" : String(Y[i]).slice(2))), textposition: "top right", textfont: { size: 10, color: cssVar("--ink-2") },
+          customdata: idx.map((i) => [Y[i], c.r[i] === null ? "–" : fx(c.r[i], 2), c.pop[i] === null ? "–" : fx(c.pop[i], 1), c.party[i] || "–"]),
+          hovertemplate: `<b>%{customdata[0]}</b> · ${s.leader} (%{customdata[3]})<br>${ES ? "Política económica" : "Economic policy"}: %{x:.1f}<br>${ES ? "Política institucional" : "Institutional policy"}: %{y:.1f}<br>${ES ? "Retórica" : "Rhetoric"}: %{customdata[1]} · ${ES ? "Índice" : "Index"}: %{customdata[2]}<extra></extra>` });
+        if (!first) traces[traces.length - 1].showlegend = false;
+      });
+      const xs = c.ep.filter((v) => v !== null), ys = c.ip.filter((v) => v !== null);
+      const pad = (a) => { const lo = Math.min(...a), hi = Math.max(...a), d = Math.max(4, (hi - lo) * 0.12); return [Math.max(0, lo - d), Math.min(100, hi + d)]; };
+      requestAnimationFrame(() => Plotly.react(el, traces, baseLayout({
+        xaxis: { type: "linear", range: pad(xs), title: { text: ES ? "Política económica populista (EP, 0-100) →" : "Economic populist policy (EP, 0-100) →", font: { size: 12 } } },
+        yaxis: { range: pad(ys), title: { text: ES ? "Política institucional populista (IP, 0-100) →" : "Institutional populist policy (IP, 0-100) →", font: { size: 12 } } },
+        extra: { showlegend: true, legend: { orientation: "h", x: 0, y: 1.02, yanchor: "bottom", font: { color: cssVar("--ink") } }, hovermode: "closest", margin: { l: 64, r: 16, t: 56, b: 52 } } }), PLOT_CONFIG));
+      hint.textContent = ES ? `${cname(state.country)}, ${Y[0]}-${Y[Y.length - 1]}: cada punto es un año (rótulo: los dos últimos dígitos), coloreado por jefe de gobierno. Arriba y a la derecha, políticas más populistas. Los ejes no son comparables entre sí, y este gráfico muestra la política, no la retórica (que está en el cursor).`
+        : `${cname(state.country)}, ${Y[0]}-${Y[Y.length - 1]}: each point is a year (labeled by its last two digits), colored by head of government. Up and to the right is more populist policy. The two axes are not comparable with each other, and the chart shows policy, not rhetoric (on hover).`;
+      csv = { name: `${ind.id}_path_${state.country}`, header: ["year", "head_of_government", "party", "EP", "IP", "rhetoric", "index"],
+        rows: Y.map((y, i) => [y, c.leader[i], c.party[i], c.ep[i], c.ip[i], c.r[i], c.pop[i]]) };
+      return el;
+    }
+
+    function render() {
+      if (!data) return;
+      mPick.style.display = state.view === "path" ? "none" : "";
+      yPick.style.display = state.view === "map" ? "" : "none";
+      cPick.style.display = state.view === "path" ? "" : "none";
+      body.replaceChildren(state.view === "map" ? mapView() : state.view === "path" ? pathView() : timeView());
+    }
+    const onCSV = () => { if (csv) downloadBlob(toCSV(csv.header, csv.rows), `${csv.name}.csv`, "text/csv"); };
+    appendAll(card, h("div", { class: "controls" }, vSeg, mPick, cPick), h("div", { class: "controls" }, yPick), hint, body,
+      ind.note ? h("p", { class: "chips-note" }, ind.note) : null,
+      h("details", { class: "lr-sources" }, h("summary", {}, ES ? "Cita" : "Citation"), h("p", { class: "no-tr" },
+        "Cachanosky, Nicolas, João Pedro Bastos, and Alexandre Padilla. 2026. Latin American Left-Leaning Populism Index, V2025.1. Harvard Dataverse. ",
+        h("a", { href: "https://doi.org/10.7910/DVN/KEJ9VF", target: "_blank", rel: "noopener" }, "https://doi.org/10.7910/DVN/KEJ9VF"))),
+      methodLine(ind),
+      h("div", { class: "card-foot" },
+        h("span", {}, "Source: ", h("a", { href: T.source_url, target: "_blank", rel: "noopener" }, ind.source_label), ...srcTail(ind)),
+        h("div", { class: "actions" }, h("button", { class: "btn", type: "button", onclick: onCSV, title: "Download the data in this view as CSV" }, "CSV"),
+          h("a", { class: "btn", href: `${DATA}${T.path}${T.file}`, download: `${ind.id}_all.json`, title: "Every country, year and measure, with heads of government (JSON)" }, "All data"))));
+    card.draw = async () => {
+      if (!data) {
+        try { [data, geo] = await Promise.all([getJSON(`${DATA}${T.path}${T.file}`), getJSON(`${DATA}${T.path}latam_map.json`)]); }
+        catch (e) { console.error(e); body.replaceChildren(h("div", { class: "error-box" }, "The data could not be loaded.")); return; }
+        mSel.replaceChildren(...data.measures.map((m) => h("option", { value: m.key }, mlabel(m.key))));
+        cSel.replaceChildren(...Object.keys(data.countries).sort((a, b) => cname(a).localeCompare(cname(b), LOCALE)).map((iso) => h("option", { value: iso }, cname(iso))));
+        cSel.value = state.country;
+        state.year = data.years[data.years.length - 1];
+        yIn.min = String(data.years[0]); yIn.max = String(state.year); yIn.value = String(state.year);
+      }
+      render();
+    };
+    return card;
+  }
+
   // ---------- card: a cross-country index, one edition (Archbridge's Social Mobility Index) ----------
   // Three views: a map of Latin America shaded by score, the ranking (region or world), and
   // Argentina's profile by pillar and sub-pillar against the regional median.
@@ -4521,6 +4712,7 @@
         : ind.kind === "turns" ? turnsCard(ind)
         : ind.kind === "ngdp" ? ngdpCard(ind)
         : ind.kind === "country_index" ? countryIndexCard(ind)
+        : ind.kind === "lallpi" ? lallpiCard(ind)
         : ind.kind === "revisions" ? revisionsCard(ind)
         : ind.kind === "year_month" ? yearMonthCard(ind)
         : ind.kind === "scorecard" ? scorecardCard(ind)

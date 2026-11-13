@@ -94,6 +94,12 @@ section becomes its notes.
   latest year of the INDEC extension), as % of nine comparison countries or regions, each column
   chosen from a menu; or levels. Shares the card's release selector; years are tagged with the
   chart's numbered events.
+- Institutions: the Latin American Left-Leaning Populism Index (Cachanosky, Bastos and Padilla,
+  V2025.1), 22 countries, 2000-2019. Three views: over time (any measure, Argentina and chosen
+  countries, regional median), a map of the region by year with a year slider and Play, and a
+  country's policy path (economic against institutional populist policy, colored by head of
+  government). Hover shows each year's head of government (added from public records) and party.
+  The card states that the site's editor is one of the index's authors.
 - Fiscal: the National Budget card (renamed from "Month by Month") gains a Year by year view: each
   line for every calendar year since 2015 and the latest twelve months, as % of GDP, real change on
   the previous year, or millions of pesos, including the Monitor's adjustments. Registry option
