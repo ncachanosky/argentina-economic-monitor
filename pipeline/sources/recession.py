@@ -14,8 +14,12 @@ A variance that also switches splits the sample by volatility, not by growth; mo
 (rather than 3-month) growth gives one-month "regimes". Ids:
 
   recession:smoothed   P(recession regime) for every month, estimated on the full sample
-  recession:realtime   the track record: for each month since 2008, the filtered probability
-                       of that month from the model re-estimated on data up to that month
+  recession:realtime   the real-time record: for each EMAE release since August 2016, the model
+                       estimated on that release's own series (as INDEC published it), and the
+                       filtered probability of its latest month. Each reading is computed once,
+                       when its release arrives, and then kept: it is what the Monitor said then.
+                       Releases to September 2026 come from INDEC's reports (Cuadro 2,
+                       data/manual/emae_trend_vintages.csv); later ones from the stored vintages.
 
 Checks, written to data/tables/recession/model.json for the card and the methodology page:
   - a Bry-Boschan (Harding-Pagan) chronology of the SA EMAE: peaks and troughs that are
@@ -27,8 +31,8 @@ Checks, written to data/tables/recession/model.json for the card and the methodo
     production (IPI), construction (ISAC) and registered private employment, as known when
     the latest IPI and ISAC are published (EMAE a month behind, employment two).
 
-The real-time track record uses today's revised data, not the data as first published.
-The EMAE model is re-estimated only when EMAE changes, the cross-check when any of its inputs does.
+The full-sample model is re-estimated only when EMAE changes, a new real-time reading only
+for a release not yet read, the cross-check when any of its inputs changes.
 """
 from __future__ import annotations
 
@@ -49,10 +53,10 @@ PANEL = {"emae": EMAE, "ipi": "453.1_SERIE_DESEADA_0_0_24_58", "isac": "33.2_ISA
          "emp": "151.1_AARIADOTAC_2012_M_26"}
 OUTLIERS_3M = pd.date_range("2020-03-01", "2020-08-01", freq="MS")   # months whose 3-month growth includes Mar-Jun 2020
 OUTLIERS_1M = pd.date_range("2020-03-01", "2020-06-01", freq="MS")
-REALTIME_FROM = pd.Timestamp("2008-01-01")
+RELEASES_CSV = ROOT / "data" / "manual" / "emae_trend_vintages.csv"
 TABLE_DIR = ROOT / "data" / "tables" / "recession"
 MODEL_FILE = TABLE_DIR / "model.json"
-VERSION = 1          # bump to force a re-estimation when the method changes
+VERSION = 3          # bump to force a re-estimation (and new real-time readings) when the method changes
 
 LAST: dict | None = None
 
@@ -94,16 +98,50 @@ def fit_ms(y: pd.Series, start_params=None):
     return best, k
 
 
-def realtime(y: pd.Series, start: pd.Timestamp = REALTIME_FROM) -> pd.Series:
-    out, prev = {}, None
-    for end in y.loc[start:].index:
+def releases() -> list[tuple[str, pd.Series]]:
+    """Every EMAE release as published: [(release date, seasonally adjusted level)], oldest first.
+
+    From 2018 the reports print the series only from a recent year (the full series was in
+    INDEC's spreadsheet of the day). Earlier months are then taken from the previous release,
+    chained at the report's first month, so each release keeps a history from 2004.
+    """
+    out, full = [], None
+    if RELEASES_CSV.exists():
+        v = pd.read_csv(RELEASES_CSV, parse_dates=["release", "period"])
+        for rel, g in v.groupby("release"):
+            lv = g.set_index("period")["sa"].dropna().sort_index()
+            if full is not None and lv.index.min() > full.index.min() and lv.index.min() in full.index:
+                head = full[full.index < lv.index.min()] * (lv.iloc[0] / full.loc[lv.index.min()])
+                lv = pd.concat([head, lv])
+            full = lv
+            out.append((rel.strftime("%Y-%m-%d"), lv))
+    last = max((s.index.max() for _, s in out), default=pd.Timestamp("1900-01-01"))
+    for vin in store.vintages(EMAE):
+        lv = store.as_of(EMAE, vin).dropna()
+        if len(lv) and lv.index.max() > last:
+            out.append((vin, lv))
+            last = lv.index.max()
+    return out
+
+
+def realtime(frozen: dict) -> dict:
+    """Add a reading for each release not yet read: {latest month: {"p", "release"}}."""
+    frozen = dict(frozen)
+    done = {r["release"] for r in frozen.values()}
+    for rel, lv in releases():
+        if rel in done:
+            continue
+        lv = lv.asfreq("MS")
+        if lv.isna().any() or lv.index.min() > pd.Timestamp("2005-01-01"):
+            continue
         try:
-            r, k = fit_ms(y.loc[:end], prev)
+            r, k = fit_ms(growth3(lv))
         except RuntimeError:
             continue
-        prev = r.params.values
-        out[end] = float(r.filtered_marginal_probabilities[k].iloc[-1])
-    return pd.Series(out, dtype=float)
+        month = lv.index.max().strftime("%Y-%m-%d")
+        if month not in frozen:            # a later release of the same month does not overwrite the first reading
+            frozen[month] = {"p": round(float(r.filtered_marginal_probabilities[k].iloc[-1]), 4), "release": rel}
+    return dict(sorted(frozen.items()))
 
 
 # ---------- Bry-Boschan ----------
@@ -157,16 +195,27 @@ def months(a: pd.Timestamp, b: pd.Timestamp) -> int:
     return (b.year - a.year) * 12 + b.month - a.month
 
 
-def evaluate(rt: pd.Series, turns) -> dict:
-    """Months from each dated turn to the first real-time reading on the other side of 0.5."""
+def evaluate(rt: pd.Series, turns, open_from: str | None = None) -> dict:
+    """Months from each dated turn to the first real-time reading on the other side of 0.5.
+
+    A recession counts as signaled only if the probability passes 0.5 between three months
+    before its peak and six months after its trough; otherwise it is "missed". Its end counts
+    as signaled if the probability falls below 0.5 before the next peak.
+    """
     entry, exit_ = [], []
-    for d, s in turns:
-        if d < rt.index.min() + pd.DateOffset(months=3):
+    start = rt.index.min() + pd.DateOffset(months=3)
+    for i, (d, s) in enumerate(turns):
+        if d < start:
             continue
-        w = rt.loc[d - pd.DateOffset(months=3):]
-        hit = w[w > 0.5] if s == "P" else w[w < 0.5]
-        if len(hit):
-            (entry if s == "P" else exit_).append({"turn": d.strftime("%Y-%m"), "months": months(d, hit.index[0])})
+        nxt = turns[i + 1][0] if i + 1 < len(turns) else rt.index.max()
+        if s == "P":
+            w = rt.loc[d - pd.DateOffset(months=3):nxt + pd.DateOffset(months=6)]
+            hit = w[w > 0.5]
+            entry.append({"turn": d.strftime("%Y-%m"), "months": months(d, hit.index[0]) if len(hit) else None})
+        else:
+            w = rt.loc[d - pd.DateOffset(months=3):nxt]
+            hit = w[w < 0.5]
+            exit_.append({"turn": d.strftime("%Y-%m"), "months": months(d, hit.index[0]) if len(hit) else None})
     rec = pd.Series(False, index=rt.index)
     peak = None
     for d, s in turns:
@@ -175,11 +224,18 @@ def evaluate(rt: pd.Series, turns) -> dict:
         elif peak is not None:
             rec[(rec.index > peak - pd.DateOffset(months=3)) & (rec.index <= d + pd.DateOffset(months=7))] = True
             peak = None
-    last_dated = max((d for d, _ in turns), default=rt.index.min())
-    window = rt.loc[:last_dated]
+    # False alarms: readings above 0.5 outside any dated recession, up to six months before the
+    # latest data (the chronology cannot date turns in its last six months), and not in a current
+    # decline that started after the last dated turn.
+    end = rt.index.max() - pd.DateOffset(months=6)
+    if open_from is not None:
+        end = min(end, pd.Timestamp(open_from) - pd.DateOffset(months=3))
+    window = rt.loc[:end]
     false = window[(window > 0.5) & ~rec.loc[window.index]]
-    med = lambda xs: float(np.median([x["months"] for x in xs])) if xs else None
-    return {"entry": entry, "exit": exit_, "median_entry": med(entry), "median_exit": med(exit_),
+    med = lambda xs: (float(np.median([x["months"] for x in xs if x["months"] is not None]))
+                      if any(x["months"] is not None for x in xs) else None)
+    return {"from": rt.index.min().strftime("%Y-%m-%d"), "entry": entry, "exit": exit_, "median_entry": med(entry), "median_exit": med(exit_),
+            "missed": sum(1 for x in entry if x["months"] is None),
             "false_alarm_months": [d.strftime("%Y-%m") for d in false.index]}
 
 
@@ -220,14 +276,14 @@ def _inputs() -> tuple[pd.Series, pd.DataFrame]:
     return level, panel
 
 
-def build(level: pd.Series) -> dict:
+def build(level: pd.Series, frozen: dict) -> dict:
     level = level.dropna().asfreq("MS")
     y = growth3(level)
     r, k = fit_ms(y)
     smoothed = r.smoothed_marginal_probabilities[k]
-    rt = realtime(y)
+    frozen = realtime(frozen)
+    rt = pd.Series({pd.Timestamp(m): v["p"] for m, v in frozen.items()}, dtype=float).sort_index()
     turns = bry_boschan(np.log(level))
-    ev = evaluate(rt, turns)
     # Dated recessions (peak to trough) and, after the last dated turn, a current low-growth run too
     # recent to date: the months since the smoothed probability last rose above 0.5.
     bands, peak = [], None
@@ -246,6 +302,7 @@ def build(level: pd.Series) -> dict:
         open_phase = start.strftime("%Y-%m-%d")
     elif last_turn and last_turn[1] == "P":
         open_phase = (last_turn[0] + pd.DateOffset(months=1)).strftime("%Y-%m-%d")
+    ev = evaluate(rt, turns, open_phase)
     params = {
         "mu_recession": round(float(r.params[f"const[{k}]"]), 3),
         "mu_expansion": round(float(r.params[f"const[{1 - k}]"]), 3),
@@ -260,7 +317,7 @@ def build(level: pd.Series) -> dict:
                    "smoothed": round(float(smoothed.iloc[-1]), 3)},
         "params": params,
         "turns": [{"date": d.strftime("%Y-%m-%d"), "type": "peak" if s == "P" else "trough"} for d, s in turns],
-        "bands": bands, "open_phase": open_phase, "evaluation": ev,
+        "bands": bands, "open_phase": open_phase, "evaluation": ev, "realtime": frozen,
         "series": {"smoothed": {d.strftime("%Y-%m-%d"): round(float(v), 4) for d, v in smoothed.items()},
                    "realtime": {d.strftime("%Y-%m-%d"): round(float(v), 4) for d, v in rt.items()}},
     }
@@ -275,10 +332,11 @@ def fetch(ids) -> FetchResult:
         # The EMAE model (about two minutes with the real-time re-estimation) only when EMAE changes;
         # the factor cross-check (seconds) when any of its four series changes.
         h_emae, h_panel = _hash(level), _hash(panel)
-        if cached.get("inputs_emae") == h_emae:
+        if cached.get("inputs_emae") == h_emae and cached.get("version") == VERSION:
             model = cached
         else:
-            model = build(level)
+            frozen = cached.get("realtime", {}) if cached.get("version") == VERSION else {}
+            model = build(level, frozen)
             model["inputs_emae"] = h_emae
         if model.get("inputs_panel") != h_panel:
             try:

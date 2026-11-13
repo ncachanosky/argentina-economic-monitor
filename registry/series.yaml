@@ -465,8 +465,11 @@ inputs:
   - {id: 370.3_HONESTIDADDAD_0_0_10_58, source: datos_gob, frequency: M, measure: index, allow_gaps: true, label: "UTDT ICG: honesty"}
   - {id: 370.3_CAPACIDADDAD_0_0_9_83, source: datos_gob, frequency: M, measure: index, allow_gaps: true, label: "UTDT ICG: capacity to solve problems"}
   # Economic Freedom of the World (Fraser Institute), 0-10; 1970-2000 every five years.
+  # Revision tracker: first prints of GDP and EMAE growth (pipeline/sources/revisions.py).
+  - {id: "revisions:gdp_first_qq", source: revisions, frequency: Q, measure: flow, stale_days: 300, label: "GDP q/q (SA), first print"}
+  - {id: "revisions:emae_first_mm", source: revisions, frequency: M, measure: flow, stale_days: 120, label: "EMAE m/m (SA), first print"}
   # Monthly activity: the Monitor's EMAE-based recession probability (pipeline/sources/recession.py).
-  - {id: "recession:realtime", source: recession, frequency: M, measure: flow, stale_days: 120, label: "Recession probability (EMAE-based): real-time track record"}
+  - {id: "recession:realtime", source: recession, frequency: M, measure: flow, stale_days: 120, allow_gaps: true, label: "Recession probability (EMAE-based): real-time record, each release as published"}
   - {id: "recession:smoothed", source: recession, frequency: M, measure: flow, stale_days: 120, label: "Recession probability (EMAE-based): full-sample estimate"}
   # Institutions. Archbridge Institute's Social Mobility Index: hand-kept edition file (data/manual/social_mobility_<edition>.csv).
   - {id: "smi:ARG:overall", source: smi, frequency: Y, measure: flow, stale_days: 1100, label: "Social Mobility Index, Argentina: overall score"}
@@ -800,7 +803,7 @@ indicators:
     transforms: [level]
     no_presidency: true
     variants:
-      realtime: {label: "Real time (each month's reading)", id: "recession:realtime"}
+      realtime: {label: "Real time (each release as published, since 2016)", id: "recession:realtime"}
       smoothed: {label: "Full sample (today's estimate)", id: "recession:smoothed"}
     overlay: true
     default: {variant: realtime, transform: level, range: 10Y}
@@ -812,8 +815,10 @@ indicators:
       average) and one of growth, and gives the probability of being in the
       falling one. It is not the "two quarters of falling GDP" rule: a long,
       broad decline counts even if one quarter grows, and a small two-quarter
-      dip may not. Real time: each month's reading with the data available
-      then; full sample: today's estimate for every month. Because EMAE comes
+      dip may not. Real time: what the model said when each EMAE release came
+      out, estimated on that release's data as INDEC published it (August
+      2016 onwards; each reading is kept as it was); full sample: today's
+      estimate for every month. Because EMAE comes
       out about 52 days after the month and the model needs a few months of
       data, it has signaled recessions some months after they began (see
       the methodology). Shaded: recessions dated on EMAE (Bry-Boschan).
@@ -844,6 +849,35 @@ indicators:
       after the data. Releases since October 2026 are stored by the daily
       update; earlier ones come from INDEC's PDF reports (the September 2018
       report is missing).
+
+  - id: emae_revisions
+    topic: real_sector
+    kind: revisions
+    wide: true
+    title: How Much EMAE Gets Revised
+    short_title: EMAE revisions
+    description: >-
+      Monthly activity growth as first published and as it reads today,
+      for every month since mid-2016, and how one month's figure changed
+      from release to release.
+    source: table
+    source_label: "INDEC, EMAE technical reports (Cuadro 2) since August 2016, then the series as published"
+    frequency: M
+    units: "%"
+    default: {}
+    table:
+      source: revisions
+      file: emae.json
+      status_id: "revisions:emae_first_mm"
+    note: >-
+      Growth rates as INDEC published them in each release, rounded to one
+      decimal as published (so a 0.1-point revision can be rounding).
+      Revisions come from new source data, the annual benchmarking of the
+      quarterly accounts and the re-estimation of the seasonal adjustment
+      with every release, which is why seasonally adjusted rates move more
+      than year-on-year ones. The statistics leave out 2020's collapse and
+      rebound and periods with fewer than four releases.
+    method_links: [{anchor: revisions, label: "How revisions are measured"}]
 
   - id: emae_sectors
     topic: real_sector
@@ -1091,6 +1125,35 @@ indicators:
     # Yearly table: annual growth (average of the year's quarters, original
     # series), Q4/Q4 and the carryover into the next year (seasonally adjusted).
     annual_table: {accumulated: original, within_year: sa, carryover: true}
+
+  - id: gdp_revisions
+    topic: gdp
+    kind: revisions
+    wide: true
+    title: How Much GDP Gets Revised
+    short_title: GDP revisions
+    description: >-
+      Quarterly GDP growth as first published and as it reads today, for
+      every quarter since mid-2016, and how one quarter's figure changed
+      from release to release.
+    source: table
+    source_label: "INDEC, quarterly national accounts as published at each release (sh_oferta_demanda_desest and sh_oferta_demanda, Sep 2016 onwards)"
+    frequency: Q
+    units: "%"
+    default: {}
+    table:
+      source: revisions
+      file: gdp.json
+      status_id: "revisions:gdp_first_qq"
+    note: >-
+      Growth rates as INDEC published them in each release, rounded to one
+      decimal as published (so a 0.1-point revision can be rounding).
+      Revisions come from new source data, the annual benchmarking of the
+      quarterly accounts and the re-estimation of the seasonal adjustment
+      with every release, which is why seasonally adjusted rates move more
+      than year-on-year ones. The statistics leave out 2020's collapse and
+      rebound and periods with fewer than four releases.
+    method_links: [{anchor: revisions, label: "How revisions are measured"}]
 
   - id: gdp_tracker
     topic: gdp

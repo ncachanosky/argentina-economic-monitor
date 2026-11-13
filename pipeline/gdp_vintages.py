@@ -107,6 +107,7 @@ def main(folder: str, out: str) -> None:
         frames.append(sa.reset_index())
         print(v, dates.get(v), len(sa), sa.index.max().date(), "orig" if "gdp_orig" in sa else "-")
     df = pd.concat(frames, ignore_index=True)
+    df["release"] = pd.to_datetime(df["release"]).dt.strftime("%Y-%m-%d")
     df.to_csv(out, index=False, float_format="%.3f", date_format="%Y-%m-%d")
 
 

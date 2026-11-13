@@ -565,3 +565,6 @@ table.data td.ci-name, table.data td.ci-reg, table.data th.ci-l { text-align: le
   .ci-prow { grid-template-columns: minmax(0, 1fr) 44px 74px; }
   .ci-prow .ci-pbar { grid-column: 1 / -1; grid-row: 2; }
 }
+
+/* Revision tracker: four statistics under the chart. */
+.rev-stats { margin-top: 10px; }

@@ -1598,14 +1598,127 @@
   function recessionNote(R) {
     const es = LANG === "es", out = [];
     const n = (v) => Number(v).toLocaleString(LOCALE, { maximumFractionDigits: 1 });
-    if (R.median_entry !== null && R.median_entry !== undefined) out.push(es
-      ? `Historial desde 2008: la probabilidad en tiempo real superó el 50% una mediana de ${n(R.median_entry)} meses de datos después del inicio de cada recesión y bajó del 50% una mediana de ${n(R.median_exit)} meses después de su fin (sume unos dos meses por la demora de publicación del EMAE). Meses por encima del 50% fuera de una recesión fechada: ${R.false_alarms}.`
-      : `Track record since 2008: the real-time probability passed 50% a median of ${n(R.median_entry)} data months after each recession began and fell below 50% a median of ${n(R.median_exit)} months after it ended (add about two months for EMAE's release lag). Months above 50% outside a dated recession: ${R.false_alarms}.`);
+    if (R.median_entry !== null && R.median_entry !== undefined) {
+      const since = R.from ? fmtMonth(R.from) : "2016";
+      const missed = R.missed ? (es ? ` (${R.missed} sin señal)` : ` (${R.missed} missed)`) : (es ? ", ninguna sin señal" : ", none missed");
+      out.push(es
+        ? `Historial en tiempo real desde ${since}, con cada publicación del EMAE tal como salió: en ${R.recessions} recesiones${missed}, la probabilidad superó el 50% una mediana de ${n(R.median_entry)} meses de datos después del inicio y bajó del 50% una mediana de ${n(R.median_exit)} meses después del fin (sume unos dos meses por la demora de publicación). Meses por encima del 50% fuera de una recesión fechada: ${R.false_alarms}.`
+        : `Real-time record since ${since}, using each EMAE release as published: across ${R.recessions} recessions${missed}, the probability passed 50% a median of ${n(R.median_entry)} data months after each began and fell below 50% a median of ${n(R.median_exit)} months after it ended (add about two months for EMAE's release lag). Months above 50% outside a dated recession: ${R.false_alarms}.`);
+    }
     const F = R.factor_check;
     if (F) out.push(es
       ? `Control: el mismo modelo aplicado a un factor común del EMAE, la producción industrial (IPI), la construcción (ISAC) y el empleo registrado da ${Math.round(100 * F.probability)}% para ${fmtMonth(F.month)}, con datos de industria y construcción un mes más recientes que el EMAE.`
       : `Cross-check: the same model on a common factor of EMAE, industrial production (IPI), construction (ISAC) and registered employment gives ${Math.round(100 * F.probability)}% for ${fmtMonth(F.month)}, with industry and construction data a month newer than EMAE.`);
     return out.length ? h("p", { class: "chips-note no-tr" }, out.join(" ")) : null;
+  }
+
+  // ---------- card: revision tracker (GDP, EMAE): first print vs today, and one period's path ----------
+  function revisionsCard(ind) {
+    const T = ind.table;
+    const card = cardFrame(ind, true);
+    let data = null, csv = null;
+    const Q = (ind.frequency || T.frequency) === "Q";
+    const ES = LANG === "es";
+    const short = Q ? "q/q" : "m/m";
+    const state = { measure: "short", view: "first", period: null };
+    const mSeg = segmented([["short", `${short}, seasonally adjusted`], ["yy", "y/y, original"]], state.measure, (k) => { state.measure = k; mSeg.update(k); draw(); }, "Measure");
+    const vSeg = segmented([["first", "First print vs today"], ["path", "One period's revisions"]], state.view, (k) => { state.view = k; vSeg.update(k); draw(); }, "View");
+    const pSel = h("select", { class: "select", "aria-label": Q ? "Quarter" : "Month" });
+    pSel.addEventListener("change", () => { state.period = pSel.value; draw(); });
+    const pPick = h("label", { class: "base-pick" }, h("span", {}, Q ? "Quarter:" : "Month:"), pSel);
+    const chartEl = h("div", { class: "chart tall-ish", role: "img", "aria-label": "Revisions" });
+    const hint = h("p", { class: "hint" });
+    const statsEl = h("div", { class: "rer-grid rev-stats" });
+    const per = (iso) => (Q ? fmtPeriod(iso, "Q") : fmtShortMonth(iso));
+    const pct = (v, d = 1) => (v === null || v === undefined ? "–" : `${v > 0 ? "+" : v < 0 ? "−" : ""}${fx(Math.abs(v), d)}%`);
+    const pp = (v) => (v === null || v === undefined ? "–" : `${v > 0 ? "+" : v < 0 ? "−" : ""}${fx(Math.abs(v), 2)} pp`);
+    const M = () => data.measures[state.measure];
+    const lab = () => (ES ? (state.measure === "short" ? `Crecimiento ${Q ? "t/t" : "m/m"}, desestacionalizado` : "Crecimiento interanual, serie original")
+      : (state.measure === "short" ? `${short} growth, seasonally adjusted` : "y/y growth, original series"));
+
+    function statsTiles() {
+      const S = M().stats;
+      const tile = (k, v, s) => h("div", { class: "rer-tile" }, h("div", { class: "rer-k" }, k), h("div", { class: "rer-v" }, v), h("div", { class: "rer-s" }, s));
+      const span = ES ? `${per(S.from)} a ${per(S.to)}, ${S.n} ${Q ? "trimestres" : "meses"}` : `${per(S.from)} to ${per(S.to)}, ${S.n} ${Q ? "quarters" : "months"}`;
+      statsEl.replaceChildren(
+        tile("Average size of the revision", `${fx(S.mean_abs, 2)} pp`, ES ? `De la primera estimación a hoy, en valor absoluto (${span})` : `First print to today, in absolute value (${span})`),
+        tile("Average direction", pp(S.mean), S.mean > 0.05 ? "First prints have tended to understate growth" : S.mean < -0.05 ? "First prints have tended to overstate growth" : "No clear direction"),
+        tile("Changed sign", ES ? `${S.sign_changes} de ${S.n}` : `${S.sign_changes} of ${S.n}`, "First print and today's figure on opposite sides of zero"),
+        tile("Largest revision", `${fx(S.max_abs, 1)} pp`, "In absolute value"));
+    }
+
+    function drawFirst() {
+      const rows = M().rows.filter((r) => r.latest !== null);
+      const x = rows.map((r) => r.period);
+      const c0 = cssVar(SERIES_VARS[0]), ink3 = cssVar("--ink-3");
+      // One thin segment per period from first print to today's figure.
+      const sx = [], sy = [];
+      rows.forEach((r) => { sx.push(r.period, r.period, null); sy.push(r.first, r.latest, null); });
+      const traces = [
+        { type: "scatter", mode: "lines", x: sx, y: sy, line: { color: ink3, width: 1 }, hoverinfo: "skip", showlegend: false, _light: "#85909A" },
+        { type: "scatter", mode: "markers", name: "First print", x, y: rows.map((r) => r.first), marker: { size: 7, color: "rgba(0,0,0,0)", line: { color: c0, width: 1.6 } }, _slot: 0,
+          customdata: rows.map((r) => [r.first_release]), hovertemplate: ES ? "Primera estimación: <b>%{y:.1f}%</b><extra></extra>" : "First print: <b>%{y:.1f}%</b><extra></extra>" },
+        { type: "scatter", mode: "markers", name: "Today", x, y: rows.map((r) => r.latest), marker: { size: 7, color: c0 }, _slot: 0,
+          customdata: rows.map((r) => [(r.latest - r.first).toFixed(1), r.releases]),
+          hovertemplate: ES ? "Hoy: <b>%{y:.1f}%</b> (revisado %{customdata[0]} pp en %{customdata[1]} publicaciones)<extra></extra>"
+            : "Today: <b>%{y:.1f}%</b> (revised %{customdata[0]} pp over %{customdata[1]} releases)<extra></extra>" },
+      ];
+      // Scale: without the 2020 collapse and rebound, which would flatten every other period (zoom out to see them).
+      const vals = rows.filter((r) => !/^2020-0[3-9]/.test(r.period)).flatMap((r) => [r.first, r.latest]);
+      const lo = Math.min(...vals), hi = Math.max(...vals), pad = 0.12 * (hi - lo);
+      Plotly.react(chartEl, traces, baseLayout({
+        xaxis: { hoverformat: "%b %Y" }, yaxis: { range: [lo - pad, hi + pad], ticksuffix: "%", zeroline: true },
+        extra: { showlegend: true, legend: { orientation: "h", x: 0, y: 1.02, yanchor: "bottom", font: { color: cssVar("--ink") } },
+          hovermode: "x unified", margin: { l: 52, r: 16, t: 40, b: 36 } },
+      }), PLOT_CONFIG);
+      hint.textContent = ES ? `${lab()}: los puntos vacíos son la primera cifra publicada; los llenos, la de hoy. La línea entre ambos es la revisión total. 2020 queda fuera de escala; haga doble clic en el gráfico para verlo.`
+        : `${lab()}: hollow dots are the first published figure, solid dots today's. The line between them is the total revision. 2020 is off the scale; double-click the chart to see it.`;
+      csv = { header: ["period", "first_print", "first_release", "today", "revision_pp", "releases"],
+        rows: rows.map((r) => [r.period, r.first, r.first_release, r.latest, +(r.latest - r.first).toFixed(1), r.releases]) };
+    }
+
+    function drawPath() {
+      const P = M().paths, keys = Object.keys(P).sort();
+      if (!state.period || !P[state.period]) {
+        // Default: the latest period with at least four releases.
+        state.period = keys.filter((k) => P[k].length >= 4).pop() || keys[keys.length - 1];
+      }
+      pSel.replaceChildren(...keys.slice().reverse().map((k) => h("option", { value: k }, per(k))));
+      pSel.value = state.period;
+      const path = P[state.period];
+      const tr = [{ type: "scatter", mode: "lines+markers", name: per(state.period), x: path.map((p) => p[0].length === 7 ? `${p[0]}-15` : p[0]), y: path.map((p) => p[1]),
+        line: { color: cssVar(SERIES_VARS[0]), width: 2, shape: "hv" }, marker: { size: 6, color: cssVar(SERIES_VARS[0]) }, _slot: 0,
+        hovertemplate: ES ? `Publicación del %{x|%d %b %Y}: <b>%{y:.1f}%</b><extra></extra>` : `Release of %{x|%d %b %Y}: <b>%{y:.1f}%</b><extra></extra>` }];
+      Plotly.react(chartEl, tr, baseLayout({
+        xaxis: { hoverformat: "%d %b %Y" }, yaxis: { ticksuffix: "%", zeroline: true },
+        extra: { showlegend: false, hovermode: "closest", margin: { l: 52, r: 16, t: 16, b: 36 } },
+      }), PLOT_CONFIG);
+      const first = path[0][1], last = path[path.length - 1][1];
+      hint.textContent = ES ? `${lab()} de ${per(state.period)}, tal como se publicó en cada difusión: primero ${pct(first)}, hoy ${pct(last)} (${pp(+(last - first).toFixed(2))} en ${path.length} publicaciones).`
+        : `${lab()} for ${per(state.period)}, as published in each release: first ${pct(first)}, now ${pct(last)} (${pp(+(last - first).toFixed(2))} over ${path.length} releases).`;
+      csv = { header: ["period", "release", "value"], rows: path.map((p) => [state.period, p[0], p[1]]) };
+    }
+
+    function draw() {
+      if (!data) return;
+      pPick.style.display = state.view === "path" ? "" : "none";
+      statsTiles();
+      if (state.view === "first") drawFirst(); else drawPath();
+    }
+    const onCSV = () => { if (csv) downloadBlob(toCSV(csv.header, csv.rows), `${ind.id}_${state.measure}_${state.view}.csv`, "text/csv"); };
+    appendAll(card, h("div", { class: "controls" }, vSeg, mSeg, pPick), hint, chartEl, statsEl,
+      ind.note ? h("p", { class: "chips-note" }, ind.note) : null, methodLine(ind),
+      h("div", { class: "card-foot" },
+        h("span", {}, "Source: ", ind.source_label, ` · ${ES ? "Último período" : "Latest period"}: ${ind.last_obs ? per(ind.last_obs) : "–"}`, ...srcTail(ind)),
+        h("div", { class: "actions" }, h("button", { class: "btn", type: "button", onclick: onCSV, title: "Download the data in this view as CSV" }, "CSV"),
+          h("a", { class: "btn", href: `${DATA}${T.path}${T.file}`, download: `${ind.id}_all.json`, title: "Every release, first prints and revision paths (JSON)" }, "All data"))));
+    card.draw = async () => {
+      if (!data) {
+        try { data = await getJSON(`${DATA}${T.path}${T.file}`); } catch (e) { console.error(e); chartEl.replaceChildren(h("div", { class: "error-box" }, "The revisions could not be loaded.")); return; }
+      }
+      draw();
+    };
+    return card;
   }
 
   // ---------- card: a cross-country index, one edition (Archbridge's Social Mobility Index) ----------
@@ -3897,6 +4010,7 @@
         : ind.kind === "turns" ? turnsCard(ind)
         : ind.kind === "ngdp" ? ngdpCard(ind)
         : ind.kind === "country_index" ? countryIndexCard(ind)
+        : ind.kind === "revisions" ? revisionsCard(ind)
         : variantsCard(ind, !ind.half);
   }
 

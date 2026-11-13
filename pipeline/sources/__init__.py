@@ -75,6 +75,10 @@ def get_adapter(name: str):
         from . import a3
 
         return a3
+    if name == "revisions":
+        from . import revisions
+
+        return revisions
     if name == "recession":
         from . import recession
 

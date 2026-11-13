@@ -45,3 +45,11 @@ def test_evaluate_counts_lags_and_false_alarms():
     ev = recession.evaluate(rt, turns)
     assert ev["entry"][0]["months"] == 3 and ev["exit"][0]["months"] == 3
     assert ev["false_alarm_months"] == ["2012-06"]
+
+
+def test_evaluate_marks_a_missed_recession():
+    idx = pd.date_range("2010-01-01", periods=48, freq="MS")
+    rt = pd.Series(0.1, index=idx)
+    turns = [(pd.Timestamp("2011-01-01"), "P"), (pd.Timestamp("2011-09-01"), "T")]
+    ev = recession.evaluate(rt, turns)
+    assert ev["entry"][0]["months"] is None and ev["missed"] == 1

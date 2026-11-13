@@ -381,6 +381,7 @@ def recession_extras(ind) -> dict:
     return {"bands": bands or None, "recession": {
         "median_entry": ev.get("median_entry"), "median_exit": ev.get("median_exit"),
         "false_alarms": len(ev.get("false_alarm_months", [])), "open_phase": m.get("open_phase"),
+        "from": ev.get("from"), "missed": ev.get("missed", 0), "recessions": len(ev.get("entry", [])),
         "factor_check": m.get("factor_check"), "params": m.get("params")}}
 
 
