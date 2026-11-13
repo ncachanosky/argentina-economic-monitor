@@ -102,6 +102,8 @@ section becomes its notes.
   economies, any country addable); the choice applies to every card. A snapshot table at the top;
   each card also ranks the group for a chosen year. New sources: IMF SDMX API, World Bank API;
   the EFW, V-Dem and SMI adapters also write all-country tables.
+- International: general government revenue, expenditure and balance share one card with a switch;
+  the view, range, year and added countries carry over between them.
 - Institutions: the Latin American Left-Leaning Populism Index (Cachanosky, Bastos and Padilla,
   V2025.1), 22 countries, 2000-2019. Three views: over time (any measure, Argentina and chosen
   countries, regional median), a map of the region by year with a year slider and Play, and a

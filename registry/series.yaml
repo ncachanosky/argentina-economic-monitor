@@ -7647,6 +7647,7 @@ indicators:
     wide: true
     title: "General Government Revenue"
     short_title: "Government revenue"
+    switch: {group: intl_fiscal, label: "Revenue"}
     heading: "The public sector"
     description: >-
       General government revenue, % of GDP, with the IMF's projections.
@@ -7670,6 +7671,7 @@ indicators:
     wide: true
     title: "General Government Expenditure"
     short_title: "Government expenditure"
+    switch: {group: intl_fiscal, label: "Expenditure"}
     description: >-
       General government total expenditure, % of GDP, with the IMF's projections.
     source: table
@@ -7690,6 +7692,7 @@ indicators:
     wide: true
     title: "General Government Balance"
     short_title: "Government balance"
+    switch: {group: intl_fiscal, label: "Balance"}
     description: >-
       General government net lending (+) or borrowing (−), revenue less expenditure, % of GDP, with the IMF's projections.
     source: table

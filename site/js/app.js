@@ -2280,6 +2280,14 @@
       }
     }
     INTL.listeners.add(() => draw());
+    // Switch groups (revenue / expenditure / balance): view, range, year and added countries carry over.
+    card.getView = () => ({ view: state.view, from: state.from, year: state.year, picks: state.picks ? [...state.picks] : null, pickGroup: state.pickGroup });
+    card.setView = (v) => {
+      if (v.view) { state.view = v.view; vSeg.update(v.view); }
+      state.from = v.from; rSeg.update(v.from ? "2000" : "max");
+      if (v.year) state.year = v.year;
+      if (v.picks) { state.picks = new Set(v.picks); state.pickGroup = v.pickGroup; }
+    };
     const onCSV = () => { if (csv) downloadBlob(toCSV(csv.header, csv.rows), `${csv.name}.csv`, "text/csv"); };
     appendAll(card, h("div", { class: "controls" }, vSeg, gPick, yPick, h("span", { class: "spacer" }), rSeg), hint, chartEl, h("div", { class: "controls" }, chips, addSel),
       ind.note ? h("p", { class: "chips-note" }, ind.note) : null, methodLine(ind),

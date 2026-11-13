@@ -424,5 +424,8 @@
  "Real GDP growth": "Crecimiento del PIB real",
  "Unemployment rate": "Tasa de desocupación",
  "Inflation": "Inflación",
- "Investment": "Inversión"
+ "Investment": "Inversión",
+ "Revenue": "Ingresos",
+ "Expenditure": "Gasto",
+ "Balance": "Resultado"
 }
