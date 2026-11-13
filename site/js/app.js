@@ -1745,6 +1745,50 @@
     return card;
   }
 
+  // The economy under each presidency: rows of measures, one column per term. No colors, no ranks.
+  function scorecardCard(ind) {
+    const T = ind.scorecard;
+    const card = cardFrame(ind, true);
+    const ES = LANG === "es";
+    const num = (v, d, signed) => {
+      if (v === null || v === undefined) return "–";
+      const s = Math.abs(v).toLocaleString(LOCALE, { minimumFractionDigits: d, maximumFractionDigits: d });
+      return (v < 0 ? "−" : signed && v > 0 ? "+" : "") + s;
+    };
+    const yr = (iso) => (iso ? iso.slice(0, 4) : "");
+    const fmtDate = (iso) => new Date(iso + "T00:00:00Z").toLocaleDateString(LOCALE, { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" });
+    const per = (iso) => (iso.length === 4 ? iso : iso.length >= 10 && iso.slice(8, 10) !== "01" ? fmtDate(iso) : fmtShortMonth(iso));
+    const text = (r, c) => {
+      if (!c) return "–";
+      const mark = (c.partial ? "*" : "") + (c.annual ? "†" : "");
+      if (r.measure === "se") return `${num(c.start, r.decimals)} → ${num(c.end, r.decimals)}${mark}`;
+      const signed = r.measure === "diff" || r.measure === "cum" || (r.measure === "ann" && r.key === "gdp_pc");
+      return `${num(c.value, r.decimals, signed)}${r.unit}${mark}`;
+    };
+    const head = h("tr", {}, h("th", { class: "sc-label" }, ""),
+      T.terms.map((p) => h("th", {}, h("div", { class: "sc-name" }, p.short),
+        h("div", { class: "sc-years" }, `${yr(p.start)}–${p.end ? yr(p.end) : (ES ? "hoy" : "today")}`))));
+    const body = [];
+    const csvRows = [];
+    let sec = null;
+    T.rows.forEach((r) => {
+      if (r.section !== sec) { sec = r.section; body.push(h("tr", { class: "sc-sec" }, h("td", { colspan: T.terms.length + 1 }, tr(sec)))); }
+      body.push(h("tr", {},
+        h("td", { class: "sc-label" }, h("a", { href: `${ROOT}${r.slug}/#ind-${r.card}` }, tr(r.label))),
+        r.cells.map((c) => h("td", { title: c ? `${per(c.from)} → ${per(c.to)}` : null, class: c ? null : "sc-na" }, text(r, c)))));
+      csvRows.push([r.label, ...r.cells.map((c) => (c ? (r.measure === "se" ? `${c.start} -> ${c.end}` : c.value) + (c.partial ? "*" : "") + (c.annual ? "†" : "") : ""))]);
+    });
+    const onCSV = () => downloadBlob(toCSV(["Measure", ...T.terms.map((p) => p.short)], csvRows), `${ind.id}.csv`, "text/csv");
+    appendAll(card,
+      h("div", { class: "sc-wrap" }, h("table", { class: "sc-table" }, h("thead", {}, head), h("tbody", {}, body))),
+      ind.note ? h("p", { class: "chips-note" }, ind.note) : null, methodLine(ind),
+      h("div", { class: "card-foot" },
+        h("span", {}, "Source: ", ind.source_label, ` · Latest: ${T.latest ? fmtDate(T.latest) : "–"}`),
+        h("div", { class: "actions" }, h("button", { class: "btn", type: "button", onclick: onCSV, title: "Download the table as CSV" }, "CSV"))));
+    card.draw = () => {};
+    return card;
+  }
+
   function revisionsCard(ind) {
     const T = ind.table;
     const card = cardFrame(ind, true);
@@ -4372,6 +4416,7 @@
         : ind.kind === "country_index" ? countryIndexCard(ind)
         : ind.kind === "revisions" ? revisionsCard(ind)
         : ind.kind === "year_month" ? yearMonthCard(ind)
+        : ind.kind === "scorecard" ? scorecardCard(ind)
         : ind.kind === "maddison" ? maddisonCard(ind)
         : variantsCard(ind, !ind.half);
   }

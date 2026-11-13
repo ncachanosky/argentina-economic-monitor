@@ -7196,6 +7196,39 @@ indicators:
       and the release's last population growth (dotted).
     method_links: [{anchor: maddison, label: "About the long-run data"}]
 
+  - id: lr_presidencies
+    topic: long_run
+    wide: true
+    kind: scorecard
+    title: The Economy under Each Presidency
+    short_title: By presidency
+    description: >-
+      The same measures for every presidency since December 1983, each from the
+      month before the term to its last month. Facts, not grades: no score,
+      ranking or colors.
+    source: scorecard
+    source_label: "The Monitor's cards (INDEC, BCRA, Ministry of Economy, Maddison Project, Fraser Institute, V-Dem and others; see each row)"
+    frequency: M
+    units: various
+    table: {source: scorecard}
+    note: >-
+      Terms follow the convention of every card on the site: the month of the
+      handover belongs to the outgoing president, and a term starts in the first
+      full month after inauguration, measured from the month before. So December
+      2023 (25.5% inflation, including the devaluation of 13 December) counts
+      under Alberto Fernández, whose term ended on 10 December, and July 1989 (the
+      hyperinflation's peak) under Raúl Alfonsín, who handed over on 8 July. Quarterly
+      and semiannual data follow the same rule; daily data start on inauguration day;
+      a year of annual data belongs to the president in office on 1 July. Inflation
+      uses the CPI corrected for the INDEC intervention (2007-2015); real wages and
+      the minimum wage are deflated by it. GDP per capita: INDEC's quarterly GDP
+      (four-quarter sums, so seasonality cancels) less population growth, from 1993;
+      before, the Maddison Project's annual figures (†). Poverty leaves out INDEC's
+      rates from 2007 to the first half of 2016, which are not comparable. * The series
+      starts after the term began (measured from its first value); blank: no data, or
+      data for less than half the term. Milei: to the latest data.
+    method_links: [{anchor: presidency-table, label: "How terms are dated"}]
+    default: {transform: level}
   - id: trade_long
     topic: long_run
     wide: true

@@ -10,8 +10,8 @@ ROOT = Path(__file__).resolve().parents[1]
 REGISTRY_PATH = ROOT / "registry" / "series.yaml"
 RELEASES_PATH = ROOT / "registry" / "releases.yaml"
 
-KINDS = {"ngdp", "turns", "variants", "panel", "contributions", "balance_sheet", "top10", "schedule", "placements", "curve", "statement", "rer_calc", "tenure", "rem_revisions", "country_index", "revisions", "maddison", "year_month"}
-TABLE_KINDS = {"balance_sheet", "top10", "schedule", "placements", "curve", "tenure", "rem_revisions", "turns", "ngdp", "country_index", "revisions", "maddison"}   # cards that read a full table (data/tables/<source>), no series
+KINDS = {"ngdp", "turns", "variants", "panel", "contributions", "balance_sheet", "top10", "schedule", "placements", "curve", "statement", "rer_calc", "tenure", "rem_revisions", "country_index", "revisions", "maddison", "year_month", "scorecard"}
+TABLE_KINDS = {"balance_sheet", "top10", "schedule", "placements", "curve", "tenure", "rem_revisions", "turns", "ngdp", "country_index", "revisions", "maddison", "scorecard"}   # cards that read a full table (data/tables/<source>), no series
 DERIVE_METHODS = {"splice", "reweight", "ratio", "tracker", "monthly", "flows", "expectations", "formula", "net_reserves"}
 RANGE_KEYS = {"2Y", "5Y", "10Y", "25Y", "50Y", "Max"}
 

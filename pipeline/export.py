@@ -436,6 +436,28 @@ def export_table(ind, out: Path, status: dict, reg_meta: dict | None = None) -> 
             "status": payload["status"], "last_obs": last, "headline": False}
 
 
+def export_scorecard(ind, out: Path, reg, status: dict) -> dict | None:
+    """The economy under each presidency (pipeline/scorecard.py), from the cards just exported."""
+    from . import scorecard
+    try:
+        table = scorecard.build(out, reg.presidencies)
+        slugs = {tp["id"]: tp.get("slug", tp["id"]) for tp in reg.topics}
+        for r in table["rows"]:
+            r["slug"] = slugs.get(r["topic"], r["topic"])
+    except Exception as exc:
+        print(f"skip {ind.id}: {exc}")
+        return None
+    payload = {
+        "id": ind.id, "topic": ind.topic, "kind": ind.kind, "title": ind.title, "short_title": ind.short_title,
+        "description": ind.description, "note": ind.note, "source_label": ind.source_label, "wide": True,
+        "frequency": ind.frequency, "units": ind.units, "method_links": ind.method_links,
+        "status": "ok", "last_obs": table["latest"], "scorecard": table,
+    }
+    (out / f"{ind.id}.json").write_text(json.dumps(payload, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
+    return {"id": ind.id, "topic": ind.topic, "kind": ind.kind, "title": ind.title, "short_title": ind.short_title,
+            "status": "ok", "last_obs": table["latest"], "headline": False}
+
+
 def country_summary(index: dict, iso: str = "ARG") -> dict | None:
     """Argentina's overall score and ranks in a cross-country index, for the page's tile."""
     c = next((x for x in index.get("countries", []) if x["iso"] == iso), None)
@@ -502,8 +524,12 @@ def export(out: Path) -> None:
     (out / "vintages").mkdir(exist_ok=True)
 
     manifest_inds = []
+    deferred = []
     for ind in reg.indicators:
         if ind.hidden:
+            continue
+        if ind.kind == "scorecard":        # built from the other cards' exported data, after them
+            deferred.append((len(manifest_inds), ind))
             continue
         if ind.kind in registry.TABLE_KINDS:
             entry = export_turns(ind, out) if ind.kind == "turns" else export_ngdp(ind, out) if ind.kind == "ngdp" else export_table(ind, out, status, meta)
@@ -649,6 +675,11 @@ def export(out: Path) -> None:
             "headline": bool(ind.headline),
             **({"also_on": ind.display["also_on"]} if ind.display and ind.display.get("also_on") else {}),
         })
+
+    for pos, ind in reversed(deferred):
+        entry = export_scorecard(ind, out, reg, status)
+        if entry:
+            manifest_inds.insert(pos, entry)
 
     # Each card's description, for the site search (site/js/app.js, setupSearch).
     desc = {ind.id: " ".join((ind.description or "").split()) for ind in reg.indicators}

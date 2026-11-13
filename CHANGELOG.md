@@ -82,6 +82,12 @@ section becomes its notes.
   inflation for headline, core, regulated and seasonal prices, shaded on a log scale, with each year's
   December-to-December (year to date for the current year) and average-over-average inflation.
   CSV of the view. New card kind `year_month`.
+- Long Run: The Economy under Each Presidency, a table of sixteen measures (inflation, GDP per
+  capita, real wages and the minimum wage, unemployment, poverty, the real exchange rate, the
+  exchange-rate gap, reserves, country risk, the primary balance, economic freedom, V-Dem) for
+  each term since December 1983, from the cards' own data and the site's term convention (the
+  handover month belongs to the outgoing president, explained in the card's note). No score,
+  ranking or colors. Each row links to its card. Methodology: "The economy under each presidency".
 
 ## 1.2.0 (2026-11-12)
 
