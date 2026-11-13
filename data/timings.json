@@ -1,32 +1,32 @@
 [
  {
   "source": "bcra (D)",
-  "seconds": 74.1,
+  "seconds": 75.3,
   "series": 46
  },
  {
-  "source": "datos_gob (M)",
-  "seconds": 31.0,
-  "series": 146
- },
- {
   "source": "x13 (M)",
-  "seconds": 29.0,
+  "seconds": 36.2,
   "series": 16
  },
  {
+  "source": "datos_gob (M)",
+  "seconds": 31.5,
+  "series": 146
+ },
+ {
   "source": "finanzas (M)",
-  "seconds": 24.0,
+  "seconds": 29.7,
   "series": 39
  },
  {
   "source": "bcra_entities (M)",
-  "seconds": 21.4,
+  "seconds": 26.3,
   "series": 32
  },
  {
   "source": "ustreasury (D)",
-  "seconds": 20.5,
+  "seconds": 18.2,
   "series": 1
  },
  {
@@ -36,33 +36,28 @@
  },
  {
   "source": "bcra_fx (D)",
-  "seconds": 7.8,
+  "seconds": 9.5,
   "series": 1
  },
  {
   "source": "itcrm (D)",
-  "seconds": 5.5,
+  "seconds": 6.9,
   "series": 5
  },
  {
-  "source": "datos_gob (Y)",
-  "seconds": 2.9,
-  "series": 2
- },
- {
   "source": "bcra_banks (M)",
-  "seconds": 2.4,
+  "seconds": 3.8,
   "series": 67
  },
  {
   "source": "efw (Y)",
-  "seconds": 2.4,
+  "seconds": 3.1,
   "series": 22
  },
  {
-  "source": "dolar (D)",
-  "seconds": 1.8,
-  "series": 5
+  "source": "datos_gob (Y)",
+  "seconds": 2.2,
+  "series": 2
  },
  {
   "source": "rem (M)",
@@ -71,18 +66,23 @@
  },
  {
   "source": "riesgo (D)",
-  "seconds": 1.4,
+  "seconds": 1.2,
   "series": 11
  },
  {
-  "source": "bcra_cambiario (M)",
-  "seconds": 1.1,
-  "series": 14
+  "source": "dolar (D)",
+  "seconds": 1.2,
+  "series": 5
  },
  {
   "source": "bcra_weekly (D)",
   "seconds": 1.1,
   "series": 6
+ },
+ {
+  "source": "bcra_cambiario (M)",
+  "seconds": 1.0,
+  "series": 14
  },
  {
   "source": "bcra_balance (M)",
@@ -91,17 +91,27 @@
  },
  {
   "source": "vdem (Y)",
-  "seconds": 0.9,
+  "seconds": 0.6,
   "series": 62
  },
  {
-  "source": "a3 (D)",
+  "source": "maddison (Y)",
   "seconds": 0.5,
-  "series": 3
+  "series": 1
  },
  {
   "source": "bcra (M)",
   "seconds": 0.5,
+  "series": 1
+ },
+ {
+  "source": "a3 (D)",
+  "seconds": 0.4,
+  "series": 3
+ },
+ {
+  "source": "revisions (M)",
+  "seconds": 0.4,
   "series": 1
  },
  {
@@ -110,12 +120,7 @@
   "series": 2
  },
  {
-  "source": "maddison (Y)",
-  "seconds": 0.4,
-  "series": 1
- },
- {
-  "source": "revisions (M)",
+  "source": "revisions (Q)",
   "seconds": 0.3,
   "series": 1
  },
@@ -123,11 +128,6 @@
   "source": "officials (Y)",
   "seconds": 0.2,
   "series": 2
- },
- {
-  "source": "revisions (Q)",
-  "seconds": 0.2,
-  "series": 1
  },
  {
   "source": "aif (M)",
