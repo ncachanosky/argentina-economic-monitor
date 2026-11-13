@@ -614,3 +614,6 @@ table.data td.ci-name, table.data td.ci-reg, table.data th.ci-l { text-align: le
 .lr-bench .sc-label { min-width: 110px; max-width: 150px; }
 .lr-bench th, .lr-bench td { padding: 5px 4px; }
 .lr-bench thead th { vertical-align: bottom; }
+
+/* Statement, year by year: the latest twelve months set apart */
+table.statement th.st-cur, table.statement td.st-cur { border-left: 2px solid var(--ink-3); background: color-mix(in srgb, var(--ink-3) 8%, transparent); }

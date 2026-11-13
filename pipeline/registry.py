@@ -38,6 +38,8 @@ class Variant:
 #   line_styles   overlay lines {variant: {slot, dash}}: shared colors, dashed pairs
 #   switch        {group, label, section}: cards of one group share a card with a switch between them
 #                 (a dropdown, grouped by section, when the group has more than four cards)
+#   year_table    statement cards: a Year by year view; {gdp_ratio: {card, variant, row}} gives GDP over 12
+#                 months as sum12(row) / (that card's ratio of row to GDP / 100)
 #   term_toggle   term_colored cards: presidency colors off by default, with a button to turn them on
 #   break_gaps    annual cards: break lines at missing years instead of joining across them
 #   y_tickformat  Plotly tick format for the left axis (e.g. ".1f")
@@ -45,7 +47,7 @@ class Variant:
 #                 its home page, links, search and feeds stay with `topic`
 #   data_table    the "Show data table" view: {order: asc, year_marks: true, columns: [mom, ytd, yoy]}
 #                 (columns: a fixed table of these rates of the default line, whatever the chart shows)
-DISPLAY_KEYS = ("half", "tiles", "line_styles", "switch", "y_tickformat", "pres_view", "inflation_ref", "no_presidency", "data_table", "also_on", "break_gaps", "term_toggle")
+DISPLAY_KEYS = ("half", "tiles", "line_styles", "switch", "y_tickformat", "pres_view", "inflation_ref", "no_presidency", "data_table", "also_on", "break_gaps", "term_toggle", "year_table")
 
 
 @dataclass

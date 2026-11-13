@@ -2522,7 +2522,11 @@
     // Quarterly statements (balance of payments) or monthly ones (the budget).
     const MQ = ind.frequency === "M", N = MQ ? 12 : 4;
     const qLabel = (i) => fmtPeriod(D[i], MQ ? "M" : "Q");
-    const state = { mode: S.stock ? "stock" : "q", end: last };
+    const state = { mode: S.stock ? "stock" : "q", end: last, years: false, yunits: "gdp" };
+    // Year by year (year_table): calendar years and the latest twelve months, as % of GDP, real change or pesos.
+    // GDP over twelve months comes from another card's revenue ratio: sum12(row) / (ratio / 100).
+    const YT = ind.year_table || null;
+    let gdpRatio = null;
     const fmt = (v) => (v === null || v === undefined || Number.isNaN(v) ? "–" : (v < 0 ? "−" : "") + Math.abs(Math.round(v)).toLocaleString(LOCALE));
     const fmtP = (v) => (v === null || v === undefined || Number.isNaN(v) ? "–" : (v > 0 ? "+" : v < 0 ? "−" : "") + fx(Math.abs(v), 1) + "%");
     const fmtD = (v) => (v === null || v === undefined || Number.isNaN(v) ? "–" : (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(Math.round(v)).toLocaleString(LOCALE));
@@ -2544,6 +2548,9 @@
       const ok = endChoices(); if (!ok.includes(state.end)) state.end = ok[ok.length - 1];
       fillSel(); draw();
     }, "Period");
+    const ySeg = YT ? segmented([["periods", "Month by month"], ["years", "Year by year"]], "periods", (k) => { state.years = k === "years"; ySeg.update(k); draw(); }, "View") : null;
+    if (ySeg) ySeg.classList.add("card-switch");
+    const yuSeg = YT ? segmented([["gdp", "% of GDP"], ["real", "Real change, %"], ["ars", "Millions of pesos"]], state.yunits, (k) => { state.yunits = k; yuSeg.update(k); draw(); }, "Units") : null;
     const sel = h("select", { "aria-label": "Period" });
     sel.addEventListener("change", () => { state.end = Number(sel.value); draw(); });
     function fillSel() {
@@ -2572,9 +2579,32 @@
       draw();
     } }, "Collapse all");
     function draw() {
-      const [i0, i1, lab] = state.mode === "pres" ? [last, last, ""] : period(state.end);
+      const Y = YT && state.years;
+      for (const el of [modeSeg, endWrap]) if (el) el.style.display = Y ? "none" : "";
+      if (yuSeg) yuSeg.style.display = Y ? "" : "none";
+      if (Y && !gdpRatio && state.yunits === "gdp") {
+        getJSON(`${DATA}${YT.gdp_ratio.card}.json`).then((c) => { const m = new Map(c.dates.map((d, i) => [d, c.variants[YT.gdp_ratio.variant].values[i]])); gdpRatio = D.map((d) => m.get(d) ?? null); draw(); })
+          .catch((e) => { console.error(e); gdpRatio = D.map(() => null); draw(); });
+        return;
+      }
+      const [i0, i1, lab] = state.mode === "pres" || Y ? [last, last, ""] : period(state.end);
       let cols;   // [{label, get(key)}]
-      if (state.mode === "pres") {
+      if (Y) {
+        const DF = ind.deflator ? ind.deflator.values : null;
+        const s12 = (k, e) => sum(k, e - 11, e);
+        const r12 = (k, e) => { if (!DF || e < 11) return null; let s = 0; for (let i = e - 11; i <= e; i++) { const v = V(k)[i]; if (v === null || v === undefined || !DF[i]) return null; s += v / DF[i]; } return s; };
+        const gdp = (e) => { const a = s12(YT.gdp_ratio.row, e), r = gdpRatio ? gdpRatio[e] : null; return a !== null && r ? a / (r / 100) : null; };
+        const ends = D.map((d, i) => i).filter((i) => i >= 11 && i <= last && quarterNo(i) === 12);
+        if (quarterNo(last) !== 12) ends.push(last);
+        const latestLab = LANG === "es" ? `12 meses a ${qLabel(last)}` : `12 months to ${qLabel(last)}`;
+        cols = ends.map((e) => ({
+          label: quarterNo(e) === 12 ? D[e].slice(0, 4) : latestLab, cur: quarterNo(e) !== 12,
+          pct: state.yunits === "real", gdp: state.yunits === "gdp",
+          get: state.yunits === "gdp" ? (k) => { const a = s12(k, e), g = gdp(e); return a !== null && g ? 100 * a / g : null; }
+            : state.yunits === "real" ? (k) => { const a = r12(k, e), b = r12(k, e - 12); return a !== null && b !== null && a > 0 && b > 0 ? (a / b - 1) * 100 : null; }
+            : (k) => s12(k, e),
+        }));
+      } else if (state.mode === "pres") {
         // Real twelve-month totals, in pesos of the latest CPI month: the last twelve months of each term (to the
         // latest month for the sitting president) against the twelve months before the term began.
         const DF = ind.deflator.values, L = ind.deflator.latest_value;
@@ -2624,22 +2654,27 @@
           : h("span", {}, h("span", { class: "st-caret", "aria-hidden": "true" }), name);
         const cls = [r.bold ? "st-bold" : "", r.rule ? "rule" : ""].join(" ").trim();
         return h("tr", { class: cls || null },
-          h("td", { class: "pres", style: `padding-left:${10 + 18 * (r.indent || 0)}px` }, label),
-          ...cols.map((c) => { const v = c.get(r.key); return h("td", { class: c.delta || c.pct ? "st-delta" : null }, c.pct ? fmtP(v) : c.delta ? fmtD(v) : fmt(v)); }));
+          h("td", { class: "pres", style: `padding-left:${10 + 18 * (r.indent || 0)}px${Y ? ";min-width:240px" : ""}` }, label),
+          ...cols.map((c) => { const v = c.get(r.key); return h("td", { class: [c.delta || c.pct ? "st-delta" : "", c.cur ? "st-cur" : ""].join(" ").trim() || null },
+            c.gdp ? (v === null || v === undefined || Number.isNaN(v) ? "–" : (v < 0 ? "−" : "") + fx(Math.abs(v), 1)) : c.pct ? fmtP(v) : c.delta ? fmtD(v) : fmt(v)); }));
       });
       tableEl.replaceChildren(h("table", { class: "data statement" },
-        h("thead", {}, h("tr", {}, h("th", {}, ind.units), ...cols.map((c) => h("th", {}, c.label)))), h("tbody", {}, rows.filter(Boolean))));
+        h("thead", {}, h("tr", {}, h("th", {}, Y ? (state.yunits === "gdp" ? (LANG === "es" ? "% del PIB" : "% of GDP") : state.yunits === "real" ? (LANG === "es" ? "Variación real, % (año contra año anterior)" : "Real change, % (year on previous year)") : ind.units) : ind.units),
+          ...cols.map((c) => h("th", { class: c.cur ? "st-cur" : null, style: c.cur ? "white-space:normal;width:7em" : null }, c.label)))), h("tbody", {}, rows.filter(Boolean))));
       foldAll.textContent = collapsed.size ? "Expand all" : "Collapse all";
-      hint.textContent = state.mode === "pres" ? `By presidency: twelve-month totals in real terms (each month deflated by the CPI), the last twelve months of each term against the twelve months before it began. ${state._presNote}.`
+      hint.textContent = Y ? (LANG === "es"
+          ? `Años calendario y los últimos doce meses. ${state.yunits === "gdp" ? "Flujos del año sobre el PIB nominal del mismo año (los meses que las cuentas nacionales aún no cubren, con el PIB extendido por el IPC)." : state.yunits === "real" ? "Cada mes deflactado por el IPC; cada año contra el anterior (la última columna, contra los doce meses previos)." : "Millones de pesos corrientes."}`
+          : `Calendar years and the latest twelve months. ${state.yunits === "gdp" ? "Each year's flows over that year's nominal GDP (months the national accounts have not yet covered use GDP extended with the CPI)." : state.yunits === "real" ? "Each month deflated by the CPI; each year against the previous one (the last column against the twelve months before)." : "Millions of current pesos."}`)
+        : state.mode === "pres" ? `By presidency: twelve-month totals in real terms (each month deflated by the CPI), the last twelve months of each term against the twelve months before it began. ${state._presNote}.`
         : S.stock ? `End-of-quarter positions; latest: ${qLabel(last)}.`
         : `Flows over the period, against the same period a year earlier. Latest ${MQ ? "month" : "quarter"}: ${qLabel(last)}.${S.pct_change && ind.deflator ? " Real change: each month deflated by the CPI." : ""}`;
       view = { header: ["item", ...cols.map((c) => c.label)],
         rows: S.rows.filter((r) => r.key).map((r) => [ind.variants[r.key].label, ...cols.map((c) => { const v = c.get(r.key); return v === null || v === undefined ? "" : +v.toFixed(1); })]) };
     }
-    const onCSV = () => { if (view) downloadBlob(toCSV(view.header, view.rows), `${ind.id}_${state.mode}_${D[state.end]}.csv`, "text/csv"); };
+    const onCSV = () => { if (view) downloadBlob(toCSV(view.header, view.rows), `${ind.id}_${YT && state.years ? "years_" + state.yunits : state.mode + "_" + D[state.end]}.csv`, "text/csv"); };
     fillSel();
     const endWrap = h("label", { class: "inline-select" }, S.stock ? "Quarter: " : "Ending: ", sel);
-    appendAll(card, h("div", { class: "controls" }, modeSeg, parents.length ? foldAll : null, h("span", { class: "spacer" }), endWrap),
+    appendAll(card, ySeg, h("div", { class: "controls" }, modeSeg, yuSeg, parents.length ? foldAll : null, h("span", { class: "spacer" }), endWrap),
       hint, tableEl, ind.note ? h("p", { class: "chips-note" }, ind.note) : null, methodLine(ind),
       h("div", { class: "card-foot" },
         h("span", {}, `Source: ${ind.source_label} · Latest: ${qLabel(last)}`, ...srcTail(ind)),

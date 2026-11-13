@@ -94,6 +94,10 @@ section becomes its notes.
   latest year of the INDEC extension), as % of nine comparison countries or regions, each column
   chosen from a menu; or levels. Shares the card's release selector; years are tagged with the
   chart's numbered events.
+- Fiscal: the National Budget card (renamed from "Month by Month") gains a Year by year view: each
+  line for every calendar year since 2015 and the latest twelve months, as % of GDP, real change on
+  the previous year, or millions of pesos, including the Monitor's adjustments. Registry option
+  `year_table` for statement cards.
 - Economic freedom and V-Dem cards: Argentina's line in one color by default; "Color by president" turns the
   presidency colors on (and stays on across the card's views). Registry option `term_toggle`.
 

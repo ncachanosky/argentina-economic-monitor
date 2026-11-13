@@ -4746,14 +4746,15 @@ indicators:
     wide: true
     kind: statement
     measure: flow
-    title: The National Budget, Month by Month
+    title: The National Budget
+    year_table: {gdp_ratio: {card: fiscal_revenue_spending, variant: revenue, row: rev}}
     short_title: Budget table
     description: >-
       Revenue, spending and the balance of the national non-financial public
-      sector, cash basis, line by line as the Secretaría de Hacienda publishes
-      it: a month, the year to date, the last twelve months or a calendar
-      year, against the same period a year earlier, in nominal and real
-      terms. Millions of pesos.
+      sector, cash basis, line by line as the Secretaría de Hacienda
+      publishes it: a month, the year to date, the last twelve months or a
+      calendar year, against the same period a year earlier, in nominal and
+      real terms; or year by year, as a share of GDP. Millions of pesos.
     source: derived
     source_label: Secretaría de Hacienda (Esquema Ahorro-Inversión-Financiamiento, base caja), via datos.gob.ar; Secretaría de Finanzas; BCRA
     frequency: M

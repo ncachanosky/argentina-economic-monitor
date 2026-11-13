@@ -287,5 +287,11 @@
  "Monthly inflation for each year and month, with each year's December to December inflation and its average monthly rate.": "Inflación mensual por año y mes, con la inflación de diciembre a diciembre de cada año y su tasa mensual promedio.",
  "The Fraser Institute's summary rating of economic freedom, 0 (least free) to 10: Argentina and comparison countries; the bars are Argentina's world rank. 1970-2000 every five years, annual since. Add countries with the buttons below the chart.": "Calificación general de libertad económica del Fraser Institute, de 0 (menos libre) a 10: la Argentina y países de comparación; las barras son la posición mundial de la Argentina. 1970-2000 cada cinco años, anual desde entonces. Se pueden agregar países con los botones debajo del gráfico.",
  "% of each": "% de cada uno",
- "Levels": "Niveles"
+ "Levels": "Niveles",
+ "Month by month": "Mes a mes",
+ "Year by year": "Año a año",
+ "Real change, %": "Variación real, %",
+ "Millions of pesos": "Millones de pesos",
+ "The National Budget": "El presupuesto nacional",
+ "Revenue, spending and the balance of the national non-financial public sector, cash basis, line by line as the Secretaría de Hacienda publishes it: a month, the year to date, the last twelve months or a calendar year, against the same period a year earlier, in nominal and real terms; or year by year, as a share of GDP. Millions of pesos.": "Ingresos, gastos y resultado del sector público nacional no financiero, base caja, rubro por rubro tal como lo publica la Secretaría de Hacienda: un mes, el acumulado del año, los últimos doce meses o un año calendario, frente al mismo período del año anterior, en términos nominales y reales; o año a año, como porcentaje del PIB. Millones de pesos."
 }
