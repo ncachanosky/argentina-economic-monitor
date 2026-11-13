@@ -59,6 +59,8 @@ EN = {
     "switch_title": "Ver este sitio en español",
     "pending_note": "",
     "skip": "Skip to content",
+    "rss_weekly": "weekly summary (RSS)",
+    "rss_new": "new data (RSS)",
     "beta_note": ('Corrections and suggestions are welcome '
                   '<a href="__REPO__/issues" target="_blank" rel="noopener">on GitHub</a>. '
                   'New here? See <a href="about/#how">how to use the Monitor</a>.'),
@@ -72,7 +74,7 @@ EN = {
       </div>
       <div>
         <h4>Data</h4>
-        <p>Each chart offers the series as CSV. Full revision histories (every published vintage) are in <code>data/vintages/</code>. How every number is calculated: <a href="__ROOT__methodology/">Methodology</a>. When the next figures come out: <a href="__ROOT__calendar/">Release calendar</a>.</p>
+        <p>Each chart offers the series as CSV. Full revision histories (every published vintage) are in <code>data/vintages/</code>. How every number is calculated: <a href="__ROOT__methodology/">Methodology</a>. When the next figures come out: <a href="__ROOT__calendar/">Release calendar</a>. By RSS: <a href="__ROOT__feed.xml">weekly summary</a> (Mondays) or <a href="__ROOT__releases.xml">every release</a>.</p>
         <p class="site-version">Version __VERSION__ · <a href="__RELEASES__" target="_blank" rel="noopener">What's new</a></p>
       </div>""",
 }
@@ -123,7 +125,7 @@ def render(template: str, *, page: str, root: str, title: str, desc: str, h1: st
         "__HREFLANG__": hreflang, "__LANGSWITCH__": switch_html,
         "__T_HOME_ARIA__": esc(T["home_aria"]), "__T_BY__": esc(T["by"]), "__T_TOPICS__": esc(T["topics_aria"]),
         "__T_SUBSCRIBE__": esc(T["subscribe"]), "__T_THEME__": esc(T["theme"]), "__T_SHARE__": esc(T["share"]), "__T_ONPAGE__": esc(T["onpage"]),
-        "__T_LATEST__": esc(T["latest"]), "__T_SKIP__": esc(T["skip"]), "__BETA__": (f'      <p class="beta-note">{T["beta_note"].replace("__REPO__", repo)}</p>' if page == "home" else ""), "__JSONLD__": jsonld, "__FOOTER__": T["footer"],
+        "__T_LATEST__": esc(T["latest"]), "__T_SKIP__": esc(T["skip"]), "__T_RSS_WEEKLY__": esc(T["rss_weekly"]), "__T_RSS_NEW__": esc(T["rss_new"]), "__BETA__": (f'      <p class="beta-note">{T["beta_note"].replace("__REPO__", repo)}</p>' if page == "home" else ""), "__JSONLD__": jsonld, "__FOOTER__": T["footer"],
         "__CONTENT__": content,
         "__VERSION__": esc(VERSION), "__RELEASES__": esc(f"{repo}/releases" if repo else "#"),
     }
@@ -257,6 +259,8 @@ def build(out: Path, tag: str, with_data: bool = True) -> None:
     write_404(out, reg, base, tag, es)
     if with_data:
         export.export(out / "data")
+        from . import feed
+        feed.render(out)
         if es:
             (out / "data" / "i18n").mkdir(parents=True, exist_ok=True)
             print(f"spanish csv: {translate_csv_headers(out / 'data', load_content('es'))} files")

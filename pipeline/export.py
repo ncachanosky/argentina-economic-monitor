@@ -489,7 +489,8 @@ def updates(reg, days_back: int = 21, days_ahead: int = 21) -> dict:
                               "publisher": cal.get("publisher", "INDEC"), "key": key, "indicators": cards,
                               "in_monitor": bool(last) and last[:7] >= d["period"]})
     ahead.sort(key=lambda r: (r["date"], r["name"]))
-    return {"today": today.strftime("%Y-%m-%d"), "recent": recent[:12], "ahead": ahead}
+    # The home page lists the latest twelve; the RSS feeds use them all.
+    return {"today": today.strftime("%Y-%m-%d"), "recent": recent[:12], "recent_all": recent, "ahead": ahead}
 
 
 def export(out: Path) -> None:

@@ -12,6 +12,11 @@ Changes since the last release, recorded as they are made. At the next release t
 section becomes its notes.
 
 ### Added
+- RSS feeds, in English and Spanish: a weekly summary every Monday at about 07:30 Buenos Aires
+  time (`feed.xml`: last week's new data grouped by page, with the latest m/m and y/y changes
+  where the home table has them, the cards that are late, and the coming week's releases) and
+  one item per release (`releases.xml`). Linked in each page's header for feed readers and in
+  the footer. Links carry `?ref=rss`, so visits from the feeds show in the site's analytics.
 - Monthly Activity: Probability of Recession (EMAE-based, Monitor estimate), below the EMAE
   card. A two-regime Markov-switching model of the seasonally adjusted EMAE's three-month
   growth (switching mean, common variance, 2020 outliers), shown as the real-time track record

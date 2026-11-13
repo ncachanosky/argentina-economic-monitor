@@ -50,6 +50,10 @@ jobs:
         # Also runs on pushes, so newly registered series appear right away.
         run: python -m pipeline.update
 
+      - name: Weekly RSS digest
+        # Mondays from 07:00 Buenos Aires (the 07:30 run): last week's summary, kept in data/feed/weekly.json.
+        run: python -m pipeline.feed --record || echo "::warning::weekly digest failed (not blocking the update)"
+
       - name: Commit new data
         run: |
           git config user.name "aem-bot"

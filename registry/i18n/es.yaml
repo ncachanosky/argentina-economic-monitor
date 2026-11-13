@@ -8,6 +8,8 @@
 
 site:
   site_name: Monitor de la Economía Argentina
+  rss_weekly: resumen semanal (RSS)
+  rss_new: datos nuevos (RSS)
   home_h1: La economía argentina, actualizada todos los días
   home_lede: >-
     Estadísticas oficiales, verificadas dos veces por día contra la fuente y graficadas
@@ -52,7 +54,7 @@ site:
           </div>
           <div>
             <h4>Datos</h4>
-            <p>Cada gráfico ofrece la serie en CSV. Los historiales completos de revisiones (cada versión publicada) están en <code>data/vintages/</code>. Cómo se calcula cada número: <a href="__ROOT__methodology/">Metodología</a>. Cuándo salen los próximos datos: <a href="__ROOT__calendar/">Calendario de publicaciones</a>.</p>
+            <p>Cada gráfico ofrece la serie en CSV. Los historiales completos de revisiones (cada versión publicada) están en <code>data/vintages/</code>. Cómo se calcula cada número: <a href="__ROOT__methodology/">Metodología</a>. Cuándo salen los próximos datos: <a href="__ROOT__calendar/">Calendario de publicaciones</a>. Por RSS: <a href="__ROOT__feed.xml">resumen semanal</a> (los lunes) o <a href="__ROOT__releases.xml">cada publicación</a>.</p>
             <p class="site-version">Versión __VERSION__ · <a href="__RELEASES__" target="_blank" rel="noopener">Novedades</a></p>
           </div>
 
