@@ -4969,6 +4969,24 @@
       "20 missing semester(s), first 2005-01"
     ]
   },
+  "recession:realtime": {
+    "last_changed": "2026-11-13",
+    "last_checked": "2026-11-13T01:08:23+00:00",
+    "last_obs": "2026-08-01",
+    "source": "recession",
+    "source_units": "probability, %",
+    "status": "ok",
+    "warnings": []
+  },
+  "recession:smoothed": {
+    "last_changed": "2026-11-13",
+    "last_checked": "2026-11-13T01:08:23+00:00",
+    "last_obs": "2026-08-01",
+    "source": "recession",
+    "source_units": "probability, %",
+    "status": "ok",
+    "warnings": []
+  },
   "rem:core_m0": {
     "last_changed": "2026-11-05",
     "last_checked": "2026-11-12T23:36:54+00:00",

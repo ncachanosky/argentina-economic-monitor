@@ -365,6 +365,25 @@ def export_ngdp(ind, out: Path) -> dict | None:
             "status": "ok", "last_obs": last, "headline": False}
 
 
+def recession_extras(ind) -> dict:
+    """The recession card's shading (Bry-Boschan recessions, open phase) and its track record, from the model file."""
+    from .update import TABLES_DIR
+    p = TABLES_DIR / "recession" / "model.json"
+    if not p.exists():
+        return {}
+    m = json.loads(p.read_text(encoding="utf-8"))
+    bands = [dict(b, **({"key": "Recessions dated on EMAE (Bry-Boschan, peak to trough)"} if i == 0 else {}))
+             for i, b in enumerate(m.get("bands", []))]
+    if m.get("open_phase"):
+        bands.append({"start": m["open_phase"], "style": "outline",
+                      "key": "Current decline, too recent to date (needs six months after the peak)"})
+    ev = m.get("evaluation") or {}
+    return {"bands": bands or None, "recession": {
+        "median_entry": ev.get("median_entry"), "median_exit": ev.get("median_exit"),
+        "false_alarms": len(ev.get("false_alarm_months", [])), "open_phase": m.get("open_phase"),
+        "factor_check": m.get("factor_check"), "params": m.get("params")}}
+
+
 def trend_note() -> str | None:
     """One line for the EMAE card's trend-cycle view."""
     from . import emae_turns
@@ -599,6 +618,8 @@ def export(out: Path) -> None:
             tn = trend_note()
             if tn:
                 payload["variant_notes"] = {"trend": tn, "trend_link": "ind-emae_turns"}
+        if ind.source == "recession":
+            payload.update(recession_extras(ind))
         (out / f"{ind.id}.json").write_text(json.dumps(payload, separators=(",", ":")), encoding="utf-8")
 
         # The downloadable "all data" CSV keeps the source units (e.g. millions of 2004 pesos).

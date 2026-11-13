@@ -11,6 +11,18 @@ Numbering: minor versions (1.1, 1.2) add cards or features; patch versions
 Changes since the last release, recorded as they are made. At the next release this
 section becomes its notes.
 
+### Added
+- Monthly Activity: Probability of Recession (EMAE-based, Monitor estimate), below the EMAE
+  card. A two-regime Markov-switching model of the seasonally adjusted EMAE's three-month
+  growth (switching mean, common variance, 2020 outliers), shown as the real-time track record
+  (re-estimated each month since 2008 on data up to that month) and today's full-sample
+  estimate. Shaded: recessions dated on EMAE with the Bry-Boschan rule; outlined: a decline too
+  recent to date. The card says what "recession" means here (a regime of falling activity, not
+  two quarters of falling GDP), its track record (a median of four months of data to signal a
+  recession, two to signal its end; one false month since 2008) and a cross-check from a factor
+  model of EMAE, industry, construction and registered employment. New methodology section.
+  Re-estimated only when EMAE changes; statsmodels added to the requirements.
+
 ### Changed
 - Where would the exchange rate be (two dates): the span behind the yearly productivity
   change reads in years and months ("10 years and 10 months") instead of decimal years.

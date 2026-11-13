@@ -465,6 +465,9 @@ inputs:
   - {id: 370.3_HONESTIDADDAD_0_0_10_58, source: datos_gob, frequency: M, measure: index, allow_gaps: true, label: "UTDT ICG: honesty"}
   - {id: 370.3_CAPACIDADDAD_0_0_9_83, source: datos_gob, frequency: M, measure: index, allow_gaps: true, label: "UTDT ICG: capacity to solve problems"}
   # Economic Freedom of the World (Fraser Institute), 0-10; 1970-2000 every five years.
+  # Monthly activity: the Monitor's EMAE-based recession probability (pipeline/sources/recession.py).
+  - {id: "recession:realtime", source: recession, frequency: M, measure: flow, stale_days: 120, label: "Recession probability (EMAE-based): real-time track record"}
+  - {id: "recession:smoothed", source: recession, frequency: M, measure: flow, stale_days: 120, label: "Recession probability (EMAE-based): full-sample estimate"}
   # Institutions. Archbridge Institute's Social Mobility Index: hand-kept edition file (data/manual/social_mobility_<edition>.csv).
   - {id: "smi:ARG:overall", source: smi, frequency: Y, measure: flow, stale_days: 1100, label: "Social Mobility Index, Argentina: overall score"}
   - {id: "smi:ARG:rank", source: smi, frequency: Y, measure: flow, stale_days: 1100, label: "Social Mobility Index, Argentina: rank"}
@@ -777,6 +780,44 @@ indicators:
     # Yearly table: cumulative change of the year to date vs. the same months a
     # year earlier (original series, as INDEC reports it) and Dec-to-Dec (SA).
     annual_table: {accumulated: original, within_year: sa, carryover: true}
+
+  - id: emae_recession
+    topic: real_sector
+    kind: variants
+    title: "Probability of Recession (EMAE-Based, Monitor Estimate)"
+    short_title: Recession probability
+    description: >-
+      How likely it is that the economy is in a recession, as read from
+      INDEC's monthly activity index (EMAE). "Recession" here is a regime
+      of falling activity identified by a statistical model, not two
+      quarters of falling GDP.
+    release: emae
+    source: recession
+    source_label: "Monitor estimate from INDEC's seasonally adjusted EMAE (Markov switching)"
+    frequency: M
+    units: Probability, %
+    measure: rate
+    transforms: [level]
+    no_presidency: true
+    variants:
+      realtime: {label: "Real time (each month's reading)", id: "recession:realtime"}
+      smoothed: {label: "Full sample (today's estimate)", id: "recession:smoothed"}
+    overlay: true
+    default: {variant: realtime, transform: level, range: 10Y}
+    ranges: [5Y, 10Y, Max]
+    ref_line: 50
+    note: >-
+      What "recession" means here: the model splits EMAE's three-month growth
+      into two regimes, one of falling activity (about -0.5% a month on
+      average) and one of growth, and gives the probability of being in the
+      falling one. It is not the "two quarters of falling GDP" rule: a long,
+      broad decline counts even if one quarter grows, and a small two-quarter
+      dip may not. Real time: each month's reading with the data available
+      then; full sample: today's estimate for every month. Because EMAE comes
+      out about 52 days after the month and the model needs a few months of
+      data, it has signaled recessions some months after they began (see
+      the methodology). Shaded: recessions dated on EMAE (Bry-Boschan).
+    method_links: [{anchor: recession-probability, label: "How the recession probability is estimated"}]
 
   - id: emae_turns
     topic: real_sector

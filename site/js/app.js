@@ -1398,7 +1398,8 @@
       trackerLine(), summaryEl, hint, methodLine(ind), bandKey, termKey(), epKey, chartEl, chipRow, statsEl);
     drawSummary();
     table = tableView([], [], false, ind.frequency);
-    appendAll(card, breakdownTable(ind), table, annualTable(ind), weightsTable(ind), ind.note ? h("p", { class: "chips-note" }, ind.note) : null, footer(ind, onPNG, onCSV));
+    appendAll(card, breakdownTable(ind), table, annualTable(ind), weightsTable(ind), ind.note ? h("p", { class: "chips-note" }, ind.note) : null,
+      ind.recession ? recessionNote(ind.recession) : null, footer(ind, onPNG, onCSV));
     card.draw = draw;
     return card;
   }
@@ -1591,6 +1592,20 @@
       render();
     };
     return card;
+  }
+
+  // The recession card's track record and factor cross-check (pipeline/sources/recession.py), in the page's language.
+  function recessionNote(R) {
+    const es = LANG === "es", out = [];
+    const n = (v) => Number(v).toLocaleString(LOCALE, { maximumFractionDigits: 1 });
+    if (R.median_entry !== null && R.median_entry !== undefined) out.push(es
+      ? `Historial desde 2008: la probabilidad en tiempo real superó el 50% una mediana de ${n(R.median_entry)} meses de datos después del inicio de cada recesión y bajó del 50% una mediana de ${n(R.median_exit)} meses después de su fin (sume unos dos meses por la demora de publicación del EMAE). Meses por encima del 50% fuera de una recesión fechada: ${R.false_alarms}.`
+      : `Track record since 2008: the real-time probability passed 50% a median of ${n(R.median_entry)} data months after each recession began and fell below 50% a median of ${n(R.median_exit)} months after it ended (add about two months for EMAE's release lag). Months above 50% outside a dated recession: ${R.false_alarms}.`);
+    const F = R.factor_check;
+    if (F) out.push(es
+      ? `Control: el mismo modelo aplicado a un factor común del EMAE, la producción industrial (IPI), la construcción (ISAC) y el empleo registrado da ${Math.round(100 * F.probability)}% para ${fmtMonth(F.month)}, con datos de industria y construcción un mes más recientes que el EMAE.`
+      : `Cross-check: the same model on a common factor of EMAE, industrial production (IPI), construction (ISAC) and registered employment gives ${Math.round(100 * F.probability)}% for ${fmtMonth(F.month)}, with industry and construction data a month newer than EMAE.`);
+    return out.length ? h("p", { class: "chips-note no-tr" }, out.join(" ")) : null;
   }
 
   // ---------- card: a cross-country index, one edition (Archbridge's Social Mobility Index) ----------

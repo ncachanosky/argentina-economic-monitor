@@ -121,5 +121,18 @@
  "Sub-Saharan Africa": "África subsahariana",
  "South Asia": "Asia del Sur",
  "East Asia & Pacific": "Asia Oriental y el Pacífico",
- "Social Mobility Index (edition file kept in the repository)": "Índice de Movilidad Social (archivo de la edición guardado en el repositorio)"
+ "Social Mobility Index (edition file kept in the repository)": "Índice de Movilidad Social (archivo de la edición guardado en el repositorio)",
+ "Probability of Recession (EMAE-Based, Monitor Estimate)": "Probabilidad de recesión (basada en el EMAE, estimación del Monitor)",
+ "Recession probability": "Probabilidad de recesión",
+ "How likely it is that the economy is in a recession, as read from INDEC's monthly activity index (EMAE). \"Recession\" here is a regime of falling activity identified by a statistical model, not two quarters of falling GDP.": "Qué tan probable es que la economía esté en recesión, según el estimador mensual de actividad del INDEC (EMAE). Aquí, \"recesión\" es un régimen de caída de la actividad identificado por un modelo estadístico, no dos trimestres de caída del PIB.",
+ "Monitor estimate from INDEC's seasonally adjusted EMAE (Markov switching)": "Estimación del Monitor a partir del EMAE desestacionalizado del INDEC (cambio de régimen markoviano)",
+ "Probability, %": "Probabilidad, %",
+ "Real time (each month's reading)": "Tiempo real (la lectura de cada mes)",
+ "Full sample (today's estimate)": "Muestra completa (estimación actual)",
+ "What \"recession\" means here: the model splits EMAE's three-month growth into two regimes, one of falling activity (about -0.5% a month on average) and one of growth, and gives the probability of being in the falling one. It is not the \"two quarters of falling GDP\" rule: a long, broad decline counts even if one quarter grows, and a small two-quarter dip may not. Real time: each month's reading with the data available then; full sample: today's estimate for every month. Because EMAE comes out about 52 days after the month and the model needs a few months of data, it has signaled recessions some months after they began (see the methodology). Shaded: recessions dated on EMAE (Bry-Boschan).": "Qué significa \"recesión\" aquí: el modelo divide el crecimiento a tres meses del EMAE en dos regímenes, uno de caída de la actividad (en promedio, alrededor de -0,5% mensual) y otro de crecimiento, y da la probabilidad de estar en el de caída. No es la regla de \"dos trimestres de caída del PIB\": una caída larga y extendida cuenta aunque un trimestre crezca, y una baja pequeña en dos trimestres puede no contar. Tiempo real: la lectura de cada mes con los datos disponibles entonces; muestra completa: la estimación actual para cada mes. Como el EMAE se publica unos 52 días después del mes y el modelo necesita algunos meses de datos, ha señalado las recesiones algunos meses después de su inicio (ver la metodología). Sombreado: recesiones fechadas sobre el EMAE (Bry-Boschan).",
+ "How the recession probability is estimated": "Cómo se estima la probabilidad de recesión",
+ "Recessions dated on EMAE (Bry-Boschan, peak to trough)": "Recesiones fechadas sobre el EMAE (Bry-Boschan, de pico a valle)",
+ "Current decline, too recent to date (needs six months after the peak)": "Caída actual, demasiado reciente para fecharla (requiere seis meses después del pico)",
+ "Recession probability (EMAE-based): real-time track record": "Probabilidad de recesión (EMAE): historial en tiempo real",
+ "Recession probability (EMAE-based): full-sample estimate": "Probabilidad de recesión (EMAE): estimación con muestra completa"
 }

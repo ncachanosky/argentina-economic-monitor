@@ -9,3 +9,4 @@ pdfplumber>=0.11
 matplotlib>=3.8
 lxml>=5.0
 x13binary>=1.1.61   # X-13ARIMA-SEATS, for the Monitor's seasonally adjusted EMAE sectors
+statsmodels>=0.14   # Markov switching and the factor model for the recession probability

@@ -69,6 +69,10 @@ def link_for(adapter: str, sid: str, st: dict | None = None) -> dict | None:
                 "url": url or "https://www.bcra.gob.ar/", "kind": "file"} if url else None
     if adapter == "efw":
         return {"publisher": "Fraser Institute", "name": efw.URL.rsplit("/", 1)[-1], "url": efw.URL, "kind": "file"}
+    if adapter == "recession":
+        # Computed by the Monitor from INDEC's EMAE: link to the model's code.
+        return {"publisher": "Argentina Economic Monitor (computed)", "name": "recession.py (the model)",
+                "url": f"{REPO_FILES}pipeline/sources/recession.py", "kind": "file"}
     if adapter == "smi":
         return {"publisher": "Archbridge Institute", "name": "Social Mobility Index (edition file kept in the repository)",
                 "url": f"{REPO_FILES}data/manual/", "page": "https://www.archbridgeinstitute.org/social-mobility-index/", "kind": "file"}
