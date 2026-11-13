@@ -1547,6 +1547,7 @@ indicators:
     kind: variants
     title: Consumer Price Index (CPI)
     short_title: CPI
+    switch: {group: cpi_main, label: "Chart"}
     description: >-
       INDEC's national consumer price index. Monthly inflation is the m/m
       change; rebase to a presidential term to read cumulative inflation since
@@ -1571,6 +1572,28 @@ indicators:
       - {variant: core, transform: mom, label: "CPI, core", good: none}
       - {variant: headline, transform: yoy, label: "CPI, 12 months", good: none, sub: "y/y, headline"}
 
+  - id: cpi_ym
+    topic: prices
+    wide: true
+    kind: year_month
+    title: Consumer Price Index (CPI), Year by Month
+    short_title: CPI by month
+    switch: {group: cpi_main, label: "Year × month"}
+    description: >-
+      Monthly inflation for each year and month, with each year's December to
+      December and average inflation.
+    release: ipc
+    source: datos_gob
+    source_label: INDEC (CPI release file serie_ipc_divisiones.csv)
+    frequency: M
+    units: Index, Dec 2016 = 100
+    transforms: [level]
+    variants:
+      headline:  {label: Headline,  id: 148.3_INIVELNAL_DICI_M_26}
+      core:      {label: Core,      id: 148.3_INUCLEONAL_DICI_M_19}
+      regulated: {label: Regulated, id: 148.3_IREGULANAL_DICI_M_22}
+      seasonal:  {label: Seasonal,  id: 148.3_IESTACINAL_DICI_M_25}
+    default: {variant: headline, transform: level}
   - id: cpi_categories
     topic: prices
     kind: panel

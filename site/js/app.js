@@ -1666,6 +1666,80 @@
   }
 
   // ---------- card: revision tracker (GDP, EMAE): first print vs today, and one period's path ----------
+  // Year × month table of monthly (or 12-month) rates, shaded on a log scale; e.g. the CPI.
+  function yearMonthCard(ind) {
+    const card = cardFrame(ind, true);
+    const ES = LANG === "es";
+    const keys = Object.keys(ind.variants);
+    const state = { variant: ind.default.variant || keys[0], rate: "mom" };
+    const vSeg = segmented(keys.map((k) => [k, ind.variants[k].label]), state.variant, (k) => { state.variant = k; vSeg.update(k); draw(); }, "Series");
+    const rSeg = segmented([["mom", ES ? "m/m %" : "m/m %"], ["yoy", ES ? "i.a. %" : "y/y %"]], state.rate, (k) => { state.rate = k; rSeg.update(k); draw(); }, "Rate");
+    const wrap = h("div", { class: "ym-wrap" });
+    const note = h("p", { class: "chips-note" });
+    const MONTH = (m) => new Date(Date.UTC(2001, m, 1)).toLocaleString(LOCALE, { month: "short", timeZone: "UTC" }).replace(".", "");
+    let csv = null;
+    const shade = (v, top) => {
+      if (v === null) return null;
+      if (v < 0) return `color-mix(in srgb, var(--series-2, #5B8DB8) ${Math.round(20 + 50 * Math.min(1, -v / 2))}%, transparent)`;
+      const s = Math.min(1, Math.log1p(v) / Math.log1p(top));
+      return `color-mix(in srgb, var(--accent) ${Math.round(6 + 74 * s)}%, transparent)`;
+    };
+    function draw() {
+      const vals = ind.variants[state.variant].values, lv = new Map(ind.dates.map((d, i) => [d, vals[i]]));
+      const lag = state.rate === "mom" ? 1 : 12;
+      const rows = new Map();
+      ind.dates.forEach((d, i) => {
+        const prev = ind.dates[i - lag] && monthIndex(ind.dates[i - lag]) === monthIndex(d) - lag ? vals[i - lag] : null;
+        const r = vals[i] !== null && prev ? 100 * (vals[i] / prev - 1) : null;
+        const y = +d.slice(0, 4);
+        if (!rows.has(y)) rows.set(y, new Array(12).fill(null));
+        rows.get(y)[+d.slice(5, 7) - 1] = r;
+      });
+      const years = [...rows.keys()].filter((y) => rows.get(y).some((v) => v !== null)).sort((a, b) => b - a);
+      const all = years.flatMap((y) => rows.get(y)).filter((v) => v !== null);
+      const top = Math.max(...all, 1);
+      const last = ind.dates.filter((d, i) => vals[i] !== null).pop();
+      const at = (y, m) => lv.get(`${y}-${String(m).padStart(2, "0")}-01`) ?? null;
+      const f1 = (v) => (v === null ? "" : fx(v, 1));
+      const header = [ES ? "Año" : "Year", ...Array.from({ length: 12 }, (_, m) => MONTH(m)), ES ? "Dic/dic" : "Dec/Dec", ES ? "Prom/prom" : "Avg/Avg"];
+      const csvRows = [];
+      const body = years.map((y) => {
+        const r = rows.get(y);
+        const dec = at(y, 12), pdec = at(y - 1, 12);
+        let tot = null, ytd = false;
+        if (dec !== null && pdec !== null) tot = 100 * (dec / pdec - 1);
+        else if (pdec !== null) { const k = r.reduce((a, v, i) => (v !== null ? i : a), -1); if (k >= 0 && at(y, k + 1) !== null) { tot = 100 * (at(y, k + 1) / pdec - 1); ytd = true; } }
+        const cur = Array.from({ length: 12 }, (_, m) => at(y, m + 1)), prv = Array.from({ length: 12 }, (_, m) => at(y - 1, m + 1));
+        const avg = cur.every((v) => v !== null) && prv.every((v) => v !== null) ? 100 * (cur.reduce((a, b) => a + b) / prv.reduce((a, b) => a + b) - 1) : null;
+        csvRows.push([y, ...r.map((v) => (v === null ? "" : v.toFixed(2))), tot === null ? "" : tot.toFixed(2), avg === null ? "" : avg.toFixed(2)]);
+        return h("tr", {},
+          h("td", { class: "ym-y" }, String(y)),
+          ...r.map((v, m) => h("td", { class: `${y}-${String(m + 1).padStart(2, "0")}-01` === last ? "ym-last" : null, style: v === null ? null : `background:${shade(v, top)}`, title: v === null ? null : `${MONTH(m)} ${y}: ${fx(v, 1)}%` }, f1(v))),
+          h("td", { class: "ym-tot" }, tot === null ? "–" : [fx(tot, 1), ytd ? h("span", { class: "ym-ytd" }, ES ? " acum." : " ytd") : null]),
+          h("td", { class: "ym-avg" }, avg === null ? "–" : fx(avg, 1)));
+      });
+      csv = { header, rows: csvRows };
+      wrap.replaceChildren(h("table", { class: "ym-table" },
+        h("thead", {}, h("tr", {}, header.map((c, i) => h("th", { class: i === 0 ? "ym-y" : i === 13 ? "ym-tot" : null }, c)))),
+        h("tbody", {}, body)));
+      note.textContent = ES ? (state.rate === "mom"
+        ? "Cada celda es la variación del mes respecto del mes anterior (serie original). El sombreado crece con la tasa en escala logarítmica, para que se lean tanto 2% como 25%. La celda recuadrada es el último mes. Dic/dic: la inflación del año (acumulada en el año en curso). Prom/prom: el índice promedio del año sobre el del año anterior."
+        : "Cada celda es la variación respecto del mismo mes del año anterior. El sombreado crece con la tasa en escala logarítmica. La celda recuadrada es el último mes. Dic/dic: la inflación del año (acumulada en el año en curso). Prom/prom: el índice promedio del año sobre el del año anterior.")
+        : state.rate === "mom"
+        ? "Each cell is the month's change over the previous month (original series). Shading grows with the rate on a log scale, so 2% and 25% both read. The outlined cell is the latest month. Dec/Dec: the year's inflation (year to date for the current year). Avg/Avg: the year's average index over the previous year's."
+        : "Each cell is the change over the same month a year earlier. Shading grows with the rate on a log scale. The outlined cell is the latest month. Dec/Dec: the year's inflation (year to date for the current year). Avg/Avg: the year's average index over the previous year's.";
+    }
+    const onCSV = () => { if (csv) downloadBlob(toCSV(csv.header, csv.rows), `${ind.id}_${state.variant}_${state.rate}.csv`, "text/csv"); };
+    appendAll(card, h("div", { class: "controls" }, vSeg, rSeg), wrap, note, methodLine(ind),
+      h("div", { class: "card-foot" },
+        h("span", {}, "Source: ", ind.source_label, ` · Latest: ${fmtPeriod(ind.last_obs, ind.frequency)}`, ...srcTail(ind)),
+        h("div", { class: "actions" }, h("button", { class: "btn", type: "button", onclick: onCSV, title: "Download the data in this view as CSV" }, "CSV"),
+          h("a", { class: "btn", href: `${DATA}${ind.id}${ES ? ".es" : ""}.csv`, download: `${ind.id}_all.csv`, title: "All variants, levels, as published" }, "All data"))));
+    draw();
+    card.draw = () => {};
+    return card;
+  }
+
   function revisionsCard(ind) {
     const T = ind.table;
     const card = cardFrame(ind, true);
@@ -4292,6 +4366,7 @@
         : ind.kind === "ngdp" ? ngdpCard(ind)
         : ind.kind === "country_index" ? countryIndexCard(ind)
         : ind.kind === "revisions" ? revisionsCard(ind)
+        : ind.kind === "year_month" ? yearMonthCard(ind)
         : ind.kind === "maddison" ? maddisonCard(ind)
         : variantsCard(ind, !ind.half);
   }

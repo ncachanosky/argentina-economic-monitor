@@ -247,5 +247,10 @@
  "Growth by use": "Crecimiento por uso",
  "Spending": "Gasto",
  "Ratio": "Ratio",
- "Why it changes": "Por qué cambia"
+ "Why it changes": "Por qué cambia",
+ "Consumer Price Index (CPI), Year by Month": "Índice de Precios al Consumidor (IPC), por año y mes",
+ "CPI by month": "IPC por mes",
+ "Chart": "Gráfico",
+ "Year × month": "Año × mes",
+ "Monthly inflation for each year and month, with each year's December to December and average inflation.": "Inflación mensual por año y mes, con la inflación de diciembre a diciembre y la promedio de cada año."
 }

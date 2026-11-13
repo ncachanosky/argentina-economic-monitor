@@ -581,3 +581,14 @@ table.data td.ci-name, table.data td.ci-reg, table.data th.ci-l { text-align: le
 
 /* A pointer to cards that moved to another page. */
 .page-pointer { margin: 18px 0 0; font-family: var(--font-ui); font-size: 13.5px; color: var(--ink-2); }
+
+/* Year × month table (e.g. CPI) */
+.ym-wrap { overflow-x: auto; margin-top: 8px; }
+.ym-table { border-collapse: collapse; width: 100%; font-size: 13px; font-variant-numeric: tabular-nums; }
+.ym-table th, .ym-table td { padding: 5px 6px; text-align: right; white-space: nowrap; }
+.ym-table thead th { border-bottom: 1px solid var(--rule); font-weight: 700; color: var(--ink-2); text-transform: capitalize; }
+.ym-table .ym-y { text-align: left; font-weight: 700; }
+.ym-table .ym-tot { font-weight: 700; border-left: 2px solid var(--ink-3); }
+.ym-table .ym-avg { color: var(--ink-2); }
+.ym-table td.ym-last { outline: 2px solid var(--ink); outline-offset: -2px; }
+.ym-table .ym-ytd { font-weight: 400; font-size: 11px; color: var(--ink-3); }

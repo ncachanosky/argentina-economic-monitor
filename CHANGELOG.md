@@ -78,6 +78,10 @@ section becomes its notes.
   group), concentration (ten largest, HHI), real and dollar wages, Central Bank financing of the
   government (share of assets, real pesos), exports and imports (level, growth), trade prices
   (exports, imports), spending and revenue drivers, and debt / GDP (ratio, why it changes).
+- Prices: a year × month view of the CPI (switch on the CPI card): monthly or 12-month inflation
+  for headline, core, regulated and seasonal prices, shaded on a log scale, with each year's
+  December-to-December (year to date for the current year) and average-over-average inflation.
+  CSV of the view. New card kind `year_month`.
 
 ## 1.2.0 (2026-11-12)
 
