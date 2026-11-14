@@ -31,6 +31,7 @@
   const MAX_PANEL_SERIES = 4;              // fixed palette has four distinguishable slots
   const SERIES_VARS = ["--series-1", "--series-2", "--series-3", "--series-4", "--series-5", "--series-6", "--series-7", "--series-8"];
   const EXPORT = { width: 1200, height: 800 }; // EO figure standard
+  const EO_LOGO = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxNjUwIDE2NTAiPgogIDxjaXJjbGUgY3g9IjgyNSIgY3k9IjgyNSIgcj0iODI1IiBmaWxsPSIjMzY0NTRGIi8+CiAgPGcgZmlsbD0iI2ZmZiI+CiAgICA8cGF0aCBkPSJNMzMzIDQ4NyA0NTEgMzY5IDU3MCA0ODdINDg3VjExNjFIMTE2MVYxMDc5TDEyODAgMTE5NyAxMTYxIDEzMTVWMTIzM0g0MTVWNDg3WiIvPgogIDwvZz4KICA8ZyBmaWxsPSJub25lIiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iNzIiPgogICAgPHBhdGggZD0iTTU4NCA1NjBDNjgwIDc5NSA3OTAgOTgwIDExMTMgMTA1OCIvPgogICAgPHBhdGggZD0iTTExMDEgNTcyQzEwMTAgODMwIDgyMCAxMDUwIDU2MCAxMDY1Ii8+CiAgPC9nPgo8L3N2Zz4K";   // site/img/logo.svg, for exported images
 
   // Transformations by measure. Indices change in percent; rates (e.g. capacity
   // utilization, already in %) change in percentage points.
@@ -331,6 +332,14 @@
     layout.margin.b += 20 * (srcLines.length - 1);
     if (extras.sourceY !== undefined) layout.annotations.slice(-2).forEach((a) => { a.y = extras.sourceY; });
     if (data[0] && data[0].orientation === "h") { layout.xaxis.ticksuffix = (extras.xsuffix !== undefined ? extras.xsuffix : specOf(pct).suffix); if (extras.xrange) layout.xaxis.range = extras.xrange; layout.yaxis.ticksuffix = ""; layout.margin.l = 260; }
+    // Economic Order's logo at the right of the credit line, 34 px square, aligned with it.
+    {
+      const credit = layout.annotations[layout.annotations.length - 1];
+      const LOGO = 34, plotW = EXPORT.width - layout.margin.l - layout.margin.r, plotH = EXPORT.height - layout.margin.t - layout.margin.b;
+      credit.xshift = -(LOGO + 10); credit.yshift = -(LOGO - 20) / 2;
+      layout.images = [...(layout.images || []), { source: EO_LOGO, xref: "paper", yref: "paper", x: 1, y: credit.y, xanchor: "right", yanchor: "top",
+        sizex: LOGO / plotW, sizey: LOGO / plotH, sizing: "contain", layer: "above" }];
+    }
     const url = await Plotly.toImage({ data, layout }, { format: "png", width: EXPORT.width, height: EXPORT.height });
     const a = h("a", { href: url, download: filename });
     document.body.append(a); a.click(); a.remove();
