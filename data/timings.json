@@ -1,27 +1,27 @@
 [
  {
-  "source": "bcra (D)",
-  "seconds": 69.5,
-  "series": 46
- },
- {
   "source": "intl (Y)",
-  "seconds": 29.3,
+  "seconds": 120.2,
   "series": 13
  },
  {
+  "source": "bcra (D)",
+  "seconds": 72.5,
+  "series": 46
+ },
+ {
   "source": "datos_gob (M)",
-  "seconds": 26.9,
+  "seconds": 25.0,
   "series": 146
  },
  {
   "source": "x13 (M)",
-  "seconds": 22.7,
+  "seconds": 22.8,
   "series": 16
  },
  {
   "source": "finanzas (M)",
-  "seconds": 20.6,
+  "seconds": 19.6,
   "series": 39
  },
  {
@@ -31,28 +31,33 @@
  },
  {
   "source": "ustreasury (D)",
-  "seconds": 19.2,
+  "seconds": 17.6,
   "series": 1
  },
  {
   "source": "datos_gob (Q)",
-  "seconds": 14.1,
+  "seconds": 14.0,
   "series": 101
  },
  {
   "source": "bcra_fx (D)",
-  "seconds": 12.2,
+  "seconds": 12.9,
   "series": 1
  },
  {
   "source": "vdem (Y)",
-  "seconds": 4.5,
+  "seconds": 6.7,
   "series": 90
  },
  {
   "source": "itcrm (D)",
-  "seconds": 4.1,
+  "seconds": 4.0,
   "series": 5
+ },
+ {
+  "source": "bcra_banks (M)",
+  "seconds": 2.6,
+  "series": 67
  },
  {
   "source": "efw (Y)",
@@ -61,33 +66,23 @@
  },
  {
   "source": "datos_gob (Y)",
-  "seconds": 2.0,
+  "seconds": 2.1,
   "series": 2
  },
  {
-  "source": "bcra_banks (M)",
-  "seconds": 2.0,
-  "series": 67
- },
- {
   "source": "dolar (D)",
-  "seconds": 1.3,
+  "seconds": 1.5,
   "series": 5
  },
  {
-  "source": "rem (M)",
-  "seconds": 1.3,
-  "series": 8
- },
- {
   "source": "riesgo (D)",
-  "seconds": 1.2,
+  "seconds": 1.3,
   "series": 11
  },
  {
-  "source": "bcra_weekly (D)",
-  "seconds": 0.9,
-  "series": 6
+  "source": "rem (M)",
+  "seconds": 1.2,
+  "series": 8
  },
  {
   "source": "bcra_cambiario (M)",
@@ -95,29 +90,29 @@
   "series": 14
  },
  {
-  "source": "aif (M)",
-  "seconds": 0.7,
-  "series": 35
+  "source": "bcra_weekly (D)",
+  "seconds": 0.9,
+  "series": 6
  },
  {
   "source": "bcra_balance (M)",
-  "seconds": 0.7,
+  "seconds": 0.8,
   "series": 20
  },
  {
-  "source": "smi (Y)",
-  "seconds": 0.5,
-  "series": 2
- },
- {
   "source": "bcra (M)",
-  "seconds": 0.5,
+  "seconds": 0.4,
   "series": 1
  },
  {
   "source": "a3 (D)",
-  "seconds": 0.3,
+  "seconds": 0.4,
   "series": 3
+ },
+ {
+  "source": "smi (Y)",
+  "seconds": 0.4,
+  "series": 2
  },
  {
   "source": "maddison (Y)",
@@ -136,8 +131,13 @@
  },
  {
   "source": "officials (Y)",
-  "seconds": 0.2,
+  "seconds": 0.1,
   "series": 2
+ },
+ {
+  "source": "aif (M)",
+  "seconds": 0.1,
+  "series": 35
  },
  {
   "source": "lallpi (Y)",
