@@ -1,0 +1,16 @@
+HTTP/2 200 
+date: Mon, 16 Nov 2026 06:43:50 GMT
+content-type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+content-length: 835754
+server: cloudflare
+strict-transport-security: max-age=31536000
+last-modified: Mon, 05 Oct 2026 13:11:28 GMT
+etag: "6ac3a200-cc0aa"
+accept-ranges: bytes
+x-bcra-upstream-ip: 192.168.188.36:80
+expires: Mon, 16 Nov 2026 06:53:50 GMT
+cache-control: public, max-age=600
+cf-cache-status: MISS
+set-cookie: __cf_bm=YSdDZA8YG.iFxPreH3zqtw7kv7m83lp4xs3SWElnQ_E-1794811429.2337766-1.0.1.1-8HQDsY6YVtA3DwOA0_0kl47ff3WxtFNBcXWFU5imiUveNaahIj4mm0chx98im6sqiIF_ijTQvkZyCt8WM9U4vff_C_.kp.ddYWAxyy3SIwn7yZryUGH82ScSvTeckcwi; HttpOnly; SameSite=None; Partitioned; Secure; Path=/; Domain=bcra.gob.ar; Expires=Mon, 16 Nov 2026 07:13:50 GMT
+cf-ray: a5b48608bf718d3a-PDX
+

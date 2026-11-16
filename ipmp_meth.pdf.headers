@@ -1,0 +1,16 @@
+HTTP/2 200 
+date: Mon, 16 Nov 2026 06:43:53 GMT
+content-type: application/pdf
+content-length: 516864
+server: cloudflare
+strict-transport-security: max-age=31536000
+last-modified: Thu, 01 Oct 2026 12:53:49 GMT
+etag: "6abe57dd-7e300"
+accept-ranges: bytes
+x-bcra-upstream-ip: 192.168.188.36:80
+expires: Mon, 16 Nov 2026 06:53:53 GMT
+cache-control: public, max-age=600
+cf-cache-status: REVALIDATED
+set-cookie: __cf_bm=zpl6VDeLulIcb2cuFy.bKemgwnrmB6Jolnv_H9fRC2w-1794811432.4057193-1.0.1.1-4gnJ6KjK9L8E5Oc0ddKV1pJDPhdBkR0I4.FSP_HirEuAeGc_C6iJh8zXX3_dNQrq0Kbyskb0.lrL_ieb4odvCV3Y5dhn9qoUBco4Z2raK5wtKeQz1JRWzvt0iItA6xL0; HttpOnly; SameSite=None; Partitioned; Secure; Path=/; Domain=bcra.gob.ar; Expires=Mon, 16 Nov 2026 07:13:53 GMT
+cf-ray: a5b4861c8caa8969-PDX
+
