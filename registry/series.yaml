@@ -1213,7 +1213,7 @@ indicators:
     transforms: [level, yoy]
     component_noun: industries
     title: Capacity Utilization by Industry
-    short_title: UCII by industry
+    short_title: Capacity utilization (UCII) by industry
     switch: {group: ucii, label: "By industry"}
     description: >-
       Capacity utilization in each of INDEC's twelve industry blocks, latest
@@ -6355,7 +6355,7 @@ indicators:
     kind: contributions
     measure: flow
     title: Foreign-Exchange Market Flows (Balance Cambiario)
-    short_title: Balance cambiario
+    short_title: FX market flows
     description: >-
       What moved through the foreign-exchange market each month, and the
       change in reserves it left: trade, services, income, purchases of

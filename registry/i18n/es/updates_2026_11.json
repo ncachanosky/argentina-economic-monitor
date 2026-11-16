@@ -427,5 +427,7 @@
  "Investment": "Inversión",
  "Revenue": "Ingresos",
  "Expenditure": "Gasto",
- "Balance": "Resultado"
+ "Balance": "Resultado",
+ "FX market flows": "Balance cambiario",
+ "Capacity utilization (UCII) by industry": "Utilización de la capacidad instalada (UCII) por rama"
 }

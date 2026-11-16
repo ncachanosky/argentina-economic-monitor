@@ -3307,6 +3307,7 @@
     function at(k, day) { let j = -1; for (let i = 0; i < D.length && D[i] <= day; i++) if (V(k)[i] !== null) j = i; return j; }
     // The same four boxes for both questions: A is the reference (or the first date), B the second date
     // (by default the latest observation).
+    let last = null, lastFig = null;   // the latest result and chart, for PNG and CSV
     function boxes(A, bIdx) {
       const k = state.mode, fxk = k === "m" ? "ofx" : "ccl", fxName = k === "m" ? "official (wholesale) rate" : "CCL rate";
       const rA = A.v, rB = V(k)[bIdx], al = state.alpha;
@@ -3331,6 +3332,10 @@
         const d = Math.round((b - a) / dayMs);
         return `${d} ${es ? (d === 1 ? "día" : "días") : (d === 1 ? "day" : "days")}`;
       })();
+      last = { mode: k === "m" ? "official" : "CCL", reference: A.date ? `${A.date}` : A.label, reference_index: rA, date_b: D[bIdx], index_b: rB,
+        rer_change_pct: rer, rate_that_restores: implied, actual_rate: fxB, actual_rate_date: jf >= 0 ? D[jf] : null, alpha: al,
+        productivity_change_pct: total, productivity_change_per_year_pct: perYear, span, terms_of_trade_change_pct: totCh,
+        aName, fxName, question: state.calc };
       outEl.replaceChildren(
         h("div", { class: "rer-grid" },
           h("div", { class: "rer-tile" }, h("div", { class: "rer-k" }, "Real exchange rate"), h("div", { class: "rer-v" }, `${fmtR(rA, 1)} → ${fmtR(rB, 1)}`),
@@ -3383,6 +3388,7 @@
         { type: "rect", xref: "paper", x0: 0, x1: 1, y0: p25, y1: p75, fillcolor: isDark() ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.05)", line: { width: 0 }, layer: "below", _lightFill: "rgba(0,0,0,0.05)" },
         ...(ref.v ? [{ type: "line", xref: "paper", x0: 0, x1: 1, y0: ref.v, y1: ref.v, line: { color: ink3, width: 1.5, dash: "dash" } }] : []),
       ];
+      lastFig = { traces, shapes };
       Plotly.react(chartEl, traces, baseLayout({ yaxis: { tickformat: ".0f" }, extra: { shapes, showlegend: false, hovermode: "closest", margin: { l: 48, r: 16, t: 10, b: 36 } } }), PLOT_CONFIG);
     }
     function lineXY(k) {
@@ -3401,6 +3407,7 @@
       if (sel) tr.push({ type: "scatter", mode: "markers+text", name: "Equilibrium dates", x: [D[sel.a], D[sel.b]], y: [V(k)[sel.a], V(k)[sel.b]],
         text: ["A", "B"], textposition: "top center", textfont: { color: cssVar("--ink") },
         marker: { color: cssVar("--ink"), size: 10, symbol: "diamond" }, hovertemplate: "%{x|%d %b %Y}: <b>%{y:.1f}</b><extra></extra>" });
+      lastFig = { traces: tr, shapes: [] };
       Plotly.react(chartEl, tr, baseLayout({ yaxis: { tickformat: ".0f" }, extra: { showlegend: false, hovermode: "closest", margin: { l: 48, r: 16, t: 10, b: 36 } } }), PLOT_CONFIG);
     }
     const caveats = h("div", { class: "chips-note rer-caveats" },
@@ -3408,14 +3415,30 @@
         "The terms of trade are about 45% above their 2004 level and energy has turned from a deficit into a surplus, changes that support a stronger peso than history suggests; productivity growth relative to partners (the Balassa–Samuelson effect) works the same way. Single dates can be overshoots: the index spiked after the 2002 and December 2023 devaluations, and was at its strongest at the end of convertibility in 2001. The range across reference choices is the honest answer, not any one number."),
       h("p", {}, "Model-based assessments (the IMF's External Balance Assessment) estimate the real exchange rate consistent with fundamentals and desirable policies. The IMF's May 2026 staff report judges Argentina's external position \"weaker than the level implied by medium-term fundamentals and desirable policies\", a preliminary assessment subject to exceptionally high uncertainty. ",
         h("a", { href: "https://www.imf.org/en/publications/cr/issues/2026/05/22/argentina-2026-article-iv-consultation-second-review-under-the-extended-arrangement-under-576253", target: "_blank", rel: "noopener" }, "IMF Country Report, May 2026"), "."));
+    // Exports carry the result and its assumptions (reference, dates, α), not just the line.
+    function onPNG() {
+      if (!lastFig || !last) return;
+      const ES = LANG === "es", L = last;
+      const sub = ES
+        ? `Índice de tipo de cambio real${L.mode === "CCL" ? " al CCL" : ""} · ${L.question === "two" ? "A" : "Referencia"}: ${L.aName} (${fmtR(L.reference_index, 1)}) → ${fmtDay(L.date_b)} (${fmtR(L.index_b, 1)}), ${pct(L.rer_change_pct)}<br>Tipo de cambio que la restablece: ${fmtR(L.rate_that_restores)} (efectivo ${fmtR(L.actual_rate, 2)}) · Cambio requerido en la productividad relativa: ${pct(L.productivity_change_pct)}, con α = ${fx(L.alpha, 2)}`
+        : `Real exchange rate index${L.mode === "CCL" ? " at the CCL rate" : ""} · ${L.question === "two" ? "A" : "Reference"}: ${L.aName} (${fmtR(L.reference_index, 1)}) → ${fmtDay(L.date_b)} (${fmtR(L.index_b, 1)}), ${pct(L.rer_change_pct)}<br>Rate that restores it: ${fmtR(L.rate_that_restores)} (actual ${fmtR(L.actual_rate, 2)}) · Required change in relative productivity: ${pct(L.productivity_change_pct)}, with α = ${fx(L.alpha, 2)}`;
+      exportPNG(ind, lastFig.traces, sub, { suffix: "", signed: false }, `${ind.id}_${L.mode}_${L.date_b}.png`, { shapes: lastFig.shapes, margin: { t: 160 } });
+    }
+    function onCSV() {
+      if (!last) return;
+      const keys = ["question", "mode", "reference", "reference_index", "date_b", "index_b", "rer_change_pct", "rate_that_restores", "actual_rate", "actual_rate_date",
+        "alpha", "productivity_change_pct", "productivity_change_per_year_pct", "span", "terms_of_trade_change_pct"];
+      const rows = keys.map((k) => [k, last[k] === null || last[k] === undefined ? "" : typeof last[k] === "number" ? Number(last[k].toFixed(4)) : last[k]]);
+      rows.push(["method", "Relative PPP; Balassa-Samuelson: dln RER = -alpha x dln relative productivity (see the methodology page)"]);
+      downloadBlob(toCSV(["item", "value"], rows), `${ind.id}_${last.mode}_${last.date_b}.csv`, "text/csv");
+    }
     const refWrap = h("label", { class: "inline-select" }, "Reference: ", refSel, dateIn);
     const twoWrap = h("div", { class: "inline-select rer-two", hidden: true },
       h("label", {}, "A: ", inA), h("label", {}, "B: ", inB));
     const aWrap = h("label", { class: "inline-select", title: "Weight of non-tradables in the price index" }, "α: ", aIn, aOut);
     appendAll(card, h("div", { class: "controls" }, calcSeg, modeSeg, h("span", { class: "spacer" }), refWrap, twoWrap, aWrap),
       outEl, chartEl, h("p", { class: "hint rer-legend" }, "Restore a reference: shaded is the middle half of the index since 2003 (25th to 75th percentile), dashed is the reference. Two dates: A and B are marked."),
-      caveats, methodLine(ind),
-      h("div", { class: "card-foot" }, h("span", {}, `Source: ${ind.source_label} · Latest: ${fmtDay(ind.last_obs)}`, ...srcTail(ind))));
+      caveats, methodLine(ind), footer(ind, onPNG, onCSV));
     card.draw = () => draw();
     return card;
   }
@@ -4486,7 +4509,7 @@
           if (!x) return h("td", { class: "empty" }, "");
           const [v, z] = x;
           const tip = `${r.label}, ${r.freq === "Q" ? QN(c) + " " + c.slice(0, 4) : MON(c) + " " + c.slice(0, 4)}: ${fmtChange(r, V.kind, v)}` +
-            (z === null ? "" : ` · ${Math.abs(z) < 0.5 ? "a usual move" : `${z > 0 ? (r.good === "none" ? "high" : "better") : (r.good === "none" ? "low" : "worse")} than usual (${fx(Math.abs(z), 1)} s.d.)`} for this series`);
+            (z === null ? "" : ` · ${Math.abs(z) < 0.5 ? "a usual move" : `${z > 0 ? (r.good === "none" ? "higher" : "better") : (r.good === "none" ? "lower" : "worse")} than usual (${fx(Math.abs(z), 1)} s.d.)`} for this series`);
           return h("td", { class: fb ? "dash-fb" : null, style: cellStyle(r, z), title: tip }, fmtChange(r, V.kind, v), r.freq === "Q" ? h("span", { class: "dash-q" }, QN(c)) : null);
         });
         const lvlDate = r.freq === "Q" ? `${QN(r.level_date)} ${r.level_date.slice(0, 4)}` : `${MON(r.level_date)} ${r.level_date.slice(0, 4)}`;
@@ -4710,8 +4733,11 @@
       $("#eo-link").href = site.publisher_url;
     }
     if (site.repo_url) $("#repo-link").href = site.repo_url;
+    // The language switch keeps the chart anchor (#ind-…), so a chart link survives the change of language.
+    const ls = document.querySelector(".lang-switch");
+    if (ls) { const base = ls.getAttribute("href").split("#")[0]; const sync = () => { ls.href = base + location.hash; }; sync(); window.addEventListener("hashchange", sync); }
     const built = new Date(manifest.built_at);
-    $("#build-meta").textContent = `Last data check: ${built.toLocaleString(LOCALE, { dateStyle: "medium", timeStyle: "short" })}`;
+    $("#build-meta").textContent = `Last data check: ${built.toLocaleString(LOCALE, { dateStyle: "medium", timeStyle: "short", timeZone: "America/Argentina/Buenos_Aires" })} (${LANG === "es" ? "hora de Buenos Aires" : "Buenos Aires time"})`;
 
     const topicOf = new Map(manifest.indicators.map((m) => [m.id, m.topic]));
     const slugOf = new Map(manifest.topics.map((t) => [t.id, t.slug]));
@@ -4981,13 +5007,19 @@
       const terms = norm(input.value).split(/\s+/).filter(Boolean);
       sel = -1;
       if (!terms.length) { results = []; render(); return; }
+      // Each term must start a word (not sit inside one); title hits rank above description hits, and
+      // description-only hits are dropped when the titles already give five or more results.
+      const words = (s) => s.split(/[^a-z0-9]+/);
       results = items.map((it) => {
-        if (!terms.every((w) => it.text.includes(w))) return null;
-        let score = 0;
-        for (const w of terms) score += it.tn.includes(w) ? (it.tn.split(/\W+/).some((x) => x.startsWith(w)) ? 3 : 2) : 1;
+        const tw = it._tw || (it._tw = words(it.tn)), dw = it._dw || (it._dw = words(it.text));
+        if (!terms.every((w) => dw.some((x) => x.startsWith(w)))) return null;
+        let score = 0, inTitle = true;
+        for (const w of terms) { if (tw.some((x) => x.startsWith(w))) score += tw.includes(w) ? 3 : 2; else { score += 1; inTitle = false; } }
         if (it.where === tr("Page")) score += 0.5;
-        return { ...it, score };
-      }).filter(Boolean).sort((a, b) => b.score - a.score || a.title.length - b.title.length).slice(0, 8);
+        return { ...it, score, inTitle };
+      }).filter(Boolean);
+      if (results.filter((r) => r.inTitle).length >= 5) results = results.filter((r) => r.inTitle);
+      results = results.sort((a, b) => b.score - a.score || a.title.length - b.title.length).slice(0, 8);
       if (window.goatcounter && window.goatcounter.count && terms.join(" ").length > 2) {
         clearTimeout(input._gc); input._gc = setTimeout(() => window.goatcounter.count({ path: `search/${terms.join("-")}`, title: "search", event: true }), 1500);
       }

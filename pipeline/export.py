@@ -308,11 +308,27 @@ def rem_outcomes() -> dict:
     return {k: {y: float(v) for y, v in d.items()} for k, d in out.items()}
 
 
+def observed_last(wide, ind=None):
+    """The card's latest observation: the default variant's last date with data (other variants can
+    run ahead: the exchange-rate band's limits are scheduled in advance), never after today
+    (Buenos Aires); the whole card's last date if the default variant has none."""
+    idx = wide.dropna(how="all").index
+    try:
+        sid = ind.variants[ind.default["variant"]].source_id if ind is not None else None
+    except Exception:
+        sid = None
+    if sid in getattr(wide, "columns", []) and wide[sid].notna().any():
+        idx = wide[sid].dropna().index
+    today = pd.Timestamp.now(tz="America/Argentina/Buenos_Aires").tz_localize(None).normalize()
+    past = idx[idx <= today]
+    return (past.max() if len(past) else idx.max())
+
+
 def release_last_obs(ind, wide) -> str:
     """The latest period the card's release calendar has delivered. Usually the card's own last
     date; the quarter tracker is quarterly but follows the monthly EMAE calendar, and its last
     quarter is dated by its first month, so it would always look a month or two behind."""
-    last = wide.dropna(how="all").index.max()
+    last = observed_last(wide, ind)
     m = (ind.derive or {}).get("monthly_sa") if (ind.derive or {}).get("method") == "tracker" else None
     if m:
         s = store.as_of(m).dropna()
@@ -622,7 +638,7 @@ def export(out: Path) -> None:
             "ranges": ind.ranges,
             "derived": derived_info,
             "status": worst,
-            "last_obs": wide.dropna(how="all").index.max().strftime("%Y-%m-%d"),
+            "last_obs": observed_last(wide, ind).strftime("%Y-%m-%d"),
             "last_changed": max(changed) if changed else None,
             "last_checked": max(checked) if checked else None,
             "next_release": reg.next_release(ind, release_last_obs(ind, wide)),

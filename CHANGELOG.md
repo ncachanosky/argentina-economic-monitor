@@ -102,6 +102,13 @@ section becomes its notes.
   economies, any country addable); the choice applies to every card. A snapshot table at the top;
   each card also ranks the group for a chosen year. New sources: IMF SDMX API, World Bank API;
   the EFW, V-Dem and SMI adapters also write all-country tables.
+- Small fixes: summary-table tooltips read "higher/lower than usual"; the header's last data check
+  is in Buenos Aires time and says so, like the chart footers; a card's "Latest" is its main series'
+  last observation, never a date scheduled ahead (the exchange-rate band, the announced minimum-wage
+  steps); the language switch keeps the chart anchor; "FX market flows" and "Capacity utilization
+  (UCII) by industry" in the English section names; the RER calculator exports PNG and CSV with the
+  reference, dates and α; search matches whole-word beginnings and drops description-only hits
+  when titles already give five or more.
 - Exported PNG charts carry the Economic Order logo next to the credit line (bottom right).
 - International: general government revenue, expenditure and balance share one card with a switch;
   the view, range, year and added countries carry over between them.
