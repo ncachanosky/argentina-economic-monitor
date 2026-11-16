@@ -87,6 +87,12 @@ def get_adapter(name: str):
         from . import recession
 
         return recession
+    if name == "ipmp":
+        from . import ipmp
+        return ipmp
+    if name == "pcps":
+        from . import pcps
+        return pcps
     if name == "intl":
         from . import intl
         return intl

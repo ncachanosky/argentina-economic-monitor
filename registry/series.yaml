@@ -488,6 +488,23 @@ inputs:
   - {id: "intl:ARG:openness", source: intl, frequency: Y, measure: flow, allow_gaps: true, stale_days: 1100, label: "International: openness, Argentina"}
   - {id: "intl:ARG:fdi", source: intl, frequency: Y, measure: flow, allow_gaps: true, stale_days: 1100, label: "International: fdi, Argentina"}
   - {id: "intl:ARG:gini", source: intl, frequency: Y, measure: flow, allow_gaps: true, stale_days: 1100, label: "International: gini, Argentina"}
+  - {id: "ipmp:total", source: ipmp, frequency: M, measure: index, stale_days: 100, label: "IPMP total"}
+  - {id: "ipmp:agro", source: ipmp, frequency: M, measure: index, stale_days: 100, label: "IPMP agro"}
+  - {id: "ipmp:metals", source: ipmp, frequency: M, measure: index, stale_days: 100, label: "IPMP metals"}
+  - {id: "ipmp:energy", source: ipmp, frequency: M, measure: index, stale_days: 100, label: "IPMP energy"}
+  - {id: "ipmp:total_real", source: ipmp, frequency: M, measure: index, stale_days: 100, label: "IPMP total_real"}
+  - {id: "ipmp:agro_real", source: ipmp, frequency: M, measure: index, stale_days: 100, label: "IPMP agro_real"}
+  - {id: "ipmp:metals_real", source: ipmp, frequency: M, measure: index, stale_days: 100, label: "IPMP metals_real"}
+  - {id: "ipmp:energy_real", source: ipmp, frequency: M, measure: index, stale_days: 100, label: "IPMP energy_real"}
+  - {id: "pcps:PSOYB", source: pcps, frequency: M, measure: index, stale_days: 100, label: "IMF PCPS PSOYB"}
+  - {id: "pcps:PSMEA", source: pcps, frequency: M, measure: index, stale_days: 100, label: "IMF PCPS PSMEA"}
+  - {id: "pcps:PSOIL", source: pcps, frequency: M, measure: index, stale_days: 100, label: "IMF PCPS PSOIL"}
+  - {id: "pcps:PMAIZMT", source: pcps, frequency: M, measure: index, stale_days: 100, label: "IMF PCPS PMAIZMT"}
+  - {id: "pcps:PWHEAMT", source: pcps, frequency: M, measure: index, stale_days: 100, label: "IMF PCPS PWHEAMT"}
+  - {id: "pcps:PBEEF", source: pcps, frequency: M, measure: index, stale_days: 100, label: "IMF PCPS PBEEF"}
+  - {id: "pcps:POILBRE", source: pcps, frequency: M, measure: index, stale_days: 100, label: "IMF PCPS POILBRE"}
+  - {id: "pcps:PNGASUS", source: pcps, frequency: M, measure: index, stale_days: 100, label: "IMF PCPS PNGASUS"}
+  - {id: "pcps:PNGASEU", source: pcps, frequency: M, measure: index, stale_days: 100, label: "IMF PCPS PNGASEU"}
   - {id: "lallpi:ARG:pop", source: lallpi, frequency: Y, measure: flow, allow_gaps: true, stale_days: 4000, label: "Latin American Left-Leaning Populism Index, Argentina"}
   - {id: "smi:ARG:rank", source: smi, frequency: Y, measure: flow, stale_days: 1100, label: "Social Mobility Index, Argentina: rank"}
   - {id: "efw:ARG:summary", source: efw, frequency: Y, measure: flow, allow_gaps: true, stale_days: 1400, label: "EFW, Argentina: summary"}
@@ -3651,6 +3668,115 @@ indicators:
         total: {label: Value, expr: "100 * (p * q / (lag(p, 4) * lag(q, 4)) - 1)"}
         price: {label: Prices, expr: "100 * (p / lag(p, 4) - 1) * (1 + q / lag(q, 4)) / 2"}
         qty:   {label: Quantities, expr: "100 * (q / lag(q, 4) - 1) * (1 + p / lag(p, 4)) / 2"}
+
+  - id: trade_ipmp
+    topic: trade
+    wide: true
+    kind: variants
+    measure: index
+    overlay: true
+    overlay_default: [total, agro, energy]
+    emphasis: total
+    title: "Export Commodity Prices (BCRA IPMP)"
+    short_title: "Export commodity prices"
+    switch: {group: ipmp, label: "In dollars"}
+    description: >-
+      The prices of Argentina's commodity exports, weighted by what the country exports: the BCRA's index and its three groups, December 2001 = 100, in US dollars. Monthly averages since 1997.
+    source: ipmp
+    source_label: "BCRA, Índice de Precios de las Materias Primas (IPMP), serie histórica (metodología 2026)"
+    frequency: M
+    units: "Index, Dec 2001 = 100"
+    transforms: [level, yoy]
+    ranges: [5Y, 10Y, Since 2002, Max]
+    note: >-
+      The BCRA's index of the international prices of Argentina's main
+      commodity exports, each weighted by its share of exports in the
+      previous years (weights updated monthly). Largest weights in
+      September 2026: crude oil 15.9%, soybean meal 15.0%, corn 13.0%,
+      soybean oil 12.9%, gold 8.7%, beef 8.2%, wheat 6.6%, soybeans 6.0%;
+      the soybean complex together, about a third. The index measures
+      prices, not volumes: a bad harvest leaves it unchanged.
+    method_links: [{anchor: commodities, label: "About the commodity prices"}]
+    variants:
+      total: {label: "IPMP (all)", id: "ipmp:total"}
+      agro: {label: "Agricultural products", id: "ipmp:agro"}
+      metals: {label: "Metals and chemicals", id: "ipmp:metals"}
+      energy: {label: "Hydrocarbons", id: "ipmp:energy"}
+    default: {variant: total, transform: level, range: Since 2002}
+
+  - id: trade_ipmp_real
+    topic: trade
+    wide: true
+    kind: variants
+    measure: index
+    overlay: true
+    overlay_default: [total, agro, energy]
+    emphasis: total
+    title: "Export Commodity Prices in Real Terms (BCRA IPMP)"
+    short_title: "Export commodity prices, real"
+    switch: {group: ipmp, label: "Real"}
+    description: >-
+      The BCRA's export commodity price index deflated by the BCRA (December 2001 = 100), to compare purchasing power across decades. Monthly since 1997.
+    source: ipmp
+    source_label: "BCRA, Índice de Precios de las Materias Primas (IPMP), serie histórica (metodología 2026)"
+    frequency: M
+    units: "Index, Dec 2001 = 100, real"
+    transforms: [level, yoy]
+    ranges: [5Y, 10Y, Since 2002, Max]
+    note: >-
+      The BCRA's index of the international prices of Argentina's main
+      commodity exports, each weighted by its share of exports in the
+      previous years (weights updated monthly). Largest weights in
+      September 2026: crude oil 15.9%, soybean meal 15.0%, corn 13.0%,
+      soybean oil 12.9%, gold 8.7%, beef 8.2%, wheat 6.6%, soybeans 6.0%;
+      the soybean complex together, about a third. The index measures
+      prices, not volumes: a bad harvest leaves it unchanged.
+    method_links: [{anchor: commodities, label: "About the commodity prices"}]
+    variants:
+      total: {label: "IPMP (all)", id: "ipmp:total_real"}
+      agro: {label: "Agricultural products", id: "ipmp:agro_real"}
+      metals: {label: "Metals and chemicals", id: "ipmp:metals_real"}
+      energy: {label: "Hydrocarbons", id: "ipmp:energy_real"}
+    default: {variant: total, transform: level, range: Since 2002}
+
+  - id: trade_commodities
+    topic: trade
+    wide: true
+    kind: variants
+    measure: index
+    title: "World Commodity Prices"
+    short_title: "Commodity prices"
+    description: >-
+      World prices of the commodities behind Argentina's trade: the soybean
+      complex, corn, wheat, beef, crude oil, and natural gas. Monthly
+      averages in US dollars, from the IMF.
+    source: pcps
+    source_label: "IMF, Primary Commodity Prices"
+    frequency: M
+    units: "US dollars"
+    no_presidency: true
+    transforms: [level, yoy]
+    ranges: [5Y, 10Y, Max]
+    note: >-
+      Benchmark world prices (the IMF's definitions): soybeans and soybean
+      products at US and Argentine ports, corn and wheat US Gulf, beef
+      Australian and New Zealand exports to the US, Brent crude, natural gas
+      at the US Henry Hub and the Dutch TTF hub. Argentina's own export
+      prices differ from these by freight, quality and export duties. Gas
+      matters on both sides: Argentina imported LNG at European-linked prices
+      until Vaca Muerta made it a net exporter.
+    method_links: [{anchor: commodities, label: "About the commodity prices"}]
+    variants:
+      soybeans: {label: "Soybeans (US$/t)", id: "pcps:PSOYB"}
+      soy_meal: {label: "Soybean meal (US$/t)", id: "pcps:PSMEA"}
+      soy_oil: {label: "Soybean oil (US$/t)", id: "pcps:PSOIL"}
+      corn: {label: "Corn (US$/t)", id: "pcps:PMAIZMT"}
+      wheat: {label: "Wheat (US$/t)", id: "pcps:PWHEAMT"}
+      beef: {label: "Beef (US cents/lb)", id: "pcps:PBEEF"}
+      brent: {label: "Crude oil, Brent (US$/barrel)", id: "pcps:POILBRE"}
+      gas_us: {label: "Natural gas, US Henry Hub (US$/MMBtu)", id: "pcps:PNGASUS"}
+      gas_eu: {label: "Natural gas, Europe TTF (US$/MMBtu)", id: "pcps:PNGASEU"}
+    default: {variant: soybeans, transform: level, range: 10Y}
 
   - id: trade_terms
     topic: trade

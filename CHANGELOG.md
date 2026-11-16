@@ -102,6 +102,11 @@ section becomes its notes.
   economies, any country addable); the choice applies to every card. A snapshot table at the top;
   each card also ranks the group for a chosen year. New sources: IMF SDMX API, World Bank API;
   the EFW, V-Dem and SMI adapters also write all-country tables.
+- International Trade: commodity prices. The BCRA's export commodity price index (IPMP, weighted by
+  Argentina's exports) and its three groups, in dollars or in real terms (one card with a switch),
+  and world benchmark prices from the IMF (soybeans, soybean meal and oil, corn, wheat, beef,
+  Brent, natural gas in the US and Europe). New sources: the BCRA's IPMP workbook and the IMF's
+  Primary Commodity Prices.
 - Data page (/download/, in the menu as "Data"): every chart's CSV and JSON with stable links,
   grouped by page, with source, frequency and latest observation; a catalog of every chart and
   every stored series (catalog.json); one-download archives of all the data (all_data.zip) and of

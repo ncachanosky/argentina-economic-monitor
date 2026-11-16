@@ -5555,6 +5555,78 @@
     "status": "ok",
     "warnings": []
   },
+  "ipmp:agro": {
+    "last_changed": "2026-11-16",
+    "last_checked": "2026-11-16T06:47:58+00:00",
+    "last_obs": "2026-10-01",
+    "source": "ipmp",
+    "source_units": "index, Dec 2001 = 100",
+    "status": "ok",
+    "warnings": []
+  },
+  "ipmp:agro_real": {
+    "last_changed": "2026-11-16",
+    "last_checked": "2026-11-16T06:47:58+00:00",
+    "last_obs": "2026-09-01",
+    "source": "ipmp",
+    "source_units": "index, Dec 2001 = 100",
+    "status": "ok",
+    "warnings": []
+  },
+  "ipmp:energy": {
+    "last_changed": "2026-11-16",
+    "last_checked": "2026-11-16T06:47:58+00:00",
+    "last_obs": "2026-10-01",
+    "source": "ipmp",
+    "source_units": "index, Dec 2001 = 100",
+    "status": "ok",
+    "warnings": []
+  },
+  "ipmp:energy_real": {
+    "last_changed": "2026-11-16",
+    "last_checked": "2026-11-16T06:47:58+00:00",
+    "last_obs": "2026-09-01",
+    "source": "ipmp",
+    "source_units": "index, Dec 2001 = 100",
+    "status": "ok",
+    "warnings": []
+  },
+  "ipmp:metals": {
+    "last_changed": "2026-11-16",
+    "last_checked": "2026-11-16T06:47:58+00:00",
+    "last_obs": "2026-10-01",
+    "source": "ipmp",
+    "source_units": "index, Dec 2001 = 100",
+    "status": "ok",
+    "warnings": []
+  },
+  "ipmp:metals_real": {
+    "last_changed": "2026-11-16",
+    "last_checked": "2026-11-16T06:47:58+00:00",
+    "last_obs": "2026-09-01",
+    "source": "ipmp",
+    "source_units": "index, Dec 2001 = 100",
+    "status": "ok",
+    "warnings": []
+  },
+  "ipmp:total": {
+    "last_changed": "2026-11-16",
+    "last_checked": "2026-11-16T06:47:58+00:00",
+    "last_obs": "2026-10-01",
+    "source": "ipmp",
+    "source_units": "index, Dec 2001 = 100",
+    "status": "ok",
+    "warnings": []
+  },
+  "ipmp:total_real": {
+    "last_changed": "2026-11-16",
+    "last_checked": "2026-11-16T06:47:58+00:00",
+    "last_obs": "2026-09-01",
+    "source": "ipmp",
+    "source_units": "index, Dec 2001 = 100",
+    "status": "ok",
+    "warnings": []
+  },
   "itcrm:br": {
     "last_changed": "2026-11-14",
     "last_checked": "2026-11-16T06:40:15+00:00",
@@ -5641,6 +5713,87 @@
     "last_obs": "2026-01-01",
     "source": "officials",
     "source_units": "officials taking office per year",
+    "status": "ok",
+    "warnings": []
+  },
+  "pcps:PBEEF": {
+    "last_changed": "2026-11-16",
+    "last_checked": "2026-11-16T06:47:58+00:00",
+    "last_obs": "2026-10-01",
+    "source": "pcps",
+    "source_units": "US$",
+    "status": "ok",
+    "warnings": []
+  },
+  "pcps:PMAIZMT": {
+    "last_changed": "2026-11-16",
+    "last_checked": "2026-11-16T06:47:58+00:00",
+    "last_obs": "2026-10-01",
+    "source": "pcps",
+    "source_units": "US$",
+    "status": "ok",
+    "warnings": []
+  },
+  "pcps:PNGASEU": {
+    "last_changed": "2026-11-16",
+    "last_checked": "2026-11-16T06:47:58+00:00",
+    "last_obs": "2026-10-01",
+    "source": "pcps",
+    "source_units": "US$",
+    "status": "ok",
+    "warnings": []
+  },
+  "pcps:PNGASUS": {
+    "last_changed": "2026-11-16",
+    "last_checked": "2026-11-16T06:47:58+00:00",
+    "last_obs": "2026-10-01",
+    "source": "pcps",
+    "source_units": "US$",
+    "status": "ok",
+    "warnings": []
+  },
+  "pcps:POILBRE": {
+    "last_changed": "2026-11-16",
+    "last_checked": "2026-11-16T06:47:58+00:00",
+    "last_obs": "2026-10-01",
+    "source": "pcps",
+    "source_units": "US$",
+    "status": "ok",
+    "warnings": []
+  },
+  "pcps:PSMEA": {
+    "last_changed": "2026-11-16",
+    "last_checked": "2026-11-16T06:47:58+00:00",
+    "last_obs": "2026-10-01",
+    "source": "pcps",
+    "source_units": "US$",
+    "status": "ok",
+    "warnings": []
+  },
+  "pcps:PSOIL": {
+    "last_changed": "2026-11-16",
+    "last_checked": "2026-11-16T06:47:58+00:00",
+    "last_obs": "2026-10-01",
+    "source": "pcps",
+    "source_units": "US$",
+    "status": "ok",
+    "warnings": []
+  },
+  "pcps:PSOYB": {
+    "last_changed": "2026-11-16",
+    "last_checked": "2026-11-16T06:47:58+00:00",
+    "last_obs": "2026-10-01",
+    "source": "pcps",
+    "source_units": "US$",
+    "status": "ok",
+    "warnings": []
+  },
+  "pcps:PWHEAMT": {
+    "last_changed": "2026-11-16",
+    "last_checked": "2026-11-16T06:47:58+00:00",
+    "last_obs": "2026-10-01",
+    "source": "pcps",
+    "source_units": "US$",
     "status": "ok",
     "warnings": []
   },
