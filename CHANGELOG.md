@@ -102,6 +102,11 @@ section becomes its notes.
   economies, any country addable); the choice applies to every card. A snapshot table at the top;
   each card also ranks the group for a chosen year. New sources: IMF SDMX API, World Bank API;
   the EFW, V-Dem and SMI adapters also write all-country tables.
+- Data page (/download/, in the menu as "Data"): every chart's CSV and JSON with stable links,
+  grouped by page, with source, frequency and latest observation; a catalog of every chart and
+  every stored series (catalog.json); one-download archives of all the data (all_data.zip) and of
+  every revision history (vintages.zip), rebuilt at each update. A stated promise that the file
+  addresses stay stable.
 - Small fixes: summary-table tooltips read "higher/lower than usual"; the header's last data check
   is in Buenos Aires time and says so, like the chart footers; a card's "Latest" is its main series'
   last observation, never a date scheduled ahead (the exchange-rate band, the announced minimum-wage

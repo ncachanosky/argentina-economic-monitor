@@ -41,6 +41,9 @@ EN = {
     "about_title": "About",
     "about_lede": "What the Monitor is, how to use it, who is behind it, and how to cite it or report an error.",
     "about_desc": "About the Argentina Economic Monitor, a project of Economic Order.",
+    "download_title": "Data",
+    "download_lede": "Every chart's data with stable links, a catalog of every series, and everything in one download.",
+    "download_desc": "Download the Argentina Economic Monitor's data: CSV and JSON for every chart, a catalog of every series, bulk downloads and revision histories.",
     "calendar_title": "Release calendar",
     "calendar_lede": "When the next official figures come out, and whether the latest ones are already on the Monitor.",
     "calendar_desc": "Release calendar for Argentina's official economic statistics (INDEC): upcoming dates and the latest releases.",
@@ -74,7 +77,7 @@ EN = {
       </div>
       <div>
         <h4>Data</h4>
-        <p>Each chart offers the series as CSV. Full revision histories (every published vintage) are in <code>data/vintages/</code>. How every number is calculated: <a href="__ROOT__methodology/">Methodology</a>. When the next figures come out: <a href="__ROOT__calendar/">Release calendar</a>. By RSS: <a href="__ROOT__feed.xml">weekly summary</a> (Mondays) or <a href="__ROOT__releases.xml">every release</a>.</p>
+        <p>Each chart offers the series as CSV; <a href="__ROOT__download/">every chart's data, with stable links and a single download</a>. Full revision histories (every published vintage) are in <code>data/vintages/</code>. How every number is calculated: <a href="__ROOT__methodology/">Methodology</a>. When the next figures come out: <a href="__ROOT__calendar/">Release calendar</a>. By RSS: <a href="__ROOT__feed.xml">weekly summary</a> (Mondays) or <a href="__ROOT__releases.xml">every release</a>.</p>
         <p class="site-version">Version __VERSION__ · <a href="__RELEASES__" target="_blank" rel="noopener">What's new</a></p>
       </div>""",
 }
@@ -203,7 +206,7 @@ def build(out: Path, tag: str, with_data: bool = True) -> None:
             tt = tops[t["id"]]
             yield (f"{t['slug']}/", t["id"], f"{tt['title']} · {site_name}", tt["title"], tt.get("description", ""),
                    f"{tt['title']}: {tt.get('description', '')}", None, img(t["slug"]))
-        for key in ("methodology", "about"):
+        for key in ("methodology", "about", "download"):
             src = SITE / (f"{key}.es.html" if lang == "es" and (SITE / f"{key}.es.html").exists() else f"{key}.html")
             yield (f"{key}/", key, f"{T[key + '_title']} · {site_name}", T[key + "_title"], T[key + "_lede"], T[key + "_desc"],
                    src.read_text(encoding="utf-8"), img("home"))
@@ -222,8 +225,8 @@ def build(out: Path, tag: str, with_data: bool = True) -> None:
             other = ("" if lang == "es" else "es/") + path
             hreflang = (f'  <link rel="alternate" hreflang="en" href="{base}{path}">\n'
                         f'  <link rel="alternate" hreflang="es" href="{base}es/{path}">') if page != "embed" and spanish_live else ""
-            translated = page in ("methodology", "about") and (SITE / f"{page}.es.html").exists()
-            if lang == "es" and texts.get("pending_note") and (page not in ("methodology", "about") or translated):
+            translated = page in ("methodology", "about", "download") and (SITE / f"{page}.es.html").exists()
+            if lang == "es" and texts.get("pending_note") and (page not in ("methodology", "about", "download") or translated):
                 t_use = {**texts, "pending_note": ""}
             else:
                 t_use = texts
@@ -252,7 +255,7 @@ def build(out: Path, tag: str, with_data: bool = True) -> None:
                     f'<link rel="canonical" href="{target}">'
                     f'<script>location.replace("{target}" + location.hash)</script>'
                     f'<a href="{target}">This page moved.</a>\n', encoding="utf-8")
-    for key in ("methodology", "about"):
+    for key in ("methodology", "about", "download"):
         for f in (f"{key}.html", f"{key}.es.html"):
             (out / f).unlink(missing_ok=True)
     write_crawl_files(out, reg, base, spanish_live)
@@ -266,6 +269,16 @@ def build(out: Path, tag: str, with_data: bool = True) -> None:
             print(f"spanish csv: {translate_csv_headers(out / 'data', load_content('es'))} files")
             (out / "data" / "i18n" / "es.json").write_text(json.dumps(i18n_payload(es), ensure_ascii=False, separators=(",", ":")),
                                                          encoding="utf-8")
+        # The data page's list: the files the export just wrote (pipeline/catalog.py).
+        from . import catalog
+        cat = catalog.build(out / "data", reg, status)
+        cat["_out"] = str(out / "data")
+        for lang, prefix in (("en", ""), ("es", "es/")):
+            pg = out / prefix / "download" / "index.html"
+            if pg.exists():
+                root = "../" * (1 + prefix.count("/"))
+                html_list = catalog.page_html(cat, reg, lang, content_es, "../", f"{root}data/", (es.get("topics") or {}) if es else {})
+                pg.write_text(pg.read_text(encoding="utf-8").replace("<!--DATA_CATALOG-->", html_list), encoding="utf-8")
         from . import social
         print(f"social: {social.build(out, reg, base)} preview images")
         # Plain-text latest values: a list on each topic page (read by crawlers before the charts
@@ -304,7 +317,7 @@ def dataset_jsonld(reg, base: str, lang: str, name: str, desc: str) -> str:
 
 
 def site_paths(reg) -> list[str]:
-    return [""] + [f"{t['slug']}/" for t in reg.topics] + ["methodology/", "about/", "calendar/"]
+    return [""] + [f"{t['slug']}/" for t in reg.topics] + ["methodology/", "about/", "calendar/", "download/"]
 
 
 def write_crawl_files(out: Path, reg, base: str, spanish: bool) -> None:

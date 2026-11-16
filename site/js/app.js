@@ -2903,6 +2903,7 @@
     nav.append(menu,
       h("a", { href: `${ROOT}methodology/`, "aria-current": PAGE === "methodology" ? "page" : null }, tr("Methodology")),
       h("a", { href: `${ROOT}calendar/`, "aria-current": PAGE === "calendar" ? "page" : null }, tr("Calendar")),
+      h("a", { href: `${ROOT}download/`, "aria-current": PAGE === "download" ? "page" : null }, tr("Data")),
       h("a", { href: `${ROOT}about/`, "aria-current": PAGE === "about" ? "page" : null }, tr("About")));
   }
 
@@ -4796,7 +4797,7 @@
     });
 
     const topicsEl2 = $("#topics");
-    if (PAGE === "methodology" || PAGE === "about" || PAGE === "calendar") return;   // static pages: nothing to load
+    if (PAGE === "methodology" || PAGE === "about" || PAGE === "calendar" || PAGE === "download") return;   // static pages: nothing to load
     if (PAGE === "home") {
       // Home: the summary dashboard, then one card per topic.
       let dash = null;

@@ -629,3 +629,13 @@ table.statement th.st-cur, table.statement td.st-cur { border-left: 2px solid va
 .cards-heading { grid-column: 1 / -1; margin: 18px 0 0; font-size: 18px; color: var(--ink); border-bottom: 2px solid var(--ink-3); padding-bottom: 4px; }
 .sc-table td.sc-arg { font-weight: 700; }
 .sc-table .sc-label .ev { display: block; font-size: 11px; color: var(--ink-3); }
+
+/* Data page */
+.data-table { border-collapse: collapse; width: 100%; font-size: 13px; }
+.data-table th, .data-table td { padding: 6px 8px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--rule); }
+.data-table thead th { border-bottom: 2px solid var(--ink-3); font-weight: 700; color: var(--ink-2); }
+.data-table code { font-size: 11px; color: var(--ink-3); }
+.data-table td.data-files, .data-table td.data-latest { white-space: nowrap; }
+.data-wrap { overflow-x: auto; margin-bottom: 8px; }
+.data-bulk li { margin: 4px 0; }
+.data-count { color: var(--ink-3); font-size: 13px; }
