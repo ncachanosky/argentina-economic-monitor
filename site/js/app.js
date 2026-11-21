@@ -330,6 +330,22 @@
     }
     if (extras.margin) Object.assign(layout.margin, extras.margin);
     layout.margin.b += 20 * (srcLines.length - 1);
+    // A legend too long for one line above the plot would run into the subtitle (presidency
+    // colors, many countries): it goes under the plot instead, one 26 px row per line, and the
+    // source line moves down with it.
+    if (!extras.yaxis2 && layout.showlegend && extras.sourceY === undefined) {
+      const plotW = EXPORT.width - layout.margin.l - layout.margin.r;
+      const items = data.filter((t) => t.showlegend !== false && t.name).map((t) => String(t.name).replace(/<[^>]+>/g, "").length * 8.6 + 48);
+      let rows = 1, w = 0;
+      for (const iw of items) { if (w && w + iw > plotW) { rows += 1; w = 0; } w += iw; }
+      if (rows > 1) {
+        layout.margin.b += rows * 26;
+        layout.margin.t -= 30;   // the space the legend had above the plot
+        const plotH = EXPORT.height - layout.margin.t - layout.margin.b;
+        layout.legend = { ...layout.legend, y: -48 / plotH, yanchor: "top" };
+        layout.annotations.slice(-2).forEach((a) => { a.y = -(48 + rows * 26 + 18) / plotH; });
+      }
+    }
     if (extras.sourceY !== undefined) layout.annotations.slice(-2).forEach((a) => { a.y = extras.sourceY; });
     if (data[0] && data[0].orientation === "h") { layout.xaxis.ticksuffix = (extras.xsuffix !== undefined ? extras.xsuffix : specOf(pct).suffix); if (extras.xrange) layout.xaxis.range = extras.xrange; layout.yaxis.ticksuffix = ""; layout.margin.l = 260; }
     // Economic Order's logo at the right of the credit line, 34 px square, aligned with it.
@@ -1172,7 +1188,7 @@
             if (!ii.length) continue;
             const color = termColor(p);
             const st = stats.get(p.id);
-            const stat = st && st.avg !== null ? (t.change ? `${isAnnualized(state.transform, ind.measure) ? "annualized" : "avg"} ${fmtNum(st.avg, t)}` : `max ${fmtNum(st.max, t)}`) : "";
+            const stat = st && st.avg !== null ? (t.change ? `${isAnnualized(state.transform, ind.measure) ? "annualized" : "avg"} ${fmtNum(st.avg, t)}` : `max ${(state.transform === "level" && ind.headline && ind.headline.digits !== undefined ? Number(st.max).toLocaleString(LOCALE, { minimumFractionDigits: ind.headline.digits, maximumFractionDigits: ind.headline.digits }) : fmtNum(st.max, t))}`) : "";
             const common = { type: "scatter", mode: "lines", _light: termLight(p), legendgroup: p.id };
             if (faint) {
               traces.push({ ...common, x: ii.map((i) => ind.dates[i]), y: ii.map((i) => yy[i]), line: { color, width: 1.2, dash: "dash" }, opacity: 0.35, showlegend: false, hoverinfo: "skip", name: `${p.short} (original)` });
@@ -1204,7 +1220,7 @@
         if (state.transform === "level" && y.length) {
           const lastV = y[y.length - 1];
           shapes.push({ type: "line", xref: "paper", yref: "y", x0: 0, x1: 1, y0: lastV, y1: lastV, line: { color: cssVar("--ink-3"), width: 1, dash: "dash", _light: "#85909A" } });
-          annotations.push({ xref: "paper", yref: "y", x: 0.005, y: annY(lastV), xanchor: "left", yanchor: "bottom", showarrow: false, text: `Latest: ${fmtNum(lastV, t)}`, font: { size: 12, color: cssVar("--ink-2") } });
+          annotations.push({ xref: "paper", yref: "y", x: 0.005, y: annY(lastV), xanchor: "left", yanchor: "bottom", showarrow: false, text: `Latest: ${(state.transform === "level" && ind.headline && ind.headline.digits !== undefined ? Number(lastV).toLocaleString(LOCALE, { minimumFractionDigits: ind.headline.digits, maximumFractionDigits: ind.headline.digits }) : fmtNum(lastV, t))}`, font: { size: 12, color: cssVar("--ink-2") } });
         }
       }
       if (main.rebased && state.transform === "level") {

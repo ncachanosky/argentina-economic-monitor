@@ -5551,8 +5551,9 @@ indicators:
     description: >-
       "Riesgo país": the spread of Argentina's dollar bonds over US
       Treasuries in JP Morgan's EMBI index, in basis points (100 = one
-      percentage point), daily since 1999. Other Latin American countries
-      can be added for comparison, from 2007.
+      percentage point), daily since 1999, against the median of
+      ten other Latin American countries (from 2007); each of them can be
+      added too.
     source: riesgo
     source_label: "JP Morgan EMBI: Argentina as published by Ámbito Financiero, via ArgentinaDatos; other countries via the Banco Central de la República Dominicana (market data, not an official statistic)"
     frequency: D
@@ -5576,14 +5577,20 @@ indicators:
       Other countries: JP Morgan's EMBI Global Diversified subindices as
       republished by the Banco Central de la República Dominicana, from
       October 2007 (Bolivia from 2012, Paraguay from 2013). The marked
-      breaks refer to Argentina. Weekends are left out.
+      breaks refer to Argentina. The Latin American median is taken each
+      day over the ten other countries listed (on days with at least seven
+      of them), not over the EMBI's own regional index, which jumps when
+      countries enter or leave it; a median, so one country in distress
+      (Ecuador in 2020) does not move it. Weekends are left out.
     method_links: [{anchor: country-risk, label: "About country risk"}]
     overlay: true
     log_level: true
     emphasis: embi
-    overlay_default: [embi, br, cl, co, mx, pe, uy]
+    overlay_default: [embi, latam]
+    muted: [latam]
     variants:
       embi: {label: "Argentina", id: "riesgo:embi"}
+      latam: {label: "Latin America (median)", id: "riesgo:latam"}
       br: {label: "Brazil", id: "riesgo:br"}
       cl: {label: "Chile", id: "riesgo:cl"}
       co: {label: "Colombia", id: "riesgo:co"}

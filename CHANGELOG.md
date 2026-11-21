@@ -102,6 +102,11 @@ section becomes its notes.
   economies, any country addable); the choice applies to every card. A snapshot table at the top;
   each card also ranks the group for a chosen year. New sources: IMF SDMX API, World Bank API;
   the EFW, V-Dem and SMI adapters also write all-country tables.
+- Country risk: Argentina's spread is now shown by default against the median of ten other
+  Latin American countries (EMBI Global Diversified, daily from 2007); each country can still
+  be added. Chart downloads: a legend too long for one line (presidency colors, many countries)
+  now goes under the plot instead of running into the subtitle; levels use the card's digits
+  ("Latest: 1,070", not "1,070.0").
 - International Trade: commodity prices. The BCRA's export commodity price index (IPMP, weighted by
   Argentina's exports) and its three groups, in dollars or in real terms (one card with a switch),
   and world benchmark prices from the IMF (soybeans, soybean meal and oil, corn, wheat, beef,

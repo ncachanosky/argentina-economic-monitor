@@ -25,6 +25,10 @@ since October 2007 in one workbook (spreads in percentage points, converted to b
 here). Its Argentina column tracks ArgentinaDatos within a few basis points; it is the
 fallback for riesgo:embi when ArgentinaDatos fails. Its Latin America aggregate is not used:
 it has level breaks when countries enter or leave the index (April 2024, September 2026).
+Instead riesgo:latam is the median, each day, of the ten other countries here (LATAM), on days
+with at least MIN_LATAM of them (a country missing for up to three days keeps its last
+value, so the set behind the median does not change for a day): a median, so one country in distress (Ecuador in 2020) does
+not move it, and without Argentina, so the comparison is Argentina against the rest.
 A one-day move of more than SPIKE that the next day undoes, with the days around it within
 10% of each other, is dropped as a glitch (Uruguay, 23 October 2025: 41 between 69 and 70).
 """
@@ -51,6 +55,18 @@ BCRD_PAGE = "https://www.bancentral.gov.do/a/d/2585-entorno-internacional"
 BCRD_COLS = {"ar": "Argentina", "br": "Brasil", "cl": "Chile", "co": "Colombia", "mx": "México", "pe": "Perú",
              "uy": "Uruguay", "ec": "Ecuador", "bo": "Bolivia", "py": "Paraguay", "pa": "Panamá"}
 SPIKE = 0.20
+LATAM = [c for c in BCRD_COLS if c != "ar"]
+MIN_LATAM = 7
+
+
+def latam_median(bcrd: dict[str, pd.Series]) -> pd.Series:
+    """Median spread of the other Latin American countries, each day with at least MIN_LATAM of them."""
+    df = pd.DataFrame({c: bcrd[c] for c in LATAM if c in bcrd})
+    # A country missing for a day or two (a holiday, a dropped glitch) keeps its last value, so
+    # the set behind the median does not change from one day to the next.
+    df = df.ffill(limit=3).where(df.bfill().notna() | df.notna())
+    m = df.median(axis=1, skipna=True)[df.notna().sum(axis=1) >= MIN_LATAM]
+    return m.round(1).dropna()
 
 
 def _get(url: str, retries: int = 3):
@@ -154,6 +170,8 @@ def fetch(ids) -> FetchResult:
             bcrd_err = str(exc)
     for sid in region:
         code = sid.split(":", 1)[1]
+        if code == "latam" and bcrd is not None:
+            bcrd = {**bcrd, "latam": latam_median(bcrd)}
         if bcrd is None or code not in bcrd or bcrd[code].empty:
             errors[sid] = bcrd_err or f"no BCRD column for '{code}'"
             continue

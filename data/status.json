@@ -5971,6 +5971,15 @@
     "status": "ok",
     "warnings": []
   },
+  "riesgo:latam": {
+    "last_changed": "2026-11-21",
+    "last_checked": "2026-11-21T23:44:22+00:00",
+    "last_obs": "2026-11-19",
+    "source": "riesgo",
+    "source_units": "basis points",
+    "status": "ok",
+    "warnings": []
+  },
   "riesgo:mx": {
     "last_changed": "2026-11-21",
     "last_checked": "2026-11-21T17:45:25+00:00",
