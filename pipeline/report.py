@@ -27,6 +27,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 from . import store
+from . import summary as sm
 from .registry import ROOT
 from .social import BG, COPPER, INK, INK2, INK3, RULE, _font
 
@@ -73,6 +74,25 @@ def sectors() -> pd.DataFrame:
     out = pd.DataFrame(rows, columns=["id", "label", "yoy", "contrib"]).set_index("id")
     out.attrs["month"] = t
     return out
+
+
+def site_line(c: str) -> str:
+    """The card's summary line in its default view, by the site's rules (pipeline/summary.py)."""
+    d = _payload(c)
+    try:
+        pres = json.loads((DATA / "manifest.json").read_text()).get("presidencies") or []
+    except FileNotFoundError:
+        pres = []
+    df = d.get("default") or {}
+    v, tk = df.get("variant"), df.get("transform", "level")
+    lv = pd.Series(d["variants"][v]["values"], index=pd.to_datetime(d["dates"]), dtype=float)
+    y = (lv / lv.shift(1) - 1) * 100 if tk == "mom" else (lv / lv.shift(12) - 1) * 100 if tk == "yoy" else lv
+    cmp = None
+    for k in d.get("muted") or []:
+        if "median" in d["variants"][k]["label"].lower() and k in (d.get("overlay_default") or []):
+            cmp = (d["variants"][k]["label"], pd.Series(d["variants"][k]["values"], index=lv.index, dtype=float))
+    return sm.line(sm.summarize(d, y, units=d["units"], tkey=tk, change=tk != "level", levels=lv,
+                                start=sm.view_start(d), presidencies=pres, compare=cmp))
 
 
 def rem(k: str) -> pd.Series:
@@ -274,6 +294,13 @@ def build(out: Path, cpi_month: str | None = None) -> dict:
     dec = sa.get(pd.Timestamp(ta.year - 1, 12, 1))
     e_ytd = (sa[ta] / dec - 1) * 100 if dec is not None and ta.month > 1 else None
     sec = sectors()
+    # The two-quarter rule on the SA EMAE (as the site's toggle): calendar quarters and monthly rolling.
+    cal_sp = sm.spell_stats(sa, sm.two_quarter_spells(sa, "calendar"), "calendar")
+    rol_sp = sm.spell_stats(sa, sm.two_quarter_spells(sa, "rolling"), "rolling")
+    cal_now = next((x for x in cal_sp if x["ongoing"]), None)
+    rol_now = next((x for x in rol_sp if x["ongoing"]), None)
+    gdp_sa = card("gdp", "sa")
+    gq = (gdp_sa / gdp_sa.shift(1) - 1) * 100
 
     # Wages and employment
     wr = real("labor_wages_real", "private")
@@ -365,7 +392,11 @@ def build(out: Path, cpi_month: str | None = None) -> dict:
 
     # 3. EMAE
     since = ta - pd.DateOffset(months=36)
-    fig, ax = _fig("Economic activity", "EMAE, seasonally adjusted, index 2004 = 100", "INDEC")
+    fig, ax = _fig("Economic activity", "EMAE, seasonally adjusted, index 2004 = 100; shaded: two or more calendar quarters of decline", "INDEC; monitor's calculations")
+    for x_ in cal_sp:
+        a_, b_ = max(x_["start"], since), sm.add_months(x_["end"], 1)
+        if b_ > since:
+            ax.axvspan(a_, b_, color=INK3, alpha=0.18, lw=0)
     ax.plot(sa[since:].index, sa[since:].values, color=INK, lw=2)
     ax.scatter([ta], [sa[ta]], s=24, color=COPPER, zorder=3)
     _end_label(ax, sa[since:], "{:.1f}", COPPER)
@@ -475,7 +506,7 @@ def build(out: Path, cpi_month: str | None = None) -> dict:
          f"{p1(y['core'][t])} y/y; REM median {p1(ec)}" if ec is not None else ""),
         ("CPI, regulated", MY(t), f"{p1(r)} m/m", f"{p1(m['regulated'][prev])} in {M(prev)}", f"{p1(y['regulated'][t])} y/y"),
         ("EMAE (activity)", MY(ta), f"{signed(e_sa)} m/m s.a.", f"{signed(e_sa1)} in {M(ta - pd.DateOffset(months=1))}",
-         f"{signed(e_yoy)} y/y; {signed(e_3m)} 3m/3m"),
+         f"{signed(e_yoy)} y/y; {signed(e_3m)} 3m/3m" + (f"; two-quarter decline since Q{(cal_now['start'].month - 1) // 3 + 1} {cal_now['start'].year}" if cal_now else "")),
         ("Real registered private wages", MY(tw), f"{signed(w_yoy)} y/y", f"{signed(w_mom)} m/m", ""),
         ("Official exchange rate", DM(tf), f"${fx[tf]:,.1f}", f"{signed(fx_chg)} in 30 days",
          f"{p1(room[room.index[-1]])} room to the band ceiling; 12m: {signed(hz[2][1])} vs CPI {p1(hz[2][2])}"),
@@ -624,6 +655,42 @@ def build(out: Path, cpi_month: str | None = None) -> dict:
         per_s = (f"Q{(per.month - 1) // 3 + 1} {per.year}" if a["frequency"] == "Q" else MY(per))
         cal.append((DM(a["date"]), a["indicators"][0]["title"], per_s))
 
+    # The two-quarter rule, and whether GDP has confirmed it.
+    Qn = lambda d: f"Q{(pd.Timestamp(d).month - 1) // 3 + 1} {pd.Timestamp(d).year}"
+    gdp_next = next((a["date"] for a in up["ahead"] if any(i["id"] == "gdp" for i in a["indicators"])), None)
+    tq = []
+    if cal_now or rol_now:
+        tq.append("By the two-quarter rule of thumb, activity is in a decline: "
+                  + (f"the seasonally adjusted EMAE's quarterly average has fallen for {num(cal_now['months'] // 3)} calendar quarters in a row "
+                     f"({Qn(cal_now['start'])} to {Qn(cal_now['end'])}, {abs(cal_now['depth']):.1f}% below the quarter before)" if cal_now else
+                     "calendar quarters do not show two falling quarters yet")
+                  + (f"; on monthly rolling quarters, the spell runs from {MY(rol_now['start'])} to {MY(rol_now['end'])}." if rol_now else "."))
+        q_end = cal_now["end"] if cal_now else (rol_now["end"] if rol_now else None)
+        q_last = pd.Timestamp(q_end.year, (q_end.month - 1) // 3 * 3 + 1, 1) if q_end is not None else None
+        if q_last is not None and gdp_sa.index[-1] >= q_last:
+            g2 = gq[gq.index <= q_last].dropna()[-2:]
+            both = (g2 < 0).all()
+            tq.append(f"INDEC's GDP figures {'confirm' if both else 'do not confirm'} it: seasonally adjusted GDP changed "
+                      + andjoin([f"{signed(v)} in {Qn(d)}" for d, v in g2.items()]) + " on the previous quarter.")
+        elif gdp_next:
+            tq.append(f"GDP for {Qn(gdp_sa.index[-1] + pd.DateOffset(months=3))} is due from INDEC on {DM(gdp_next)}; "
+                      "the EMAE is revised with each release, so the rule's latest months can still change.")
+        tq.append("It is a rule of thumb, not an official dating of the cycle; the Monitor's EMAE chart shades both versions and lists every spell since 2004.")
+    else:
+        tq.append("The seasonally adjusted EMAE does not show two consecutive quarters of decline, on calendar quarters or on rolling quarters.")
+    T["two_quarter"] = tq
+
+    # The site's summary line for each section's card (same rules as the Monitor).
+    MON = {}
+    for k_, cs_ in (("prices", ["cpi"]), ("activity", ["emae"]), ("fx", ["fx_official"]), ("reserves", ["net_reserves", "country_risk"]),
+                    ("fiscal", ["fiscal_balance"]), ("rates", ["policy_rate_real"]), ("labor", ["labor_registered"])):
+        try:
+            MON[k_] = [(json.loads((DATA / f"{c_}.json").read_text())["title"], site_line(c_)) for c_ in cs_]
+        except Exception as exc:   # a missing card leaves the line out, never the report
+            MON[k_] = []
+            print(f"report: no summary line for {cs_}: {exc}")
+    T["monitor"] = MON
+
     # Quarterly releases seen since the last issue
     quarterly = [r_ for r_ in up["recent"] if r_["frequency"] == "Q"]
 
@@ -664,6 +731,7 @@ def render(d: dict) -> str:
     e = html.escape
     t, T, C = d["t"], d["text"], d["charts"]
     P = lambda xs: "".join(f"<p>{e(x)}</p>" for x in xs if x)
+    ON = lambda k: "".join(f'<p class="note">On the Monitor, {e(t_)}: {e(l_)}</p>' for t_, l_ in T.get("monitor", {}).get(k, []) if l_)
     img = lambda k, alt: f'<img src="{C[k]}" alt="{e(alt)}">'
     rows = "".join(f"<tr><td>{e(a)}</td><td>{e(b)}</td><td>{e(c)}</td><td>{e(dd)}</td><td>{e(f)}</td></tr>"
                    for a, b, c, dd, f in d["rows"])
@@ -691,13 +759,13 @@ Charts are in the <code>img/</code> folder, numbered in order.</div>
 
 <hr class="paywall"><div class="paylabel">Paywall break: insert Substack's paywall here</div>
 
-<h2>Prices</h2>{P(T['prices'])}{img('prices', 'Headline, core and regulated CPI, monthly change')}
-<h2>Activity</h2>{P(T['activity'][:1])}{img('activity', 'EMAE seasonally adjusted')}{P(T['activity'][1:])}{img('sectors', 'EMAE sectors, contributions to the year-on-year change')}
-<h2>Exchange rate</h2>{P(T['fx'][:2])}{img('fx', 'Official exchange rate, band ceiling and CCL')}{P(T['fx'][2:])}{img('fx_real', 'Peso depreciation against CPI inflation')}
-<h2>Reserves and the BCRA</h2>{P(T['reserves'])}{img('reserves', 'Gross and net reserves')}
-<h2>Fiscal</h2>{P(T['fiscal'])}{img('fiscal', 'Primary, financial and accrual fiscal balances')}
-<h2>Rates and money</h2>{P(T['rates'])}{img('rates', 'Real TAMAR')}
-<h2>Labor</h2>{P(T['labor'])}{img('labor', 'Real wages index')}
+<h2>Prices</h2>{P(T['prices'])}{img('prices', 'Headline, core and regulated CPI, monthly change')}{ON('prices')}
+<h2>Activity</h2>{P(T['activity'][:1])}{P(T.get('two_quarter', []))}{img('activity', 'EMAE seasonally adjusted, with two-quarter declines shaded')}{P(T['activity'][1:])}{img('sectors', 'EMAE sectors, contributions to the year-on-year change')}{ON('activity')}
+<h2>Exchange rate</h2>{P(T['fx'][:2])}{img('fx', 'Official exchange rate, band ceiling and CCL')}{P(T['fx'][2:])}{img('fx_real', 'Peso depreciation against CPI inflation')}{ON('fx')}
+<h2>Reserves and the BCRA</h2>{P(T['reserves'])}{img('reserves', 'Gross and net reserves')}{ON('reserves')}
+<h2>Fiscal</h2>{P(T['fiscal'])}{img('fiscal', 'Primary, financial and accrual fiscal balances')}{ON('fiscal')}
+<h2>Rates and money</h2>{P(T['rates'])}{img('rates', 'Real TAMAR')}{ON('rates')}
+<h2>Labor</h2>{P(T['labor'])}{img('labor', 'Real wages index')}{ON('labor')}
 <h2>Surprises</h2>{P(T['surprises'])}{img('surprises', 'CPI minus REM median')}
 {qsec}
 <h2>Analysis</h2>

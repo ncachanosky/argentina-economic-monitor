@@ -102,6 +102,11 @@ section becomes its notes.
   economies, any country addable); the choice applies to every card. A snapshot table at the top;
   each card also ranks the group for a chosen year. New sources: IMF SDMX API, World Bank API;
   the EFW, V-Dem and SMI adapters also write all-country tables.
+- Monthly report draft: each section ends with the Monitor's summary line for its card, computed by
+  the same rules as the site (new `pipeline/summary.py`, a Python port of the summary line and the
+  two-quarter rule, with tests). The activity section reports the two-quarter rule (calendar and
+  monthly rolling), and whether INDEC's GDP confirms it or when GDP is due; the EMAE chart shades
+  two-quarter declines.
 - EMAE: a toggle shades spells of two or more quarters of falling seasonally adjusted activity
   (the two-quarter rule), on calendar quarters or on rolling quarters month by month (when the quarter ending in month t
   and the quarter before both fell, the six months t-5 to t are shaded), with the
