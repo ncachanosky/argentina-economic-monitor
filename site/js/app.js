@@ -342,6 +342,7 @@
     if (extras.barmode) layout.barmode = extras.barmode;
     if (extras.xcategory) layout.xaxis.type = "category";
     if (extras.xaxis) Object.assign(layout.xaxis, extras.xaxis);
+    if (extras.yaxis) Object.assign(layout.yaxis, extras.yaxis);
     if (extras.yaxis2) {
       // Right axis: keep the subtitle clear by moving the (long) legend under the plot.
       layout.yaxis2 = extras.yaxis2; layout.margin.r = 110; layout.margin.b = 200;
@@ -353,6 +354,7 @@
     // A legend too long for one line above the plot would run into the subtitle (presidency
     // colors, many countries): it goes under the plot instead, one 26 px row per line, and the
     // source line moves down with it.
+    if (data[0] && data[0].orientation === "h") { layout.xaxis.ticksuffix = (extras.xsuffix !== undefined ? extras.xsuffix : specOf(pct).suffix); if (extras.xrange) layout.xaxis.range = extras.xrange; layout.yaxis.ticksuffix = ""; layout.margin.l = extras.rankBars ? 170 : 260; }
     const ends = (extras.annotations || []).filter((a) => a._endLabel);
     if (ends.length) layout.margin.r = Math.max(layout.margin.r, 24 + 9.5 * Math.max(...ends.map((a) => a.text.replace(/<[^>]+>/g, "").length)));
     let legendRows = 0;
@@ -395,7 +397,6 @@
       }
     }
     if (extras.sourceY !== undefined) layout.annotations.slice(-2).forEach((a) => { a.y = extras.sourceY; });
-    if (data[0] && data[0].orientation === "h") { layout.xaxis.ticksuffix = (extras.xsuffix !== undefined ? extras.xsuffix : specOf(pct).suffix); if (extras.xrange) layout.xaxis.range = extras.xrange; layout.yaxis.ticksuffix = ""; layout.margin.l = 260; }
     // Economic Order's logo at the right of the credit line, 34 px square, aligned with it.
     {
       const credit = layout.annotations[layout.annotations.length - 1];
@@ -404,11 +405,41 @@
       layout.images = [...(layout.images || []), { source: EO_LOGO, xref: "paper", yref: "paper", x: 1, y: credit.y, xanchor: "right", yanchor: "top",
         sizex: LOGO / plotW, sizey: LOGO / plotH, sizing: "contain", layer: "above" }];
     }
+    // Dark site theme: the PNG comes out dark too, every light-theme color swapped for its dark counterpart.
+    const dark = isDark();
+    if (dark) darkExport(data, layout);
     const url = await Plotly.toImage({ data, layout }, { format: "png", width: EXPORT.width, height: EXPORT.height });
-    const a = h("a", { href: url, download: filename });
+    const a = h("a", { href: url, download: dark ? filename.replace(/\.png$/, "_dark.png") : filename });
     document.body.append(a); a.click(); a.remove();
   }
 
+
+  // Light-theme export colors and their dark-theme counterparts (site/css/theme.css).
+  const DARK_EXPORT = {
+    "#FFFFFF": "#1E262C", "#36454F": "#EEF1F3", "#5A6872": "#B9C2C9", "#85909A": "#8A959E", "#ECE9E3": "#2C3841", "#E3E0D9": "#34414B",
+    "#B87333": "#C98A4F", "#5B9BD5": "#6FA9DD", "#87A96B": "#93B477", "#8E7AB5": "#A08DC4", "#C9A227": "#D4B24A", "#C96B7E": "#D8899A",
+    "#3E9C9A": "#5BB5B2", "#6C7A89": "#8E9BA8", "#C9CED3": "#4A5763", "#B9C2C9": "#4A5763", "#F6F3EE": "#26313A", "#B0B7BD": "#5C6A74",
+    "#D4745E": "#E58C77",
+  };
+  function darkExport(data, layout) {
+    const M = { ...DARK_EXPORT };
+    Object.values(PARTY_COLORS).forEach((c) => { if (c.light && c.dark) M[c.light.toUpperCase()] = c.dark; });
+    const hex = (r, g, b) => "#" + [r, g, b].map((v) => Number(v).toString(16).padStart(2, "0")).join("").toUpperCase();
+    const rgb = (hx) => [1, 3, 5].map((i) => parseInt(hx.slice(i, i + 2), 16)).join(", ");
+    const fix = (x) => x.replace(/#[0-9a-fA-F]{6}\b/g, (m) => M[m.toUpperCase()] || m)
+      .replace(/rgba?\((\d+),\s*(\d+),\s*(\d+)/g, (m, r, g, b) => {
+        if (+r === 54 && +g === 69 && +b === 79) return m.replace(/\(\d+,\s*\d+,\s*\d+/, "(238, 241, 243");   // shaded bands
+        const d = M[hex(r, g, b)]; return d ? m.replace(/\(\d+,\s*\d+,\s*\d+/, `(${rgb(d)}`) : m; });
+    const walk = (o) => {
+      if (Array.isArray(o)) { o.forEach((v, i) => { if (typeof v === "string") o[i] = fix(v); else if (v && typeof v === "object") walk(v); }); return; }
+      for (const k of Object.keys(o)) {
+        if (k === "source" || k === "x" || k === "y") continue;   // the logo, and data
+        const v = o[k];
+        if (typeof v === "string") o[k] = fix(v); else if (v && typeof v === "object") walk(v);
+      }
+    };
+    data.forEach(walk); walk(layout);
+  }
 
   // ---------- presidential terms ----------
   // Filled from manifest.presidencies. Convention (registry/series.yaml): the
@@ -539,7 +570,7 @@
   function chartActions(ind, onPNG, onCSV) {
     return h("div", { class: "card-foot chart-actions" }, h("span", {}),
       h("div", { class: "actions" },
-        h("button", { class: "btn", type: "button", onclick: onPNG, title: "Download this chart as a 1200×800 PNG" }, "PNG"),
+        h("button", { class: "btn", type: "button", onclick: onPNG, title: "Download this chart as a 1200×800 PNG (dark when the site is in dark mode)" }, "PNG"),
         onCSV ? h("button", { class: "btn", type: "button", onclick: onCSV, title: "Download the data in this chart as CSV" }, "CSV") : null,
         h("a", { class: "btn", href: `${DATA}${ind.id}${LANG === "es" ? ".es" : ""}.csv`, download: `${ind.id}_all.csv`, title: "All variants, levels, as published" }, "All data")));
   }
@@ -623,7 +654,7 @@
         ` · Latest: ${fmtPeriod(ind.last_obs, ind.frequency)}`, fresh ? " " : null, fresh, nr ? " · " : null, nr,
         files ? h("br") : null, files),
       h("div", { class: "actions" },
-        h("button", { class: "btn", type: "button", onclick: onPNG, title: "Download this chart as a 1200×800 PNG" }, "PNG"),
+        h("button", { class: "btn", type: "button", onclick: onPNG, title: "Download this chart as a 1200×800 PNG (dark when the site is in dark mode)" }, "PNG"),
         h("button", { class: "btn", type: "button", onclick: onCSV, title: "Download the data in this view as CSV" }, "CSV"),
         h("a", { class: "btn", href: `${DATA}${ind.id}${LANG === "es" ? ".es" : ""}.csv`, download: `${ind.id}_all.csv`, title: "All variants, levels, as published" }, "All data")));
   }
@@ -2297,7 +2328,30 @@
     addSel.addEventListener("change", () => { if (addSel.value) { state.picks.add(addSel.value); addSel.value = ""; draw(); } });
     const chartEl = h("div", { class: "chart tall-ish", role: "img", "aria-label": ind.title });
     const hint = h("p", { class: "hint" });
+    const sumEl = h("p", { class: "summary-line stats-line no-tr", hidden: true });
+    let sumItems = [], png = null;
     const nd = () => D.decimals;
+    // Argentina's value, its rank in the group and the group's median, for one year.
+    const ordinal = (n) => `${n}${n % 100 >= 11 && n % 100 <= 13 ? "th" : ["th", "st", "nd", "rd"][n % 10] || "th"}`;
+    function intlStats(g, members, med, year) {
+      const i = D.years.indexOf(year), a = (D.values[HOME] || [])[i];
+      if (i < 0 || a === null || a === undefined) return [];
+      const u = (D.unit || "").toLowerCase();
+      const v = (x) => (/^%/.test(u) ? `${fx(x, nd())}%` : /international dollars/.test(u) ? `$ ${Number(x).toLocaleString(LOCALE, { maximumFractionDigits: 0 })}` : fx(x, nd()));
+      const has = (c) => D.values[c] && D.values[c][i] !== null && D.values[c][i] !== undefined;
+      const set = [...new Set([...members, HOME])].filter(has).sort((p, q) => D.values[q][i] - D.values[p][i]);
+      const r = set.indexOf(HOME) + 1, gname = tr(g.label), m = med[i];
+      const pf = D.proj_from, pi = pf ? D.years.indexOf(year + 1) : -1, nxt = pi >= 0 && year + 1 >= pf ? (D.values[HOME] || [])[pi] : null;
+      const proj = nxt !== null && nxt !== undefined;
+      const items = [{ big: v(a), small: ES ? `la Argentina en ${year}${proj ? `; el FMI proyecta ${v(nxt)} para ${year + 1}` : ""}` : `Argentina in ${year}${proj ? `; the IMF projects ${v(nxt)} for ${year + 1}` : ""}` }];
+      if (r) items.push({ big: ES ? `${r} de ${set.length}` : `${ordinal(r)} of ${set.length}`, small: ES ? `en ${gname}${members.includes(HOME) ? "" : " y la Argentina"}, de mayor a menor` : `in ${gname}${members.includes(HOME) ? "" : " and Argentina"}, highest first` });
+      if (m !== null && m !== undefined) {
+        const d = a - m, ds = `${d > 0 ? "+" : d < 0 ? "−" : ""}${fx(Math.abs(d), nd())}${/^%/.test(u) ? " pp" : ""}`;
+        const n = members.filter(has).length;
+        items.push({ big: v(m), small: ES ? `mediana de ${gname} (${n} países); la Argentina, ${ds}` : `median of ${gname} (${n} countries); Argentina ${ds}` });
+      }
+      return items;
+    }
     const fmt = (v) => (v === null || v === undefined ? "–" : fx(v, nd()));
     const lastActual = () => { const pf = D.proj_from || 1e9; const a = D.values[HOME] || []; let y = null; D.years.forEach((yy, i) => { if (yy < pf && a[i] !== null) y = yy; }); return y || Math.min(pf - 1, D.years[D.years.length - 1]); };
     function draw() {
@@ -2317,6 +2371,8 @@
       const members = g.members.filter((c) => D.values[c]);
       const med = Y.map((y, i) => intlMedian(members.map((c) => D.values[c][i])));
       const gname = tr(g.label);
+      sumItems = intlStats(g, members, med, state.view === "rank" ? state.year : lastActual());
+      statsLine(sumEl, sumItems);
       if (state.view === "time") {
         chips.replaceChildren(h("span", { class: "chip-label" }, ES ? "Mostrar:" : "Show:"),
           ...[...state.picks].map((c) => h("button", { type: "button", class: "chip", "aria-pressed": "true", onclick: () => { state.picks.delete(c); draw(); } }, `${intlName(c)} ×`)));
@@ -2344,6 +2400,19 @@
           extra: { showlegend: true, legend: { orientation: "h", x: 0, y: 1.1, yanchor: "bottom", font: { color: cssVar("--ink") } }, hovermode: "x unified", shapes, annotations: ann, margin: { l: 56, r: 16, t: 56, b: 36 } } }), PLOT_CONFIG);
         hint.textContent = (ES ? `${tr(D.label)}, ${tr(D.unit)}. La Argentina, la mediana de ${gname} (${members.length} países, cada año sobre los que tienen datos) y países elegidos.` : `${tr(D.label)}, ${tr(D.unit)}. Argentina, the median of ${gname} (${members.length} countries; each year over those with data) and chosen countries.`)
           + (pf ? (ES ? ` Desde ${pf}, estimaciones y proyecciones del FMI (líneas discontinuas).` : ` From ${pf}, IMF estimates and projections (dashed).`) : "");
+        // For the PNG: light-theme colors, the median grey, Argentina charcoal, chosen countries by slot.
+        const medName = ES ? `Mediana: ${gname}` : `Median: ${gname}`;
+        const slots = new Map();
+        const exp = traces.map((t) => {
+          const c = { ...t };
+          if (t.legendgroup === intlName(HOME)) c._light = "#36454F";
+          else if (t.legendgroup === medName) c._light = "#85909A";
+          else { if (!slots.has(t.legendgroup)) slots.set(t.legendgroup, slots.size % 8); c._slot = slots.get(t.legendgroup); }
+          return c;
+        });
+        png = { traces: exp, sub: `${tr(D.label)} · ${tr(D.unit)}${pf ? (ES ? ` · desde ${pf}, proyecciones del FMI` : ` · from ${pf}, IMF projections`) : ""}`, file: `${ind.id}_${INTL.group}.png`,
+          extras: { shapes: shapes.map((sh) => ({ ...sh, _lightFill: "rgba(236, 233, 227, 0.6)" })),
+            xaxis: { range: [`${state.from && state.from > Y[0] ? state.from : Y[0]}-01-01`, `${Y[Y.length - 1]}-12-31`] } } };
         csv = { name: `${ind.id}_${INTL.group}`, header: ["year", intlName(HOME), `median ${g.label}`, ...[...state.picks].map(intlName)],
           rows: Y.map((y, i) => [y, (D.values[HOME] || [])[i], med[i], ...[...state.picks].map((c) => D.values[c][i])]) };
       } else {
@@ -2359,6 +2428,19 @@
           baseLayout({ xaxis: { type: "linear", zeroline: true }, yaxis: { autorange: "reversed", type: "category", automargin: true, tickfont: { size: 11 }, dtick: 1 },
             extra: { height: tall, hovermode: "closest", margin: { l: 120, r: 48, t: 10, b: 30 }, shapes: m === null ? [] : [{ type: "line", xref: "x", yref: "paper", x0: m, x1: m, y0: 0, y1: 1, line: { color: cssVar("--ink-2"), width: 1.5, dash: "dot" } }] } }), PLOT_CONFIG);
         const r = set.indexOf(HOME) + 1;
+        {
+          // For the PNG: at most 41 bars, centered on Argentina when the group is larger.
+          let lo = 0, hi = set.length;
+          if (set.length > 41) { lo = Math.max(0, Math.min(set.length - 41, r - 21)); hi = lo + 41; }
+          const sub = set.slice(lo, hi).reverse();
+          png = { traces: [{ type: "bar", orientation: "h", y: sub.map(intlName), x: sub.map((c) => D.values[c][i]),
+              marker: { color: "#B9C2C9" }, _lightColors: sub.map((c) => (c === HOME ? "#B87333" : members.includes(c) ? "#B9C2C9" : "#E3E0D9")),
+              text: sub.map((c) => fmt(D.values[c][i])), textposition: "outside", cliponaxis: false, textfont: { size: 12 } }],
+            sub: `${tr(D.label)}, ${state.year} · ${gname}${hi - lo < set.length ? (ES ? ` · puestos ${lo + 1} a ${hi} de ${set.length}` : ` · ranks ${lo + 1}–${hi} of ${set.length}`) : ""}`,
+            file: `${ind.id}_${INTL.group}_${state.year}.png`,
+            extras: { xsuffix: "", rankBars: true, shapes: m === null ? [] : [{ type: "line", xref: "x", yref: "paper", x0: m, x1: m, y0: 0, y1: 1, line: { width: 1.5, dash: "dot", _light: "#5A6872" } }],
+              yaxis: { type: "category", tickfont: { size: sub.length > 25 ? 11 : 14 }, dtick: 1 } } };
+        }
         hint.textContent = ES ? `${tr(D.label)}, ${state.year}: ${gname}${members.includes(HOME) ? "" : " y la Argentina"}, de mayor a menor. Línea punteada: la mediana del grupo (${fmt(m)}). ${r ? `La Argentina: ${r}.ª de ${set.length}.` : "La Argentina: sin dato."}`
           : `${tr(D.label)}, ${state.year}: ${gname}${members.includes(HOME) ? "" : " and Argentina"}, highest first. Dotted line: the group median (${fmt(m)}). ${r ? `Argentina: ${r} of ${set.length}.` : "Argentina: no data."}`;
         csv = { name: `${ind.id}_${INTL.group}_${state.year}`, header: ["country", "iso3", "value"], rows: set.map((c) => [intlName(c), c, D.values[c][i]]) };
@@ -2374,11 +2456,13 @@
       if (v.picks) { state.picks = new Set(v.picks); state.pickGroup = v.pickGroup; }
     };
     const onCSV = () => { if (csv) downloadBlob(toCSV(csv.header, csv.rows), `${csv.name}.csv`, "text/csv"); };
-    appendAll(card, h("div", { class: "controls" }, vSeg, gPick, yPick, h("span", { class: "spacer" }), rSeg), hint, chartEl, h("div", { class: "controls" }, chips, addSel),
+    const onPNG = () => { if (png) exportPNG(ind, png.traces, png.sub, { suffix: "", signed: false }, png.file, { ...png.extras, tiles: sumItems }); };
+    appendAll(card, h("div", { class: "controls" }, vSeg, gPick, yPick, h("span", { class: "spacer" }), rSeg), sumEl, hint, chartEl, h("div", { class: "controls" }, chips, addSel),
       ind.note ? h("p", { class: "chips-note" }, ind.note) : null, methodLine(ind),
       h("div", { class: "card-foot" },
         h("span", {}, "Source: ", T.source_url ? h("a", { href: T.source_url, target: "_blank", rel: "noopener" }, ind.source_label) : ind.source_label, ...srcTail(ind)),
-        h("div", { class: "actions" }, h("button", { class: "btn", type: "button", onclick: onCSV, title: "Download the data in this view as CSV" }, "CSV"),
+        h("div", { class: "actions" }, h("button", { class: "btn", type: "button", onclick: onPNG, title: "Download this chart as a 1200×800 PNG (dark when the site is in dark mode)" }, "PNG"),
+          h("button", { class: "btn", type: "button", onclick: onCSV, title: "Download the data in this view as CSV" }, "CSV"),
           h("a", { class: "btn", href: `${DATA}${T.path}${T.file}`, download: `${ind.id}_all.json`, title: "Every country and year (JSON)" }, "All data"))));
     card.draw = async () => {
       if (!D) {
@@ -2929,7 +3013,7 @@
         h("span", {}, "Source: ", T.source_url ? h("a", { href: T.source_url, target: "_blank", rel: "noopener" }, ind.source_label) : ind.source_label,
           ` · Report as of: ${ind.last_obs ? fmtDay(ind.last_obs) : "–"}`, ...srcTail(ind)),
         h("div", { class: "actions" },
-          h("button", { class: "btn", type: "button", onclick: onPNG, title: "Download this chart as a 1200×800 PNG" }, "PNG"),
+          h("button", { class: "btn", type: "button", onclick: onPNG, title: "Download this chart as a 1200×800 PNG (dark when the site is in dark mode)" }, "PNG"),
           h("button", { class: "btn", type: "button", onclick: onCSV, title: "Download this view as CSV" }, "CSV"))));
     card.draw = async () => {
       if (!data) {
@@ -3602,7 +3686,7 @@
         h("span", {}, "Source: ", T.source_url ? h("a", { href: T.source_url, target: "_blank", rel: "noopener" }, ind.source_label) : ind.source_label,
           ` · Latest: ${ind.last_obs ? fmtDay(ind.last_obs) : "–"}`, ...srcTail(ind)),
         h("div", { class: "actions" },
-          h("button", { class: "btn", type: "button", onclick: onPNG, title: "Download this chart as a 1200×800 PNG" }, "PNG"),
+          h("button", { class: "btn", type: "button", onclick: onPNG, title: "Download this chart as a 1200×800 PNG (dark when the site is in dark mode)" }, "PNG"),
           h("button", { class: "btn", type: "button", onclick: onCSV, title: "Download the curves as CSV" }, "CSV"))));
     card.draw = async () => {
       if (!data) {
@@ -3724,7 +3808,7 @@
       h("div", { class: "card-foot" },
         h("span", {}, `Source: ${ind.source_label}`, data && data.latest ? ` · Latest change: ${fmtDay(data.latest)}` : "", ...srcTail(ind)),
         h("div", { class: "actions" },
-          h("button", { class: "btn", type: "button", onclick: onPNG, title: "Download this chart as a 1200×800 PNG" }, "PNG"),
+          h("button", { class: "btn", type: "button", onclick: onPNG, title: "Download this chart as a 1200×800 PNG (dark when the site is in dark mode)" }, "PNG"),
           h("button", { class: "btn", type: "button", onclick: onCSV, title: "Download the full list as CSV" }, "CSV"))));
     card.draw = async () => {
       if (!data) {
@@ -3800,7 +3884,7 @@
       ind.note ? h("p", { class: "chips-note" }, ind.note) : null,
       h("div", { class: "card-foot" }, h("span", {}, `Source: ${ind.source_label} · Latest survey: ${ind.last_obs ? fmtMonth(ind.last_obs) : "–"}`, ...srcTail(ind)),
         h("div", { class: "actions" },
-          h("button", { class: "btn", type: "button", onclick: onPNG, title: "Download this chart as a 1200×800 PNG" }, "PNG"),
+          h("button", { class: "btn", type: "button", onclick: onPNG, title: "Download this chart as a 1200×800 PNG (dark when the site is in dark mode)" }, "PNG"),
           h("button", { class: "btn", type: "button", onclick: onCSV, title: "Download every survey's forecasts for this variable as CSV" }, "CSV"))));
     card.draw = async () => {
       if (!data) {

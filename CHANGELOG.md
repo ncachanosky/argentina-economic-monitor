@@ -102,6 +102,10 @@ section becomes its notes.
   economies, any country addable); the choice applies to every card. A snapshot table at the top;
   each card also ranks the group for a chosen year. New sources: IMF SDMX API, World Bank API;
   the EFW, V-Dem and SMI adapters also write all-country tables.
+- International page: each chart's summary line gives Argentina's value (with the IMF's projection
+  for the next year), its rank in the chosen group and the group median; the charts now have a PNG
+  download (over time, or the ranking: up to 41 bars, centered on Argentina in large groups).
+- PNG downloads follow the site's theme: in dark mode the image comes out dark.
 - Summary line on most charts: three numbers chosen by rule from the kind of series shown (flows:
   total over the range, latest vs. a year earlier, this year's average vs. last year's; rates:
   latest, a year earlier or the 12-month change, average of the current presidency; levels:
