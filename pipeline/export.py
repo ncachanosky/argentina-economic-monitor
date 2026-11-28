@@ -394,7 +394,17 @@ def recession_extras(ind) -> dict:
         bands.append({"start": m["open_phase"], "style": "outline",
                       "key": "Current decline, too recent to date (needs six months after the peak)"})
     ev = m.get("evaluation") or {}
-    return {"bands": bands or None, "recession": {
+    # The four measures side by side (shading switch and comparison table on the card).
+    methods = None
+    try:
+        from . import store, summary
+        sa = store.as_of("143.3_NO_PR_2004_A_31")
+        prob = store.as_of("recession:smoothed")
+        if len(sa.dropna()) and len(prob.dropna()):
+            methods = summary.compare_methods(sa, prob, m.get("bands", []), m.get("open_phase"))
+    except Exception as exc:   # the comparison is extra: never block the card
+        print(f"recession methods: {exc}")
+    return {"bands": bands or None, "methods": methods, "recession": {
         "median_entry": ev.get("median_entry"), "median_exit": ev.get("median_exit"),
         "false_alarms": len(ev.get("false_alarm_months", [])), "open_phase": m.get("open_phase"),
         "from": ev.get("from"), "missed": ev.get("missed", 0), "recessions": len(ev.get("entry", [])),

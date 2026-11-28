@@ -968,7 +968,8 @@
     // averages (each month against the three before). A rule of thumb, not a dating committee.
     const RR = ind.recession_rule || null;
     state.rr = "off";
-    const rrSeg = RR ? segmented([["off", "Off"], ["calendar", "Calendar quarters"], ["rolling", "Monthly rolling"]], "off",
+    const RQ = ind.frequency === "Q";   // quarterly data (GDP): quarters as published, no rolling version
+    const rrSeg = RR ? segmented(RQ ? [["off", "Off"], ["calendar", "On"]] : [["off", "Off"], ["calendar", "Calendar quarters"], ["rolling", "Monthly rolling"]], "off",
       (k) => { state.rr = k; rrSeg.update(k); draw(); }, "Two quarters of decline") : null;
     const rrWrap = RR ? h("div", { class: "base-pick rr-pick" }, h("span", {}, "Two-quarter declines:"), rrSeg) : null;
     const rrKey = RR ? h("p", { class: "band-key rr-key", hidden: true }) : null;
@@ -978,9 +979,11 @@
     function spellStats(mode, spells) {
       const v = ind.variants[RR.variant || "sa"].values, D = ind.dates;
       const at = new Map(D.map((d, i) => [d, v[i]]));
-      const A = (m) => { const xs = [0, 1, 2].map((k) => at.get(addMonths(m, -k))); return xs.some((x) => x === null || x === undefined) ? null : (xs[0] + xs[1] + xs[2]) / 3; };
+      const A = RQ ? (m) => { const x = at.get(quarterOf(m)); return x === null || x === undefined ? null : x; }
+        : (m) => { const xs = [0, 1, 2].map((k) => at.get(addMonths(m, -k))); return xs.some((x) => x === null || x === undefined) ? null : (xs[0] + xs[1] + xs[2]) / 3; };
       let lastFull = null;
-      for (let i = D.length - 1; i >= 0; i--) if (A(D[i]) !== null && (mode !== "calendar" || Number(D[i].slice(5, 7)) % 3 === 0)) { lastFull = D[i]; break; }
+      if (RQ) { for (let i = D.length - 1; i >= 0; i--) if (v[i] !== null && v[i] !== undefined) { lastFull = addMonths(D[i], 2); break; } }
+      else for (let i = D.length - 1; i >= 0; i--) if (A(D[i]) !== null && (mode !== "calendar" || Number(D[i].slice(5, 7)) % 3 === 0)) { lastFull = D[i]; break; }
       return spells.map((sp, n) => {
         const months = monthIndex(sp.end) - monthIndex(sp.start) + 1;
         const next = spells[n + 1] || null;
@@ -1051,7 +1054,8 @@
           h("thead", {}, h("tr", {}, ...(ES ? ["Episodio", "Duración", "Caída", "Trimestre más bajo", "Vuelta al nivel previo"] : ["Spell", "Length", "Fall", "Lowest quarter", "Back to the pre-spell level"]).map((x) => h("th", {}, x)))),
           h("tbody", {}, rows))),
         h("p", { class: "chips-note no-tr" }, ES
-          ? "Caída: del promedio trimestral del EMAE desestacionalizado en el trimestre anterior al episodio al trimestre más bajo dentro de él. Vuelta al nivel previo: el primer trimestre después del piso cuyo promedio vuelve al del trimestre anterior al episodio (o no, si antes empieza el episodio siguiente). Todos los episodios desde el comienzo de la serie, cualquiera sea el período que muestre el gráfico; el episodio en curso no entra en los extremos."
+          ? (RQ ? "Caída: del PIB desestacionalizado en el trimestre anterior al episodio al trimestre más bajo dentro de él. Vuelta al nivel previo: el primer trimestre después del piso que vuelve al nivel del trimestre anterior al episodio (o no, si antes empieza el episodio siguiente). Todos los episodios desde el comienzo de la serie; el episodio en curso no entra en los extremos." : "") || "Caída: del promedio trimestral del EMAE desestacionalizado en el trimestre anterior al episodio al trimestre más bajo dentro de él. Vuelta al nivel previo: el primer trimestre después del piso cuyo promedio vuelve al del trimestre anterior al episodio (o no, si antes empieza el episodio siguiente). Todos los episodios desde el comienzo de la serie, cualquiera sea el período que muestre el gráfico; el episodio en curso no entra en los extremos."
+          : RQ ? "Fall: from seasonally adjusted GDP in the quarter before the spell to the lowest quarter inside it. Back to the pre-spell level: the first quarter after the low back at the level of the quarter before the spell (or not, if the next spell starts first). Every spell since the series begins; the spell under way is left out of the extremes."
           : "Fall: from the seasonally adjusted EMAE's quarterly average in the quarter before the spell to the lowest quarter inside it. Back to the pre-spell level: the first quarter after the low whose average is back at the quarter before the spell (or not, if the next spell starts first). Every spell since the series begins, whatever range the chart shows; the spell under way is left out of the extremes."));
       const open = rrStatsEl.querySelector("details") && rrStatsEl.querySelector("details").open;
       if (open) tbl.open = true;
@@ -1064,7 +1068,8 @@
       const spells = [];   // [{start, end (last month), q: [growth...]}]
       if (mode === "calendar") {
         const Q = [];
-        for (let i = 0; i < D.length; i++) {
+        if (RQ) D.forEach((d, i) => { if (v[i] !== null && v[i] !== undefined) Q.push({ start: d, avg: v[i] }); });
+        else for (let i = 0; i < D.length; i++) {
           const m = Number(D[i].slice(5, 7));
           if (m % 3 !== 1) continue;
           const xs = [0, 1, 2].map((k) => at.get(addMonths(D[i], k)));
@@ -1171,9 +1176,10 @@
             text: p.short, font: { size: 9, color: cssVar("--ink-3") } });
         });
       }
-      if (!ind.bands || !x.length) return { shapes, annotations };
+      const BANDS = curBands();
+      if (!BANDS || !x.length) return { shapes, annotations };
       const x0 = x[0], x1 = x[x.length - 1];
-      for (const b of ind.bands) {
+      for (const b of BANDS) {
         const end = addMonths(b.end || x1, 1);
         if (end <= x0 || b.start > x1) continue;
         const s0 = b.start < x0 ? x0 : b.start;
@@ -1189,8 +1195,35 @@
     }
 
     // Key for shaded periods: shaded = one kind of period, dotted outline = another.
-    const bandKey = ind.bands && ind.bands.some((b) => b.key) ? h("p", { class: "band-key" }, ind.bands.filter((b) => b.key).map((b) =>
-      h("span", {}, h("span", { class: "band-sw" + (b.style === "outline" ? " outline" : "") }), b.key))) : null;
+    // Recession measures (registry: the recession card): which one shades the chart, and how they compare.
+    const MT = ind.methods || null;
+    state.meth = "bb";
+    function curBands() {
+      if (!MT || state.meth === "bb") return ind.bands;
+      return MT.spells[state.meth].map((sp, k) => ({ start: sp.start, end: sp.end, ...(k === 0 ? { key: tr(MT.labels[state.meth]) } : {}) }));
+    }
+    const keyOf = () => { const B = curBands(); return B && B.some((b) => b.key) ? B.filter((b) => b.key).map((b) =>
+      h("span", {}, h("span", { class: "band-sw" + (b.style === "outline" ? " outline" : "") }), b.key)) : []; };
+    const bandKey = ind.bands && ind.bands.some((b) => b.key) ? h("p", { class: "band-key" }, keyOf()) : null;
+    const methSeg = MT ? segmented([["bb", "Turning points"], ["calendar", "Two quarters (calendar)"], ["rolling", "Two quarters (monthly rolling)"], ["markov", "Probability > 50%"]], "bb",
+      (k) => { state.meth = k; methSeg.update(k); if (bandKey) bandKey.replaceChildren(...keyOf()); draw(); }, "Recession shading") : null;
+    const methWrap = MT ? h("div", { class: "controls" }, h("div", { class: "base-pick rr-pick" }, h("span", {}, "Shade:"), methSeg)) : null;
+    function methTable() {
+      if (!MT || !MT.table) return null;
+      const ES = LANG === "es", f1 = (v) => (v === null || v === undefined ? "–" : `${fx(v, 0)}%`);
+      const lead = (v) => (v === null || v === undefined ? "–" : v === 0 ? (ES ? "mismo mes" : "same month") : `${v > 0 ? "+" : "−"}${fx(Math.abs(v), v % 1 ? 1 : 0)} ${ES ? "meses" : "months"}`);
+      const rows = MT.table.map((r) => h("tr", {}, h("td", { class: "pres" }, tr(r.label)), h("td", {}, String(r.spells)), h("td", {}, f1(r.share)),
+        h("td", {}, r.key === "bb" ? "–" : f1(r.agree)), h("td", {}, r.key === "bb" ? "–" : `${r.dated_found} ${ES ? "de" : "of"} ${r.dated_total}`),
+        h("td", {}, r.key === "bb" ? "–" : lead(r.median_start)), h("td", {}, r.key === "bb" ? "–" : String(r.other_spells)),
+        h("td", {}, r.now ? `${ES ? "sí, desde" : "yes, since"} ${fmtShortMonth(r.now)}` : (ES ? "no" : "no"))));
+      const head = ES ? ["Medida", "Episodios", "Meses en recesión", "Coincide", "Detecta fechadas", "Inicio (mediana)", "Otros episodios", "¿Ahora?"]
+        : ["Measure", "Spells", "Months in recession", "Agrees", "Finds dated", "Starts (median)", "Other spells", "Now?"];
+      return h("details", { class: "rr-table term-stats" }, h("summary", {}, ES ? "Cómo se comparan las cuatro medidas" : "How the four measures compare"),
+        h("div", { class: "table-scroll" }, h("table", { class: "data" }, h("thead", {}, h("tr", {}, head.map((x) => h("th", {}, x)))), h("tbody", {}, rows))),
+        h("p", { class: "chips-note" }, ES
+          ? `Meses de ${fmtShortMonth(MT.sample[0])} a ${fmtShortMonth(MT.sample[1])} (los puntos de giro necesitan seis meses después de un giro para fecharlo). Coincide: proporción de meses clasificados igual que con los puntos de giro. Detecta fechadas: recesiones fechadas con las que se superpone. Inicio: meses desde el inicio fechado hasta el propio (+ después, − antes). Otros episodios: los que no se superponen con ninguna recesión fechada. La probabilidad es la estimación con toda la muestra, que usa datos posteriores a cada mes: su inicio frente al fechado es retrospectivo, no una señal en tiempo real (la versión en tiempo real está en el gráfico). "Episodios" no incluye uno en curso.`
+          : `Months from ${fmtShortMonth(MT.sample[0])} to ${fmtShortMonth(MT.sample[1])} (turning points need six months after a turn to date it). Agrees: share of months classified the same way as by the turning points. Finds dated: dated recessions it overlaps. Starts: months from the dated start to its own (+ later, − earlier). Other spells: spells that overlap no dated recession. The probability is the full-sample estimate, which uses data after each month: its start against the dated start is hindsight, not a real-time signal (the real-time version is on the chart). "Spells" leaves out one under way.`));
+    }
 
     // Quarter tracker: where the quarter in progress stands.
     function trackerLine() {
@@ -1643,7 +1676,8 @@
           const list = spells.map((sp) => (state.rr === "calendar" ? `${fq(sp.start)}–${fq(sp.end)}` : (sp.start === sp.end ? fm(sp.start) : `${fm(sp.start)}–${fm(sp.end)}`))).join(", ");
           rrKey.replaceChildren(h("span", {}, h("span", { class: "band-sw" }),
             state.rr === "calendar"
-              ? (ES ? `Sombreado: dos o más trimestres calendario seguidos en que el promedio trimestral del EMAE desestacionalizado cayó frente al trimestre anterior (último trimestre completo: ${fq(lastQ)}). ` : `Shaded: two or more calendar quarters in a row in which the quarterly average of the seasonally adjusted EMAE fell from the quarter before (last complete quarter: ${fq(lastQ)}). `)
+              ? (RQ ? (ES ? `Sombreado: dos o más trimestres seguidos en que el PIB desestacionalizado cayó frente al trimestre anterior (último trimestre: ${fq(lastQ)}). ` : `Shaded: two or more quarters in a row in which seasonally adjusted GDP fell from the quarter before (latest quarter: ${fq(lastQ)}). `)
+                : ES ? `Sombreado: dos o más trimestres calendario seguidos en que el promedio trimestral del EMAE desestacionalizado cayó frente al trimestre anterior (último trimestre completo: ${fq(lastQ)}). ` : `Shaded: two or more calendar quarters in a row in which the quarterly average of the seasonally adjusted EMAE fell from the quarter before (last complete quarter: ${fq(lastQ)}). `)
               : (ES ? "Sombreado: cuando el trimestre que termina en el mes t (promedio de t-2 a t del EMAE desestacionalizado) cayó frente al trimestre anterior (t-5 a t-3), y ese trimestre también había caído frente al previo, se sombrean los seis meses de esos dos trimestres (t-5 a t). " : "Shaded: when the quarter ending in month t (the average of months t-2 to t of the seasonally adjusted EMAE) fell from the quarter before (t-5 to t-3), and that quarter had also fallen from the one before it, the six months of those two quarters (t-5 to t) are shaded. "),
             ES ? `Es la regla práctica de los dos trimestres, no una datación oficial; los últimos meses pueden cambiar con las revisiones del INDEC. Episodios: ${list || "ninguno"}.` : `This is the two-quarter rule of thumb, not an official dating; the latest months can change with INDEC's revisions. Spells: ${list || "none"}.`));
         }
@@ -1678,7 +1712,7 @@
     function colorPres() { return state.byPres && ind.pres_view !== "shaded"; }
     function overlayKeys() { return ind.overlay && !colorPres() ? [state.variant, ...lineKeys.filter((k) => k !== state.variant && state.shown.has(k))] : [state.variant]; }
     const subtitle = (main, t) => `${overlayKeys().map((k) => ind.variants[k].label).join(" vs. ")} · ${t.change ? t.short : main.units}`
-      + (RR && state.rr !== "off" ? (LANG === "es" ? ` · sombreado: dos o más trimestres de caída (${state.rr === "calendar" ? "trimestres calendario" : "trimestres móviles mensuales"})` : ` · shaded: two or more quarters of decline (${state.rr === "calendar" ? "calendar quarters" : "monthly rolling quarters"})`) : "");
+      + (RR && state.rr !== "off" ? (LANG === "es" ? ` · sombreado: dos o más trimestres de caída (${RQ ? "PIB trimestral" : state.rr === "calendar" ? "trimestres calendario" : "trimestres móviles mensuales"})` : ` · shaded: two or more quarters of decline (${RQ ? "quarterly GDP" : state.rr === "calendar" ? "calendar quarters" : "monthly rolling quarters"})`) : "");
     const fileTag = () => `${ind.id}_${state.variant}_${state.transform}${baseMonth() ? "_base" + baseMonth().slice(0, 7) : ""}${state.byPres ? "_presidencies" : ""}`;
     const onPNG = () => {
       if (state.yearly) {
@@ -1713,9 +1747,9 @@
       h("div", { class: "controls" }, ySeg, vSeg, tSeg, h("span", { class: "spacer" }), ind.view_start ? null : rSeg),
       // A short fixed window (view_start) has no use for rebasing or presidencies.
       ind.view_start ? (remBtn ? h("div", { class: "controls" }, remBtn) : null) : h("div", { class: "controls" }, realSeg, baseWrap, presBtn, epBtn, remBtn, termBtn),
-      rrWrap ? h("div", { class: "controls" }, rrWrap) : null,
+      rrWrap ? h("div", { class: "controls" }, rrWrap) : null, methWrap,
       ind.caveat ? h("p", { class: "caveat" }, ind.caveat) : null,
-      trackerLine(), sumEl, summaryEl, hint, methodLine(ind), bandKey, termKeyEl, epKey, rrKey, rrStatsEl, chartEl, chipRow, statsEl);
+      trackerLine(), sumEl, summaryEl, hint, methodLine(ind), bandKey, termKeyEl, epKey, rrKey, rrStatsEl, chartEl, methTable(), chipRow, statsEl);
     drawSummary();
     table = tableView([], [], false, ind.frequency, { asc: (ind.data_table || {}).order === "asc", yearMarks: !!(ind.data_table || {}).year_marks });
     appendAll(card, breakdownTable(ind), table, annualTable(ind), weightsTable(ind), ind.note ? h("p", { class: "chips-note" }, ind.note) : null,

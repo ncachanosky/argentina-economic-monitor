@@ -412,3 +412,80 @@ def spell_stats(s: pd.Series, spells: list[dict], mode: str = "calendar") -> lis
                     "trough_at": trough_at, "ongoing": sp["end"] == last_full, "back": back,
                     "recovery_months": _mi(back) - _mi(trough_at) if back is not None else None, "cut": cut})
     return out
+
+
+# ── four ways to call a recession ─────────────────────────────────────────
+
+METHODS = {
+    "bb": "Bry-Boschan turning points (peak to trough)",
+    "calendar": "Two quarters of decline, calendar quarters",
+    "rolling": "Two quarters of decline, monthly rolling",
+    "markov": "Recession probability above 50% (full sample)",
+}
+
+
+def _months_of(spells: list[dict]) -> set:
+    out = set()
+    for sp in spells:
+        m = pd.Timestamp(sp["start"])
+        while m <= pd.Timestamp(sp["end"]):
+            out.add(m)
+            m = add_months(m, 1)
+    return out
+
+
+def _runs(months: list[pd.Timestamp]) -> list[dict]:
+    spells: list[dict] = []
+    for m in sorted(months):
+        if spells and add_months(spells[-1]["end"], 1) == m:
+            spells[-1]["end"] = m
+        else:
+            spells.append({"start": m, "end": m})
+    return spells
+
+
+def compare_methods(sa: pd.Series, prob: pd.Series, bb_bands: list[dict], open_phase: str | None) -> dict:
+    """Each measure's spells (monthly), and how they compare with the Bry-Boschan chronology.
+
+    Comparison sample: from the first month every measure can be computed to six months before the
+    last observation (Bry-Boschan needs six months after a turn to date it)."""
+    sa = sa.dropna().asfreq("MS")
+    last = sa.index[-1]
+    bb = [{"start": pd.Timestamp(b["start"]), "end": pd.Timestamp(b["end"])} for b in bb_bands if b.get("end")]
+    if open_phase:
+        bb.append({"start": pd.Timestamp(open_phase), "end": last, "open": True})
+    spells = {
+        "bb": bb,
+        "calendar": two_quarter_spells(sa, "calendar"),
+        "rolling": two_quarter_spells(sa, "rolling"),
+        "markov": _runs([d for d, v in prob.dropna().items() if v > 50]),
+    }
+    first = max(sa.index[0] + pd.DateOffset(months=6), prob.dropna().index[0])
+    end = add_months(last, -6)
+    sample = [m for m in pd.date_range(first, end, freq="MS")]
+    on = {k: _months_of([x for x in v if not x.get("open")]) for k, v in spells.items()}
+    rows = []
+    for k in METHODS:
+        mk = on[k]
+        inrec = sum(m in mk for m in sample)
+        agree = sum((m in mk) == (m in on["bb"]) for m in sample)
+        # For each dated recession: did this measure flag it, and how many months after (+) or before (−) its start?
+        hits, leads = 0, []
+        for b in [x for x in bb if not x.get("open")]:
+            over = [x for x in spells[k] if x["start"] <= b["end"] and x["end"] >= b["start"]]
+            if over:
+                hits += 1
+                leads.append(_mi(over[0]["start"]) - _mi(b["start"]))
+        false = [x for x in spells[k] if not any(x["start"] <= b["end"] and x["end"] >= b["start"] for b in bb)]
+        cur = next((x for x in spells[k] if pd.Timestamp(x["end"]) >= add_months(last, -1)), None)
+        rows.append({"key": k, "label": METHODS[k], "spells": len([x for x in spells[k] if not x.get("open") and x is not cur]),
+                     "share": round(100 * inrec / len(sample), 1) if sample else None,
+                     "agree": round(100 * agree / len(sample), 1) if sample else None,
+                     "dated_found": hits, "dated_total": len([x for x in bb if not x.get("open")]),
+                     "median_start": float(pd.Series(leads).median()) if leads else None,
+                     "other_spells": len(false),
+                     "now": pd.Timestamp(cur["start"]).strftime("%Y-%m-%d") if cur else None})
+    fmt = lambda x: {"start": pd.Timestamp(x["start"]).strftime("%Y-%m-%d"), "end": pd.Timestamp(x["end"]).strftime("%Y-%m-%d"), **({"open": True} if x.get("open") else {})}
+    return {"spells": {k: [fmt(x) for x in v] for k, v in spells.items()}, "table": rows,
+            "sample": [sample[0].strftime("%Y-%m-%d"), sample[-1].strftime("%Y-%m-%d")] if sample else None,
+            "labels": METHODS}

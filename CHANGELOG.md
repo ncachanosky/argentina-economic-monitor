@@ -102,6 +102,9 @@ section becomes its notes.
   economies, any country addable); the choice applies to every card. A snapshot table at the top;
   each card also ranks the group for a chosen year. New sources: IMF SDMX API, World Bank API;
   the EFW, V-Dem and SMI adapters also write all-country tables.
+- Recession probability chart: a switch shades any of four measures (Bry-Boschan turning points,
+  two quarters of decline on calendar quarters or monthly rolling, probability above 50%), with a
+  table comparing them on a common sample. Quarterly GDP gets the two-quarter switch and spell table.
 - International page: monetary-regime groups, dollarized economies (Panama, Ecuador, El Salvador;
   each member's line, no median) and Latin American inflation targeters (Brazil, Chile, Colombia
   1999; Mexico 2001; Peru 2002; Uruguay 2007). A country counts in a regime group only from its year

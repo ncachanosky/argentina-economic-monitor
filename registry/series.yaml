@@ -796,6 +796,7 @@ topics:
     description: >-
       Quarterly GDP at constant 2004 prices, and its growth by expenditure
       component and by industry.
+
   - id: trade
     slug: international-trade
     see_also: {page: long_run, text: "Trade since 1910 is on the Long Run page."}
@@ -1286,6 +1287,8 @@ indicators:
     # Yearly table: annual growth (average of the year's quarters, original
     # series), Q4/Q4 and the carryover into the next year (seasonally adjusted).
     annual_table: {accumulated: original, within_year: sa, carryover: true}
+    # Toggle: shade two or more quarters in a row of falling seasonally adjusted GDP.
+    recession_rule: {variant: sa}
 
   - id: gdp_revisions
     topic: gdp
