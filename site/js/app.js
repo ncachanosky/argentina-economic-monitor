@@ -981,15 +981,28 @@
       const A = (m) => { const xs = [0, 1, 2].map((k) => at.get(addMonths(m, -k))); return xs.some((x) => x === null || x === undefined) ? null : (xs[0] + xs[1] + xs[2]) / 3; };
       let lastFull = null;
       for (let i = D.length - 1; i >= 0; i--) if (A(D[i]) !== null && (mode !== "calendar" || Number(D[i].slice(5, 7)) % 3 === 0)) { lastFull = D[i]; break; }
-      return spells.map((sp) => {
+      return spells.map((sp, n) => {
         const months = monthIndex(sp.end) - monthIndex(sp.start) + 1;
+        const next = spells[n + 1] || null;
         const base = A(addMonths(sp.start, -1));
         let trough = null, troughAt = null;
         for (let m = addMonths(sp.start, 2); m <= sp.end; m = addMonths(m, mode === "calendar" ? 3 : 1)) {
           const a = A(m);
           if (a !== null && (trough === null || a < trough)) { trough = a; troughAt = m; }
         }
-        return { ...sp, months, quarters: months / 3, depth: base && trough !== null ? (trough / base - 1) * 100 : null, troughAt, ongoing: sp.end === lastFull };
+        // Recovery: the first quarter after the trough (calendar quarters; rolling: any month's quarter) whose
+        // average is back at the quarter before the spell; cut off by the next spell or the end of the data.
+        let back = null, cut = null;
+        if (troughAt && base) {
+          for (let m = addMonths(troughAt, mode === "calendar" ? 3 : 1); lastFull && m <= lastFull; m = addMonths(m, mode === "calendar" ? 3 : 1)) {
+            if (next && addMonths(next.start, 2) <= m && A(m) < base) { cut = next.start; break; }
+            const a = A(m);
+            if (a !== null && a >= base) { back = m; break; }
+          }
+        }
+        const recMonths = back ? monthIndex(back) - monthIndex(troughAt) : null;
+        return { ...sp, months, quarters: months / 3, depth: base && trough !== null ? (trough / base - 1) * 100 : null, troughAt, ongoing: sp.end === lastFull,
+          back, recMonths, cut };
       });
     }
     function drawSpellStats(mode, spells) {
@@ -1008,6 +1021,14 @@
       const longest = by((x) => x.months, -1), shortest = by((x) => x.months, 1), deepest = by((x) => x.depth, 1), mildest = by((x) => x.depth, -1);
       const med = (() => { const m = done.map((x) => x.months).sort((p, q) => p - q); if (!m.length) return null; const k = m.length >> 1; return m.length % 2 ? m[k] : (m[k - 1] + m[k]) / 2; })();
       const medTxt = med === null ? "–" : cal ? `${fx(med / 3, med % 3 ? 1 : 0)} ${ES ? "trimestres" : "quarters"}` : `${fx(med, med % 1 ? 1 : 0)} ${ES ? "meses" : "months"}`;
+      const qm = (k) => (cal ? `${k / 3} ${ES ? (k === 3 ? "trimestre" : "trimestres") : (k === 3 ? "quarter" : "quarters")}` : `${k} ${ES ? (k === 1 ? "mes" : "meses") : (k === 1 ? "month" : "months")}`);
+      const pq = (iso) => (cal ? fmtPeriod(addMonths(iso, -2), "Q") : `${fmtShortMonth(addMonths(iso, -2))}–${fmtShortMonth(iso)}`);
+      const recTxt = (x) => (x.ongoing ? "–" : x.back ? (ES ? `${pq(x.back)}, ${qm(x.recMonths)} después del piso` : `${pq(x.back)}, ${qm(x.recMonths)} after the low`)
+        : x.cut ? (ES ? `no antes del episodio siguiente (${cal ? fmtPeriod(x.cut, "Q") : fmtShortMonth(x.cut)})` : `not before the next spell (${cal ? fmtPeriod(x.cut, "Q") : fmtShortMonth(x.cut)})`)
+        : (ES ? "todavía no" : "not yet"));
+      const recs = done.filter((x) => x.back).map((x) => x.recMonths).sort((p, q) => p - q);
+      const recMed = recs.length ? (recs.length % 2 ? recs[recs.length >> 1] : (recs[(recs.length >> 1) - 1] + recs[recs.length >> 1]) / 2) : null;
+      const notBack = done.filter((x) => !x.back).length;
       const item = (label, xs) => (!xs.length ? null : xs.length === 1 ? h("span", { class: "stat" }, `${label}: `, h("b", {}, per(xs[0])), ` (${len(xs[0])}, ${dep(xs[0])})`)
         : h("span", { class: "stat" }, `${label}: `, h("b", {}, label.match(/prof|leve|deep|mild/) ? dep(xs[0]) : len(xs[0])), ` (${xs.length} ${ES ? "episodios" : "spells"}: ${xs.map(per).join(", ")})`));
       const parts = [
@@ -1016,18 +1037,22 @@
         h("span", { class: "stat" }, ES ? "duración mediana: " : "median length: ", h("b", {}, medTxt)),
         item(ES ? "el más largo" : "longest", longest), item(ES ? "el más corto" : "shortest", shortest),
         item(ES ? "el más profundo" : "deepest", deepest), item(ES ? "el más leve" : "mildest", mildest),
+        h("span", { class: "stat" }, ES ? "vuelta al nivel previo: " : "back to the pre-spell level: ", h("b", {}, `${done.length - notBack} ${ES ? "de" : "of"} ${done.length}`),
+          recMed !== null ? (ES ? `, en una mediana de ${cal ? fx(recMed / 3, recMed % 3 ? 1 : 0) + " trimestres" : fx(recMed, recMed % 1 ? 1 : 0) + " meses"} desde el piso` : `, a median ${cal ? fx(recMed / 3, recMed % 3 ? 1 : 0) + " quarters" : fx(recMed, recMed % 1 ? 1 : 0) + " months"} after the low`) : "",
+          notBack ? (ES ? `; ${notBack} no se recuperaron antes del episodio siguiente o todavía no` : `; ${notBack} not before the next spell or not yet`) : ""),
         cur ? h("span", { class: "stat" }, ES ? "en curso: " : "under way: ", h("b", {}, `${ES ? "desde" : "since"} ${cal ? fmtPeriod(cur.start, "Q") : fmtShortMonth(cur.start)}`), ` (${len(cur)} ${ES ? "hasta ahora" : "so far"}, ${dep(cur)})`) : null,
       ].filter(Boolean);
       const line = h("p", { class: "summary-line stats-line no-tr" }, ...parts.flatMap((p, i) => (i ? [h("span", { class: "sep" }, " · "), p] : [p])));
       const rows = st.slice().reverse().map((x) => h("tr", {}, h("td", {}, per(x) + (x.ongoing ? (ES ? " (en curso)" : " (under way)") : "")), h("td", {}, len(x)), h("td", {}, dep(x)),
-        h("td", {}, x.troughAt ? (cal ? fmtPeriod(addMonths(x.troughAt, -2), "Q") : `${fmtShortMonth(addMonths(x.troughAt, -2))}–${fmtShortMonth(x.troughAt)}`) : "–")));
+        h("td", {}, x.troughAt ? (cal ? fmtPeriod(addMonths(x.troughAt, -2), "Q") : `${fmtShortMonth(addMonths(x.troughAt, -2))}–${fmtShortMonth(x.troughAt)}`) : "–"),
+        h("td", {}, recTxt(x))));
       const tbl = h("details", { class: "rr-table" }, h("summary", {}, ES ? "Ver todos los episodios" : "Show every spell"),
         h("div", { class: "table-scroll" }, h("table", { class: "data" },
-          h("thead", {}, h("tr", {}, ...(ES ? ["Episodio", "Duración", "Caída", "Trimestre más bajo"] : ["Spell", "Length", "Fall", "Lowest quarter"]).map((x) => h("th", {}, x)))),
+          h("thead", {}, h("tr", {}, ...(ES ? ["Episodio", "Duración", "Caída", "Trimestre más bajo", "Vuelta al nivel previo"] : ["Spell", "Length", "Fall", "Lowest quarter", "Back to the pre-spell level"]).map((x) => h("th", {}, x)))),
           h("tbody", {}, rows))),
         h("p", { class: "chips-note no-tr" }, ES
-          ? "Caída: del promedio trimestral del EMAE desestacionalizado en el trimestre anterior al episodio al trimestre más bajo dentro de él. Todos los episodios desde el comienzo de la serie, cualquiera sea el período que muestre el gráfico; el episodio en curso no entra en los extremos."
-          : "Fall: from the seasonally adjusted EMAE's quarterly average in the quarter before the spell to the lowest quarter inside it. Every spell since the series begins, whatever range the chart shows; the spell under way is left out of the extremes."));
+          ? "Caída: del promedio trimestral del EMAE desestacionalizado en el trimestre anterior al episodio al trimestre más bajo dentro de él. Vuelta al nivel previo: el primer trimestre después del piso cuyo promedio vuelve al del trimestre anterior al episodio (o no, si antes empieza el episodio siguiente). Todos los episodios desde el comienzo de la serie, cualquiera sea el período que muestre el gráfico; el episodio en curso no entra en los extremos."
+          : "Fall: from the seasonally adjusted EMAE's quarterly average in the quarter before the spell to the lowest quarter inside it. Back to the pre-spell level: the first quarter after the low whose average is back at the quarter before the spell (or not, if the next spell starts first). Every spell since the series begins, whatever range the chart shows; the spell under way is left out of the extremes."));
       const open = rrStatsEl.querySelector("details") && rrStatsEl.querySelector("details").open;
       if (open) tbl.open = true;
       rrStatsEl.replaceChildren(line, tbl);

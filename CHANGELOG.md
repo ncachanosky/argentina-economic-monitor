@@ -108,7 +108,8 @@ section becomes its notes.
   spells listed under the chart, with summary statistics (number of spells, share of months,
   median length, longest, shortest, deepest and mildest; the spell under way apart) and a table of
   every spell's length and fall (quarterly averages, from the quarter before to the lowest quarter
-  inside). Methodology: under the recession probability.
+  inside) and its recovery (the first quarter back at the pre-spell level and how long after the low,
+  or not before the next spell). Methodology: under the recession probability.
 - International page: each chart's summary line gives Argentina's value (with the IMF's projection
   for the next year), its rank in the chosen group and the group median; the charts now have a PNG
   download (over time, or the ranking: up to 41 bars, centered on Argentina in large groups).
