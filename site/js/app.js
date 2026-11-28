@@ -968,7 +968,7 @@
     // averages (each month against the three before). A rule of thumb, not a dating committee.
     const RR = ind.recession_rule || null;
     state.rr = "off";
-    const rrSeg = RR ? segmented([["off", "Off"], ["calendar", "Calendar quarters"], ["rolling", "Rolling quarters"]], "off",
+    const rrSeg = RR ? segmented([["off", "Off"], ["calendar", "Calendar quarters"], ["rolling", "Monthly rolling"]], "off",
       (k) => { state.rr = k; rrSeg.update(k); draw(); }, "Two quarters of decline") : null;
     const rrWrap = RR ? h("div", { class: "base-pick rr-pick" }, h("span", {}, "Two-quarter declines:"), rrSeg) : null;
     const rrKey = RR ? h("p", { class: "band-key rr-key", hidden: true }) : null;
@@ -996,11 +996,11 @@
         return { spells, lastQ: Q.length ? Q[Q.length - 1].start : null };
       }
       // Rolling: at each month t, the quarter ending in t (t-2..t) against the quarter before (t-5..t-3),
-      // and that quarter against the one before it; when both fall, month t is shaded.
+      // and that quarter against the one before it; when both fall, the six months t-5..t are shaded.
       const A = D.map((d, i) => { const xs = [0, 1, 2].map((k) => at.get(addMonths(d, -k))); return xs.some((x) => x === null || x === undefined) ? null : (xs[0] + xs[1] + xs[2]) / 3; });
       const g = D.map((d, i) => { const j = D.indexOf(addMonths(d, -3)); return j < 0 || A[i] === null || A[j] === null ? null : (A[i] / A[j] - 1) * 100; });
       const on = new Set();
-      D.forEach((d, i) => { const j = D.indexOf(addMonths(d, -3)); if (j >= 0 && g[i] !== null && g[j] !== null && g[i] < 0 && g[j] < 0) on.add(d); });
+      D.forEach((d, i) => { const j = D.indexOf(addMonths(d, -3)); if (j >= 0 && g[i] !== null && g[j] !== null && g[i] < 0 && g[j] < 0) for (let k = 0; k < 6; k++) on.add(addMonths(d, -k)); });
       const months = [...on].sort();
       months.forEach((m) => { const last = spells[spells.length - 1]; if (last && addMonths(last.end, 1) === m) last.end = m; else spells.push({ start: m, end: m }); });
       return { spells };
@@ -1556,7 +1556,7 @@
           rrKey.replaceChildren(h("span", {}, h("span", { class: "band-sw" }),
             state.rr === "calendar"
               ? (ES ? `Sombreado: dos o más trimestres calendario seguidos en que el promedio trimestral del EMAE desestacionalizado cayó frente al trimestre anterior (último trimestre completo: ${fq(lastQ)}). ` : `Shaded: two or more calendar quarters in a row in which the quarterly average of the seasonally adjusted EMAE fell from the quarter before (last complete quarter: ${fq(lastQ)}). `)
-              : (ES ? "Sombreado: cada mes t en que el trimestre que termina en t (promedio de t-2 a t del EMAE desestacionalizado) cayó frente al trimestre anterior, y ese trimestre también había caído frente al previo. " : "Shaded: each month t in which the quarter ending in t (the average of months t-2 to t of the seasonally adjusted EMAE) fell from the quarter before, and that quarter had also fallen from the one before it. "),
+              : (ES ? "Sombreado: cuando el trimestre que termina en el mes t (promedio de t-2 a t del EMAE desestacionalizado) cayó frente al trimestre anterior (t-5 a t-3), y ese trimestre también había caído frente al previo, se sombrean los seis meses de esos dos trimestres (t-5 a t). " : "Shaded: when the quarter ending in month t (the average of months t-2 to t of the seasonally adjusted EMAE) fell from the quarter before (t-5 to t-3), and that quarter had also fallen from the one before it, the six months of those two quarters (t-5 to t) are shaded. "),
             ES ? `Es la regla práctica de los dos trimestres, no una datación oficial; los últimos meses pueden cambiar con las revisiones del INDEC. Episodios: ${list || "ninguno"}.` : `This is the two-quarter rule of thumb, not an official dating; the latest months can change with INDEC's revisions. Spells: ${list || "none"}.`));
         }
       }
@@ -1590,7 +1590,7 @@
     function colorPres() { return state.byPres && ind.pres_view !== "shaded"; }
     function overlayKeys() { return ind.overlay && !colorPres() ? [state.variant, ...lineKeys.filter((k) => k !== state.variant && state.shown.has(k))] : [state.variant]; }
     const subtitle = (main, t) => `${overlayKeys().map((k) => ind.variants[k].label).join(" vs. ")} · ${t.change ? t.short : main.units}`
-      + (RR && state.rr !== "off" ? (LANG === "es" ? ` · sombreado: dos o más trimestres de caída (${state.rr === "calendar" ? "trimestres calendario" : "trimestres móviles, mes a mes"})` : ` · shaded: two or more quarters of decline (${state.rr === "calendar" ? "calendar quarters" : "rolling quarters, month by month"})`) : "");
+      + (RR && state.rr !== "off" ? (LANG === "es" ? ` · sombreado: dos o más trimestres de caída (${state.rr === "calendar" ? "trimestres calendario" : "trimestres móviles mensuales"})` : ` · shaded: two or more quarters of decline (${state.rr === "calendar" ? "calendar quarters" : "monthly rolling quarters"})`) : "");
     const fileTag = () => `${ind.id}_${state.variant}_${state.transform}${baseMonth() ? "_base" + baseMonth().slice(0, 7) : ""}${state.byPres ? "_presidencies" : ""}`;
     const onPNG = () => {
       if (state.yearly) {
