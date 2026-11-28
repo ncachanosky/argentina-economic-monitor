@@ -105,7 +105,10 @@ section becomes its notes.
 - EMAE: a toggle shades spells of two or more quarters of falling seasonally adjusted activity
   (the two-quarter rule), on calendar quarters or on rolling quarters month by month (when the quarter ending in month t
   and the quarter before both fell, the six months t-5 to t are shaded), with the
-  spells listed under the chart. Methodology: under the recession probability.
+  spells listed under the chart, with summary statistics (number of spells, share of months,
+  median length, longest, shortest, deepest and mildest; the spell under way apart) and a table of
+  every spell's length and fall (quarterly averages, from the quarter before to the lowest quarter
+  inside). Methodology: under the recession probability.
 - International page: each chart's summary line gives Argentina's value (with the IMF's projection
   for the next year), its rank in the chosen group and the group median; the charts now have a PNG
   download (over time, or the ranking: up to 41 bars, centered on Argentina in large groups).

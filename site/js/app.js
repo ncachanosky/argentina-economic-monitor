@@ -972,6 +972,67 @@
       (k) => { state.rr = k; rrSeg.update(k); draw(); }, "Two quarters of decline") : null;
     const rrWrap = RR ? h("div", { class: "base-pick rr-pick" }, h("span", {}, "Two-quarter declines:"), rrSeg) : null;
     const rrKey = RR ? h("p", { class: "band-key rr-key", hidden: true }) : null;
+    const rrStatsEl = RR ? h("div", { class: "rr-stats", hidden: true }) : null;
+    // Each spell's length and depth: the fall of the quarterly average (months t-2..t) from the quarter
+    // just before the spell to the lowest quarter inside it (calendar: quarters; rolling: every month).
+    function spellStats(mode, spells) {
+      const v = ind.variants[RR.variant || "sa"].values, D = ind.dates;
+      const at = new Map(D.map((d, i) => [d, v[i]]));
+      const A = (m) => { const xs = [0, 1, 2].map((k) => at.get(addMonths(m, -k))); return xs.some((x) => x === null || x === undefined) ? null : (xs[0] + xs[1] + xs[2]) / 3; };
+      let lastFull = null;
+      for (let i = D.length - 1; i >= 0; i--) if (A(D[i]) !== null && (mode !== "calendar" || Number(D[i].slice(5, 7)) % 3 === 0)) { lastFull = D[i]; break; }
+      return spells.map((sp) => {
+        const months = monthIndex(sp.end) - monthIndex(sp.start) + 1;
+        const base = A(addMonths(sp.start, -1));
+        let trough = null, troughAt = null;
+        for (let m = addMonths(sp.start, 2); m <= sp.end; m = addMonths(m, mode === "calendar" ? 3 : 1)) {
+          const a = A(m);
+          if (a !== null && (trough === null || a < trough)) { trough = a; troughAt = m; }
+        }
+        return { ...sp, months, quarters: months / 3, depth: base && trough !== null ? (trough / base - 1) * 100 : null, troughAt, ongoing: sp.end === lastFull };
+      });
+    }
+    function drawSpellStats(mode, spells) {
+      const ES = LANG === "es", cal = mode === "calendar";
+      const st = spellStats(mode, spells);
+      const done = st.filter((x) => !x.ongoing), cur = st.find((x) => x.ongoing);
+      const len = (x) => (cal ? `${x.quarters} ${ES ? (x.quarters === 1 ? "trimestre" : "trimestres") : (x.quarters === 1 ? "quarter" : "quarters")}` : `${x.months} ${ES ? (x.months === 1 ? "mes" : "meses") : (x.months === 1 ? "month" : "months")}`);
+      const per = (x) => (cal ? `${fmtPeriod(x.start, "Q")}–${fmtPeriod(x.end, "Q")}` : x.start === x.end ? fmtShortMonth(x.start) : `${fmtShortMonth(x.start)}–${fmtShortMonth(x.end)}`);
+      const dep = (x) => (x.depth === null ? "–" : `${x.depth < 0 ? "−" : "+"}${fx(Math.abs(x.depth), 1)}%`);
+      if (!st.length) { rrStatsEl.replaceChildren(); rrStatsEl.hidden = true; return; }
+      const first = ind.dates.find((d, i) => ind.variants[RR.variant || "sa"].values[i] !== null);
+      const total = monthIndex(ind.dates[ind.dates.length - 1]) - monthIndex(first) + 1;
+      const inRec = st.reduce((a, x) => a + x.months, 0);
+      // The extreme spells; a tie lists every spell sharing the extreme value.
+      const by = (f, sgn) => { const xs = done.filter((x) => f(x) !== null).sort((p, q) => sgn * (f(p) - f(q))); return xs.length ? xs.filter((x) => Math.abs(f(x) - f(xs[0])) < 1e-9) : []; };
+      const longest = by((x) => x.months, -1), shortest = by((x) => x.months, 1), deepest = by((x) => x.depth, 1), mildest = by((x) => x.depth, -1);
+      const med = (() => { const m = done.map((x) => x.months).sort((p, q) => p - q); if (!m.length) return null; const k = m.length >> 1; return m.length % 2 ? m[k] : (m[k - 1] + m[k]) / 2; })();
+      const medTxt = med === null ? "–" : cal ? `${fx(med / 3, med % 3 ? 1 : 0)} ${ES ? "trimestres" : "quarters"}` : `${fx(med, med % 1 ? 1 : 0)} ${ES ? "meses" : "months"}`;
+      const item = (label, xs) => (!xs.length ? null : xs.length === 1 ? h("span", { class: "stat" }, `${label}: `, h("b", {}, per(xs[0])), ` (${len(xs[0])}, ${dep(xs[0])})`)
+        : h("span", { class: "stat" }, `${label}: `, h("b", {}, label.match(/prof|leve|deep|mild/) ? dep(xs[0]) : len(xs[0])), ` (${xs.length} ${ES ? "episodios" : "spells"}: ${xs.map(per).join(", ")})`));
+      const parts = [
+        h("span", { class: "stat" }, h("b", {}, String(st.length)), ES ? ` episodios desde ${fmtShortMonth(first)}` : ` spells since ${fmtShortMonth(first)}`,
+          ES ? `; ${fx(inRec / total * 100, 0)}% de los meses` : `; ${fx(inRec / total * 100, 0)}% of the months`),
+        h("span", { class: "stat" }, ES ? "duración mediana: " : "median length: ", h("b", {}, medTxt)),
+        item(ES ? "el más largo" : "longest", longest), item(ES ? "el más corto" : "shortest", shortest),
+        item(ES ? "el más profundo" : "deepest", deepest), item(ES ? "el más leve" : "mildest", mildest),
+        cur ? h("span", { class: "stat" }, ES ? "en curso: " : "under way: ", h("b", {}, `${ES ? "desde" : "since"} ${cal ? fmtPeriod(cur.start, "Q") : fmtShortMonth(cur.start)}`), ` (${len(cur)} ${ES ? "hasta ahora" : "so far"}, ${dep(cur)})`) : null,
+      ].filter(Boolean);
+      const line = h("p", { class: "summary-line stats-line no-tr" }, ...parts.flatMap((p, i) => (i ? [h("span", { class: "sep" }, " · "), p] : [p])));
+      const rows = st.slice().reverse().map((x) => h("tr", {}, h("td", {}, per(x) + (x.ongoing ? (ES ? " (en curso)" : " (under way)") : "")), h("td", {}, len(x)), h("td", {}, dep(x)),
+        h("td", {}, x.troughAt ? (cal ? fmtPeriod(addMonths(x.troughAt, -2), "Q") : `${fmtShortMonth(addMonths(x.troughAt, -2))}–${fmtShortMonth(x.troughAt)}`) : "–")));
+      const tbl = h("details", { class: "rr-table" }, h("summary", {}, ES ? "Ver todos los episodios" : "Show every spell"),
+        h("div", { class: "table-scroll" }, h("table", { class: "data" },
+          h("thead", {}, h("tr", {}, ...(ES ? ["Episodio", "Duración", "Caída", "Trimestre más bajo"] : ["Spell", "Length", "Fall", "Lowest quarter"]).map((x) => h("th", {}, x)))),
+          h("tbody", {}, rows))),
+        h("p", { class: "chips-note no-tr" }, ES
+          ? "Caída: del promedio trimestral del EMAE desestacionalizado en el trimestre anterior al episodio al trimestre más bajo dentro de él. Todos los episodios desde el comienzo de la serie, cualquiera sea el período que muestre el gráfico; el episodio en curso no entra en los extremos."
+          : "Fall: from the seasonally adjusted EMAE's quarterly average in the quarter before the spell to the lowest quarter inside it. Every spell since the series begins, whatever range the chart shows; the spell under way is left out of the extremes."));
+      const open = rrStatsEl.querySelector("details") && rrStatsEl.querySelector("details").open;
+      if (open) tbl.open = true;
+      rrStatsEl.replaceChildren(line, tbl);
+      rrStatsEl.hidden = false;
+    }
     function recessionSpells(mode) {
       const v = ind.variants[RR.variant || "sa"].values, D = ind.dates;
       const at = new Map(D.map((d, i) => [d, v[i]]));
@@ -1548,6 +1609,8 @@
       drawSumStats(main, t);
       if (rrKey) {
         rrKey.hidden = state.rr === "off";
+        rrStatsEl.hidden = state.rr === "off";
+        if (state.rr !== "off") drawSpellStats(state.rr, recessionSpells(state.rr).spells);
         if (state.rr !== "off") {
           const { spells, lastQ } = recessionSpells(state.rr);
           const ES = LANG === "es";
@@ -1627,7 +1690,7 @@
       ind.view_start ? (remBtn ? h("div", { class: "controls" }, remBtn) : null) : h("div", { class: "controls" }, realSeg, baseWrap, presBtn, epBtn, remBtn, termBtn),
       rrWrap ? h("div", { class: "controls" }, rrWrap) : null,
       ind.caveat ? h("p", { class: "caveat" }, ind.caveat) : null,
-      trackerLine(), sumEl, summaryEl, hint, methodLine(ind), bandKey, termKeyEl, epKey, rrKey, chartEl, chipRow, statsEl);
+      trackerLine(), sumEl, summaryEl, hint, methodLine(ind), bandKey, termKeyEl, epKey, rrKey, rrStatsEl, chartEl, chipRow, statsEl);
     drawSummary();
     table = tableView([], [], false, ind.frequency, { asc: (ind.data_table || {}).order === "asc", yearMarks: !!(ind.data_table || {}).year_marks });
     appendAll(card, breakdownTable(ind), table, annualTable(ind), weightsTable(ind), ind.note ? h("p", { class: "chips-note" }, ind.note) : null,

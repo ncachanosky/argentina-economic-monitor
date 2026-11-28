@@ -644,3 +644,8 @@ table.statement th.st-cur, table.statement td.st-cur { border-left: 2px solid va
 .data-wrap { overflow-x: auto; margin-bottom: 8px; }
 .data-bulk li { margin: 4px 0; }
 .data-count { color: var(--ink-3); font-size: 13px; }
+
+.rr-stats { margin: 2px 0 8px; }
+.rr-stats .rr-table { font-family: var(--font-ui); font-size: 13px; }
+.rr-stats .rr-table .table-scroll { max-height: none; }
+.rr-stats .rr-table summary { font-family: var(--font-ui); font-size: 13px; color: var(--ink-2); cursor: pointer; }
