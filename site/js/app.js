@@ -968,7 +968,7 @@
     // averages (each month against the three before). A rule of thumb, not a dating committee.
     const RR = ind.recession_rule || null;
     state.rr = "off";
-    const rrSeg = RR ? segmented([["off", "Off"], ["calendar", "Calendar quarters"], ["rolling", "Rolling 3 months"]], "off",
+    const rrSeg = RR ? segmented([["off", "Off"], ["calendar", "Calendar quarters"], ["rolling", "Rolling quarters"]], "off",
       (k) => { state.rr = k; rrSeg.update(k); draw(); }, "Two quarters of decline") : null;
     const rrWrap = RR ? h("div", { class: "base-pick rr-pick" }, h("span", {}, "Two-quarter declines:"), rrSeg) : null;
     const rrKey = RR ? h("p", { class: "band-key rr-key", hidden: true }) : null;
@@ -995,12 +995,12 @@
         close();
         return { spells, lastQ: Q.length ? Q[Q.length - 1].start : null };
       }
-      // Rolling: three-month average against the three months before; a month counts when that change
-      // and the one three months earlier are both negative, and the six months behind it are shaded.
+      // Rolling: at each month t, the quarter ending in t (t-2..t) against the quarter before (t-5..t-3),
+      // and that quarter against the one before it; when both fall, month t is shaded.
       const A = D.map((d, i) => { const xs = [0, 1, 2].map((k) => at.get(addMonths(d, -k))); return xs.some((x) => x === null || x === undefined) ? null : (xs[0] + xs[1] + xs[2]) / 3; });
       const g = D.map((d, i) => { const j = D.indexOf(addMonths(d, -3)); return j < 0 || A[i] === null || A[j] === null ? null : (A[i] / A[j] - 1) * 100; });
       const on = new Set();
-      D.forEach((d, i) => { const j = D.indexOf(addMonths(d, -3)); if (j >= 0 && g[i] !== null && g[j] !== null && g[i] < 0 && g[j] < 0) for (let k = 0; k < 6; k++) on.add(addMonths(d, -k)); });
+      D.forEach((d, i) => { const j = D.indexOf(addMonths(d, -3)); if (j >= 0 && g[i] !== null && g[j] !== null && g[i] < 0 && g[j] < 0) on.add(d); });
       const months = [...on].sort();
       months.forEach((m) => { const last = spells[spells.length - 1]; if (last && addMonths(last.end, 1) === m) last.end = m; else spells.push({ start: m, end: m }); });
       return { spells };
@@ -1552,11 +1552,11 @@
           const { spells, lastQ } = recessionSpells(state.rr);
           const ES = LANG === "es";
           const fq = (iso) => fmtPeriod(iso, "Q"), fm = (iso) => fmtShortMonth(iso);
-          const list = spells.map((sp) => (state.rr === "calendar" ? `${fq(sp.start)}–${fq(sp.end)}` : `${fm(sp.start)}–${fm(sp.end)}`)).join(", ");
+          const list = spells.map((sp) => (state.rr === "calendar" ? `${fq(sp.start)}–${fq(sp.end)}` : (sp.start === sp.end ? fm(sp.start) : `${fm(sp.start)}–${fm(sp.end)}`))).join(", ");
           rrKey.replaceChildren(h("span", {}, h("span", { class: "band-sw" }),
             state.rr === "calendar"
               ? (ES ? `Sombreado: dos o más trimestres calendario seguidos en que el promedio trimestral del EMAE desestacionalizado cayó frente al trimestre anterior (último trimestre completo: ${fq(lastQ)}). ` : `Shaded: two or more calendar quarters in a row in which the quarterly average of the seasonally adjusted EMAE fell from the quarter before (last complete quarter: ${fq(lastQ)}). `)
-              : (ES ? "Sombreado: meses en que el promedio de tres meses del EMAE desestacionalizado cayó frente a los tres meses anteriores dos veces seguidas (ese mes y tres meses antes); se sombrean los seis meses involucrados. " : "Shaded: months in which the seasonally adjusted EMAE's three-month average fell against the three months before, twice in a row (that month and three months earlier); the six months involved are shaded. "),
+              : (ES ? "Sombreado: cada mes t en que el trimestre que termina en t (promedio de t-2 a t del EMAE desestacionalizado) cayó frente al trimestre anterior, y ese trimestre también había caído frente al previo. " : "Shaded: each month t in which the quarter ending in t (the average of months t-2 to t of the seasonally adjusted EMAE) fell from the quarter before, and that quarter had also fallen from the one before it. "),
             ES ? `Es la regla práctica de los dos trimestres, no una datación oficial; los últimos meses pueden cambiar con las revisiones del INDEC. Episodios: ${list || "ninguno"}.` : `This is the two-quarter rule of thumb, not an official dating; the latest months can change with INDEC's revisions. Spells: ${list || "none"}.`));
         }
       }
@@ -1590,7 +1590,7 @@
     function colorPres() { return state.byPres && ind.pres_view !== "shaded"; }
     function overlayKeys() { return ind.overlay && !colorPres() ? [state.variant, ...lineKeys.filter((k) => k !== state.variant && state.shown.has(k))] : [state.variant]; }
     const subtitle = (main, t) => `${overlayKeys().map((k) => ind.variants[k].label).join(" vs. ")} · ${t.change ? t.short : main.units}`
-      + (RR && state.rr !== "off" ? (LANG === "es" ? ` · sombreado: dos o más trimestres de caída (${state.rr === "calendar" ? "trimestres calendario" : "promedios móviles de 3 meses"})` : ` · shaded: two or more quarters of decline (${state.rr === "calendar" ? "calendar quarters" : "rolling 3-month averages"})`) : "");
+      + (RR && state.rr !== "off" ? (LANG === "es" ? ` · sombreado: dos o más trimestres de caída (${state.rr === "calendar" ? "trimestres calendario" : "trimestres móviles, mes a mes"})` : ` · shaded: two or more quarters of decline (${state.rr === "calendar" ? "calendar quarters" : "rolling quarters, month by month"})`) : "");
     const fileTag = () => `${ind.id}_${state.variant}_${state.transform}${baseMonth() ? "_base" + baseMonth().slice(0, 7) : ""}${state.byPres ? "_presidencies" : ""}`;
     const onPNG = () => {
       if (state.yearly) {
