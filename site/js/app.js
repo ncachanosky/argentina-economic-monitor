@@ -926,7 +926,8 @@
       const mk = (ind.muted || []).find((k) => overlayKeys().includes(k) && k !== state.variant && /median|mediana/i.test(ind.variants[k].label));
       sumItems = summaryStats({ ind, dates: ind.dates, y: main.y, levels: main.v.values, t, tkey: state.transform, units: main.rebased ? "Index" : (ind._units_en || ind.units) + (ind._real ? ", real prices" : ""),
         start: viewStart(ind, state.range), compare: mk ? { label: ind.variants[mk].label, y: series(mk).y } : null });
-      statsLine(sumEl, sumItems);
+      // Several equal lines (no emphasized one): say which line the numbers describe.
+      statsLine(sumEl, sumItems, ind.overlay && !ind.emphasis && overlayKeys().length > 1 ? ind.variants[state.variant].label : null);
     }
 
     // Overlay cards draw every variant at once; the default one leads and is the

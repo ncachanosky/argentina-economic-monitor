@@ -467,6 +467,24 @@
     "status": "ok",
     "warnings": []
   },
+  "147.3_IBIENESNAL_DICI_T_19": {
+    "last_changed": "2026-11-28",
+    "last_checked": "2026-11-28T17:46:34+00:00",
+    "last_obs": "2026-10-01",
+    "source": "datos_gob",
+    "source_units": "\u00cdndice",
+    "status": "ok",
+    "warnings": []
+  },
+  "147.3_ISERVICNAL_DICI_T_22": {
+    "last_changed": "2026-11-28",
+    "last_checked": "2026-11-28T17:46:34+00:00",
+    "last_obs": "2026-10-01",
+    "source": "datos_gob",
+    "source_units": "\u00cdndice",
+    "status": "ok",
+    "warnings": []
+  },
   "148.3_IESTACINAL_DICI_M_25": {
     "last_changed": "2026-11-12",
     "last_checked": "2026-11-28T17:42:47+00:00",

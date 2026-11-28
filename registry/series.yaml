@@ -1842,6 +1842,70 @@ indicators:
       Secretaría de Hacienda's monthly fiscal data.
     method_links: [{anchor: rem, label: "About the REM survey"}]
 
+  - id: goods_services
+    topic: prices
+    wide: true
+    kind: variants
+    title: Goods and Services Prices
+    short_title: Goods and services
+    switch: {group: goods_services, label: "Inflation"}
+    description: >-
+      INDEC's CPI split into goods and services: how fast each is rising.
+      Services are mostly non-tradable (rents, utilities, education, health,
+      personal services); goods are mostly tradable. Monthly since 2017.
+    release: ipc
+    source: datos_gob
+    source_label: INDEC (CPI, goods and services, national)
+    frequency: M
+    units: Index, Dec 2016 = 100
+    measure: index
+    transforms: [yoy, mom, level]
+    overlay: true
+    overlay_default: [goods, services]
+    variants:
+      goods:    {label: Goods,    id: 147.3_IBIENESNAL_DICI_T_19}
+      services: {label: Services, id: 147.3_ISERVICNAL_DICI_T_22}
+    default: {variant: goods, transform: yoy, start: "2018-01", rebase: false}
+    note: >-
+      INDEC's classification of the CPI basket into goods and services, national
+      index. Datos.gob.ar publishes these series some days after INDEC's release.
+
+  - id: goods_services_relative
+    topic: prices
+    wide: true
+    kind: variants
+    title: Services Relative to Goods
+    short_title: Services vs. goods
+    switch: {group: goods_services, label: "Relative price"}
+    description: >-
+      The price of services relative to goods in INDEC's CPI (December 2016 =
+      100): a rough gauge of the real exchange rate from inside the basket.
+      A rise means services (mostly non-tradable) got dearer relative to goods
+      (mostly tradable), as in a real appreciation.
+    release: ipc
+    source: derived
+    source_label: INDEC (CPI, goods and services); monitor's calculations
+    frequency: M
+    units: Index, Dec 2016 = 100
+    measure: index
+    transforms: [level, yoy]
+    default: {variant: ratio, transform: level, range: Max, rebase: false}
+    ranges: [5Y, Max]
+    ref_line: 100
+    note: >-
+      Services price index over goods price index, times 100. Not a measure of
+      the real exchange rate itself: services include regulated prices (utilities,
+      transport, prepaid health), so the ratio also moves with tariff policy,
+      as when utility rates were frozen and later raised; and many goods carry
+      domestic margins and taxes. Read it next to the real exchange rate.
+    method_links: [{anchor: goods-services, label: "About goods and services prices"}]
+    derive:
+      method: formula
+      anchor: g
+      vars: {g: "147.3_IBIENESNAL_DICI_T_19", s: "147.3_ISERVICNAL_DICI_T_22"}
+      variants:
+        ratio: {label: "Services relative to goods", expr: "100 * s / g"}
+
   - id: cpi_regions
     topic: prices
     kind: panel

@@ -102,6 +102,9 @@ section becomes its notes.
   economies, any country addable); the choice applies to every card. A snapshot table at the top;
   each card also ranks the group for a chosen year. New sources: IMF SDMX API, World Bank API;
   the EFW, V-Dem and SMI adapters also write all-country tables.
+- Prices: goods and services. INDEC's national CPI for goods and for services (inflation, with a
+  switch to the price of services relative to goods, a rough inside-the-basket gauge of the real
+  exchange rate that also moves with regulated tariffs). New series from datos.gob.ar.
 - Money and Banking: "Money Growth and Inflation", twelve-month growth of base money and private M2
   next to CPI inflation, with a switch that shifts money growth 6 to 24 months forward. Descriptive:
   no fitted line. New display option `lag_shift`.
