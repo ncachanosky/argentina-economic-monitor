@@ -1,0 +1,16 @@
+HTTP/2 200 
+date: Sat, 28 Nov 2026 17:45:57 GMT
+content-type: application/json
+nel: {"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}
+server: cloudflare
+x-frame-options: SAMEORIGIN
+vary: Origin
+vary: accept-encoding
+report-to: {"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=3REkx7cIz1SnK5inr8Yyl1ITs%2FbzB0oPsTmkkmdXgC0dbw5FJvFzOU%2Fw7qHv2N0bW4xunMRofyrA51%2F0pWB%2FcRe3QTQh0o7Bjypwb4CuYx4dU%2FfTC3n9iF8oMYT%2F%2BW9uCOA4Bg%3D%3D"}]}
+access-control-allow-origin: *
+x-kong-upstream-latency: 932
+x-kong-proxy-latency: 0
+cf-cache-status: DYNAMIC
+cf-ray: a61b30709db50055-PDX
+alt-svc: h3=":443"; ma=86400
+
