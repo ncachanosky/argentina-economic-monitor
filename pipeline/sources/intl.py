@@ -11,7 +11,7 @@ Every country both cover (about 190), annual:
 
 Writes one file per indicator, data/tables/intl/<key>.json ({years, values: {iso: [...]},
 proj_from, ...}), and index.json with the countries, the groups (registry/geo/groups.yaml,
-filtered to the countries covered) and each group's largest economies (GDP at PPP), drawn by
+filtered to the countries covered; regime groups with each member's year of adoption) and each group's largest economies (GDP at PPP), drawn by
 default. The cards' status series: "intl:ARG:<key>".
 """
 from __future__ import annotations
@@ -134,10 +134,13 @@ def build(weo_xml: str, wb_countries, wb_series: dict) -> dict:
         else:
             regions.append(grp(r))
     blocs = [grp(b) for b in g["blocs"]]
+    # Regimes: members count from their year of adoption (`since`); `lines`: draw members, no median.
+    regimes = [{**grp(r), "since": {k: int(v) for k, v in (r.get("since") or {}).items() if k in covered}, "lines": bool(r.get("lines"))}
+               for r in g.get("regimes") or []]
     world = {"key": "world", "label": "World (all countries)", "members": covered, "main": sorted(covered, key=lambda c: -size[c])[:5]}
     index = {"edition": edition, "proj_from": proj_from, "years": years,
              "countries": {iso: {"n": SHORT_NAMES.get(iso, econ[iso][0]), "a2": econ[iso][1]} for iso in covered},
-             "groups": {"world": world, "regions": regions, "blocs": blocs},
+             "groups": {"world": world, "regions": regions, "blocs": blocs, "regimes": regimes},
              "indicators": [{"key": k, "label": t["label"], "unit": t["unit"], "source": t["source"], "decimals": t["decimals"]} for k, t in tables.items()],
              "latest": f"{proj_from - 1}-01-01"}
     return {"index": index, "tables": tables}

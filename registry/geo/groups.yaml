@@ -5,6 +5,13 @@
 # Blocs as of November 2026: Mercosur without Venezuela (suspended since 2016) and with
 # Bolivia (full member since 2024); euro area with Bulgaria (2026); BRICS after the 2024-25
 # enlargement; ASEAN with Timor-Leste (2025).
+#
+# Regimes are the exception: a country counts in a regime group only from the year it adopted the
+# regime (`since`), so a median or a rank in 1995 does not include Ecuador as a dollarized economy.
+# `lines: true` draws each member's line and no median (a median of three says little).
+# Dollarized: Panama (US dollar since 1904), Ecuador (2000), El Salvador (2001).
+# Inflation targeters in Latin America, year of adoption as usually dated (e.g. Hammond 2012,
+# Bank of England CCBS): Brazil, Chile, Colombia 1999; Mexico 2001; Peru 2002; Uruguay 2007.
 
 regions:
   - key: latam
@@ -52,3 +59,9 @@ blocs:
   - {key: brics, label: BRICS, members: [BRA, RUS, IND, CHN, ZAF, EGY, ETH, IRN, ARE, IDN]}
   - {key: asean, label: ASEAN, members: [BRN, KHM, IDN, LAO, MYS, MMR, PHL, SGP, THA, VNM, TLS]}
   - {key: gcc, label: Gulf Cooperation Council, members: [SAU, ARE, QAT, KWT, BHR, OMN]}
+
+regimes:
+  - {key: dollarized, label: Dollarized economies (Latin America), lines: true,
+     members: [PAN, ECU, SLV], since: {PAN: 1904, ECU: 2000, SLV: 2001}}
+  - {key: inflation_targeters, label: Inflation targeters (Latin America),
+     members: [BRA, CHL, COL, MEX, PER, URY], since: {BRA: 1999, CHL: 1999, COL: 1999, MEX: 2001, PER: 2002, URY: 2007}}

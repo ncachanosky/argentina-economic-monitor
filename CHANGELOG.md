@@ -102,6 +102,10 @@ section becomes its notes.
   economies, any country addable); the choice applies to every card. A snapshot table at the top;
   each card also ranks the group for a chosen year. New sources: IMF SDMX API, World Bank API;
   the EFW, V-Dem and SMI adapters also write all-country tables.
+- International page: monetary-regime groups, dollarized economies (Panama, Ecuador, El Salvador;
+  each member's line, no median) and Latin American inflation targeters (Brazil, Chile, Colombia
+  1999; Mexico 2001; Peru 2002; Uruguay 2007). A country counts in a regime group only from its year
+  of adoption; before it, its line is dotted.
 - Monthly report draft: each section ends with the Monitor's summary line for its card, computed by
   the same rules as the site (new `pipeline/summary.py`, a Python port of the summary line and the
   two-quarter rule, with tests). The activity section reports the two-quarter rule (calendar and
@@ -118,8 +122,8 @@ section becomes its notes.
 - International page: each chart's summary line gives Argentina's value (with the IMF's projection
   for the next year), its rank in the chosen group and the group median; the charts now have a PNG
   download (over time, or the ranking: up to 41 bars, centered on Argentina in large groups).
-- International page: the y axis fits the years shown (Argentina's 1989 inflation no longer flattens
-  the "Since 2000" view).
+- International page: the y axis fits the years shown (Brazil's early-1990s inflation no longer
+  flattens the "Since 2000" view).
 - PNG downloads follow the site's theme: in dark mode the image comes out dark.
 - Summary line on most charts: three numbers chosen by rule from the kind of series shown (flows:
   total over the range, latest vs. a year earlier, this year's average vs. last year's; rates:

@@ -2450,15 +2450,19 @@
     const G = INTL.index.groups, out = [["world", G.world]];
     G.regions.forEach((r) => { out.push([r.key, r]); (r.sub || []).forEach((s) => out.push([s.key, s, true])); });
     G.blocs.forEach((b) => out.push([b.key, b, false, true]));
+    (G.regimes || []).forEach((r) => out.push([r.key, r, false, false, true]));
     return out;
   }
+  // A regime group's member counts only from its year of adoption (groups.yaml `since`).
+  const inGroup = (g, c, year) => g.members.includes(c) && (!g.since || !g.since[c] || year >= g.since[c]);
   const intlGroup = (key) => (intlGroups().find((g) => g[0] === key) || intlGroups()[0])[1];
   function intlGroupSelect() {
     const sel = h("select", { class: "select", "aria-label": "Country group" });
     const G = intlGroups();
     sel.append(h("option", { value: "world" }, tr("World (all countries)")),
-      h("optgroup", { label: LANG === "es" ? "Regiones" : "Regions" }, G.filter((g) => !g[3] && g[0] !== "world").map(([k, g, sub]) => h("option", { value: k }, (sub ? "  · " : "") + tr(g.label)))),
-      h("optgroup", { label: LANG === "es" ? "Bloques" : "Blocs" }, G.filter((g) => g[3]).map(([k, g]) => h("option", { value: k }, tr(g.label)))));
+      h("optgroup", { label: LANG === "es" ? "Regiones" : "Regions" }, G.filter((g) => !g[3] && !g[4] && g[0] !== "world").map(([k, g, sub]) => h("option", { value: k }, (sub ? "  · " : "") + tr(g.label)))),
+      h("optgroup", { label: LANG === "es" ? "Bloques" : "Blocs" }, G.filter((g) => g[3]).map(([k, g]) => h("option", { value: k }, tr(g.label)))),
+      G.some((g) => g[4]) ? h("optgroup", { label: LANG === "es" ? "Regímenes monetarios" : "Monetary regimes" }, G.filter((g) => g[4]).map(([k, g]) => h("option", { value: k }, tr(g.label)))) : null);
     sel.value = INTL.group;
     sel.addEventListener("change", () => INTL.setGroup(sel.value));
     const wrap = h("label", { class: "base-pick" }, h("span", {}, "Compare with:"), sel);
@@ -2501,7 +2505,11 @@
       const proj = nxt !== null && nxt !== undefined;
       const items = [{ big: v(a), small: ES ? `la Argentina en ${year}${proj ? `; el FMI proyecta ${v(nxt)} para ${year + 1}` : ""}` : `Argentina in ${year}${proj ? `; the IMF projects ${v(nxt)} for ${year + 1}` : ""}` }];
       if (r) items.push({ big: ES ? `${r} de ${set.length}` : `${ordinal(r)} of ${set.length}`, small: ES ? `en ${gname}${members.includes(HOME) ? "" : " y la Argentina"}, de mayor a menor` : `in ${gname}${members.includes(HOME) ? "" : " and Argentina"}, highest first` });
-      if (m !== null && m !== undefined) {
+      if (g.lines) {
+        // A small group: each member's value instead of a median.
+        const each = members.filter(has).map((c) => `${intlName(c)} ${v(D.values[c][i])}`);
+        if (each.length) items.push({ big: v(m), small: ES ? `mediana; ${each.join(", ")}` : `median; ${each.join(", ")}` });
+      } else if (m !== null && m !== undefined) {
         const d = a - m, ds = `${d > 0 ? "+" : d < 0 ? "−" : ""}${fx(Math.abs(d), nd())}${/^%/.test(u) ? " pp" : ""}`;
         const n = members.filter(has).length;
         items.push({ big: v(m), small: ES ? `mediana de ${gname} (${n} países); la Argentina, ${ds}` : `median of ${gname} (${n} countries); Argentina ${ds}` });
@@ -2514,7 +2522,7 @@
       if (!D || !INTL.index) return;
       gPick.sync && gPick.sync();
       const g = intlGroup(INTL.group);
-      if (state.pickGroup !== INTL.group) { state.picks = new Set(g.main.filter((c) => c !== HOME && D.values[c]).slice(0, 4)); state.pickGroup = INTL.group; }
+      if (state.pickGroup !== INTL.group) { state.picks = new Set((g.lines ? g.members : g.main).filter((c) => c !== HOME && D.values[c]).slice(0, g.lines ? 8 : 4)); state.pickGroup = INTL.group; }
       const single = D.years.length === 1;
       if (single) state.view = "rank";
       vSeg.style.display = single ? "none" : "";
@@ -2525,9 +2533,10 @@
       yPick.style.display = state.view === "rank" && !single ? "" : "none";
       chips.style.display = addSel.style.display = rSeg.style.display = state.view === "time" ? "" : "none";
       const members = g.members.filter((c) => D.values[c]);
-      const med = Y.map((y, i) => intlMedian(members.map((c) => D.values[c][i])));
+      const membersAt = (year) => members.filter((c) => inGroup(g, c, year));
+      const med = Y.map((y, i) => intlMedian(membersAt(y).map((c) => D.values[c][i])));
       const gname = tr(g.label);
-      sumItems = intlStats(g, members, med, state.view === "rank" ? state.year : lastActual());
+      sumItems = intlStats(g, membersAt(state.view === "rank" ? state.year : lastActual()), med, state.view === "rank" ? state.year : lastActual());
       statsLine(sumEl, sumItems);
       if (state.view === "time") {
         chips.replaceChildren(h("span", { class: "chip-label" }, ES ? "Mostrar:" : "Show:"),
@@ -2545,21 +2554,36 @@
           if (p) traces.push({ type: "scatter", mode: "lines", name: `${name} (${ES ? "proyección" : "projection"})`, x, y: p, connectgaps: false, showlegend: false, legendgroup: name, line: { ...style, dash: "dash" },
             hovertemplate: `${name} %{x|%Y} (${ES ? "FMI, proyección" : "IMF projection"}): <b>%{y:,.${nd()}f}</b><extra></extra>` });
         };
-        line(ES ? `Mediana: ${gname}` : `Median: ${gname}`, med, { color: cssVar("--ink-3"), width: 2, dash: "dot" });
+        if (!g.lines) line(ES ? `Mediana: ${gname}` : `Median: ${gname}`, med, { color: cssVar("--ink-3"), width: 2, dash: "dot" });
         let slot = 0;
-        for (const c of state.picks) if (D.values[c]) line(intlName(c), D.values[c], { color: cssVar(SERIES_VARS[slot++ % SERIES_VARS.length]), width: 1.6 });
+        for (const c of state.picks) {
+          if (!D.values[c]) continue;
+          const color = cssVar(SERIES_VARS[slot++ % SERIES_VARS.length]);
+          const since = g.since && g.since[c] && members.includes(c) ? g.since[c] : null;
+          if (since && since > Y[0]) {
+            // Before the country adopted the regime: a faint line, outside the group.
+            const k0 = Y.indexOf(since);
+            traces.push({ type: "scatter", mode: "lines", name: `${intlName(c)} (${ES ? "antes de" : "before"} ${since})`, x, y: D.values[c].map((v, k) => (k <= k0 ? v : null)),
+              connectgaps: false, showlegend: false, legendgroup: intlName(c), line: { color, width: 1.2, dash: "dot" }, opacity: 0.55,
+              hovertemplate: `${intlName(c)} %{x|%Y} (${ES ? "antes del régimen" : "before the regime"}): <b>%{y:,.${nd()}f}</b><extra></extra>` });
+            line(intlName(c), D.values[c].map((v, k) => (k >= k0 ? v : null)), { color, width: 1.6 });
+          } else line(intlName(c), D.values[c], { color, width: 1.6 });
+        }
         if (D.values[HOME]) line(intlName(HOME), D.values[HOME], { color: cssVar("--ink"), width: 3 });
         const shapes = pf && Y.includes(pf) ? [{ type: "rect", xref: "x", yref: "paper", x0: `${pf}-01-01`, x1: `${Y[Y.length - 1]}-12-31`, y0: 0, y1: 1, fillcolor: cssVar("--grid"), opacity: 0.35, line: { width: 0 }, layer: "below" }] : [];
         const ann = shapes.length ? [{ xref: "x", yref: "paper", x: `${pf}-01-01`, y: 1, xanchor: "left", yanchor: "bottom", showarrow: false, text: ES ? `Proyecciones del FMI (WEO ${D.edition.replace("April", "abril").replace("October", "octubre")})` : `IMF projections (WEO, ${D.edition})`, font: { size: 11, color: cssVar("--ink-2") } }] : [];
         chartEl.style.height = "";
-        // The y axis fits the years shown, not the whole series (1989's hyperinflation would flatten "Since 2000").
+        // The y axis fits the years shown, not the whole series (Brazil's early-1990s hyperinflation would flatten "Since 2000").
         const y0 = state.from && state.from > Y[0] ? state.from : Y[0];
         const vis = traces.flatMap((t) => t.y.filter((v, k) => v !== null && v !== undefined && Y[k] >= y0));
         const lo = Math.min(...vis), hi = Math.max(...vis), pad = (hi - lo) * 0.06 || 1;
         const yr = vis.length ? [lo - pad, hi + pad] : undefined;
         Plotly.react(chartEl, traces, baseLayout({ xaxis: { hoverformat: "%Y", range: [`${y0}-01-01`, `${Y[Y.length - 1]}-12-31`] }, yaxis: { tickformat: nd() === 0 ? ",.0f" : undefined, ...(yr ? { range: yr, autorange: false } : {}) },
           extra: { showlegend: true, legend: { orientation: "h", x: 0, y: 1.1, yanchor: "bottom", font: { color: cssVar("--ink") } }, hovermode: "x unified", shapes, annotations: ann, margin: { l: 56, r: 16, t: 56, b: 36 } } }), PLOT_CONFIG);
-        hint.textContent = (ES ? `${tr(D.label)}, ${tr(D.unit)}. La Argentina, la mediana de ${gname} (${members.length} países, cada año sobre los que tienen datos) y países elegidos.` : `${tr(D.label)}, ${tr(D.unit)}. Argentina, the median of ${gname} (${members.length} countries; each year over those with data) and chosen countries.`)
+        const regimeNote = g.since ? (ES ? ` Cada país cuenta en el grupo desde el año en que adoptó el régimen (${Object.entries(g.since).map(([c, y]) => `${intlName(c)} ${y}`).join(", ")}); antes, línea punteada.`
+          : ` Each country counts in the group from the year it adopted the regime (${Object.entries(g.since).map(([c, y]) => `${intlName(c)} ${y}`).join(", ")}); before that, dotted.`) : "";
+        hint.textContent = (g.lines ? (ES ? `${tr(D.label)}, ${tr(D.unit)}. La Argentina y cada país de ${gname}.` : `${tr(D.label)}, ${tr(D.unit)}. Argentina and each country in ${gname}.`)
+          : ES ? `${tr(D.label)}, ${tr(D.unit)}. La Argentina, la mediana de ${gname} (${members.length} países, cada año sobre los que tienen datos) y países elegidos.` : `${tr(D.label)}, ${tr(D.unit)}. Argentina, the median of ${gname} (${members.length} countries; each year over those with data) and chosen countries.`) + regimeNote
           + (pf ? (ES ? ` Desde ${pf}, estimaciones y proyecciones del FMI (líneas discontinuas).` : ` From ${pf}, IMF estimates and projections (dashed).`) : "");
         // For the PNG: light-theme colors, the median grey, Argentina charcoal, chosen countries by slot.
         const medName = ES ? `Mediana: ${gname}` : `Median: ${gname}`;
@@ -2578,7 +2602,8 @@
           rows: Y.map((y, i) => [y, (D.values[HOME] || [])[i], med[i], ...[...state.picks].map((c) => D.values[c][i])]) };
       } else {
         const i = Y.indexOf(state.year);
-        const set = [...new Set([...members, HOME])].filter((c) => D.values[c] && D.values[c][i] !== null && D.values[c][i] !== undefined);
+        const mem = membersAt(state.year);
+        const set = [...new Set([...mem, HOME])].filter((c) => D.values[c] && D.values[c][i] !== null && D.values[c][i] !== undefined);
         set.sort((a, b) => D.values[b][i] - D.values[a][i]);
         const m = med[i];
         const tall = Math.max(260, 20 * set.length + 50);
@@ -2659,7 +2684,7 @@
         if (r.section && r.section !== sec) { sec = r.section; body.push(h("tr", { class: "sc-sec" }, h("td", { colspan: 5 + main.length }, tr(sec)))); }
         const pf = D.proj_from || 1e9, a = D.values[HOME] || [];
         let i = -1; D.years.forEach((y, k) => { if (y < pf && a[k] !== null && a[k] !== undefined) i = k; });
-        const members = g.members.filter((c) => D.values[c]);
+        const members = g.members.filter((c) => D.values[c] && (i < 0 || inGroup(g, c, D.years[i])));
         const val = (c) => (i >= 0 && D.values[c] ? D.values[c][i] : null);
         const med = i >= 0 ? intlMedian(members.map(val)) : null;
         const pool = [...new Set([...members, HOME])].map((c) => [c, val(c)]).filter((x) => x[1] !== null && x[1] !== undefined);
