@@ -102,6 +102,9 @@ section becomes its notes.
   economies, any country addable); the choice applies to every card. A snapshot table at the top;
   each card also ranks the group for a chosen year. New sources: IMF SDMX API, World Bank API;
   the EFW, V-Dem and SMI adapters also write all-country tables.
+- Money and Banking: "Money Growth and Inflation", twelve-month growth of base money and private M2
+  next to CPI inflation, with a switch that shifts money growth 6 to 24 months forward. Descriptive:
+  no fitted line. New display option `lag_shift`.
 - Recession probability chart: a switch shades any of four measures (Bry-Boschan turning points,
   two quarters of decline on calendar quarters or monthly rolling, probability above 50%), with a
   table comparing them on a common sample. Quarterly GDP gets the two-quarter switch and spell table.

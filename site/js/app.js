@@ -966,6 +966,12 @@
     // Two-quarter rule (registry `recession_rule`): shade spells of two or more consecutive quarters
     // of falling activity, on calendar quarters (as GDP is published) or on rolling three-month
     // averages (each month against the three before). A rule of thumb, not a dating committee.
+    // Shift some lines forward in time (registry `lag_shift`), e.g. money growth k months earlier against inflation now.
+    const LSH = ind.lag_shift || null;
+    state.lag = 0;
+    const lagSeg = LSH ? segmented((LSH.options || [0, 6, 12]).map((k) => [String(k), k ? (LANG === "es" ? `${k} meses antes` : `${k} months earlier`) : (LANG === "es" ? "Mismo mes" : "Same month")]), "0",
+      (k) => { state.lag = Number(k); lagSeg.update(k); draw(); }, "Shift") : null;
+    const lagWrap = LSH ? h("div", { class: "controls" }, h("div", { class: "base-pick rr-pick" }, h("span", {}, LANG === "es" ? "Crecimiento del dinero:" : "Money growth:"), lagSeg)) : null;
     const RR = ind.recession_rule || null;
     state.rr = "off";
     const RQ = ind.frequency === "Q";   // quarterly data (GDP): quarters as published, no rolling version
@@ -1353,6 +1359,8 @@
           // (Daily overlays drop each series' empty days, since sources keep different calendars.)
           const ii = ind.overlay ? ind.dates.map((d, i) => i).filter((i) => (!start || ind.dates[i] >= start) && (!x.length || ind.dates[i] <= x[x.length - 1]) && (!["D", "S", "Y"].includes(ind.frequency) || s.y[i] !== null)) : idx;
           let xx = ii.map((i) => ind.dates[i]), yy = ii.map((i) => s.y[i]);
+          const shifted = LSH && state.lag && LSH.variants.includes(k);
+          if (shifted) xx = xx.map((d) => addMonths(d, state.lag));
           if (ind.frequency === "D") [xx, yy] = breakGaps(xx, yy);
           if (ind.frequency === "S") [xx, yy] = breakGaps(xx, yy, 400);
           if (ind.frequency === "Y" && ind.break_gaps) [xx, yy] = breakGaps(xx, yy, 400);   // e.g. no legislature under military rule
@@ -1360,7 +1368,8 @@
           const cslot = ind.overlay_default ? lineKeys.filter((q) => q !== ind.emphasis && !(ind.muted || []).includes(q)).indexOf(k) : slot;
           const LS = (ind.line_styles || {})[k];
           const color = cssVar(SERIES_VARS[Math.max(0, LS && LS.slot !== undefined ? LS.slot : cslot) % SERIES_VARS.length]);
-          const hover = `${ind.frequency === "S" ? "%{customdata}" : `%{x|${DF}}`}: <b>%{y:${yFmt()}}${sfx}</b><extra>${s.v.label}</extra>`;
+          const vlabel = shifted ? `${s.v.label} (${LANG === "es" ? `${state.lag} meses antes` : `${state.lag} months earlier`})` : s.v.label;
+          const hover = `${ind.frequency === "S" ? "%{customdata}" : `%{x|${DF}}`}: <b>%{y:${yFmt()}}${sfx}</b><extra>${vlabel}</extra>`;
           const emph = ind.emphasis === k;   // e.g. a total: thick and dark
           const muted = (ind.muted || []).includes(k);   // e.g. a regional median: grey reference
           const marks = ind.frequency === "S" || ind.frequency === "Y";
@@ -1385,7 +1394,7 @@
           const lighter = TC() && !emph && !muted;   // comparison lines recede behind the emphasized one
           traces.push(state.transform === "mom"
             ? { type: "bar", x: xx, y: yy, name: s.v.label, marker: { color }, hovertemplate: hover, _slot: slot }
-            : { type: "scatter", mode: marks ? "lines+markers" : "lines", x: xx, y: yy, name: s.v.label, connectgaps: false,
+            : { type: "scatter", mode: marks ? "lines+markers" : "lines", x: xx, y: yy, name: vlabel, connectgaps: false,
                 ...(ind.frequency === "S" ? { customdata: xx.map((d) => fmtPeriod(d, "S")) } : {}),
                 ...(marks ? { marker: { size: ind.frequency === "Y" ? 4 : 5, color: emph ? cssVar("--ink") : muted ? cssVar("--ink-3") : color } } : {}),
                 ...(emph ? { legendrank: 1 } : {}),
@@ -1747,7 +1756,7 @@
       h("div", { class: "controls" }, ySeg, vSeg, tSeg, h("span", { class: "spacer" }), ind.view_start ? null : rSeg),
       // A short fixed window (view_start) has no use for rebasing or presidencies.
       ind.view_start ? (remBtn ? h("div", { class: "controls" }, remBtn) : null) : h("div", { class: "controls" }, realSeg, baseWrap, presBtn, epBtn, remBtn, termBtn),
-      rrWrap ? h("div", { class: "controls" }, rrWrap) : null, methWrap,
+      rrWrap ? h("div", { class: "controls" }, rrWrap) : null, methWrap, lagWrap,
       ind.caveat ? h("p", { class: "caveat" }, ind.caveat) : null,
       trackerLine(), sumEl, summaryEl, hint, methodLine(ind), bandKey, termKeyEl, epKey, rrKey, rrStatsEl, chartEl, methTable(), chipRow, statsEl);
     drawSummary();

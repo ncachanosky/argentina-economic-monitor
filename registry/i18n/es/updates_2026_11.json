@@ -483,5 +483,16 @@
  "Bry-Boschan turning points (peak to trough)": "Puntos de giro Bry-Boschan (pico a valle)",
  "Two quarters of decline, calendar quarters": "Dos trimestres de caída, trimestres calendario",
  "Two quarters of decline, monthly rolling": "Dos trimestres de caída, móvil mensual",
- "Recession probability above 50% (full sample)": "Probabilidad de recesión mayor a 50% (muestra completa)"
+ "Recession probability above 50% (full sample)": "Probabilidad de recesión mayor a 50% (muestra completa)",
+ "Money Growth and Inflation": "Crecimiento del dinero e inflación",
+ "Money and inflation": "Dinero e inflación",
+ "CPI inflation": "Inflación (IPC)",
+ "Base money growth": "Crecimiento de la base monetaria",
+ "Private M2 growth": "Crecimiento del M2 privado",
+ "About this chart": "Sobre este gráfico",
+ "Since 2003": "Desde 2003",
+ "A descriptive chart, not a model: over long stretches money growth and inflation move together, but the gap between them moves with the demand for pesos (how much money people want to hold relative to income), which shifts with interest rates, expectations, the exchange regime and remonetization after a stabilization; 2024-2026 is a case in point. The shift moves the money lines forward in time (with 12 months, the point for a month shows money growth a year earlier), so a reader can compare the timing by eye; no line is fitted. Base money: monthly average of daily data. Private M2: currency plus private sight deposits, monthly average. CPI: the corrected long-run series (see Prices).": "Un gráfico descriptivo, no un modelo: en períodos largos el crecimiento del dinero y la inflación se mueven juntos, pero la brecha entre ambos cambia con la demanda de pesos (cuánto dinero se quiere tener en relación con el ingreso), que varía con las tasas de interés, las expectativas, el régimen cambiario y la remonetización tras una estabilización; 2024-2026 es un ejemplo. El desplazamiento mueve las líneas del dinero hacia adelante en el tiempo (con 12 meses, el punto de un mes muestra el crecimiento del dinero un año antes), para comparar los tiempos a ojo; no se ajusta ninguna línea. Base monetaria: promedio mensual de datos diarios. M2 privado: circulante más depósitos a la vista privados, promedio mensual. IPC: la serie larga corregida (ver Precios).",
+ "BCRA, INDEC (CPI corrected for 2007-2016); monitor's calculations": "BCRA, INDEC (IPC corregido para 2007-2016); cálculos del Monitor",
+ "Index (levels behind the growth rates)": "Índice (niveles detrás de las tasas de crecimiento)",
+ "Twelve-month growth of base money and private M2 next to twelve-month CPI inflation, with money growth shifted forward by a chosen number of months to compare it with later inflation. Monthly, since 2003.": "Crecimiento en doce meses de la base monetaria y del M2 privado junto a la inflación en doce meses, con el crecimiento del dinero desplazado hacia adelante la cantidad de meses elegida para compararlo con la inflación posterior. Mensual, desde 2003."
 }

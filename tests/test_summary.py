@@ -54,3 +54,15 @@ def test_spell_recovery():
     s = _m(vals, start="2025-01-01")
     st = sm.spell_stats(s, sm.two_quarter_spells(s, "calendar"), "calendar")[0]
     assert st["back"] == pd.Timestamp("2025-12-01") and st["recovery_months"] == 3
+
+
+def test_compare_methods_table():
+    vals = [100] * 12 + [99] * 3 + [98] * 3 + [98] * 3 + [100] * 12
+    sa = _m(vals, start="2020-01-01")
+    prob = pd.Series([90.0 if pd.Timestamp("2021-01-01") <= d <= pd.Timestamp("2021-06-01") else 5.0 for d in sa.index], index=sa.index)
+    bb = [{"start": "2021-01-01", "end": "2021-06-01"}]
+    r = sm.compare_methods(sa, prob, bb, None)
+    rows = {x["key"]: x for x in r["table"]}
+    assert rows["bb"]["agree"] == 100.0
+    assert rows["calendar"]["dated_found"] == 1 and rows["markov"]["dated_found"] == 1
+    assert rows["markov"]["median_start"] == 0.0
