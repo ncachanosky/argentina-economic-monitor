@@ -938,6 +938,8 @@ indicators:
     # Yearly table: cumulative change of the year to date vs. the same months a
     # year earlier (original series, as INDEC reports it) and Dec-to-Dec (SA).
     annual_table: {accumulated: original, within_year: sa, carryover: true}
+    # Toggle: shade two or more quarters in a row of falling SA activity (calendar quarters or rolling three months).
+    recession_rule: {variant: sa}
 
   - id: emae_recession
     topic: real_sector

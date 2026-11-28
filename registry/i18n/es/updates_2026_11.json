@@ -465,5 +465,10 @@
  "Net purchases": "Compras netas",
  "Total debt": "Deuda total",
  "Total": "Total",
- "Download this chart as a 1200×800 PNG (dark when the site is in dark mode)": "Descargar este gráfico como PNG de 1200×800 (oscuro cuando el sitio está en modo oscuro)"
+ "Download this chart as a 1200×800 PNG (dark when the site is in dark mode)": "Descargar este gráfico como PNG de 1200×800 (oscuro cuando el sitio está en modo oscuro)",
+ "Off": "No",
+ "Calendar quarters": "Trimestres calendario",
+ "Rolling 3 months": "Móvil de 3 meses",
+ "Two-quarter declines:": "Dos trimestres de caída:",
+ "Two quarters of decline": "Dos trimestres de caída"
 }

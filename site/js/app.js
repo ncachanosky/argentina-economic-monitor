@@ -963,6 +963,48 @@
       h("li", {}, h("b", {}, e.label), ` (${fmtShortMonth(e.start)}${e.end !== e.start ? "–" + fmtShortMonth(e.end) : ""})`, e.description ? `: ${e.description}.` : ""))) : null;
     // Months inside any episode (for averages that leave them out).
     const inEpisode = (iso) => EP.some((e) => iso >= e.start && iso <= e.end);
+    // Two-quarter rule (registry `recession_rule`): shade spells of two or more consecutive quarters
+    // of falling activity, on calendar quarters (as GDP is published) or on rolling three-month
+    // averages (each month against the three before). A rule of thumb, not a dating committee.
+    const RR = ind.recession_rule || null;
+    state.rr = "off";
+    const rrSeg = RR ? segmented([["off", "Off"], ["calendar", "Calendar quarters"], ["rolling", "Rolling 3 months"]], "off",
+      (k) => { state.rr = k; rrSeg.update(k); draw(); }, "Two quarters of decline") : null;
+    const rrWrap = RR ? h("div", { class: "base-pick rr-pick" }, h("span", {}, "Two-quarter declines:"), rrSeg) : null;
+    const rrKey = RR ? h("p", { class: "band-key rr-key", hidden: true }) : null;
+    function recessionSpells(mode) {
+      const v = ind.variants[RR.variant || "sa"].values, D = ind.dates;
+      const at = new Map(D.map((d, i) => [d, v[i]]));
+      const spells = [];   // [{start, end (last month), q: [growth...]}]
+      if (mode === "calendar") {
+        const Q = [];
+        for (let i = 0; i < D.length; i++) {
+          const m = Number(D[i].slice(5, 7));
+          if (m % 3 !== 1) continue;
+          const xs = [0, 1, 2].map((k) => at.get(addMonths(D[i], k)));
+          if (xs.some((x) => x === null || x === undefined)) continue;
+          Q.push({ start: D[i], avg: (xs[0] + xs[1] + xs[2]) / 3 });
+        }
+        let run = [];
+        const close = () => { if (run.length >= 2) spells.push({ start: run[0].start, end: addMonths(run[run.length - 1].start, 2), g: run.map((r) => r.g), n: run.length }); run = []; };
+        for (let k = 1; k < Q.length; k++) {
+          if (addMonths(Q[k - 1].start, 3) !== Q[k].start) { close(); continue; }
+          const g = (Q[k].avg / Q[k - 1].avg - 1) * 100;
+          if (g < 0) run.push({ start: Q[k].start, g }); else close();
+        }
+        close();
+        return { spells, lastQ: Q.length ? Q[Q.length - 1].start : null };
+      }
+      // Rolling: three-month average against the three months before; a month counts when that change
+      // and the one three months earlier are both negative, and the six months behind it are shaded.
+      const A = D.map((d, i) => { const xs = [0, 1, 2].map((k) => at.get(addMonths(d, -k))); return xs.some((x) => x === null || x === undefined) ? null : (xs[0] + xs[1] + xs[2]) / 3; });
+      const g = D.map((d, i) => { const j = D.indexOf(addMonths(d, -3)); return j < 0 || A[i] === null || A[j] === null ? null : (A[i] / A[j] - 1) * 100; });
+      const on = new Set();
+      D.forEach((d, i) => { const j = D.indexOf(addMonths(d, -3)); if (j >= 0 && g[i] !== null && g[j] !== null && g[i] < 0 && g[j] < 0) for (let k = 0; k < 6; k++) on.add(addMonths(d, -k)); });
+      const months = [...on].sort();
+      months.forEach((m) => { const last = spells[spells.length - 1]; if (last && addMonths(last.end, 1) === m) last.end = m; else spells.push({ start: m, end: m }); });
+      return { spells };
+    }
     const realSeg = realSwitch(ind, () => draw());
     const remBtn = ind.forecast && ind.forecast.items && ind.forecast.items.length ? h("button", { class: "btn toggle", type: "button", "aria-pressed": "true",
       title: "Show or hide the expectations of the BCRA's survey of analysts (REM)", onclick: () => { state.rem = !state.rem; draw(); } }, "REM expectations") : null;
@@ -1330,6 +1372,16 @@
         tr.error_y = { type: "data", array: arr, visible: true, color: cssVar("--ink-2"), thickness: 1.5, width: 6 };
       });
       const bs = bandShapes(x);
+      if (RR && state.rr !== "off" && x.length) {
+        const { spells } = recessionSpells(state.rr);
+        const x0 = x[0], x1 = x[x.length - 1];
+        spells.forEach((sp) => {
+          const a = sp.start, b = addMonths(sp.end, 1);
+          if (b <= x0 || a > x1) return;
+          bs.shapes.push({ type: "rect", xref: "x", yref: "paper", x0: a < x0 ? x0 : a, x1: b, y0: 0, y1: 1, layer: "below",
+            fillcolor: isDark() ? "rgba(238, 241, 243, 0.12)" : "rgba(54, 69, 79, 0.13)", _lightFill: "rgba(54, 69, 79, 0.13)", line: { width: 0 } });
+        });
+      }
       if (state.episodes && x.length) {
         EP.forEach((e, n) => {
           if (addMonths(e.end, 1) <= x[0] || e.start > x[x.length - 1]) return;
@@ -1494,6 +1546,20 @@
       }
       drawStats(main, t);
       drawSumStats(main, t);
+      if (rrKey) {
+        rrKey.hidden = state.rr === "off";
+        if (state.rr !== "off") {
+          const { spells, lastQ } = recessionSpells(state.rr);
+          const ES = LANG === "es";
+          const fq = (iso) => fmtPeriod(iso, "Q"), fm = (iso) => fmtShortMonth(iso);
+          const list = spells.map((sp) => (state.rr === "calendar" ? `${fq(sp.start)}–${fq(sp.end)}` : `${fm(sp.start)}–${fm(sp.end)}`)).join(", ");
+          rrKey.replaceChildren(h("span", {}, h("span", { class: "band-sw" }),
+            state.rr === "calendar"
+              ? (ES ? `Sombreado: dos o más trimestres calendario seguidos en que el promedio trimestral del EMAE desestacionalizado cayó frente al trimestre anterior (último trimestre completo: ${fq(lastQ)}). ` : `Shaded: two or more calendar quarters in a row in which the quarterly average of the seasonally adjusted EMAE fell from the quarter before (last complete quarter: ${fq(lastQ)}). `)
+              : (ES ? "Sombreado: meses en que el promedio de tres meses del EMAE desestacionalizado cayó frente a los tres meses anteriores dos veces seguidas (ese mes y tres meses antes); se sombrean los seis meses involucrados. " : "Shaded: months in which the seasonally adjusted EMAE's three-month average fell against the three months before, twice in a row (that month and three months earlier); the six months involved are shaded. "),
+            ES ? `Es la regla práctica de los dos trimestres, no una datación oficial; los últimos meses pueden cambiar con las revisiones del INDEC. Episodios: ${list || "ninguno"}.` : `This is the two-quarter rule of thumb, not an official dating; the latest months can change with INDEC's revisions. Spells: ${list || "none"}.`));
+        }
+      }
       const suffix = t.change ? " (" + t.label + ")" : main.rebased ? ` (${main.units})` : "";
       const cols = overlayKeys().map((k) => {
         const s = k === state.variant ? main : series(k);
@@ -1523,7 +1589,8 @@
     function shadedPres() { return state.byPres && ind.pres_view === "shaded"; }
     function colorPres() { return state.byPres && ind.pres_view !== "shaded"; }
     function overlayKeys() { return ind.overlay && !colorPres() ? [state.variant, ...lineKeys.filter((k) => k !== state.variant && state.shown.has(k))] : [state.variant]; }
-    const subtitle = (main, t) => `${overlayKeys().map((k) => ind.variants[k].label).join(" vs. ")} · ${t.change ? t.short : main.units}`;
+    const subtitle = (main, t) => `${overlayKeys().map((k) => ind.variants[k].label).join(" vs. ")} · ${t.change ? t.short : main.units}`
+      + (RR && state.rr !== "off" ? (LANG === "es" ? ` · sombreado: dos o más trimestres de caída (${state.rr === "calendar" ? "trimestres calendario" : "promedios móviles de 3 meses"})` : ` · shaded: two or more quarters of decline (${state.rr === "calendar" ? "calendar quarters" : "rolling 3-month averages"})`) : "");
     const fileTag = () => `${ind.id}_${state.variant}_${state.transform}${baseMonth() ? "_base" + baseMonth().slice(0, 7) : ""}${state.byPres ? "_presidencies" : ""}`;
     const onPNG = () => {
       if (state.yearly) {
@@ -1558,8 +1625,9 @@
       h("div", { class: "controls" }, ySeg, vSeg, tSeg, h("span", { class: "spacer" }), ind.view_start ? null : rSeg),
       // A short fixed window (view_start) has no use for rebasing or presidencies.
       ind.view_start ? (remBtn ? h("div", { class: "controls" }, remBtn) : null) : h("div", { class: "controls" }, realSeg, baseWrap, presBtn, epBtn, remBtn, termBtn),
+      rrWrap ? h("div", { class: "controls" }, rrWrap) : null,
       ind.caveat ? h("p", { class: "caveat" }, ind.caveat) : null,
-      trackerLine(), sumEl, summaryEl, hint, methodLine(ind), bandKey, termKeyEl, epKey, chartEl, chipRow, statsEl);
+      trackerLine(), sumEl, summaryEl, hint, methodLine(ind), bandKey, termKeyEl, epKey, rrKey, chartEl, chipRow, statsEl);
     drawSummary();
     table = tableView([], [], false, ind.frequency, { asc: (ind.data_table || {}).order === "asc", yearMarks: !!(ind.data_table || {}).year_marks });
     appendAll(card, breakdownTable(ind), table, annualTable(ind), weightsTable(ind), ind.note ? h("p", { class: "chips-note" }, ind.note) : null,

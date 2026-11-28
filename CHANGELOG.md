@@ -102,6 +102,9 @@ section becomes its notes.
   economies, any country addable); the choice applies to every card. A snapshot table at the top;
   each card also ranks the group for a chosen year. New sources: IMF SDMX API, World Bank API;
   the EFW, V-Dem and SMI adapters also write all-country tables.
+- EMAE: a toggle shades spells of two or more quarters of falling seasonally adjusted activity
+  (the two-quarter rule), on calendar quarters or on rolling three-month averages, with the
+  spells listed under the chart. Methodology: under the recession probability.
 - International page: each chart's summary line gives Argentina's value (with the IMF's projection
   for the next year), its rank in the chosen group and the group median; the charts now have a PNG
   download (over time, or the ranking: up to 41 bars, centered on Argentina in large groups).
