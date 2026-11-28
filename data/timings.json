@@ -1,108 +1,123 @@
 [
  {
   "source": "bcra (D)",
-  "seconds": 69.8,
+  "seconds": 82.5,
   "series": 46
  },
  {
-  "source": "x13 (M)",
-  "seconds": 23.5,
-  "series": 16
+  "source": "datos_gob (Y)",
+  "seconds": 53.5,
+  "series": 2
+ },
+ {
+  "source": "datos_gob (Q)",
+  "seconds": 45.4,
+  "series": 101
  },
  {
   "source": "datos_gob (M)",
-  "seconds": 23.3,
+  "seconds": 40.1,
   "series": 146
  },
  {
   "source": "finanzas (M)",
-  "seconds": 19.6,
+  "seconds": 24.5,
   "series": 39
  },
  {
+  "source": "x13 (M)",
+  "seconds": 23.3,
+  "series": 16
+ },
+ {
   "source": "bcra_entities (M)",
-  "seconds": 19.4,
+  "seconds": 19.7,
   "series": 32
  },
  {
   "source": "ustreasury (D)",
-  "seconds": 18.2,
+  "seconds": 19.6,
   "series": 1
- },
- {
-  "source": "datos_gob (Q)",
-  "seconds": 10.0,
-  "series": 101
  },
  {
   "source": "bcra_fx (D)",
-  "seconds": 9.3,
+  "seconds": 9.6,
   "series": 1
  },
  {
-  "source": "itcrm (D)",
-  "seconds": 4.6,
-  "series": 5
- },
- {
-  "source": "efw (Y)",
-  "seconds": 2.3,
-  "series": 92
- },
- {
-  "source": "bcra_banks (M)",
-  "seconds": 2.0,
-  "series": 67
- },
- {
-  "source": "datos_gob (Y)",
-  "seconds": 2.0,
-  "series": 2
- },
- {
-  "source": "intl (Y)",
-  "seconds": 1.9,
-  "series": 13
- },
- {
   "source": "vdem (Y)",
-  "seconds": 1.2,
+  "seconds": 5.5,
   "series": 90
  },
  {
-  "source": "riesgo (D)",
-  "seconds": 1.1,
-  "series": 12
- },
- {
-  "source": "dolar (D)",
-  "seconds": 1.1,
+  "source": "itcrm (D)",
+  "seconds": 4.9,
   "series": 5
  },
  {
+  "source": "bcra_banks (M)",
+  "seconds": 2.8,
+  "series": 67
+ },
+ {
+  "source": "efw (Y)",
+  "seconds": 2.1,
+  "series": 92
+ },
+ {
+  "source": "dolar (D)",
+  "seconds": 2.1,
+  "series": 5
+ },
+ {
+  "source": "intl (Y)",
+  "seconds": 2.0,
+  "series": 13
+ },
+ {
+  "source": "riesgo (D)",
+  "seconds": 2.0,
+  "series": 12
+ },
+ {
+  "source": "rem (M)",
+  "seconds": 1.6,
+  "series": 8
+ },
+ {
   "source": "bcra_cambiario (M)",
-  "seconds": 1.0,
+  "seconds": 1.2,
   "series": 14
  },
  {
   "source": "bcra_weekly (D)",
-  "seconds": 0.9,
+  "seconds": 1.1,
   "series": 6
  },
  {
   "source": "bcra_balance (M)",
-  "seconds": 0.8,
+  "seconds": 1.1,
   "series": 20
  },
  {
-  "source": "rem (M)",
-  "seconds": 0.6,
+  "source": "pcps (M)",
+  "seconds": 1.1,
+  "series": 9
+ },
+ {
+  "source": "ipmp (M)",
+  "seconds": 0.8,
   "series": 8
  },
  {
-  "source": "pcps (M)",
-  "seconds": 0.6,
-  "series": 9
+  "source": "a3 (D)",
+  "seconds": 0.7,
+  "series": 3
+ },
+ {
+  "source": "smi (Y)",
+  "seconds": 0.5,
+  "series": 2
  },
  {
   "source": "bcra (M)",
@@ -110,17 +125,12 @@
   "series": 1
  },
  {
-  "source": "smi (Y)",
-  "seconds": 0.4,
-  "series": 2
- },
- {
-  "source": "a3 (D)",
-  "seconds": 0.3,
-  "series": 3
- },
- {
   "source": "maddison (Y)",
+  "seconds": 0.3,
+  "series": 1
+ },
+ {
+  "source": "revisions (M)",
   "seconds": 0.3,
   "series": 1
  },
@@ -133,16 +143,6 @@
   "source": "revisions (Q)",
   "seconds": 0.2,
   "series": 1
- },
- {
-  "source": "revisions (M)",
-  "seconds": 0.2,
-  "series": 1
- },
- {
-  "source": "ipmp (M)",
-  "seconds": 0.2,
-  "series": 8
  },
  {
   "source": "aif (M)",
