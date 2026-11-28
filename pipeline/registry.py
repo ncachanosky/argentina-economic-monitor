@@ -49,7 +49,7 @@ class Variant:
 #                 its home page, links, search and feeds stay with `topic`
 #   data_table    the "Show data table" view: {order: asc, year_marks: true, columns: [mom, ytd, yoy]}
 #                 (columns: a fixed table of these rates of the default line, whatever the chart shows)
-DISPLAY_KEYS = ("half", "tiles", "line_styles", "switch", "y_tickformat", "pres_view", "inflation_ref", "no_presidency", "data_table", "also_on", "break_gaps", "term_toggle", "year_table", "heading", "rows")
+DISPLAY_KEYS = ("half", "tiles", "line_styles", "switch", "y_tickformat", "pres_view", "inflation_ref", "no_presidency", "data_table", "also_on", "break_gaps", "term_toggle", "year_table", "heading", "rows", "stats")
 
 
 @dataclass

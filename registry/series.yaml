@@ -4412,6 +4412,7 @@ indicators:
     kind: contributions
     measure: flow
     title: Net Investment Position by Sector
+    stats: {kind: level}   # positions are stocks: no totals over time
     short_title: Net position by sector
     description: >-
       Each sector's foreign assets minus its foreign liabilities, and the
@@ -4460,6 +4461,7 @@ indicators:
     kind: contributions
     measure: flow
     title: What Firms and Households Hold Abroad
+    stats: {kind: level}
     short_title: Private assets abroad
     description: >-
       Foreign assets of the private non-financial sector by type, millions
@@ -5494,6 +5496,7 @@ indicators:
     kind: contributions
     measure: flow
     title: Gross Debt by Currency
+    stats: {sum_groups: true, kind: level, label: "Total debt"}
     short_title: Debt by currency
     description: >-
       Gross debt of the central administration in normal payment status, by
@@ -5547,6 +5550,7 @@ indicators:
     kind: variants
     headline: {variant: embi, transform: level, good: down, sub: "basis points", digits: 0}
     title: Country Risk
+    stats: {ratio: true}   # summary line: Argentina as a multiple of the regional median
     short_title: Country risk
     description: >-
       "Riesgo país": the spread of Argentina's dollar bonds over US
@@ -5786,6 +5790,7 @@ indicators:
     measure: flow
     plain_level: true
     title: Treasury Deposits at the BCRA
+    stats: {kind: level}
     short_title: Treasury deposits
     description: >-
       Deposits of the Treasury and other official accounts at the central
@@ -6452,6 +6457,7 @@ indicators:
     kind: contributions
     measure: flow
     title: BCRA Purchases of Foreign Currency
+    stats: {sum_groups: true, label: "Net purchases"}
     short_title: BCRA purchases
     description: >-
       The central bank's net purchases of foreign currency in the market,

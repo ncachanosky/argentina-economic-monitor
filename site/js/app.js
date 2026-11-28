@@ -291,6 +291,25 @@
       if (t._lightFill) c.fillcolor = t._lightFill;
       return c;
     });
+    // One series of bars: the latest bar in the series color, the rest in a quiet grey; with 24
+    // bars or fewer, each bar's value written on it.
+    const bars = data.filter((t) => t.type === "bar" && t.yaxis !== "y2" && t.visible !== false);
+    if (bars.length === 1 && !extras.barmode?.startsWith("stack") && !bars[0]._lightColors && !Array.isArray(bars[0].marker.color) && !extras.xcategory) {
+      const b = bars[0], n = b.y.length;
+      let last = n - 1; while (last >= 0 && (b.y[last] === null || b.y[last] === undefined)) last--;
+      const base = b.marker.color;
+      b.marker = { ...b.marker, color: b.y.map((v, i) => (i === last ? base : "#B9C2C9")) };
+      if (b.y.filter((v) => v !== null && v !== undefined).length <= 25) {
+        const d = Math.max(...b.y.filter((v) => v !== null).map((v) => Math.abs(v))) >= 100 ? 0 : 1;
+        Object.assign(b, { text: b.y.map((v) => (v === null || v === undefined ? "" : nf(v, d))), textposition: "outside", cliponaxis: false,
+          textfont: { size: 13, family: font, color: b.y.map((v, i) => (i === last ? base : light.ink2)) } });
+      }
+    }
+    // Lines: a dot on each labelled line's last point.
+    (extras.annotations || []).filter((a) => a._endLabel).forEach((a) => {
+      data.push({ type: "scatter", mode: "markers", x: [a.x], y: [a._v],
+        marker: { size: 9, color: a._lightColor || light.ink }, showlegend: false, hoverinfo: "skip" });
+    });
     // The source note shares the bottom line with the brand on the right, so a long note is
     // wrapped to the width left of it (about 112 characters at 15 px), and the bottom margin
     // grows by one line for each extra line.
@@ -312,7 +331,8 @@
       yaxis: { gridcolor: light.grid, linecolor: light.rule, zerolinecolor: light.ink2, ticksuffix: specOf(pct).suffix, automargin: true, ...(extras.ylog ? { type: "log", ticksuffix: "", exponentformat: "none", tickformat: ",~r", ...logTicks(yVals) } : {}) },
       shapes: (extras.shapes || []).map((sh) => ({ ...sh, ...(sh._lightFill ? { fillcolor: sh._lightFill } : {}), line: { ...(sh.line || {}), color: (sh.line && sh.line._light) || light.ink3 } })),
       annotations: [
-        ...(extras.annotations || []).map((a) => ({ ...a, font: { ...(a.font || {}), size: 15, color: light.ink2 } })),
+        ...(extras.annotations || []).map((a) => (a._endLabel ? { ...a, xshift: 9, font: { ...(a.font || {}), size: 16, color: a._lightColor || light.ink } }
+          : { ...a, font: { ...(a.font || {}), size: 15, color: light.ink2 } })),
         { text: srcLines.join("<br>"), xref: "paper", yref: "paper", x: 0, y: -0.13, xanchor: "left", yanchor: "top", align: "left", showarrow: false, font: { size: 15, color: light.ink3 } },
         { text: "<b>Argentina Economic Monitor</b> · Economic Order", xref: "paper", yref: "paper", x: 1, y: -0.13, xanchor: "right", yanchor: "top", showarrow: false, font: { size: 15, color: "#B87333" } },
       ],
@@ -333,17 +353,45 @@
     // A legend too long for one line above the plot would run into the subtitle (presidency
     // colors, many countries): it goes under the plot instead, one 26 px row per line, and the
     // source line moves down with it.
-    if (!extras.yaxis2 && layout.showlegend && extras.sourceY === undefined) {
+    const ends = (extras.annotations || []).filter((a) => a._endLabel);
+    if (ends.length) layout.margin.r = Math.max(layout.margin.r, 24 + 9.5 * Math.max(...ends.map((a) => a.text.replace(/<[^>]+>/g, "").length)));
+    let legendRows = 0;
+    if (layout.showlegend && extras.sourceY === undefined) {
       const plotW = EXPORT.width - layout.margin.l - layout.margin.r;
       const items = data.filter((t) => t.showlegend !== false && t.name).map((t) => String(t.name).replace(/<[^>]+>/g, "").length * 8.6 + 48);
       let rows = 1, w = 0;
       for (const iw of items) { if (w && w + iw > plotW) { rows += 1; w = 0; } w += iw; }
-      if (rows > 1) {
-        layout.margin.b += rows * 26;
-        layout.margin.t -= 30;   // the space the legend had above the plot
-        const plotH = EXPORT.height - layout.margin.t - layout.margin.b;
-        layout.legend = { ...layout.legend, y: -48 / plotH, yanchor: "top" };
-        layout.annotations.slice(-2).forEach((a) => { a.y = -(48 + rows * 26 + 18) / plotH; });
+      if (rows > 1 || extras.yaxis2) legendRows = rows;   // with a right axis the legend always goes under the plot
+    }
+    const tiles = (extras.tiles || []).slice(0, 3);
+    if ((legendRows || tiles.length) && extras.sourceY === undefined) {
+      // Under the plot, in pixels from its bottom edge: axis labels, the legend (when moved), the
+      // tiles, then the source line.
+      let off = extras.xcategory ? 40 : 48;
+      const legendAt = off;
+      if (legendRows) { off += legendRows * 26 + 6; if (!extras.yaxis2) layout.margin.t -= 30; }
+      const tileAt = off + (tiles.length ? 10 : 0), TH = 92;
+      if (tiles.length) off = tileAt + TH;
+      const srcAt = off + 18;
+      layout.margin.b = srcAt + srcLines.length * 20 + 26;
+      const plotH = EXPORT.height - layout.margin.t - layout.margin.b;
+      const py = (px) => -px / plotH;
+      if (legendRows) layout.legend = { ...layout.legend, y: py(legendAt), yanchor: "top" };
+      layout.annotations.slice(-2).forEach((a) => { a.y = py(srcAt); });
+      if (tiles.length) {
+        const gap = 0.02, w = (1 - gap * (tiles.length - 1)) / tiles.length;
+        const chars = Math.floor((w * (EXPORT.width - layout.margin.l - layout.margin.r) - 28) / 7.3);
+        const two = (t) => { const ls = wrapText(t, chars); return ls.length > 2 ? [ls[0], ls[1] + "…"] : ls; };
+        tiles.forEach((t, i) => {
+          const x0 = i * (w + gap);
+          layout.shapes.push({ type: "rect", xref: "paper", yref: "paper", x0, x1: x0 + w, y0: py(tileAt + TH), y1: py(tileAt), fillcolor: "#F6F3EE", line: { width: 0 }, layer: "below" });
+          layout.annotations.unshift(
+            { xref: "paper", yref: "paper", x: x0 + 0.018, y: py(tileAt + 12), xanchor: "left", yanchor: "top", showarrow: false, align: "left",
+              text: `<b>${t.big}</b>`, font: { size: 27, color: "#B87333", family: font } },
+            { xref: "paper", yref: "paper", x: x0 + 0.018, y: py(tileAt + 52), xanchor: "left", yanchor: "top", showarrow: false, align: "left",
+              text: two(t.small).join("<br>"),
+              font: { size: 14.5, color: light.ink2, family: font } });
+        });
       }
     }
     if (extras.sourceY !== undefined) layout.annotations.slice(-2).forEach((a) => { a.y = extras.sourceY; });
@@ -839,6 +887,16 @@
     const chartEl = h("div", { class: "chart" + (wide ? " tall-ish" : ""), role: "img", "aria-label": `${ind.title} chart` });
     const hint = h("p", { class: "hint" });
     const statsEl = h("div", { class: "term-stats", hidden: true });
+    const sumEl = h("p", { class: "summary-line stats-line no-tr", hidden: true });
+    let sumItems = [];
+    // Summary statistics of the series on screen (see summaryStats).
+    function drawSumStats(main, t) {
+      if (state.yearly || state.transform === "share") { sumItems = []; statsLine(sumEl, sumItems); return; }
+      const mk = (ind.muted || []).find((k) => overlayKeys().includes(k) && k !== state.variant && /median|mediana/i.test(ind.variants[k].label));
+      sumItems = summaryStats({ ind, dates: ind.dates, y: main.y, levels: main.v.values, t, tkey: state.transform, units: main.rebased ? "Index" : (ind._units_en || ind.units) + (ind._real ? ", real prices" : ""),
+        start: viewStart(ind, state.range), compare: mk ? { label: ind.variants[mk].label, y: series(mk).y } : null });
+      statsLine(sumEl, sumItems);
+    }
 
     // Overlay cards draw every variant at once; the default one leads and is the
     // series used by the presidency view.
@@ -1356,7 +1414,7 @@
       if (state.yearly) {
         const hide = (el, on) => { if (el) el.style.display = on ? "none" : ""; };
         hide(tSeg, true); hide(presBtn, true); hide(baseWrap, true); hide(vSeg, !!Y.variants);
-        drawYearly(); return;
+        drawYearly(); statsLine(sumEl, []); return;
       }
       for (const el of [tSeg, presBtn, baseWrap, vSeg]) if (el) el.style.display = "";
 
@@ -1404,6 +1462,7 @@
         chartEl.on("plotly_legenddoubleclick", () => false);
       }
       drawStats(main, t);
+      drawSumStats(main, t);
       const suffix = t.change ? " (" + t.label + ")" : main.rebased ? ` (${main.units})` : "";
       const cols = overlayKeys().map((k) => {
         const s = k === state.variant ? main : series(k);
@@ -1441,7 +1500,8 @@
         return exportPNG(ind, yb.traces, `${yb.traces.map((tr) => tr.name).join(" vs. ")} · yearly${yb.partial ? " · " + yearlyNote(Y.how, yb.partial) : ""}`, yb.t, `${ind.id}_yearly.png`, { shapes: yb.shapes, barmode: "group", xcategory: true });
       }
       const { traces, shapes, annotations, main, t } = build();
-      exportPNG(ind, traces, subtitle(main, t), t, `${fileTag()}.png`, { shapes, annotations, ylog: isLog(), barmode: state.transform === "share" ? "stack" : "group", ...(SB ? { yaxis2: y2Axis(true) } : {}) });
+      const ends = endLabels(traces, t, isLog());
+      exportPNG(ind, traces, subtitle(main, t), t, `${fileTag()}.png`, { shapes, annotations: [...annotations, ...ends], tiles: state.transform === "share" ? [] : sumItems, ylog: isLog(), barmode: state.transform === "share" ? "stack" : "group", ...(SB ? { yaxis2: y2Axis(true) } : {}) });
     };
     const onCSV = () => {
       if (state.yearly) {
@@ -1468,7 +1528,7 @@
       // A short fixed window (view_start) has no use for rebasing or presidencies.
       ind.view_start ? (remBtn ? h("div", { class: "controls" }, remBtn) : null) : h("div", { class: "controls" }, realSeg, baseWrap, presBtn, epBtn, remBtn, termBtn),
       ind.caveat ? h("p", { class: "caveat" }, ind.caveat) : null,
-      trackerLine(), summaryEl, hint, methodLine(ind), bandKey, termKeyEl, epKey, chartEl, chipRow, statsEl);
+      trackerLine(), sumEl, summaryEl, hint, methodLine(ind), bandKey, termKeyEl, epKey, chartEl, chipRow, statsEl);
     drawSummary();
     table = tableView([], [], false, ind.frequency, { asc: (ind.data_table || {}).order === "asc", yearMarks: !!(ind.data_table || {}).year_marks });
     appendAll(card, breakdownTable(ind), table, annualTable(ind), weightsTable(ind), ind.note ? h("p", { class: "chips-note" }, ind.note) : null,
@@ -4266,6 +4326,7 @@
 
     function drawAll() {
       rSeg.update(state.range);
+      drawSumStats();
       const legend = { orientation: "h", x: 0, y: 1.02, yanchor: "bottom", font: { color: cssVar("--ink") } };
       // The component lines below are the monthly/quarterly view only.
       [lineTitleEl, chipsEl, lineEl].forEach((el) => { if (el) el.hidden = state.quarterly || state.yearly; });
@@ -4327,10 +4388,28 @@
     }
 
     const latestI = C.dates.length - 1;
+    // Summary statistics of the total (see summaryStats): its changes or flows, monthly view only.
+    const sumEl = h("p", { class: "summary-line stats-line no-tr", hidden: true });
+    let sumItems = [];
+    function drawSumStats() {
+      const SG = ind.stats && ind.stats.sum_groups;
+      if ((C.hide_total && !SG) || state.yearly || state.quarterly) { sumItems = []; statsLine(sumEl, []); return; }
+      const tot = SG ? C.dates.map((d, i) => (C.groups.some((g) => g.values[i] === null) ? null : C.groups.reduce((a, g) => a + g.values[i], 0))) : C.total.values;
+      // Shares that add up to 100 have no total worth summarizing.
+      const tv = tot.filter((v) => v !== null);
+      if (PC && tv.length && tv.filter((v) => Math.abs(v - 100) < 5).length > tv.length / 2) { sumItems = []; statsLine(sumEl, []); return; }
+      // Contributions in percentage points add up to a percent change.
+      const pctTotal = !PC || pp.suffix === " pp";
+      const t = pctTotal ? INDEX_TRANSFORMS.yoy : { ...pp, change: false };
+      sumItems = summaryStats({ ind, dates: C.dates, y: tot, t, tkey: pctTotal ? "yoy_total" : "level",
+        units: pctTotal ? "%" : (ind._units_en || ind.units), start: startDate(ind.last_obs, RANGES[state.range]) });
+      const lead = SG ? (ind.stats.label || tr("Total")) : C.total.label;
+      statsLine(sumEl, sumItems, !PC ? `${lead}${LANG === "es" ? ", var. i.a." : ", y/y growth"}` : lead);
+    }
     const onPNG = () => state.quarterly ? (() => { const qt = quarterlyTraces(); return exportPNG(ind, qt.tr, `${ind.units} · quarterly${qt.open ? " · *quarter in progress" : ""}`, pp, `${ind.id}_quarterly.png`, { barmode: "relative", xcategory: true }); })()
       : state.yearly ? (() => { const yt = yearlyTraces(); return exportPNG(ind, yt.tr, `${ind.units} · yearly${yt.partial ? " · " + yearlyNote(CY.how, yt.partial, CY.note) : ""}`, pp, `${ind.id}_yearly.png`, { barmode: C.style === "area" ? "stack" : "relative", xcategory: true }); })()
       : exportPNG(ind, barTraces(), `${PC ? ind.units : `Contributions to year-over-year ${C.total.label} growth, percentage points`} · latest: ${fP(C.dates[latestI])}`,
-      pp, `${ind.id}_contributions.png`, { barmode: "relative" });
+      pp, `${ind.id}_contributions.png`, { barmode: "relative", tiles: sumItems });
     const onLinePNG = () => exportPNG({ ...ind, title: C.lines_title || "Components, year-over-year change" }, lineTraces(), `Percent change vs. same ${ind.frequency === "Q" ? "quarter" : "month"} a year earlier · constant 2004 prices`, pct, `${ind.id}_lines_yoy.png`);
     const onCSV = () => {
       if (state.quarterly) {
@@ -4353,7 +4432,7 @@
     appendAll(card, 
       h("p", { class: "hint" }, C.hide_total ? `${fP(C.dates[latestI])}: ${parts}` : `${fP(C.dates[latestI])}: ${C.total.label} ${fmtNum(C.total.values[latestI], PC ? pp : pct)}${yoyWord} — ${parts}`),
       h("div", { class: "controls" }, ySeg, h("span", { class: "spacer" }), rSeg),
-      hintEl, methodLine(ind), barEl,
+      sumEl, hintEl, methodLine(ind), barEl,
       lineKeys.length ? chartActions(ind, onPNG, onCSV) : null,
       lineTitleEl,
       lineKeys.length ? chipsEl : null, lineKeys.length ? lineEl : null);
@@ -4404,13 +4483,194 @@
     for (let k = 1; k < L.length; k++) if (L[k].p - L[k - 1].p < gap) L[k].p = L[k - 1].p + gap;
     return L.map((l) => ({
       x: l.x, y: log ? Math.log10(l.y) : l.y, xref: "x", yref: "y", xanchor: "left", yanchor: "middle", showarrow: false,
-      ax: 0, ay: 0, xshift: 5, yshift: 0, _endLabel: true,
+      ax: 0, ay: 0, xshift: 5, yshift: 0, _endLabel: true, _v: l.y,
       // the label sits at its pushed-apart position; a short shift in pixels is not known here, so move y instead
       ...(Math.abs(l.p - pos(l.y)) > 1e-9 ? { y: l.p } : {}),
       text: `<b>${fmt(l.y)}</b>`, font: { size: 11, color: l.color || cssVar("--ink") }, _lightColor: l.light || l.color,
     }));
   }
   const endLabelWidth = (ends) => Math.min(80, 12 + 7 * Math.max(...ends.map((a) => a.text.replace(/<[^>]+>/g, "").length)));
+
+  // ---------- summary statistics ----------
+  // Three numbers about the series on screen, chosen by rule from what kind of series it is; a line
+  // of text under the controls, and tiles in the PNG. Kinds:
+  //   flow   amounts per period that add up (millions of dollars or pesos a month): total over the
+  //          range shown, the latest against a year earlier, this year's average against last year's
+  //   rate   percentages and changes (inflation, unemployment, y/y growth): the latest, a year
+  //          earlier (or the 12-month change of a monthly rate), the average of the current term
+  //   level  prices, indices, stocks: the latest, the change over the range shown, the change since
+  //          the current term began (bounded scales such as a 0-10 rating: changes in points)
+  // A dated break (registry `bands` with break: true, e.g. a debt swap that changed the index)
+  // starts totals and changes at the break. A number the data cannot support is left out.
+  // Registry `stats`: false hides the line; {ratio: true} adds latest / comparison as "N×".
+  const ES_ = () => LANG === "es";
+  const L_ = (en, es) => (ES_() ? es : en);
+  const nf = (v, d) => Number(v).toLocaleString(LOCALE, { minimumFractionDigits: d, maximumFractionDigits: d });
+  const autoDigits = (v) => (Math.abs(v) >= 100 ? 0 : Math.abs(v) < 1 && v !== 0 ? 2 : 1);
+  const signed = (v, d, sfx = "") => (v > 0 ? "+" : v < 0 ? "−" : "") + nf(Math.abs(v), d) + sfx;
+  // Amounts in millions: "US$ 3,070 m", "US$ 56.4 bn" ("US$ 56,4 mil M" in Spanish).
+  function moneyFmt(v, cur) {
+    const a = Math.abs(v), s = v < 0 ? "−" : "", c = cur === "usd" ? "US$ " : "$ ";
+    if (a >= 1e6) return `${s}${c}${nf(a / 1e6, 1)} ${L_("tn", "billones")}`;
+    if (a >= 1e4) return `${s}${c}${nf(a / 1e3, 1)} ${L_("bn", "mil M")}`;
+    return `${s}${c}${nf(a, 0)} ${L_("m", "M")}`;
+  }
+  // How to write a value of this card in its units.
+  function valueFmt(ind, units, t, ref) {
+    const u = (units || "").toLowerCase();
+    if (t && t.change) return (v) => fmtNum(v, t).replace(/^-/, "−");
+    // Decimals: the card's headline digits, or by the size of the latest value (for all values alike).
+    const bounded = /^(rating|index, 0|gini|hhi|times|years)/.test(u);
+    const a = Math.abs(ref || 0);
+    const d = ind.headline && ind.headline.digits !== undefined && ind.headline.transform !== "yoy" ? ind.headline.digits
+      : ref === undefined ? null : bounded ? (a < 10 ? 2 : a < 100 ? 1 : 0) : a >= 100 ? 0 : a >= 10 ? 1 : 2;
+    if (/^millions of us dollars/.test(u)) return (v) => moneyFmt(v, "usd");
+    if (/^billions of us dollars/.test(u)) return (v) => moneyFmt(v * 1000, "usd");
+    if (/^pesos per month/.test(u)) return (v) => `$ ${nf(v, 0)}`;
+    if (/^millions of pesos/.test(u)) return (v) => moneyFmt(v, "ars");
+    if (/^us dollars/.test(u)) return (v) => `US$ ${nf(v, d !== null ? d : autoDigits(v))}`;
+    if (/^basis points/.test(u)) return (v) => `${nf(v, 0)} ${L_("bp", "pb")}`;
+    if (/^pesos per us dollar/.test(u)) return (v) => `$ ${nf(v, d !== null ? d : v >= 100 ? 0 : 2)}`;
+    if (/^(%|percentage points|probability)/.test(u)) return (v) => (v < 0 ? "−" : "") + nf(Math.abs(v), 1) + (u.startsWith("percentage points") ? " pp" : "%");
+    return (v) => (v < 0 ? "−" : "") + nf(Math.abs(v), d !== null ? d : autoDigits(v));
+  }
+  function statsKind(ind, units, t, tkey) {
+    const u = (units || "").toLowerCase();
+    if (t && t.change) return "rate";
+    if (tkey === "share") return null;
+    if (/^(%|percentage points|probability)/.test(u) || ind.measure === "rate") return "rate";
+    if (ind.measure === "flow" && /^(millions|billions) of (us dollars|pesos)(, .* prices)?$/.test(u)) return "flow";
+    if (/^(rating|index, 0|gini|hhi|times|years)/.test(u)) return "bounded";
+    return "level";
+  }
+  // o: {ind, dates, y, levels, t, tkey, units, start, compare: {label, y}, freq}
+  function summaryStats(o) {
+    const { ind, dates, y, t } = o;
+    const S = ind.stats === undefined ? {} : ind.stats;
+    if (S === false || S === "False") return [];
+    const freq = o.freq || ind.frequency;
+    const kind = S.kind || statsKind(ind, o.units, t, o.tkey);
+    if (!kind || !y || !y.length) return [];
+    const per = (iso) => fmtPeriod(iso, freq);
+    let L = y.length - 1;
+    while (L >= 0 && (y[L] === null || y[L] === undefined || !Number.isFinite(y[L]))) L--;
+    if (L < 0) return [];
+    const fmt = valueFmt(ind, o.units, t, y[L]);
+    const ok = (i) => i !== undefined && i >= 0 && y[i] !== null && y[i] !== undefined && Number.isFinite(y[i]);
+    // Window start: the range shown, or a later dated break.
+    const brk = (ind.bands || []).filter((b) => b.break && b.break !== "False" && b.start <= dates[L]).map((b) => b.start).sort().pop();
+    const brkLabel = brk ? (ind.bands.find((b) => b.start === brk).label || "") : "";
+    let s0 = o.start ? dates.findIndex((d) => d >= o.start) : 0;
+    if (s0 < 0) s0 = 0;
+    let fromBreak = false;
+    if (brk && dates[s0] < brk) { s0 = dates.findIndex((d) => d >= brk); fromBreak = true; }
+    while (s0 < L && !ok(s0)) s0++;
+    // A year earlier: the same month or quarter, or for daily data the last day on or before.
+    const yearAgo = (i) => {
+      if (freq === "D") { const ms = dates.map(isoMs); const j = lastOnOrBefore(ms, isoMs(dates[i]) - 365 * dayMs); return j; }
+      return dates.indexOf(addMonths(dates[i], -12));
+    };
+    const A = yearAgo(L);
+    const term = PRESIDENCIES.length && !ind.no_presidency && !ind.plain_level ? PRESIDENCIES.find((p) => !p.end) : null;
+    const pct = (a, b) => (a / b - 1) * 100;
+    const pctTxt = (a, b) => { const r = a / b; return r >= 10 ? `${nf(r, 0)} ${L_("times", "veces")}` : signed(pct(a, b), Math.abs(pct(a, b)) >= 10 ? 0 : 1, "%"); };
+    const cmp = o.compare && ok(L) ? (() => { let j = L; while (j >= 0 && (o.compare.y[j] === null || o.compare.y[j] === undefined)) j--; return j >= 0 && dates[L] && isoMs(dates[L]) - isoMs(dates[j]) < 10 * dayMs ? o.compare.y[j] : null; })() : null;
+    const cmpTxt = cmp === null ? "" : `; ${o.compare.label} ${fmt(cmp)}${S.ratio && cmp ? ` (${nf(y[L] / cmp, 1)}×)` : ""}`;
+    const items = [];
+    const latest = { big: fmt(y[L]), small: `${L_(freq === "D" ? "on" : "in", freq === "D" ? "el" : "en")} ${per(dates[L])}${cmpTxt}` };
+    if (kind === "flow") {
+      const ii = []; for (let i = s0; i <= L; i++) if (ok(i)) ii.push(i);
+      const cap = freq === "Q" ? 21 : freq === "Y" ? 6 : 61;   // five years
+      if (ii.length > cap && freq !== "D") {
+        // A long range: the last twelve months (four quarters) against the twelve before.
+        const k = freq === "Q" ? 4 : freq === "Y" ? 1 : 12;
+        const last = ii.slice(-k), prev = ii.slice(-2 * k, -k);
+        if (last.length === k && prev.length === k && dates.indexOf(addMonths(dates[last[0]], -12)) === prev[0]) {
+          const s1 = last.reduce((a, i) => a + y[i], 0), s2 = prev.reduce((a, i) => a + y[i], 0);
+          const span = freq === "Q" ? L_("last four quarters", "últimos cuatro trimestres") : freq === "Y" ? per(dates[L]) : L_("last 12 months", "últimos 12 meses");
+          items.push({ big: fmt(s1), small: L_(`total, ${span} to ${per(dates[L])} (${fmt(s2)} in the ${freq === "Q" ? "four quarters" : "12 months"} before)`, `total, ${span} a ${per(dates[L])} (${fmt(s2)} en ${freq === "Q" ? "los cuatro trimestres" : "los 12 meses"} anteriores)`) });
+        }
+      } else if (ii.length > 1 && freq !== "D") {
+        const tot = ii.reduce((a, i) => a + y[i], 0);
+        const n = ii.length, unit = freq === "Q" ? L_(n === 1 ? "quarter" : "quarters", n === 1 ? "trimestre" : "trimestres") : freq === "Y" ? L_(n === 1 ? "year" : "years", n === 1 ? "año" : "años") : L_(n === 1 ? "month" : "months", n === 1 ? "mes" : "meses");
+        items.push({ big: fmt(tot), small: fromBreak
+          ? L_(`total since ${brkLabel} (${per(dates[ii[0]])} – ${per(dates[L])})`, `total desde ${brkLabel} (${per(dates[ii[0]])} – ${per(dates[L])})`)
+          : L_(`total, ${per(dates[ii[0]])} – ${per(dates[L])} (${n} ${unit})`, `total, ${per(dates[ii[0]])} – ${per(dates[L])} (${n} ${unit})`) });
+      }
+      items.push(ok(A) ? { big: fmt(y[L]), small: `${L_("in", "en")} ${per(dates[L])}, ${L_("vs.", "frente a")} ${fmt(y[A])} ${L_("a year earlier", "un año antes")}${y[L] > 0 && y[A] > 0 ? ` (${pctTxt(y[L], y[A])})` : ""}` } : latest);
+      if (freq === "M" || freq === "Q") {
+        // This year so far against the same months of last year; early in the year, the last 12 months against the 12 before.
+        const yr = dates[L].slice(0, 4), m = Number(dates[L].slice(5, 7));
+        const avg = (a, b) => { const v = []; for (let i = 0; i < dates.length; i++) if (dates[i] >= a && dates[i] <= b && ok(i)) v.push(y[i]); return v.length ? { v: v.reduce((p, q) => p + q, 0) / v.length, n: v.length } : null; };
+        const word = freq === "Q" ? L_("quarterly", "trimestral") : L_("monthly", "mensual");
+        if (m >= 3 || freq === "Q") {
+          const a1 = avg(`${yr}-01-01`, dates[L]), a0 = avg(`${+yr - 1}-01-01`, addMonths(dates[L], -12));
+          const q = Math.floor((m - 1) / 3) + 1, Qp = L_("Q", "T");
+          const span = freq === "Q" ? (q === 4 ? yr : q === 1 ? `${Qp}1 ${yr}` : `${Qp}1–${Qp}${q} ${yr}`) : m === 12 ? yr : `${fmtShortMonth(`${yr}-01-01`).split(" ")[0]}–${fmtShortMonth(dates[L]).split(" ")[0]} ${yr}`;
+          if (a1 && a0 && a1.n === a0.n && (!brk || `${+yr - 1}-01-01` >= brk)) items.push({ big: fmt(a1.v), small: L_(`${word} average, ${span} (${fmt(a0.v)} in ${+yr - 1})`, `promedio ${word}, ${span} (${fmt(a0.v)} en ${+yr - 1})`) });
+        } else {
+          const a1 = avg(addMonths(dates[L], -11), dates[L]), a0 = avg(addMonths(dates[L], -23), addMonths(dates[L], -12));
+          if (a1 && a0 && a1.n === 12 && a0.n === 12 && (!brk || addMonths(dates[L], -23) >= brk)) items.push({ big: fmt(a1.v), small: L_(`${word} average, last 12 months (${fmt(a0.v)} in the 12 before)`, `promedio ${word}, últimos 12 meses (${fmt(a0.v)} en los 12 anteriores)`) });
+        }
+      }
+      return items.slice(0, 3);
+    }
+    if (kind === "rate") {
+      items.push(latest);
+      const lv = o.levels;
+      if ((o.tkey === "mom") && lv && ind.measure !== "rate" && freq !== "D") {
+        const yy = transform(dates, lv, "yoy", ind.measure, freq);
+        if (yy[L] !== null && yy[L] !== undefined) items.push({ big: fmtNum(yy[L], INDEX_TRANSFORMS.yoy).replace(/^-/, "−"), small: freq === "Q"
+          ? L_(`year over year in ${per(dates[L])}`, `interanual en ${per(dates[L])}`) : L_(`over the 12 months to ${per(dates[L])}`, `en los 12 meses a ${per(dates[L])}`) });
+      } else if (ok(A) && (!brk || dates[A] >= brk)) {
+        const dpp = y[L] - y[A];
+        const unit = t && t.change ? (t.suffix || "").trim() === "pp" ? " pp" : " pp" : " pp";
+        items.push({ big: fmt(y[A]), small: L_(`a year earlier (${per(dates[A])}); change ${signed(dpp, 1, unit)}`, `un año antes (${per(dates[A])}); variación ${signed(dpp, 1, unit)}`) });
+      }
+      if (term) {
+        const row = termStats(dates, y, false, ind.measure, freq, o.tkey || "level", lv).find((r) => r.p.id === term.id);
+        const w = termWindow(term, freq);
+        if (row && row.avg !== null && row.avg !== undefined && (!brk || w.first >= brk)) {
+          const geo = isGeometric(o.tkey, ind.measure), ann = isAnnualized(o.tkey, ind.measure);
+          const f = ann ? (v) => fmtNum(v, INDEX_TRANSFORMS.yoy).replace(/^-/, "−") : fmt;
+          items.push({ big: f(row.avg), small: ann
+            ? L_(`a year on average under ${term.short} (annualized since ${per(w.base)})`, `anual en promedio con ${term.short} (anualizado desde ${per(w.base)})`)
+            : geo ? L_(`a ${freq === "Q" ? "quarter" : "month"} on average under ${term.short} (geometric, since ${per(row.first)})`, `${freq === "Q" ? "trimestral" : "mensual"} en promedio con ${term.short} (geométrico, desde ${per(row.first)})`)
+            : L_(`average under ${term.short}, since ${per(row.first)}`, `promedio con ${term.short}, desde ${freq === "D" ? "el " : ""}${per(row.first)}`) });
+        }
+      } else {
+        const ii = []; for (let i = s0; i <= L; i++) if (ok(i)) ii.push(i);
+        if (ii.length > 2) items.push({ big: fmt(ii.reduce((a, i) => a + y[i], 0) / ii.length), small: L_(`average since ${per(dates[ii[0]])}`, `promedio desde ${freq === "D" ? "el " : ""}${per(dates[ii[0]])}`) });
+      }
+      return items.slice(0, 3);
+    }
+    // level / bounded
+    items.push(latest);
+    const chg = (i) => (kind === "bounded" ? signed(y[L] - y[i], Math.abs(y[L]) < 10 ? 2 : Math.abs(y[L]) >= 100 ? 0 : 1) : y[i] > 0 && y[L] > 0 ? pctTxt(y[L], y[i]) : null);
+    if (ok(s0) && s0 < L) {
+      const c = chg(s0);
+      if (c) items.push({ big: c, small: fromBreak
+        ? L_(`since ${brkLabel} (${fmt(y[s0])} ${freq === "D" ? "on" : "in"} ${per(dates[s0])})`, `desde ${brkLabel} (${fmt(y[s0])} ${freq === "D" ? "el" : "en"} ${per(dates[s0])})`)
+        : L_(`since ${per(dates[s0])} (${fmt(y[s0])})`, `desde ${freq === "D" ? "el " : ""}${per(dates[s0])} (${fmt(y[s0])})`) });
+    }
+    if (term) {
+      const w = termWindow(term, freq);
+      let b = dates.indexOf(w.base);
+      if (b < 0 && (freq === "D" || freq === "W")) b = lastOnOrBefore(dates.map(isoMs), isoMs(w.base));
+      if (freq === "D") while (b > 0 && !ok(b)) b--;   // overlays share one calendar: the last day this series has
+      const c = ok(b) && (!brk || dates[b] >= brk) && b < L ? chg(b) : null;
+      if (c) items.push({ big: c, small: L_(`since ${term.short} took office (${fmt(y[b])} ${freq === "D" ? "on" : "in"} ${per(dates[b])})`, `desde que asumió ${term.short} (${fmt(y[b])} ${freq === "D" ? "el" : "en"} ${per(dates[b])})`) });
+    } else if (ok(A) && (!brk || dates[A] >= brk)) {
+      const c = chg(A);
+      if (c) items.push({ big: c, small: L_(`over a year (${fmt(y[A])} ${freq === "D" ? "on" : "in"} ${per(dates[A])})`, `en un año (${fmt(y[A])} ${freq === "D" ? "el" : "en"} ${per(dates[A])})`) });
+    }
+    return items.slice(0, 3);
+  }
+  // The line of text under the controls.
+  function statsLine(el, items, lead) {
+    el.replaceChildren(...(lead && items.length ? [h("span", { class: "stat-lead" }, lead + ": ")] : []), ...items.flatMap((it, n) => [...(n ? [h("span", { class: "sep" }, " · ")] : []), h("span", { class: "stat" }, h("b", {}, it.big), " ", it.small)]));
+    el.hidden = !items.length;
+  }
 
   // ---------- headline tiles ----------
   // Summary boxes of a card: its headline and any extra `tiles`.
@@ -4642,14 +4902,16 @@
     const SKIP = new Set(["id", "source_id", "values", "dates", "key", "kind", "topic", "measure", "frequency", "variant", "transform", "range",
       "default", "headline", "emphasis", "muted", "overlay_default", "composition", "anchor", "slug", "sign", "color", "style", "file", "path",
       "source", "status", "party", "status_id", "role", "ranges", "transforms", "bar_transforms", "bar_transform", "of", "rem", "freq", "good", "ind", "unit",
-      "line_styles", "ratio", "group"]);
+      "line_styles", "ratio", "group", "sum_groups"]);
     // Summary boxes: only their label and subtitle are text.
     const box = (b) => { if (b && typeof b === "object") for (const f of ["label", "sub"]) if (typeof b[f] === "string") b[f] = walk(b[f]); return b; };
     const walk = (x) => {
       if (typeof x === "string") { const k = x.trim(); return C[k] !== undefined ? C[k] : C[k.split(/\s+/).join(" ")] !== undefined ? C[k.split(/\s+/).join(" ")] : x; }
       if (Array.isArray(x)) return x.length > 400 ? x : x.map(walk);   // long arrays are data, not text
       if (x && typeof x === "object") {
+        if (typeof x.units === "string" && x._units_en === undefined) x._units_en = x.units;   // the summary statistics read the English units
         for (const key of Object.keys(x)) {
+          if (key === "_units_en") continue;
           if (key === "headline" || key === "tiles") { x[key] = Array.isArray(x[key]) ? x[key].map(box) : box(x[key]); continue; }
           if (SKIP.has(key)) continue;
           x[key] = key === "component_noun" && typeof x[key] === "string" ? ((I18N.nouns || {})[x[key]] || x[key]) : walk(x[key]);

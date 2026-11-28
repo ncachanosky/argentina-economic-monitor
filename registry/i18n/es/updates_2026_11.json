@@ -461,5 +461,8 @@
  "Crude oil, Brent (US$/barrel)": "Petróleo crudo, Brent (US$/barril)",
  "Natural gas, US Henry Hub (US$/MMBtu)": "Gas natural, Henry Hub EE. UU. (US$/MMBtu)",
  "Natural gas, Europe TTF (US$/MMBtu)": "Gas natural, TTF Europa (US$/MMBtu)",
- "About the commodity prices": "Sobre los precios de las materias primas"
+ "About the commodity prices": "Sobre los precios de las materias primas",
+ "Net purchases": "Compras netas",
+ "Total debt": "Deuda total",
+ "Total": "Total"
 }

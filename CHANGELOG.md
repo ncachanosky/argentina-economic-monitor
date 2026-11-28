@@ -102,6 +102,14 @@ section becomes its notes.
   economies, any country addable); the choice applies to every card. A snapshot table at the top;
   each card also ranks the group for a chosen year. New sources: IMF SDMX API, World Bank API;
   the EFW, V-Dem and SMI adapters also write all-country tables.
+- Summary line on most charts: three numbers chosen by rule from the kind of series shown (flows:
+  total over the range, latest vs. a year earlier, this year's average vs. last year's; rates:
+  latest, a year earlier or the 12-month change, average of the current presidency; levels:
+  latest, change over the range, change since the current president took office), recomputed
+  with the range and view; marked breaks start totals and changes. Per-card overrides in the
+  registry (`stats`). The same numbers are tiles in the PNG download. Downloads also highlight
+  the latest bar (single-series bar charts, with values on the bars up to 25 bars) and mark the
+  last point of each line with a dot and its value. Methodology: "Summary line and chart tiles".
 - Country risk: Argentina's spread is now shown by default against the median of ten other
   Latin American countries (EMBI Global Diversified, daily from 2007); each country can still
   be added. Chart downloads: a legend too long for one line (presidency colors, many countries)

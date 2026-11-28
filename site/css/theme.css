@@ -222,6 +222,11 @@ a:hover { color: var(--accent-ink); }
 .summary-line b { color: var(--ink); font-weight: 600; }
 .summary-line .sw { display: inline-block; width: 14px; height: 3px; vertical-align: middle; margin: 0 5px 2px 0; border-radius: 2px; }
 .summary-line .sw.dashed { background: none !important; border-top: 2px dashed currentColor; height: 0; }
+.stats-line { line-height: 1.55; }
+.stats-line .stat { white-space: normal; }
+.stats-line .stat b { color: var(--accent-ink); font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.stats-line .stat-lead { color: var(--ink); font-weight: 600; }
+.stats-line .sep { color: var(--ink-3); }
 .episode-key { font-family: var(--font-ui); font-size: 12.5px; color: var(--ink-2); margin: 0 0 6px; padding-left: 20px; }
 .episode-key li::marker { color: var(--highlight); font-weight: 700; }
 .band-key { display: flex; flex-wrap: wrap; gap: 4px 18px; font-family: var(--font-ui); font-size: 12.5px; color: var(--ink-2); margin: 0 0 4px; }
