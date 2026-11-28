@@ -2396,7 +2396,12 @@
         const shapes = pf && Y.includes(pf) ? [{ type: "rect", xref: "x", yref: "paper", x0: `${pf}-01-01`, x1: `${Y[Y.length - 1]}-12-31`, y0: 0, y1: 1, fillcolor: cssVar("--grid"), opacity: 0.35, line: { width: 0 }, layer: "below" }] : [];
         const ann = shapes.length ? [{ xref: "x", yref: "paper", x: `${pf}-01-01`, y: 1, xanchor: "left", yanchor: "bottom", showarrow: false, text: ES ? `Proyecciones del FMI (WEO ${D.edition.replace("April", "abril").replace("October", "octubre")})` : `IMF projections (WEO, ${D.edition})`, font: { size: 11, color: cssVar("--ink-2") } }] : [];
         chartEl.style.height = "";
-        Plotly.react(chartEl, traces, baseLayout({ xaxis: { hoverformat: "%Y", range: [`${state.from && state.from > Y[0] ? state.from : Y[0]}-01-01`, `${Y[Y.length - 1]}-12-31`] }, yaxis: { tickformat: nd() === 0 ? ",.0f" : undefined },
+        // The y axis fits the years shown, not the whole series (1989's hyperinflation would flatten "Since 2000").
+        const y0 = state.from && state.from > Y[0] ? state.from : Y[0];
+        const vis = traces.flatMap((t) => t.y.filter((v, k) => v !== null && v !== undefined && Y[k] >= y0));
+        const lo = Math.min(...vis), hi = Math.max(...vis), pad = (hi - lo) * 0.06 || 1;
+        const yr = vis.length ? [lo - pad, hi + pad] : undefined;
+        Plotly.react(chartEl, traces, baseLayout({ xaxis: { hoverformat: "%Y", range: [`${y0}-01-01`, `${Y[Y.length - 1]}-12-31`] }, yaxis: { tickformat: nd() === 0 ? ",.0f" : undefined, ...(yr ? { range: yr, autorange: false } : {}) },
           extra: { showlegend: true, legend: { orientation: "h", x: 0, y: 1.1, yanchor: "bottom", font: { color: cssVar("--ink") } }, hovermode: "x unified", shapes, annotations: ann, margin: { l: 56, r: 16, t: 56, b: 36 } } }), PLOT_CONFIG);
         hint.textContent = (ES ? `${tr(D.label)}, ${tr(D.unit)}. La Argentina, la mediana de ${gname} (${members.length} países, cada año sobre los que tienen datos) y países elegidos.` : `${tr(D.label)}, ${tr(D.unit)}. Argentina, the median of ${gname} (${members.length} countries; each year over those with data) and chosen countries.`)
           + (pf ? (ES ? ` Desde ${pf}, estimaciones y proyecciones del FMI (líneas discontinuas).` : ` From ${pf}, IMF estimates and projections (dashed).`) : "");
@@ -2412,7 +2417,7 @@
         });
         png = { traces: exp, sub: `${tr(D.label)} · ${tr(D.unit)}${pf ? (ES ? ` · desde ${pf}, proyecciones del FMI` : ` · from ${pf}, IMF projections`) : ""}`, file: `${ind.id}_${INTL.group}.png`,
           extras: { shapes: shapes.map((sh) => ({ ...sh, _lightFill: "rgba(236, 233, 227, 0.6)" })),
-            xaxis: { range: [`${state.from && state.from > Y[0] ? state.from : Y[0]}-01-01`, `${Y[Y.length - 1]}-12-31`] } } };
+            xaxis: { range: [`${y0}-01-01`, `${Y[Y.length - 1]}-12-31`] }, ...(yr ? { yaxis: { range: yr } } : {}) } };
         csv = { name: `${ind.id}_${INTL.group}`, header: ["year", intlName(HOME), `median ${g.label}`, ...[...state.picks].map(intlName)],
           rows: Y.map((y, i) => [y, (D.values[HOME] || [])[i], med[i], ...[...state.picks].map((c) => D.values[c][i])]) };
       } else {

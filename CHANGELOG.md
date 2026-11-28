@@ -105,6 +105,8 @@ section becomes its notes.
 - International page: each chart's summary line gives Argentina's value (with the IMF's projection
   for the next year), its rank in the chosen group and the group median; the charts now have a PNG
   download (over time, or the ranking: up to 41 bars, centered on Argentina in large groups).
+- International page: the y axis fits the years shown (Argentina's 1989 inflation no longer flattens
+  the "Since 2000" view).
 - PNG downloads follow the site's theme: in dark mode the image comes out dark.
 - Summary line on most charts: three numbers chosen by rule from the kind of series shown (flows:
   total over the range, latest vs. a year earlier, this year's average vs. last year's; rates:
